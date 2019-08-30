@@ -1,0 +1,456 @@
+Parameters of Epics.
+
+Any comment may be placed before ---- line.
+you must give a value for each row at column corresponding to
+ "specified".   If you give / only there, standard is taken. No items
+ should be deleted or added.  If standard column has only ",", no
+ standard value is defined.
+
+The name field must start from the 2nd column.  
+Blank lines, if any,  are ignored. If the first 2 columns are blank, 
+the line is regarded as a comment line and ignored.
+
+name   standard     specified    meaning              
+---------------------------------------------------------------------
+ AngleB    f   t       /   Deflection at bremsstrahlung is taken or
+                             not.   This can be neglected in most of 
+                             applications.
+ DtMax     100.          / very rough world size in r.l( obsolete )
+                   
+ Eabsorb   6   14    / See also Photo.  To control energy deposit
+	                   treatment  when a particle energy becomes 
+                           lower than the given  minimum energy. Each of
+               the bit of Eabsorb (LSB is the rightmost bit) specifies 
+               Normally 6 or 14  may be used.  
+               In many cases, min of 100 keV kinetic energy with 6 and 0
+               don't make any sizable difference, but in the case of BGO
+               or similar heavy crystals,  6 and 0 give a sizable difference
+               with 100keV min.  To get the same result for 6 and 0, 
+               EminElec=10 keV is needed.   (Many compton electrons < 100 keV
+               will appear and if all of them are neglected 5 % underestimation
+               could occure in BGO. )
+
+           bit 1:  When the photoelectric effect occurs, some of the
+               photon energy becomes absorbed by the atom (shell energy)
+               and  the energy conservation apparently breaks.  If this
+               bit is on, such an energy is regarded as the  energy loss 
+               in the media and included in Move.dEeff. If 0, the
+	       missing energy is converted to a charactristic X-ray.
+               Thus, bit 1 is 0 is more accurate than bit 1 is 1.
+	       However, if the incident energy is high and your energy
+               loss counter is not like BGO (e.g, plastic scinti),
+	       you may safely bit 1 on.
+           bit 2:  When a photon energy becomes lower than EminGamma, the
+               photon tracking is ceased. If the bit is on, the photon
+               energy is regarded as absorbed at the point and included
+               in the energy deposit.
+           bit 3: When an electron or positron energy becomes lower than
+               EminElec, the tracking is ceased. If this bit is on, the
+               remaining kinetic energy of the electron or the posititron
+               energy + electron mass is regarded as absorbed at the point
+               and included in the energy deposit.
+           bit 4: When the kinetic energy of a proton/heavy ion  becomes 
+               < KEmin,  its tracking is ceased. If the bit is on,
+               the kinetic energy is regarded as absorbed at the point
+               and included in the energy deposit.
+           bit 5: When the kinetic energy of a neutron becomes < EminH
+               its tracking is ceased. If the bit is on, the kinetic energy
+               is regarded as absorbed at the point and included in
+               energy deposit.
+           bit 6: When the total energy of an anti-proton or anti-neutron
+                becomes < KEmin, its tracking is ceased. If the bit is on,
+               its( energy +  mass) is regarded as absorbed at the point
+               and included in Move.dEeff.
+           bit 7: When the total energy of  a particle which may decay
+                soon after stopping (pi, K, mu) becomes  < KEmin, its
+               tracking is ceased.  If the bit is on, its kinetic energy
+               is regarded as absorbed at the point and included in
+               energy deposit.
+           bit 8: For other particles not falling in the category shown
+               above, their tracking is ceased when their kinetic energy
+               becomes < KEmin.  If the bit is on, its energy is regarded
+               as absorbed at the point and included in the energy deposit.
+
+                           
+ Eanihi   10.e-3         / At E>Eanihi (GeV), e+ annihilation is 
+                           neglected
+ Ecut     100.e-6         / cut off gamma energy for brems (obsolete)
+ EdepDedx   t             / dE/dx is energy dependent or not
+                          (don't change;f is used in test mode)
+ ElowerBndPair 2.e-3 1.022e-3     / At E<ElowerBndPair(GeV), pair creation is
+                           neglected (may be as low as threshold )
+ ModifyFile  ' '  /     give path if modifier bit is on in config.
+ AutoEmin  2           /  automatic determination of EminElec etc
+ EminElec   521.e-6        / Min of electron total energy (GeV) treated.
+                             In some case you may put this as low as
+                            (511+few tens) keV. 
+ EminGamma  10.e-6        /  Min of  gamma  energy. 
+                              If environment is "sp" and you want to
+                              treat synchrotron radiation, you may 
+                              give very low energy such as 0.1 keV.
+                      For the minimum energy of mu, pi, ... see
+                      KEmin later.
+ EminH      20.e-3         / minimum kinetic energy of neutrons (5 MeV)
+                      don't put this very small. 
+ Es       19.3d-3           / scattering const (GeV)(this is the one
+                              normally given as 21 MeV).
+                              (don't change except for  test purpose)
+ EupperBndCS   1.        / At E>EupperBndCS, compton scattering is
+                                neglected
+
+
+ IoTrace  21                  /  Fortran dev# for Trace output. Open/close
+	                         of the file is done by the system.
+                                 userhook routine. See Trace and TraceDir
+				 make this negative neutral particles 
+                                 should be included.
+ Knckon   t                   /  High energy knock-on process is explicitly
+                                 included or not
+                                 t--> knock-on of electron kinetic energy 
+                                 > RecoilKeMin  is treated as a discrete
+                                 process. 
+                                 f-->knock-on is included  as a continuous
+                                 ionization loss.
+ Molier   1               /  Moliere (1 or 2) or gaussian (0)
+                             multiple scattering.
+                             Moliere is better but Gaussian is faster
+                             so that  to have a quick look, you may
+                            use 0 in some case.  Gassian give normally 
+                            smaller spread. AlatCor may be 0 or 1 in any 
+                            case.  (result almost no change).  
+			    "2" uses completely different scheme than "1" for
+                            Moliere scattering: more rigouros,  and small
+                            angle restriction is removed.  But the result
+                            is almost completely the same as the case of 1 while
+                            cpu time increases 1.6 times !
+ Photo    t                   /  Photo electric absorption is  taken
+                                 into account or not.  If this is t,
+	               and media has high Z (such as Pb),  the K-shell
+	               energy becomes  close to the default EminGamma.
+                       Then apparent non-energy conservation may be seen
+                       in the sum of the deposited energy ( in the form of 
+                       ionization loss) in the media,
+	               since the energy of emitted electron is
+                              Ee = Eg - Eshell + Me.
+                       (If Eg ~ Eshell, there appear only a stopping electron
+                       and this means the energy of the photon disappears).
+	               The amount of energy lost in this process in Pb becomes
+                       as large as ~4% for electron incident case. That is,
+	               if the incident electron has 100 MeV, the total energy
+	               deposited in Pb is ~95 MeV. For Fe, it becomes as
+                       small as 0.1 %.  
+         Eabsorb detemines how to treat the energy absorbed in the atom.
+                       The default 1 (non 0) is to count the absorbed energy as
+                       a part of energies deposited in the media. 
+                       0 is to neglect such energy in the energy loss count.
+	              (Eabs = Eg - (Ee - Me) = Eshell) but characteristic
+                       X-ray is generated.
+ StoppingPw  1    /    use formula 1 for effective charge.  
+ SrimEmax    0.09   / GeV/n:  Above this, don't use Srim 
+                       (to get restricted dE/dx)
+ RecoilKeMin   0      /  Knock-on electron  of kinetic energy >
+                         RecoilKeMin is explicitly produced, if Knckon=t.
+                         Default 0 means that it is 
+                         replaced by min kinetic electron energy,i.e,
+		         (EminElec - electron_mass).
+                          ********************* 
+                          For very thin material(~30 micron m), 
+	                  you may think you have to  set EminElec and 
+	                  EminGamma very small; then, this value becomes
+	                  also very small; but such setting dose not give
+                          good result.  If you give very small Emin, 
+                          you must  set this  approx  max of
+	                  (10 keV.,  10*Z**2 eV)
+                          ******************** 
+                          Setting EminElec=100keV is always not bad.
+			  If AutoEmin !=0, not used.
+
+ Tcoef    5.                  /  When a sampled path length for a charged 
+                                 particle is > max(Tcoef*E, Tmin), 
+                                 the path is truncated to a shorter length.
+
+	                         This coefficient will be halved depending
+                                 on the value of (Molier, ALateCor)
+ Tmin     1.e-3               /  See Tcoef. 
+
+	                         This coefficient will be halved depending
+                                 on the value of (Molier, ALateCor)
+
+ TimeStruc  f                /  put time (sum of (path length)/beta cm) 
+                                in the track information or not
+
+ MagField    0               / 0--> no magnetic field exists
+                               1--> constant magnetic field is assumed
+                                    everywhere.  The magnitude is give
+                                    by (Bxu,Byu,Bzu)
+                               2--> You have to give the field depending
+                                    on the particle position. You must
+                                    modify  eppos2B.f in the UserHook to
+                                    give  the field  in the local coordinate
+                                    of the component there.
+
+ Bxu      0.                /  The x-component of uniform mag. field (T)
+ Byu      0.                /      y
+ Bzu      0.                /      z
+
+ ElecField    0             /  0--> no electric field.f
+                               1--> constant electric field everywhere
+                                   (Exu,Eyu,Ezu) is used
+                               2--> you have to modify eppos2B.f in 
+                                    UserHook.
+ Exu      0.              /  x-component of uniform electric field (V/m)
+ Eyu      0.              /  y
+ Ezu      0.              /  z
+ FreeC    t               /  Make f, only if you want to make the 
+                             incident pos. to be the interaction point.
+                             (continuous processes such as ionization is
+                              not regarded as the interaction)
+ EpsLeng 1.d-6            / Adjusting length in cm at the boundary of 
+                            a component.  If a particle crosses a 
+                            boundary of a component, the problem will
+                            arise if it belongs to the same component
+                            or another component. To avoid such a problem,
+	                    the position of the particle is adjusted to
+                            be at  b - w*EpsLeng, if it is to be kept
+                            in the same component or b + w*EpsLeng, if
+                            it is to be moved to the other component.
+                            Here
+                            b is the vector representing the computed
+                               boundary of the component the particle
+                               crosses,
+                            w the direction cosine vector of the particle.
+			    Becareful not to give a  value as large
+			    as some of the components.
+                              
+ ALateCor 1               / When we move a charged particle, we have to
+                            include multiple Coulomb scattering as a
+                            continuous process. The scattering causes
+                            angular deflection and lateral displacement
+                            simultaneously.  Both are correlated each
+                            other.  The correlated distribution is 
+                            available only for the Gaussian approximation
+                            of scattering and no practical distribution
+                            exists for Moliere's theory.
+                      0--> No correlation is taken into account. Only
+                           angular deflection is computed for the
+                           scattering.  The maximum distance a charged 
+                           particle can  travel is halved (see Tcoef,
+                           Tmin) to compensate the neglect of 
+                           displacement.
+                      1--> If Moliere=f (i.e, Gaussian scattering),
+                           angular lateral correlated distribution is
+                           used.  Tcoef and Tmin are used as they are.
+	                   If Moliere=t, the treatment is the same
+                           as the case of 0.
+                      2--> Scattering angle is sampled by Moliere's
+                           theory (if Moliere=t), or by Gaussian approx.
+                          (Moliere=f).  Independently of the above,
+                           the lateral displacement is computed by using
+                           Gaussian correlation.  Tcoef and Tmin are
+                           used as they are.
+
+ Sync     0               / Take synchrotron energy loss or not.
+                           0--> no synchrotron radiation process is
+                                considered.
+                           1--> dE/dx by synchrotron radiation is
+                                taken into account for electrons.  This
+                                loss is normally completely negligible.
+                           2--> If the media is "sp", explicit generation
+                                of synchrotron photon is tried.
+                                You must give a very low value to  EminGamma.
+                                (See  also SyncLoop)                        
+
+ SyncLoop 10.             / If magnetic field exists, an electron may make a
+                            semi-infinite cyclotron loop in the vacuum ("sp")
+                           To avoid such a case, if the electron runs  
+                           cyclotron radius * SyncLoop in vacuum, it is
+                           discarded.
+ MagPair  0              /  0 -> magnetic pair production is not considered
+                            1 -> magnetic pair production is considered
+                                 if Xai=B/Bc Eg/me > 0.05. Bc~4.3x10^13 g.
+
+          Lines follow describe how to treat muon energy loss.  
+          The ionization loss is always considered (but see  Knckon).
+          The direct pair creation, bremsstrahlung and  nuclear interaction
+          of muons become important at high energies  (normally at few 10
+          GeV for high (Z,A) material, and few 100 GeV for low (Z,A)).
+          Independently of the parameter values below, if the loss due to
+          each of the 3 processes is < 1 % of dE/dx(ionization), the 
+	  process is neglected.  Also, if a given media  has no table
+          for the muon energy loss, the loss is neglected. Among the 3
+          processes, nuclear interaction has least significance, then
+          follows bremsstrahlung. The direct pair creation has the largest
+	  contribution which mainly comes from a number of low energy
+          pair emissions. However, the nuclear interaction and bremsstrahlung
+          may sometimes give a large loss and lead to  big fluctuations.
+          
+          
+                 
+ MuPr     3       /   0--> direct e+e- pair creation by muon is completely
+                              neglected.   
+                      1--> energy loss by pari creation  is included
+	                   in dE/dx of muons as a continuous energy loss.
+                           Let v= E_transfer/Emu,  the loss here is
+                           Integra(vc:vmax) of (Emu vdsigma/dv).
+                           (vc ~0, vmax~1).  This is not to be used
+	                   for thin material and also for energy loss
+                           count in the media.
+	                   Can be used only to see muon energy after
+                           long path. But no range fluctution is
+                           included so that it is  useful to  see the diff.
+                           from MuPr=2 or 3. 
+                       2--> Energy loss by pair is included in dE/dx
+                            of muons as a continuous energy loss in
+                            which only the energy transfer smaller than 
+                            vmin(=10^-4) of the muon energy 
+	                    is included.  The  loss here is 
+                            Int(vc: vmin) of (Emu vdsigma/dv).
+	                    The portion of loss by v>vmin is treated as
+                            a stocastic  process. However, the product 
+                            from the pair creation itself is neglected.
+                            This can be used only if you want to see
+                            muon energy but not to see energy dedposit
+                            in the media.  Range fluctuation is included.
+
+                         3--> the same as 2, but the pair creation is
+                              explicitly  included to produce e+e-.
+                              This is most precise but if
+                              you want to see only muon energy 
+                              MuPr=2 may be employed.
+                   See NOTE below:
+ MuBr   3          /      The same as MuPr but for bremsstrahlung.
+                   See NOTE below:                   
+
+ MuNI   3          /     The same as MuPr but for muon nuclear interaction
+	                 For most of thin media or at low energies,
+                         nuclear interaction can be  neglected.
+                         The n.i is treated as a gamma-nucleus 
+                         interaction.  
+  **NOTE*** 
+            If you are interested in single muon peak (espeically
+            by low energy muons <10GeV), MuBr=MuPr=MuNI=0 is ok. 
+	    However, if you need average energy deposit by muon
+	    MuPr=MuBr=3 is needed.  Most frequent interaction among
+            these 3 is pair creation, and then brems.  Even so
+            pair creation is rather rare event and fluctuaion is very
+	    large so the MuPr=1 and MuPr=3 could give completely 
+            different result. However, single muon peak differecne by 0 or 3
+            is ~ 1% level.
+            See fig: http://Cosmos.n.kanagawa-u.ac.jp/Doc/muondEdx.pdf
+
+ KEmin  0          /      Minimum kinetic energy (GeV) of heavy particles
+                          (mu, pi, K, n, p, ... ) to be tracked. 
+                          (Some may be tracked even if 
+                          the energy becomes smaller than this when it can
+                          annihilate or decay to produce particles of kinetic
+                          energy > KEmin. If 0 is given, EminElec-Me is  
+                          taken.  If you are interested in only muons, 
+                          hadrons, and ignor the photo-hadron production,
+                          you may set EminElec, EminGamma very large while
+                          keeping this small. It is be very much effective
+                          to do a fast simulation. 
+
+ MsgLevel 1             / if 2, all (warning, error) messages are shown.
+                           if 1, some (important, fatal error) messages are
+                           shown.
+                           if 0 only fatal error is  shown.
+         *** now almost no meaning ****
+ MediaDir '$EPICSTOP/Data/Media'   /directory path to the media data.
+                                You can put a max of 3 paths by giving
+                                additional  two in below. The media
+                                name is searched for from the first path.
+                              You can use ".." or "."  but not "~".
+                              $EPICSTOP can be used if Cosmos version is
+                           > 7.58.o
+ MediaDir ' '              / another path
+ MediaDir ' '              / one more another path
+    TraceDir ' '   / now obso. put this  in sepicsfile  
+                       if ' ',  /tmp/$USER/trace1 will be the
+                        file for trace, else  given dir/trace1 is used.
+
+ Excom1   1.d-3     /  below this energy (GeV), compton/photo electric effect xsections
+                   are based on XCOM.  (must be < 100 GeV).
+ Excom2   1.d-3    /  below this energy (GeV), pair creation  creation xsection is
+                    based on XCOM.  (default is not to use XCOM).  must be < 100 GeV
+                     there will be some diff. in results if we use 1 GeV for this
+ LPMeffect t       / LPM effect is imposed or not.
+ Flpm      1.0     / LPM effect is activated when Ee > Flpm* 0.3 X0(cm)/0.56 and
+               LPMeffect=t.  Flpm=1 is normally very very small (Say, in W, 
+               Ee~200MeV is the LPM region and the photon energy <10keV is 
+               suppressed, which is not important in normal applications).
+               Even Flpm=100 (in W Ee~20GeV) is not bad if we see calorimetric
+               energy of cascade showers, i.e, no difference could be seen betwen
+               LPM and non-LPM showers in Ee~20GeV cascade showers.
+	       For SLAC type test, Flpm=10 may be OK.                       
+ HowNormBrems -1    /  Brems x-sections are computed in three different regions
+        1)  Berger & Seltzer numerial Table ( 5keV ~ 10 GeV)
+        2)  Tsai's analytic formula (partial screenng region). (100MeV~ Ecs)
+	  (Ecs is the complete screeing energy ~ 150/Z**(1/3)). GeV
+        3)  Complete screening region (by Tsai's formula). 
+        There is a small glitch among them.  
+      HowNormBrems -1:  --> 3) is assumed to be correct and 2) is normalized to 3) 
+                        at Ecs and 1) is normalized to the normalzied 2) at 10 GeV   
+                  0:   no normalization is tried. Biggest glitch is between 1) and 2)
+                       (< 2 %).
+                   1:  1) is assumed to be correct and others are normalzied to this
+                       one like -1 case.
+ EpartialSC   10  /    1) and 2) has rather large diff. for light media at around
+                     1 GeV.  For heavy media, diff. is very small. If EpartialSC
+                is set to be less than 10 (but >0.1), 2) is used down to this
+                energy.  This is used only when LPM is not activated. (For heavy
+                media where LPM could be activated, 1) and 2) has very little 
+                diff. so we need not use EpartialSC.)
+ TargetElecBrems  0    / In the case of dE/dx calculation due to ionization,
+          we get <dE/dx> by low energy ionization (so called  restricted
+	  energy loass), while the high energy knock-on precess is treated
+          as a stocastic process. The former (<dE/dx>)  fluctuation is considered 
+	  by the Urban model.
+	   For high energy muons (> 5GeV), muon energy loss  is also 
+          generated by brems of  atomic electrons in the medium.
+
+          We can  also get <dE/dx> by brems.
+	  (D. E. GROOM, N. V. MOKHOV, and S. STRIGANOV,Atomic Data and Nuclear 
+	  Data Tables, Vol. 76, No. 2, July 2001)
+
+	  To implement the effect, there are problmes: One is that the 
+	  muon energy loss dose  not lead to the energy deposit in the
+          medium  directly, since  the energy loss goes into photon energy. 
+	  The other is that the calculation above  gives only average value.
+	  So if the prcess is rather rare or the medium is thin, we must
+	  follow the generated photons and should not use average.
+
+	  As in the case of ionization, the loss may be divided into the
+	  two parts.  Higher energy brems part should be treated
+	  stocastically but it is not clear how to realize it.
+
+	  At present,  we divide <dE/dx> into two:
+	   A) the one by brems photons of which energy is below recoil min.
+	      kinetic energy (normally ~100keV), and
+  	   B) the one by higher energy brems photons.  
+          Whether we consider  A) only or A)+B) is controled by the bit 
+          pattern of TargetElecBrems.   (bit pos 0 is the Last bit; so if
+	  only it is on, TargetElecBrems becomes 1).
+	  The bit pos 0	 is for muons A).
+          The bit pos 1 is for pi,K,p's A). 
+          If the bit pos 2 is on, A)+B) is considered. 
+          So the value of TargetElecBrems means:
+	  0:  No target brems effect is considered (default)
+	  1:  A) only for muons
+	  2:  A) only for pi,K,p
+	  3:  A) for muons and pi,K,P
+          4:  should not be used.
+          5:  A) +B) for mu
+	  6:  A) +B) for pi,K,P
+	  7:  A)+B) for mu, pi,K,P
+	  For thin material, A)+B)   would give overestimation.
+	  For thick material, A)+B) would be OK
+	  In many cases, good value is between A) and A)+B).
+	  For muons of E=100 GeV, A) is negligiblly small, but A)+B) amounts
+	  to ~3% contribution to ionizaton dE/dx.  
+	  So if you are interested in muon energy after travesing 1 m Fe,
+	  7 would be a good choice.
+
+	  
+ 
+     epHooks '0 0  0'   / User cannot use this now; it should be placed in sepicsfile
+---------------------------------------------------------------------

@@ -1,0 +1,56 @@
+About world in the subdetector
+
+1)If an implicit world exists, no problem.
+   The implicit world is a component defined 
+   as the last component in the subdetector 
+   and contains all other components in the
+   subdetector.  Epics will check if all the
+   components are included in that last 
+   compoenet.
+
+2) If the implicit world is not defined, and the
+   subdetector contains more than one component,
+   noramlly the last one must be a world. However,
+   a)  if the subdetector is to be contained
+     by another component (by the notation like / 3)
+     and
+   b)  the world cannot be contained fully by that
+      component and 
+   c)  the overflowed part of the world  is expected to 
+    be harmful
+   then, the user can avoid putting the world but 
+   instead must put 'noworld' as a volume-shape.
+   Otherwise, error is reported and the run will stop.
+
+3) If the world has no gap between  other innner
+ components,  the world medium may be arbitrary.
+ But 'sp' is better since 'sp' is transparent when
+ the config is drawn.
+
+4) If the gap exits, it is natuallry filled by
+   the world medium.
+5) If such a subdetector (i.e, having gap) is 
+   contined by another component (by notation like 
+   / 5  )
+   the world medium is treated as follows.
+  (Note: If the subdetecor is simply included
+   in another subdetector or in the main detecor, 
+   discussion below  is  not applied, i.e the 
+    medium is not affected)
+   
+  a)  If medium is non 'sp', it is unchanged
+  b)  If it is 'sp',  the medium is changed to
+    that of the component which directly
+    contains the subdetector. After that no change will
+    happen.
+    (So, transparency effect  mentioned in 3) will be lost.)
+   **  If transparency is better to be kept, 'sp2' may used.
+   **  If the component directly containes that subdetector
+       is a world, this change will not happen.
+6) If the medium of a subdetector's world  is 'world',
+   it will be replaced by that of the final world which
+   contains all the detector components.
+
+
+10  box  Pb  ..
+11  noworld

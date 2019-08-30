@@ -1,0 +1,6 @@
+72 bytes from ssu002.s.sic.shibaura-it.ac.jp (172.24.201.22): icmp_seq=0. time=0. ms
+72 bytes from ssu002.s.sic.shibaura-it.ac.jp (172.24.201.22): icmp_seq=1. time=0. ms
+
+----ssu002.s.sic.shibaura-it.ac.jp PING Statistics----
+2 packets transmitted, 2 packets received, 0% packet loss
+round-trip (ms)  min/avg/max = 0/0/0

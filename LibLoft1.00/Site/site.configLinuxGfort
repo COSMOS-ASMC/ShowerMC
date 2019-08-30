@@ -1,0 +1,92 @@
+#  gnu gfortran on Linux
+#  This specifies the site specific information
+#  This file is used when making the LibLoft library  as well as
+#  when using the LibLoft library.
+#
+#  Before you issue 'make' to make the library,
+#  the following command should have been issued to set 
+#  variables, LIBLOFT.
+#  
+#  At LibLoft/
+#   source Scrpt/libenv.sh (sh, bash) 
+#
+#  LIBLOFTINC is automatically set by this site.config
+#
+#           libloft.a is made in $LIBLOFT/lib/$ARCH/
+
+
+ARCH          = LinuxGfort
+
+
+ARCHVOPT       = rv
+
+#ARCHVOPT        = rfv
+AR = /usr/bin/ar         #archiver:  for HP. f option works by native archiver
+#AR = /usr/local/bin/ar    # gnu ar is ok for if -f is not used. 
+
+#LDFLAGS       = +U77		# HP.  this is for getlog.  
+LDFLAGS       =			# non-HP
+
+LIBLOFTINC = $(LIBLOFT)/Header
+
+LD            = gfortran        # sun4 etc
+DFLAGS        = -D$(ARCH)
+INCHEADER     = -I$(LIBLOFTINC)
+
+FFLAGS       =  $(DFLAGS) $(INCHEADER)		#  non-HP
+#FFLAGS       = -g +U77 $(DFLAGS) $(INCHEADER)   # g for debugging
+FC            = $(LIBLOFT)/Scrpt/cppFCLinuxGfort
+
+################probably you need not change until next '##########' line
+#
+LIBLOC        = $(LIBLOFT)/lib/$(ARCH)
+LIBNAME       = loft
+CLIBNAME       = lib$(LIBNAME).a
+
+LIBRARY	      = $(LIBLOC)/$(CLIBNAME)
+
+INSTALL	      = /etc/install
+
+
+
+#############################################make install spec. OBSO
+#    where to copy the library.  
+#    if DEST directory not exist, you must make it by hand
+#    before 'make install'
+
+#DEST          = /usr/local/lib/$(ARCH)
+DEST	= $(LIBLOC)
+#DEST          = /tmp/$(ARCH)
+
+
+#   where to copy  header files by 'make install'
+#   if the directory not exist, you must make by hand before 'make install'
+
+HEADER     = /usr/local/include
+#HEADER     = /tmp/include
+
+#    where you copy some template files by 'make install'
+#   if the directroy not exist, you must make by hand before 'make install'
+
+TEMPLATE  = /usr/local/lib/$(LIBNAME)/template
+#TEMPLATE  = /tmp/template
+
+##############################################make install spec end
+#   archiver suffix rule
+#
+
+.SUFFIXES:	.f90
+.f.a:
+	$(FC) -c $(FFLAGS) $<
+	$(AR) $(ARCHVOPT) $@ $*.o
+	rm -f $*.o
+.c.a:
+	$(FC) -c $(FFLAGS) $<
+	$(AR) $(ARCHVOPT) $@ $*.o
+	rm -f $*.o
+.f90.a:
+	$(FC) -c $(FFLAGS) $<
+	$(AR) $(ARCHVOPT) $@ $*.o
+	rm -f $*.o
+.f90.o:
+	$(FC) -c $(FFLAGS) $<

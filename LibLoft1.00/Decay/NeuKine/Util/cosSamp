@@ -1,0 +1,43 @@
+c       ****************************************************************
+c       *
+c       * csampNeueCos: sample cos of electron neutrino from mu decay
+c       * csampNeumuCos:sample cos of muon neutrino from mu decay
+c       *
+c       **************************tested 88.07.26***************k.k*****
+c
+c /usage/   call csampNeueCos(p, cosa)
+c           call csampNeumuCos(p, f, cosa)
+c   
+c   p: real*8. input.  longitudital polarization.
+c   f: real*8. input.  fractrional energy of neumu  f=2E'/muon mass
+c
+c   cosa: real**. output. cos in the rest system of muon.
+c
+          subroutine csampNeueCos(p, cosa)
+          implicit none
+          real*8 p, cosa
+
+          real*8 u
+c
+          call rndc(u)
+          if(p .eq. 0.) then
+              cosa=2*u-1.
+          else
+              cosa=(-1.+sqrt((1.-p)**2+ p*u*4.))/p
+              if(cosa .gt. 1.) then
+                 cosa = 1.
+              elseif(cosa .lt. -1.) then
+                 cosa = -1.
+              endif
+          endif
+       end
+c ---------------------------------------------------------
+       subroutine  csampNeumuCos(p, f, cosa)
+       implicit none
+       real*8 p, f, cosa
+
+       real*8 al
+c
+          al=(1.-2*f)/(3.-f*2)
+          call  csampNeueCos(p*al, cosa)
+       end

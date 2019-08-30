@@ -1,0 +1,15 @@
+#name   Format    G-10 (G10 is also known as Micarta and Garolite, FR4)
+Gten 	1
+#
+#  Elem	 rho(g/cm^3)	Gas/Solid(1/0)  refl.index Birks c
+
+8         1.75			0         0       0 0 0
+# 	Z	A  	N
+	6	12.01	28
+	1	1	34
+	8	15.99	22
+	7	14	1
+	14	28.09	6
+	20	40.08	3
+	13	26.98	2
+	5	10.81	4

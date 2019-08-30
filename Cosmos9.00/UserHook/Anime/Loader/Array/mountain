@@ -1,0 +1,21 @@
+appearance {
+	+texturing
+	-edge
+	shading smooth
+	texture {
+#		file  ./Array/Nientien.pnm.gz
+		file  ./Array/nearmt1.pnm.gz
+		apply decal
+	}
+	material { ambient  1 1 1
+	}
+}
+UCMESH
+2 2
+#  x        y       z      R   G   B   A  s t 0
+-5000.   25000.  -6.00    0.1 1  0.7  1  0 0 0
+ 20000.  25000.  -6.00    0.1 1  0.7  1  1 0 0
+
+-5000.   33000.  -6.0    0.1 1  0.7  1  0 1 0
+ 20000.  33000.  -6.0    0.1 1  0.7  1  1 1 0
+

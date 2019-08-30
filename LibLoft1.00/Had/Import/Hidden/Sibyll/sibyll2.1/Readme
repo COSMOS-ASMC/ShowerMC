@@ -1,0 +1,23 @@
+ subroutine sibyll_ini
+      CALL PAR_INI   ! some parameteres are fixed
+      CALL JET_INI   ! compute cross sections
+        !   and table of probability for the production of
+        !   multiple soft and hard interactions
+        !   output --> /S_CCSIG/  contains
+        !    h-p, h-Air x-sections, and cumulative prob. of
+        !    of NS soft and NH hard interactions
+
+      CALL ZSAMPLE_INI  ! structure func.
+      CALL BLOCK_INI    ! some param
+      CALL NUC_GEOM_INI  ! .Initialize all nucleus profiles 2<=A<=56
+      CALL SIG_AIR_INI  ! init of p,pi,K-air xsec and mfp
+          SIB_SIGMA_HP  ! hp int. h=p,n,pi,K
+          SIG_H_AIR     ! convert hp->h-air.  GLAUBER
+                      ! is used but it can treat target of  4<A<18.
+
+
+      SUBROUTINE SIBNUC (IAB, IAT, SQS)
+   IAB(A) IAT(A') collsion generator
+   SQS  roots of A/n A'/n
+      SUBROUTINE NUC_NUC_INI
+       init for A-A' col.

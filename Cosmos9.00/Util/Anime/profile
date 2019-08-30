@@ -1,0 +1,66 @@
+#  t1   t2     dt  pixel rmax   maxppt maxthin   offset   outdir
+   0   50000   25   25    0      0       0        0     '/tmp/myid/all'
+ 10000 30000    1   1  1000.     0       0        0     '/tmp/myid/core'
+   0   0      0    0     0       0       0        0     ' '
+# if rmax==0, all r is accepted.
+
+
+
+
+From the left field on each line,
+t1:  starting time (m length/beta)   
+t2:  ending time   (m)
+	time slicing is tried in this time interval.
+dt:  At t1, t1+d, t1+2dt ...  (<=t2), slicing is performed. (m)N
+pixel:  this  size (m) is supposed to be displayed as 1 pixel
+	on the screen
+rmax:  If particles are far (r> rmax), we dicard.
+	if this is 0, all particles are employed.
+
+
+The first line in this example shows the time slicing 
+from 0 to 13770 m with 20 m step. After finishing this
+slicing, 2nd line is processed and so on.
+The last all zero line indicate the end of input.
+
+
+offset  E.g, file name will be  ts00001.skel etc if offset=0
+                                ts01001.skel etc if offset=1000
+
+maxppt    :  max particles storable at each  time.  maxp in Zprivate2.f is the
+	     limit at each time plane, but if you want make it less,
+	      you may give this.  Default is maxp (0 is converted to maxp).
+maxthin  :  thinning is tried upto this times.  1 is normally good.
+	    If particles at a given time are too much, those > maxppt
+            cannot be contained  in memory.  Particles in one and the same
+	    pixel may be shown only 1 point at display, so we many eliminate
+	    them leaving only 1 particle.  This is thinning.  
+	    After thinning, we may obtain free space for further recording of
+	    particls; but the array may be filled again.  maxthin gives the
+   	    limit of such thinning.
+outdir: output file is stored in this directory.
+------
+
+output  data format.
+
+.skel files are understood by Geomview; see Geomview manual.
+
+.dat  files.  If split =t, one file contains data at a time:
+	x y z code chg
+        x y z code chg
+       .....
+
+If split=f,  a consecutive block of data separated by one 
+	blank line  indicates particles
+	at a time.
+	x y z code   chg
+	x y z code   chg
+        ...
+       blank line
+	x y z code   chg
+	x y z code   chg
+        ...
+       blank line
+...
+
+

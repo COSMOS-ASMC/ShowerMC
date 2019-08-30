@@ -1,0 +1,41 @@
+Almost Obso.  You can do it by going to Util/Gencol/
+
+histg/histpi0_0.5 etc have factor two higher value due to that
+I took forward and backward particles together.
+The density must be devided by 2.
+
+testcol.f:
+ '# "X" "Xcms" "Pz" "Pzcms" "y" "eta" "pt" "code" '//
+     * ' "subcd" "chg" "mult" "teta" "tetacms" "K.E" "K.Ecms" "ev#"'
+  This is to test interaction code for hadron - Air or nucleus - Air
+  collisions.
+
+  As 'Air' target, you can choose N, O, Ar.  
+
+To compile and run the programn
+  make -f testcol.mk
+and prepare parm, 
+  testcol$(ARCH) < param > outfile
+
+You have to specify everything in param.
+
+
+----------
+to setup pp collision for dpmjet.
+use next param.     source Scrpt/sevi in Epics is also needed.
+
+ $PARAM
+ ....
+ IntModel = '"dpmjet3"',
+
+ $END
+
+ $HPARAM
+
+ UserHookc = 'f 6 -1 1  1.e8  1 1  f  t',       last 1 1 are for p.
+             'dpmjet',                          dpmjet
+             '  '
+
+
+
+

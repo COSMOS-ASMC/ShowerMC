@@ -1,0 +1,3187 @@
+Jun. 11, 2019
+  By taketa-san info:
+     Cosmos/cosmos/Zcondc.h
+     was removed.
+     
+     In Cosmo/Atmosphere/catmosCnst1.f
+        atmos.logP(i) = log(atmos.P(i))  was changed to
+	atmos%logP(i) = log(atmos%P(i))
+      to avoid Gfotran error.
+      
+Jun. 08, 2019
+     In Cosmos/Tracking/cputTrInfo.f, the last column of output
+     when TimeStructure is T  was height a.s.l while older versions
+     showe time  (there are two).  The two parts were changed now to the old 
+     output to show the time which shows sum of L/beta (in m), where
+     L is path (in m) and beta = v/c of each segment of the track.
+
+     Cosmos/Traking/ccomppathEnd.f had trivial error (line 994; too long line)
+     
+Jun. 06, 2019
+  Now we can use non "Air" media as atmosphere.  To change atmosphere model,
+
+  we may use atmosMolel.sh.  (Don't touch Zcondc.h to change the model).
+  AtmosModel = 1 (default; standard), 2 (NRL)  3( non standard) may be
+  given in the namelist &HParam. But this only cannot change the model,
+  the user muse use atmosModel.sh command. The value of AtmosModel
+  is used to check the consistency of the model. If we use non "Air"
+  which contains  other nucleus than N, O, Ar, for dpmjet3,
+  we need   .GLB and .inp files different from the default ones for "Air"
+  dpmjet.GLB and dpmjet.inp are prepared and contained in UserHook
+  "Air-Ice".  This file may be copied to users own applicaiton and the
+  user may give DpmFile="dpmjet.inp" in &HParam.  The available nuleus
+  is given in config file in the "Air-Ice".
+  Since dpmjet is better  not to be used at very high energies,
+  the max energy is limited to  4x10^15 eV at present. (Other model
+  may be employed at higher energies).
+  (For default "Air", no such limit  for dpmjet).
+  
+Mar. 28, 2019
+  Felix fixed a bug for Kon cross-section caluclaion. (NaN  in some
+  energy ragne).
+
+Mar. 09, 2019
+ So far tau lepton decay routine is prepared but no calling sequence is
+ prepared.  Also it cannot be specifie das 1ry.  These are now corrected.
+ 
+Oct. 27, 2018
+    v8.035
+    Ohashi reported Sibyll gives larger <Xmax> than the normal value
+    Since sibyll can treat almost "Air"  and proton target only, 
+    in Cosmos,  some special treatment is needed:  "Air" is treated as if an
+    element and we must give A=0 for that.  In other models,
+    "Air" is composed of N2,O2,Ar.  In that case,
+    cross-section calculation for e.g, the  proton projectile, 
+    x-sec for pN, pO, pAr is made and  they are summed up with their portion
+    weight. 
+    To keep this scheme as much as possible, we compute x-sec for pAir,
+    pO, pAr provided that x-sections for pO and pAr are made to be 0.
+    In this case, weight for pAir cross-section sould be modified to be 1.
+    This modification was not done in the older versions.
+    This modification is introduced in csibyllXs.f
+
+    During the course of checking, we found that in sibyll2.3c, 
+    KN and  KO x-sec calulation fail in some energy regions,
+    ( 1900.0d0  ~ 150000 GeV) : xs becomes   "NaN".
+    Also, values at other region are somewhat strange,
+    PiN, PiO x-sction, though no eror, seems also strange.
+    Ther form is different from  air target case. 
+
+    Gencol is not affected this feature.
+
+Oct. 17, 2018
+    Cosmso8.034
+    XsecModel now can take "special".  In this case user must
+    provide x-section values for the hadronic interaction  for
+    some of projectiles, target and energies.  
+
+    cxsSpecial.f is added in Tracking. It is a dummy to avoid
+    link problem. If "spcial" is given, the user must provide
+    a appropriated cxsSpecial.f in the user's own application,
+    otherwise exection will terminaed by the dummy in Tracing.
+    Makefile  is modified to compile it.  (don't put cxsSpecial
+    in cGetXsec.f.)
+    
+    cosmos/Zevhnp.h:  parameter (nmdls = 12);  --> 13
+    cosmos/BlockData/cblkEvhnp.h : added 'spcial"
+
+    XsceModel can be used also in Epics.
+
+Aug. 16, 2018
+    Sibyll2.3c.f has a stragne line  (only 0 at the 19191-th line). This seems
+    to have been corrected by Sibyll2.3c01.f  which is, however, still
+    called Sibyll2.3c.f.  This new version is included.
+    
+May. 08, 2018
+   dpmjet3 seems to have minor bug;
+      EQUIVALENCE (NRK(1,1), NRKLIN(1)) is used twice.  For new ifort v.18
+      this results in error.  First one was comm.out
+      Change of brems angle sampling routine: call cbremAng(..)  uses
+      non-starndard structure style (a.b type); gfortran cannot compile it
+      -->a%b type must be used.
+      
+Apr. 17. 2918
+   v.8.03
+     Sibyll2.3c is now usable. (now default of sibyll).
+     Charm particles are decayed inside sibyll, so they are not
+     recognized directly.  For proton target case, you can see
+     some of them diretrly if you comment out
+        call  DECSIB
+     inside Cosmos/Import/Sibyll/Interface/csibyll.c
+     (in that case, rare charm related particles such as D* will be
+      neglected).
+      
+     
+     
+Dec. 1  2017
+     Geomag data igrf12 can be used now.  igrf must be linked to igrf12...
+
+     cphits.f in PHITS/Interface has a bug (icon=0 is not set). If interation
+     model "phits" is used, this leads to 0 particle production when the
+     cphits.f is  compiled by  MacIFC (Interl ifort)  with -O2 or  -O3
+     (without -check all).  (For GFortran in Linux, Mac and  Ifort in Linux,
+     no problem).
+     Now, the problem was resolved; On Mac, linux with any option OK).
+     
+
+Mar. 28 2017
+v8.02
+Update for Epics.
+El_hin usage is updated so that the region of detector
+to which El_hin is applied may be specified by world
+Z coord. e or  comp. # or both (and or or).
+MCSzRange, MCSnumRange and MCSandor  are new paramters.
+
+
+Feb. 11 2017
+v8.01
+Multiple scattering treatment using Elsepa database was
+already implemented more than 2 years ago, but not offically
+anounced. In this version, the interface was updated so that
+the usage from Epics is better than older one.
+qgsjetII-04.f might be damaged due to unknown reason and
+replaced by the one in crmc.
+
+
+Sep. 2016
+v8.00
+First version which is compatible with Gfortran.
+This version can be compiled by Intel ifort as well.
+The user own application must be modified to be compatible
+with Gfort by the command:
+  dot2perc.sh  a-source-file
+For example
+   for f in *.f;do
+      dot2perc.sh $f
+   done
+If some change is made for a file example.f
+  old one will be kept as example.f-bkup
+The conversion is not perfect: some typical mistakes are
+   call copen(11, "/tmp/debug.dat", icon)
+This will be converted to
+   call copen(11, "/tmp/debug%dat", icon)
+and  at execution time error will hpppen.
+Another one is
+   if(  x.le. b) then
+will be
+   if(  x%le% b) then
+This will result in error at compilation time.
+  ( if( x .le.  b) then    is ok)
+The comment part is not affected at all.
+
+
+Jan. 2016
+v7.655
+Util/Gencol.f:  for EPOS with non zero crossing angles,
+  treatment is NG.  formpjtg sub in Gencol.f was updated.
+  
+For Elsepa, the data base will not be included in the
+normal release versions (>= 7.655).
+If the user needs to use Elsepa mode for multiple scattering,
+the data must be downloaded from the web site
+(or somewhere), and store it  in some directory of the user;
+A  script, elsepa.sh, is newly made in $COSMOSTOP/Scrpt/; it
+can manage to make a link of the user's data and COSMOS
+preassumed data location (=$COSMSOS/Data/Elsepa)
+
+
+Jan. 2015
+v7.651
+MCSmodel='"El_con"' can be used now.
+(but not "El_hin" which takes long cpu time
+and gives the same result as El_con).
+
+Nov. 2014
+v.7.65
+
+Elsepa made  data  has been put in Data/Elsepa.
+
+Semileptonic decay of K0short is now considered
+in default. (products are the same as K0l case).
+The branching ratio  is very small( ~ 
+*x10^-4), so it can be neglected in normal situaiton.
+At around 10^15 eV, it may be effective before charm
+contribtion comes to in effect.
+To disable those channel, make semilep=.false.
+in side the  Cosmos/Particle/Event/Decay/ckaonDecay.f
+(becareful; it must be reset to .true. later).
+
+
+parameter Moliere has been changed
+Moliere   
+  0      Gauss scattering
+  1      e: same as  Moliere 2. non e Gauss
+  2      old Moliere
+  3      rigorous Moliere.  
+Negative value has no meaning but absolute is accepted.
+Instead of using negative vlaue,
+for correlation between angle and displacement, new
+parameter ALateCor is introduced. If it is .true.(default)
+Gaussian correlation is forced.
+
+For Brems photon and Pair electron, opening angle
+sampling is updated to use Tsai's formulat explicitly.
+(Though, they are almost completely negligible effect).
+cPBA.f90 is moved to Cosmos/Module.  To use it
+call cBremPairAngInit(mno,  A, Z)
+must be called before hand. mno is 1 for Cosmos.
+It can be used from Epics, too.  In that case, mno
+shoulde be MediaNo. 
+
+Some of programs in Epics/prog/KKlib have been
+moved to Cosmos/KKlib/  (say, kcubicEq.f90,
+kquadEq.f90, kcsr1idx.f
+)
+ 
+7.645
+Mar.  , 2014
+Now  the code can be compiled and run under the
+JAXA M-system (SUN hardware, Fujitsu compiler f90jx, f90jxflat).
+The result seems consistent
+with those obtained by using ifort.  With modification
+applied to JAXA system, now the code can be compiled and
+run with ifort -O3 mode. The speed increaes by a factor of
+~1.8 as compared with -O0 mode. (Without such changes,
+-O3 ~ -O1 mode resulted in  more than 10 times slower
+speed).
+
+
+7.644
+Feb.13, 2014
+It is reported that a 10 GeV/n Rh (A=103,Z=45) incident case
+in Epics run leads to segmentation fault or suicide inside
+dpmjet3.  (~ 1/500 events?).  This is related to that
+dpmjet3 cannot treat low energy hevion ion projectiles
+(KE<5.1GeV/n) and the workaround routiens haven't been
+not ready  for the case where Z of both of projectile and 
+arget are > 26. 
+As a rescue routine, jam is employed and a new routine 
+ (Import/NUCFRAG) is introduced to treat the
+ fragmentation of Z>26 (jam cannot treat heavion fragmention).  
+Comparison of dpmjet restuls at 5.15 GeV/n and that of jam at 5.05
+GeV/n are quite consistent as far as pion prodcution specturm.
+As to fragments, jam shows smaller cross-section of very high
+Z fragment. As to n,p, jam shows fairly higher yields. 
+
+7.643
+Jan.16, 2014
+Electric field treatment updated.  Previous version
+should not be used (energy loss was not well treated).
+atmosModel.sh command is introduced by which the user
+can do   1) to see  which atmospheric model is currently usable,
+2) to see the  usage of each model, 3) to switch the model.
+
+A Short manual for the NRL-atmospheric model and Electric
+field treatment is available on the web page.
+To get a table of h rho rho' rho'' thickness Temp,
+Tracking/Atmosphere/Test/testcstdatmos0.f was updated.
+See Readme there.
+
+A (not harmful)  bug  when a low energy charged particle 
+cross the observation plane was updated (If the particle
+K.E becoms 0 just beyond the crossing point, the 3 
+momenta of the particle becomes 0 also at the crossing
+point. This was  corrected to be consistent with 
+non zero K.E  at the crossing point.)
+ 
+ 
+7.642
+Jan.6, 2014
+NRL-atmosphere which can take into account 
+time dependent factor of the atmosphere 
+can be used. Zcondc.h must be modified for that.
+
+Electric field can be included.   
+
+Some utility functions are added in
+In UtilAtmncs/Interface 
+for dealing with atmnc3.
+
+
+7.641
+Nov. 4 2013
+ dpmjet3 backword going pion Pt is skewed to +x
+Workaround was introduced in cdpmjet.f
+Control parameter 
+  ASRforDPM (Artificial Symmetry Recovering)
+  'm'  mirror transormt
+  'r'  randomization backward/forward
+  'r1' //            backword only
+
+
+7.640
+Oct. 15 2013
+Sofia uses Sibyll particle code, and Sibyll to
+Cosmos code conversion in Sibyll/Interface lacks
+omega(meson).  So it is implemented.
+
+Manager/Ccode/kgetenv.c was update to be compatible
+with c99 (#include <unistd.h> was added).
+
+Intel Fortran compiler on Mac  (v14) cannot compile
+some of the program which was no problem under v13.
+
+On Mac, it was found that member of modXsecMedia
+ (TargetNucleonNo,TargetProtonNo, TargetXs) cannot
+be recogized as compatible with x86-64, when link
+is made from Epics/Util/testcnf1.mk.  It's strange
+since there is no complain when the module is used
+from usual Epics applications as well as Cosmos
+applications.  As workaround, one common /workaround/
+is made and the variables mentioned above were
+copied to that common area for communication.
+(Used in chAcof.f and cheavyInt.f).
+The common is used only when MacIFC is defined.
+
+Now adding/removing the hadronic interaction models 
+does not affect Epics source.
+
+7.639
+Sep.28 2013; Oct.05 2013
+Along with the update of cross-section treatment,
+cxAbyxpXsec was also updated but it gives a negative
+value which leads to negative cross-section and 
+eventually, infinite loop. This happens when
+anti-nueutorn energy gose done to ~ mass and 
+n-barp xsection becomes very large; this makes
+the hA/hp xsection ratio go down and eventually
+makes it <1 or even < 0.   The workaround   is
+to use old cxAbyxpXsec when the ratio<1.
+Particle/Event/Xsection/cpippTotXs.f was updated;
+Avoided negative x-section values at lowest 
+energies. 
+Particle/Event/Xsection/Test/cgetXsTest.f was
+updated: smaller energy bin, lower first E,
+automatic array size.
+
+7.638
+Sep.1 2013
+ Aug. 2013
+ cxyz2det.f and cxyz2prim.f are updated
+to use Transformation matrixes and became
+more transparent. Also cxyz2detFE cdet2xyzFE
+cxyz2primFE, cprim2xyzFE, cdet2primFE, cprim2detFE
+are introduced for easy transformation. They are
+in cxyz2detFE.f
+Intel Fortran comipiler for Mac OS X is now usable
+(site.configMacIFC).
+
+
+7.637
+ Jul.30 2013
+ Epos v3700 is implemented. It can run for A>56.
+ Epos versions v3400 and 199 are also selectable.
+ To place one of them in the library, fixIntModel.sh
+ may be used  as in the  case of qgsjetII-03/04.
+
+ Sibyll2.1 is now usable (IntModel  is 'sibyll')
+
+ showIntModle.sh may be used to see which interaction
+model (for EPOS and QGSJETII) is now in the library.
+
+  Many of interface routines placed at
+   Cosmos/Particle/Event/Interface
+ are moved to each model's Interface part (e.g,
+ Cosmos/Import/EPOS/Interface/).  
+ As to  the cosmos standard x-section,  pA cross-section
+ at 200 GeV is again normalized to PDG values. Normalization
+ const are applied to all other cross-sections.
+
+7.636
+  Jun.30 2013
+LHC  cross-section result is considered for Cosmos X-secions.
+cxAbyxpXsec.f is updated which convert Sigma(xp)-->Sigma(xA).
+control parameter is SxAbySxpOpt
+in HParm.   1 (D): qgsjetII-04 like, 2 dpmjet3 like, 3 eposlhc like
+ (epos cannot be used > A=56). 
+ 
+7.635
+  May 2013.
+By Jam model, pi0 cannot make a collision, and a corresponding
+treatment was set in cseeColPossible.f (jcon=-1).  This has
+been in comment out state (why ?).  The line is now revived.
+
+The Gencol utility so far placed in Epics/Util is now moved
+to Cosmos/Util. 
+
+For debug, cbacktrace routine is added in Manager/cerroMsg.f 
+It may be called when an sevier error takes place and the user
+want to know the subroutines traced so far. (compilation
+with backtrace mode is needed).
+
+QGSJETII-04 has been implemented, but QGSJETII-03 is still
+usable.  Default at release version is 04. To switch to
+03<->04, use fixIntModel.sh which may be invoked at any
+place, if the path to Cosmos/Scrpt is effective.
+
+EPOS LHC version (LHC-v3400) is usable by specifing 
+"epos" in the IntModel (over 80 GeV).
+The version is not usable for A > Fe.  (so for most
+of Epics application, it is not yet usable).
+
+
+7.634
+  Apr. 2013
+   Not released
+      Rare particles in	dpmjet3 (such as kfcode=431,...) have been
+     simpliy neglected so far.  They can now be forced to decay.
+     The relevant parameter is dpmRareDecay in $HAPARM.
+     If it is 1 (default), decay is forced. else if 0, no decay.
+     Some correction of decay mode of D meson.  
+       It was found that pi- p collision by dpmjet3 sometimes
+     leads to fatal error: with a message containing a line
+                      /DTEVT1/ /DTEVT2/
+         At 10 GeV, 183/10^5 events
+         At 1TeV,   214/10^5 
+     i.e  ~ 1/500 events
+     Since p is rather rare in the detector simulation 
+     (typically SCIN contains p as it is  10 H + 9 C),
+     the error happened rather rare so far. 
+     This error is now detected and flag of dpmEmergencyFlag
+     is set which is in   module dpmEmergency. 
+     If the flag is found in cdpmjet.f, pi- is forced to be
+     pi+ and  event  geration is retried.
+     Other change is in dpmjet.f
+      
+7.633
+	It's found that  PHITS is not able to treat not only K0 but
+      also Kcharge as an incident particle.  So far, the routine 
+      'seeColPossible'  missed Kcharge.  As a result, 0 divide happened
+      and finally no particle was generated.
+
+      In this version, cfixModel was updated so that ActiveMdl is changed 
+      to one of dpmjet3, jam or nucrin when ActiveMdl is "phits".
+      This function has been implemented so far but models like dpmjet3
+      must be explicitly specified in IntModel.  The user may not want 
+      to use dpmjet3 in some case, and in such a case, IntModel could not
+      contain dpmjet3.  To use dpmjet3 only for a rescuee, the user may 
+      specify e.g IntModel = ' "a"  E1 "dpmjet3" E2 "b" ' with E1=E2.
+      (In older versions, this resulted in error stop). Then, dpmjet3 is
+      not used explicitly. Only model 'a' and 'b' are used. 
+      However, if model 'a' of 'b' cannot cope with K-charge projectile,
+      cfixModel will select dpmjet3 as an ActiveMdl.
+      The energy E1 and E2 are not important for dpmjet3 in this case. 
+      It will be employed disregarding E1/E2. 
+
+      Photo-hadron production threshold has been set to Eg=0.152 MeV
+      But the real minimum is little bit higher (0.152...), so when
+      Eg is very close to 0.152, x-section becomes 0 and the mfp
+      becomes .../0. (0 divide).  The result was not harmful (
+      hadron production is not chosen), but not a good code. 
+      So the threshold is set to be 0.153 (in Blockcommon).
+     
+7.632
+PHITS: when the target is heavy and proj is n or p, the knock-out
+       nucleons tends to be the same charge as the incident. 
+       This is rather strange, so we reassign their charge and
+       adjust the residual heavy charge.   After that, the residual
+       heavy is subject to evaporation.  Reassigning is managed
+       by cphitsADJnp.c in Interface. It is called in cberetini.f
+       and cqjmd.f.
+       This can be activated by putting 
+           DoNPadjust=1  (default 0 is not to activate)
+       in $HPARAM of the param file. (Also in Epics)
+       
+7.631
+Meaning of IncGp in epicsfile is changed a bit (IncGp is copied to
+HowPhotoP when Epics is used). The meaning of 
+ HowPhotoP; 
+	    0--> no photo hadron production.
+            1--> use Sophia at entire energies 
+            2--> exp. data < 2.5 GeV else use Sophia
+            3--> Sophia < 2.5 GeV  else an interaction model at that
+                 energy is employed; it treats the photon as
+                 a vector meson (rho, omega, phi), or pi0 or pic.
+		 (check is made in this order and first acceptable one
+		 is used. If  pic is used,  the highest pic after 
+		 collison is  replaced by pi0)
+            4--> exp. data < 2.5 else as above 3.
+ For muon,  employ above one by regarding the energy transfer as
+ a photon.
+ PHIT/JQMD issues an error message on stdout.  (write(ieo,*)
+ with ieo=6.  Many parts have been already rplaced by ieo=0, but
+ there are 3 such parts remained).
+
+7.63
+Jun.   2012
+Implementaion of PHITS has been improved.
+1) There was a part that kinetic energy was treated as momentum; this
+   was correeced.
+2) PHITS event generation fails rather often, so we have to retry 
+   the event geneation. This retry was not correctly implemented,
+   and corrected so that up to 100 retials are performed. 
+3) Break up products of a nucleus  or resitual nucleus is subject to
+   the evapolation process. This evaporation process was neglected so far
+   and now it is taken into account.
+4) In a subroutine to treat evaporation process, sometimes it happens
+   that the routine must treat A=Z nucleaus; this leads to use index
+   A-Z=0 of an array, which must be >0. 
+   How to correct this is unknown, so the present resolution is to use 
+   index 1.
+5) For heavy interaction,now  "nasa" is used for AA' cross-section
+    calculaiton  instead of "shen".  Selection is hard wired
+    in cprePhits.f ( icrhi )
+
+The first two are most serious effect for the low energy neutron treatment.
+This should affect the absence of double peak structure of E-weighted spread
+     at the first layer of TASC when a hadron interacts deep in the detector
+     (CALET detector case)
+Also the lateral spread of hadronic origin shower will be under estimated
+at large distances.
+
+ 6) Template in Cosmos/Util/DPM/GlaubIniTemplate.inp
+ was changed so that the maximum projectile (A,Z)= (207,82),i.e Pb
+ 7) Array size related to MAXSIZE in dpmjet3.f must be adjusted
+   to be compatible with such large (A,Z). This is annoying job. 
+   So, now MAXSIZE is not a parameter but a variable depending
+   on the number of targets, projectile max A, and # of energy bins. 
+   After fixing MAXSIZE, the arrays are allocated automatically.
+   It is also possible to change the # of energy bins in .inp file.
+   (It has been found that the energy bin step is little affect the
+   Glauber profile.  So the default 10 is kept).
+   This changed program is compatible with current Epics .GLB  and
+  .inp data. 
+
+  Now   EminH in epicsfile should  1 MeV.
+
+
+
+
+   
+
+
+   
+7.622
+Apr. 7 2012
+ckf2cos had a bug, if kf code is nucleus; before correct
+   conversion part is reached, it is judged as rare particle.
+   This  has effect for Jam output when it contains nucleus.
+2 lines were  omitted and noted as ccc
+
+   
+7.621
+Feb 6, 2012
+In jam, stopping pbar with A target makes loop.
+It is found in Cosmos but is not observed in Epics yet;
+however, there is a potential dangour. 
+The workaround is to put 1 MeV energy to pbar and make 
+the target p.
+Also for low energy He-A collision etc (in Jam),
+energy non conservation(5~10%) makes
+infinite loop in Cosmos (though very rare).
+Such event is accepted after 10 re-trials.
+
+
+
+Cosmos/cosmos/Zmaxdef.h  
+max # of  primary type is increased upto 11.
+Cosmos/Primary/crdPrimData.f was  updated so that if the
+# of  prmary types > max defined in Zmaxdef.h,  stop is made.
+
+../Sync/cmBremI2.f ;  bug correction. 
+
+7.62
+Jan. 2012 
+ Inelastic cross-secion for hA  (h=p,n,pi,K,..) is revised
+ so that the x-section at @200 GeV is normalized to the value of PDG data.
+ (For A > 170 or so, correction is ~ 0 %  and old values are used.
+ For smaller A, corection amounts to ~2.5% or so. Execption is
+ A=16 (Oxigen), for which it amounts to 5.5% (why ?).
+
+For AA'collisions, we normalized the cross-section to the value   by
+Shen et al at 5GeV/n;  the correction depends on AA', but
+roughly about 10 %.  This is good or not is not yet  known,
+so we introduced a parameter 'AAXsec'; AAXsec=0 assumes old vlaues
+(default). If AAXsec=1 and  E/n > 5GeV,  old x-section is normalized
+to the Shen's value at E/n=5GeV.   For phits, (normally used below 2.5GeV/n)
+Shen's value is always used.  (in cprephits, you can choose Nasa 
+cross section by giving 1 to icrhi. )
+****  AAXsec must be given in param file as one of  $Hparm.***
+
+For the jam interaction model (original one), we introduced a simple fragmentation
+scheme for spectator nucleons emerging from heavy ions (projectile and target).
+This is realized by JamFragment=1 (default).  This still experimental stage.
+JamFragment=0 dose not form any heavy ions from spectators so they appear
+only a bundle of nucleons. (The cascade transition curve by  heavy ion primary
+depends rather largely on the JamFragment value; =1 will give lower flux).
+JamFragment must be given also in $Hparm.
+
+7.61
+Dec. 2011
+Bug fix for heavy ion knock-on (cKnock.f)
+cintePhoton.f  bug fix. (for Epics photo-hadron)
+Free formthe Glauber data bug in Epics.
+
+7.60
+Release Sep, 2011
+Almost the same as 7.59
+ 
+7.59 
+Release  Jul.8, 2011
+cQGSjetII.f is updated to correct wrong particle code assignment
+(eta/ lambda  invresely assigned)
+ckf2cos.f was updated so that it can convert the cosmos eta code into
+kf code.
+For a file name, envrionmental variable such as $USER, $COSMOSTOP
+or $(USER) etc can be used.
+PHITS seems to generate neutron (from break up target)  as
+a nucleus sometimes.  If this is assigned as kgnuc in Cosmos, 
+charge 0 particle is regarded as heavy ion and problem arise
+in Srim treatment. Such partilce is neglected
+Jam generate alwasy elastic events for anti-proton collision
+if its K.E is 0. and this results in infinite loop.
+
+phits cannot accepts sigma baryon, although if sigma is projectile
+phits dose not complain and generates particles among which a very
+strange particle are contained (completely wrong code).  This leeds
+to error.  
+So cseeColPossible.f is introduced to see if the active interaction
+model can accept rare particle collisions (including pi0). If not
+decay is forced.
+
+ckf2cos.f generates code=krare(=0) if kf code is not defined (say, 
+1114 = Delta-).  Such code should be neglected but in jam.f 
+ it is not implemented.  This was corrected.
+
+Sofia is now standard for photo-hadron interaction.
+
+
+7.58
+UserHook/ModifyX 
+is added.   This is too see the effect when the pi/K's
+x-distribution is softened. The routine, cutptcl.f
+manages the softenning of the x distribution.
+It is called from chookNEPInt in chook.f (after each nuclear colliion)
+For details see cutptcl.f
+
+When 0 code particle (very rare; once / 5 days) appears,
+the program execution was terminated so far. 
+Now such particle is neglected without stop.
+Stopping charged pion sometimes resulted in the kinematical
+error of muon energy, and a message was issued so far.
+This was remedied. If such happens again, message will be issued.
+
+
+
+7.57
+Release Jan 31/2011
+In jam, we disabled  elastic scattering at > 10 GeV but
+this didn't work. So we allow elastic scattering
+and use total cross-section at all energies in jam mode.
+Cosmos/Particle/Event/Interface/cjam.f  
+from Cosmos/Tracking/csampNEPInt.f were modified.
+For heavy ion collisions, we cannot get elastic cross-section
+so we generate event until an inelastic event is obtained
+in cjam.f (by looking |k(7,i)|> 1).  The inela/ela informtion
+is put in cjamElaInfo so that we can get inela/ela info.
+from outside. To ge the  info.  call cjamElaInfo(1, inela)
+inela = 0/1 (for ela/inela) will be obtained. (Use only if
+ActiveMdl == 'jam')
+
+
+7.56
+Release Dec. 28 2010
+The igrf data format which has been used so far is no more
+available in the original web site.  So the new program
+is changed to be compatible with the current web site
+format.  WMM format cannot be used now. 
+So only "Cosmos/Data/Geomag/igrf" can be used now.
+This data include data from 1900 to 2010.  When new
+data appears with the same format, new may be simply
+put as "igrf".
+Before this version, probably B field of year 2005~
+was wrong.
+
+qgsjet2 treats nucleus break-up specially and  break-up nucleon
+has been treated as general nucleus (code=9 subcode=1).  This
+is not desirable for particle identifcation. So now, it is
+assigned code = 6 same as usual nucleon. (cQGSjet.f)
+
+7.55
+Release Dec. 26 2010
+Current Jam default is to break all spectators into nucleons
+(iressp. of proj. or target).   For heavy target such as W
+this produces too many neutrons and protons.  Although it is not so harmful,
+we disregard such target (protons may contribute to dE; so 
+may be dangerous. )  We currently neglect target spectator.
+For projectile spectator, we employ all nucleons.  
+This was implimented in interface routine 'cjam.f', but 
+Nara-san's k(7,i) == -1 seems for projectile. So 
+k(7,i)= 1 is used from  this version.
+
+ 
+7.54
+phits and jam are now supported. 
+(In some of 7.53, they are included.  Phits cannot treat
+  anti-proton/anti-neutron. This was updated so that
+  jam or dpmjet3 is employed for that).
+ Typical  IntModel is
+  '"phits" xxx "jam" yyy "zzz"'
+ xxx  is  around 0.5~2 (K.E GeV/n )
+ yyy  must be < 10 TeV 
+ zzz  dpmjet3, qgsjet2, etc.
+*****NOTE****  phits sometimes issues warning or some kind of
+    messages on standard ouput. 
+
+7.53
+csampAF is made to be f90  module
+
+7.51
+Muon decay length considering dE/dx was somewhat
+wrong. (life time becomes longer ).  So this 
+is made to be simple one and cut the path so that
+energy loss in the path is negligible.
+Maximum path is made to be < 1/5 of the depth step
+so that small depth step like  1g/cm2  can be treatable.
+5 is StepControl default value.
+
+7.50
+ Jan 25, 2010
+dE/dx related stuff was updated to be
+compatible with Epics8.82.
+
+
+
+
+uv7.48
+Release Jun.15. 2009
+cthinning.f for heavy primary was wrong since
+version 7.46.   This was corrected.
+
+
+uv7.47
+Release Jun.10, 2009
+The dark energy problem, existed in
+photo-hadron production, could not be
+fully solved.  One pion photo-production
+parts (2 parts; resonance production Eg<2 GeV or so
+ ) are now replaced by chAcol call using pi+ 
+incident.  This removes ~3% dark energy problem
+but actual reason is not clear. 
+In  dpmjet3  call (cdpmjet3), energy balance check
+is introduced and if the energy unbalace is more than
+3%, up to 10 trial is made.  If 3% criteria is not
+satisfied, further we try to find an event which
+is within  (the minum error so far) x 1.2 %.  
+If such an event is not found within 14 trials,
+we gave up and return  the last event. 
+Many events satify 1 % consevation, but some cannot;
+10% or more error may exist 0.1 % of events
+
+Energy balance check inside cinteraction is tried
+if the bit of the  BitEcheck in Eabsorb(1) is on.
+Otherwise, not check is done and results in 10% 
+faster execution.
+
+
+uv7.46
+Releas  Jun.2, 2009
+The workaround for  Lamda0 problem in qgsjet2
+is introduced; Particle/Event/Interface/cQGSjet.f.
+You can choose Lambda 1,2,3. Default is 3.
+which treats lambda0 as neutron. Lambda 1 is
+treats lambda0 collsion as 2 particles from
+lambda0 decay.
+D-meson has also now has workaround which
+considers prompt muon problem and energetics
+well.
+
+
+uv7.45
+Release May.16, 2009
+ Muon related matter: when Eabsorb(1) != 0
+ muon decay consrve energy and electron energy
+ is sampled correctly with muon polarization.
+ Two of the neutrinos as one aggregate have
+ also correct 4 momentum, but each of ehem
+ has no more correct. So if the user
+ is interested in  neutrino specrum, Eabsrob(1)
+ should be 0.
+ When MuBr/Pr/Ni is 2, it is treated as if 3
+ if Eabsorb(1) !=0. (because in case of 2, emitted
+ photons,etc at not tracked). The bug about
+ MuBr/Pr/Ni is fixed.
+ QGSJET2:  Lambda0 cannot be put to it but
+        wrongly treated.  At high enrgies,
+        it dose not decay and interact.
+  In that case the energy goes somewhere and 
+  make the shower smaller.  Lambda0 is made to
+  decay now for QGSJET2.
+
+At each hadronic collsions, energy conservation
+is checked if Eabsorb(1)'s 9th bit is on.
+Check is done in chookEabsobC in chookEabsorb.f
+The user may modify it. The default treatment is
+to check the conseration, when incident energy 
+is > 5 TeV for which the target mass and their
+Fermi momentum can be neglected whihtin  1%.
+If the break more than 2%, Warning is issued
+on stderr.
+
+uv7.42
+Release Apr. 24, 2009
+chookEabsorb.f is added for managing energy deposit
+treatment.
+
+uv7.39
+Release Nov.1, 2008
+Thinning program is separated and stored in UserHook/
+as cthinning.f so that the user can control the thinning
+method by the user's method. Also the user can
+modify the parameters directly in csetThinwgt subroutine
+in cthinning.f.  (Namelist can give only EthinRatio).
+Thinning can also be controled by the particle distance
+from the core.
+
+uv7.38
+Release Oct 26, 2008
+cdpmjet.f was updated so that dpmjet3 can run stably
+for pi- H and lambdaBar +H so that Epics.uv8.77 is now
+stable.
+EthinRatio now accept 4 variables: first 2 are for
+e/g.  Last 2 are for mu/h.  Default mu/h (0/0) 
+is convered to be 1/10 of those for e/g.
+
+
+uv7.36
+Releas Jul 08 2008
+Some instability (infinite loop) was
+eliminated which is due to very low energy positron.
+It is normally anihilates but very rarely makes brems.
+In such a case, brems energy could be larger than 
+positron kinetic energy (due to dE/dx of positron).
+and something wrong happens. (say, once in 500 hours).
+This was corrected.  Now stability was increased
+and we can run the program witout any loop more than
+5000 hours.
+
+
+uv7.35
+Release Jun 24 2008
+Muon decay is treated with the polarization effect. 
+It is difficult to treat it exactly and exclusively
+so that inclusive treatment has been done with Me=0.
+In this approximation, electron(positron) energy becomes
+< Me with a rate of ~ 5/10^5.  Such a case sometimes
+led  to infinite loop.  So we resample nue, numu and e
+energies for such a case. (Particle/Decay/cmuDecay.f)
+
+
+uv7.34
+Release Jun 22 2008
+After  AMS related calculations were performed in early
+2000 years, some modifications might introuduced such an error
+that AMS type calcuations lead to wrong results; at very high
+alttitudes, charged particle may loose too much energy by dE/dx
+which is computed using wrong thickness. Although for normal applications,
+the effect is negligible, this version corrected the error.
+
+uv7.33
+Release May 04  2008
+In 7.32, 3 lines exceeded 72 columns.
+Among them, one is completely wrong and led to
+segmentaion foult (call cbremAng in cinteElec.f).
+The other two are in cxp2xASsec.f; numerical accuracy
+is shortened.
+
+uv7.32
+Release Apr. 22 2008
+Excom1 and Excom2 are now in parm.
+ 
+uv7.31
+Release Feb. 20  2008
+Recent Intel Fortran command name is completely
+changed to ifort; ifc is no more usable so
+the command name in Cosmos is also unified to be ifort.
+
+uv7.30
+Release Feb. 4 2008
+When the thin sampling is applied for the photon primary and 
+LPM effect works (with photoProd=T), the number of muons
+at the initial stage will have large fluctuations (e.g, 0 muoons
+to 1.e6 muons at some depth).  This is avoided by using
+Full M.C at initial stage (typically upto 120 g/cm2 from 
+the first interaction point). This 120 g/cm2 is adjusted
+depending on the first collision point and primary energy.
+(If it is deep, LPM works much and muon number fluc.
+becomes larger). The changes are in cinteraction.f 
+When low energy positron interaction is sampled to be 
+brems, and if it loses all kinetic energy before the interaction 
+point, brems cannot takes place and some fatal  error occurrs.
+This was corrected such positron sohuld anihilate.
+Now pbar and nbar can be a primary.
+photo-hadron production cross section is reviewed and it is 
+adjusted so that the continuation of the cross-section values
+at 5 GeV is consistent.  Multiplicity is also adjusted there.
+Muon brems gamma was not correctly given its property.  This
+was corrected.
+
+uv7.29
+Aug.17, 2007
+MacIFC now cannot use -static at link.
+Namelist problem for MacIFC/MACOSX can be solved same as
+PCLinuxIFC.  (see copen.f).
+Update leak for UserHook/SkelFlesh/chookSkel.f
+Update leak for UserHook/SkelFlesh/chooHybAS.f
+
+
+
+uv7.28
+Aug.06, 2007
+Some bug for photon primary case (larger flux at balloon heights)
+is fixed.
+Distributed-Parallel processing scripts are updated to be more
+easy-to-use style. The manual is also updated.
+EthinRatio now takes two values.  2nd value, if given,
+is used to min value of energy for which Thinsampling is
+performed. ( EthinRatio(2)*E0 < E < EthinRatio(1)*E0 particles
+subject to thinning.  If EthinRatio<0, absolue is used 
+instead of EthinRatio(i)*E0 (i=1,2))
+
+
+uv7.25
+Mar.21/2007
+Mac Intel Fortran (site.configMacIFC) is introduced.
+
+uv7.24
+Feb.11/2007
+photo-nculear interaction was disabled from some
+version. It is revived.
+
+uv7.23
+Jul 31/2006
+Some library programs are added (cGetXXsec.f, ksampPEang.f)
+Currently they are used by Epics for Xray treatment.
+
+
+uv7.22
+Jun 02/2006
+Defualt max number of sites are now 50.
+
+At energies below 1 MeV, the number of e+/- is little bit larger
+than Epics and that of photons are bit smaller; as a result
+lateral distribution of electrons at large distances is 
+bit larger than the Epics result due to low energy electrons.
+To correct this, scattering treatment is made  completely the
+same as Epics. Also the dE/dx routine is also made to be the
+same (this effect is negligible, though). A careful examination
+of energy spectrum and lateral distributions of e-, e+, gamma
+are compared with Epics (which uses a number of layers each
+consisting of 0.25 r.l; the density of air is constant at 
+each layer but chages as layer changes.)  Now every
+result is  almost completely the same as Epics.
+
+uv7.21
+For the moliere unit, there is a change.
+M.U in Cosmos is defined as the Es/Ec * X0/rho  at the 2R.L above the
+considered point (vertical DEPTH). 2R.L means along the 1ry direction. This is simplified
+to take rho at ( DEPTH - cos(1ry zenith* 2*X0) (If this becomes small, us 10 g/cm2).
+1) Except for jobs with 'newflesh',  the older version used cos(1ry zenith) at
+   the injction point, so it is larger that input coszenith little bit. 
+   This is changed to use coszenith at the deepest observation point.
+2) For Job='newflesh', m.u calculation was done when the skeleton 1ry angle was not 
+	yet read so that  the cos(1ry) was undefined (normally 0.); so 
+	the m.u was  the one at the DEPTH. (not 2r.l above).
+  This was corrected to reflect input cos. (in Manager/ceventLoop.f).
+  For the older calculations; how to use the m.u.
+	R in m.  r in m.u
+	r=R/muo.
+	where muo is the old Molier Unit.
+	So if you want to get the real length from r, simply use R=r*muo
+	For the next situation:	
+         Suppoose we want to rehash a result at s=1.2  at depth1
+	to the result at s=1.2 at depth2, we should use next:
+	r1=(muo1 * r)/mun1 = R/mun1
+	r1 must be converted to the real lenght R2 as
+	R2=r1*mun2 = R*mun2/mun1 = r*muo1*mun2/mun1
+	Therefore  R2= r*mun2 (muo1/mun1) = r* cvf
+      
+        Example:cos=0.9  depth1= 720g/cm^2 depth2=871 g/cm^2(Utah)
+	    muo1=95.5 m  mun1 =102.9 mun2=87.1
+	    then, cvf= mun2(muo1/mun1) = 80.8
+
+            for depth2=920 g/cm2  mun2=83.0 (Akeno?)
+	      cvf=83.0*95.5/102.9 = 77.03
+	         
+uv7.20
+Release Jan.11.2006
+UserHook/Hist, DisPara, DisParRescue
+are completely rewritten. 
+Step-by-step Guide are made.
+
+
+uv7.10
+Releas Dec.16, 2005
+QGSJET-II-03 is now available.
+
+
+uv7.05
+Releas Nov.22, 2005
+A query 
+  subroutine cqFirstID(depth)
+and
+  subroutine cqFirstIPI(ptrack)
+would return a wrong first interaction point when
+KEmin is very small for hadronic particle incident.
+(KEmin > 1GeV, there should be no effect.
+ At KEmin= 1MeV, there is certainl effect.  )
+The interaction point is affected by knok-on of
+low energy electron. This was corrected.
+A small bug in e+ anihilation sampling is corrected.
+In the track record, 'track.user' is added so
+that the user can freely use it.
+
+
+uv7.04
+Release  Oct.09.2005
+if QGSJET2 is used, 1.5 % events is not correctly simulated.
+(due to Lambda0 treatment; it cannot be an input to QGSJET2).
+This has been fixed.
+
+
+uv7.03
+Release  Aug.29.2005
+cQGSjet.f is update so that subcode is always set 
+to -1 for those particles which don't need subcode.
+This is needed for Gencol in Epics.
+The ad-hoc model is cleaned.
+
+uv7.02
+Release  Aug. 18 2005
+Geomagnetic data was updated; 2005 version  is
+introudced.
+
+Cosmos/Import/Test/QGS1 and Sibyll are
+created.  If the user put qgsjet01c.f or sibyll2.1.f
+in those directories, the user can test particle
+production spectrum of these codes. Also by using
+Epics/Util/Gencol, the user can generates particles
+which could be incident particles to Epics.
+
+
+uv7.01
+Realese  Jul. 18, 2005
+QGSjet-II dose not manage pi0 incident case.  This is
+treated as pi+/- projectile and later, highest energy
+Pi+/- is replaced by pi0.  This part was buggy and
+corrected.  site.config for IFC/IFC8/IFV64 are updated.
+to include -static option at LD.
+
+uv7.00
+Release Jul. 09, 2005
+QGSjet-II is now available for use. 
+It can be used at 30~100 GeV/n or higher energy region.
+
+
+uv6.71
+Release Jun..07, 2005
+Inclusive dpmjet model which was modified to be consisitent with
+current 1ry and Bess and some other muon data is now usable.
+give IntModel='"incdpm3"'.  For gamma, inclusive model dose
+not include gamma from eta meson so the flux will be ~ 10 %
+lower.
+Bug correction for Skeleton-Flesh method.  The bug occures when
+a wide range of primary spectrum is used.
+
+
+uv6.70
+Release Mar.29, 2005
+Distributed pararell processing of an event is now possible.
+Documentation  is still not ready, though Readme's in 
+UserHook/Distributed/ and its subdirectory will be enough.
+
+Util/Anime directory is added to make a movie of
+time development of the air shower. 
+
+uv6.60
+Release Jan.06, 2005
+1) Bug correction for skeleton/flesh method.
+In some conditions, B-approximation A.S size is overestimated
+for high energy primaries. Correct data can be obtaiend by 
+re-fleshing skeleton data. See Readme in UserHook/SkelFles/.
+C++ UserInterfaces for FirstKiss, Family are usable.
+As to the Skeleton/Flesh C++ interface, Skelton making part can be
+usable.
+2) For the primary sampling, dcos distribution has been assumed
+   for Za1ry= 'is' in  the cos region of CosZenith.
+   Now if you put Za1ry='cos', cos dcos distribtuion can be
+   used. (For Obsplane=1,2,3).
+
+
+uv6.53
+Release Dec.30, 2004
+For the safety of avoiding the problem
+of Mac OS X's tar, new version is issued.
+
+uv6.52
+Release Nov. 30, 2004 
+C++ userinterface. 
+bug for ObsPlane = 2 removed.
+ASObsSites(i).mu and ObsSites(i).mu
+are usable.
+
+
+
+uv6.51
+Release Dec. 12,2003
+Ad-hoc model: leadin particle Pt and target Pt must not be
+aligned otherwise we get some correlation between Ptx Pty
+at very forward part. This was corrected.
+
+
+uv6.50
+Release Aug.22, 2003
+Correction for low energy < *MeV behaviour of E-M shower.
+The flux overestimate at  after shower max is fixed.
+Completely same cross-sections for E-M as Epics.
+(Except for density effect).
+The E-M shower is verified to be the same as Epics.
+Inclusive treatment of dpmjet3 is introduced.
+(by IntModel = '"incdpm3"'.  It must be used
+below 3x10^15 eV; also no anihilation cross-section
+is considered so   '"nucrin" 2 "incdpm3"' may be
+a good choice.
+However, current one
+dose not contain eta meson contribution and resultant
+e-m flux is lower by 20%).
+Thickness to length conversion is updated so that
+it is more quick.  If Emin = 100 keV, the speed is
+factor 2 or more faster (however, it is slower than Epics
+by 30 % or so.
+If Emin = 1MeV, the speed up factor is  1.6~1.7. 
+(1.2 times slower than Epics).
+Atmosphere presentation is changed so that it uses
+linear relation instead of c-spline interpolation.
+(cstandatmos0.fNew2.h)
+
+
+uv6.35
+Release Mar. 9 2003
+Bug for 'around point source' is fixed
+When a InitRN(2) is < 0, host name and timer have been
+used to make initial random seed. This is updated to
+use further process  number. In Manager/Ccode, kgetpid is
+added.
+If a filenames contains
+ @, it is replaced by hostname if AtEnv = ' '
+ #, it is replaced by unix process number if SharpEnv = ' '
+ %, it is replaced by YYMMDDHHMMSS if PercentEnv = ' '.
+
+If some of AtEnv, SharpEnv or PercentEnv  are not empty, an
+environment variable of that non blank string is assuemd to
+exist (say,if SharpEnv='JOB_ID', then the environmental varialbe JOB_ID
+is assumed to exist)  and its value is obtained to replace the
+corresponding character such as #.
+Note. Usage of % and # is different from the older versions.
+
+
+In pythia of Dpmjet3, if the evnet generation fails after
+100 trials, the event is totally recreated.  Such a case is
+very rare, but the case is counted in the program and
+if the number exceeds some limit, program was terminated.
+This is modified so that program run continues.
+The correction is in      SUBROUTINE PYERRM(MERR,CHMESS)
+(comment out of 2 lines).
+c//////////////// don't stop even if too many erros (2003;04 March)
+cc          IF(MERR.NE.17) CALL PYLIST(2)
+cc          STOP
+c////////////////////
+
+
+
+uv6.34
+Release May. 05 2002
+For NEXTSTEP, use of dpmjet3 is automatically
+inhibited.
+
+uv6.33
+Release Apr. 02  2002
+Fritiof7.02 sometimes produces strange particles with mass 0
+charge > 0. This leads to 0 divide in cKnockp.
+Such particles are neglected now. 
+phojet error due to  ESUM=0 in PHO_MASCOR(IREJ). After 300.
+The event is rejected.  
+
+
+
+uv6.32
+Release Mar.30, 2002
+cmkSeed.f is created in Manager directory and timer/hostname
+dependent seed creation is managed by this routine rather than
+in  cbeginRn.f directly.  cmkSeed can be used from epics too.
+If IFC is used, Seed file is not created. This was corrected.
+
+
+uv6.31
+Mar. 24. 2002
+It was found that the switch to Hadrin is better to be at
+4.1 GeV (for dpmjet3.03). So .inp files are corrected.
+
+Too many IFC warning is suppressed.
+
+call resetTimer in ctracking.f is coment-outed. 
+
+In dpmjet and fritiof, there are save statements like
+
+save
+
+save a, b, c
+ 
+The second one is not needed, and IFC compilir results in error.
+The second one is comment-outed.
+
+
+uv6.30
+Feb.28, 2002
+The first interaction depth obtained by calling cqFirstID or
+cqFirstIPI is changed; for pions, kaon, nucleons, or nuclei
+primary, the  knock-on process is not regarded as the interaction
+responsible for this output.
+Some negative sqrt in Fritiof1.6, dpmjet, phojet are fixed.
+New manual. Geomview support.
+ 
+
+uv6.27
+Dec.17, 2002
+Since some users say that  6.26 give strange first collision points ( ~ 1 g/cm^2) for protons,
+but the phenomena could not be realized at me, I am sending a new version.  
+It is suspected that during ftp to Kanagawa-u, something wrong happened.
+Bug correction. Alpha Linux with Compaq Fortan can get correct user id.
+
+
+uv6.26
+Oct.31, 2001
+When InitRn(2) < 0, timer routine (usually sec order) has been
+used for initialization of random number routine.
+But 1 sec  unit is sometimes not enough so current version
+also uses 3 last characters of the hostname. (They are added
+after conveting to integer to the timer value).
+
+MacOS X version becomes 10.1 and the Absoft compiler now
+works for a large number of arithmetic expressions.
+So the organization of Import/DPM has been restored to
+the older style.
+
+uv6.25
+Oct.16 2001
+For Absoft Fortran 90 on Linux/FreeBSD, Lund code aatj.f
+sometimes falls in negative square root (order of -10^-9).
+This was corrected and old interaction models work long time
+now on Linux/FreeBSD.
+ Mac OS X is now supported.  However, not dual cpu mode is
+tested at all yet.  ABsoft f90 on Mac OS X is weak about the 
+number of mathematicla expresssions. Therefore  some of 
+dpmjet3/phythia code could not be compliled correctly without
+modifing the code to two parts. Other codes in dpmjet3 are
+also grouped into a few peices.
+
+
+
+uv6.24
+Aug.1 2001
+
+For Absoft fortran 90 on Linux,
+namelist output cannot be read unless open has delim='apostrope'
+option.  This option has been added depending on the host.
+To open the namelist file (especially from Linux),
+   call copenNLf or copenNLfw
+must be used instead of copenf or copenfw. The arguments
+are the same for both cases.
+
+
+uv6.23
+Jul.18
+Manager/cwriteSeed.f.   Seedfile flush is now possible for
+	IBMAIX.
+In dpmjet3, K0_bar collision will easily die so that
+tentatively we regards it as K0 for dpmjet. To do so
+we change the following.
+
+In Particle/Event/Interface/cdpmjet.f,  we find
+   idp = 25
+which should be replaced by 
+   idp = 24
+
+
+uv6.22
+Jul. 9. 2001
+
+cheavyInt.f.  For stopping He,etc, negative sqrt.
+	this is fixed.
+ctracking.f.  For K.E~2GeV or less, particle dose not interact
+	correctly for recent versions. This is fixed.
+
+aatj.f : very rarely violates array boundary.  This was
+	fixed (??).
+Absoft f90 + pclinux: seed file is not flashed if abnormal
+   end. To fix this, open/close is applied every time
+   for the Seed file; open with append mode. 
+For other environment, if access='append' can be used,
+ (NEXT, DECALPHA, ALPH+compac fortran, SGI, Soralis)
+
+
+uv6.20
+Jun. 18.2001
+  For PCLinux, we now use f90 instead of f77.  Otherwise,
+no good object can be generated for dpmjet3.
+Accordingly, there are some change in the program.
+(e.g,  max( pj.where , 10) cannot be used in f90, since
+  pj.where is integer*2, this is made to be
+       max( pj.where*1, 10).
+All variables in PCLinux are treated as upper case;
+otherwise there will be conflict with common name which
+cannot be treated ASIS.  In cppXsec0.f, very rare
+array boundary check error occurs due to diff of
+0.301 0.301d0.  This is fixed.
+
+
+
+
+uv6.17
+Jun. 14 2001 
+ Correction for nucrin in 6.16 is not usable by PC Linux.
+ This is corrected by using -s option at compilation.
+ Overflow bug due to dedx < 0 for  stopping muon is
+ corrected.
+
+
+uv6.16
+Jun. 13 2001
+ Dpmjet3 at low energies needs total cross-section. 
+ctotxs seems to give too small xs.  So we employ gheisha
+total cross-section.  In that case we must get gheisha code
+for omega and  lambdac. These were missing in Interface/ccos2gheCode.f
+and cgeh2cosCode.f.  This was implemented.  ctotxs in
+Tracking/csampNEPInt.f was replaced by gheisha cross section.
+ Dpmjet3 failes to treat A>18 heavy nucleus.  So we deal them
+by Simple SuperPosition at present.  For this end, we insert
+  call cforceSSP
+
+  and add subroutine cforceSSP in ceventLoop.f
+
+
+
+uv6.15
+Jun.12  2001. 
+ nucrion (aado.f) update was forgoten in uv6.14 so it is corrected in
+this version (mail version).
+
+uv6.14
+cthick2len.f is updated so that   length < 0 is not returned.
+nucrin changes it's mass table values; some resonance values
+are stored and they are restored normally. However, in some
+rare case, they are not restored  and the next event is
+generated wrongly or even stops with zero momentum condition.
+This is correced so  that we resore the masses every time
+when nucrin is used.  6.13 was not released.
+
+
+uv6.12
+dpmjet3 heavy problem side effect fixed.  3He for old heavy routine can be
+now o.k
+
+uv6.11
+Dpmjet3 cannot deal with heavy interaction  at low energy (i.e., by Hadrin).
+So heavy interaction was bypassed if K.E/n < 5.1 GeV and we use
+cheavyInt.
+
+
+uv6.10
+6.00 has a few trivial bugs.  They are fixed.  Also some potential
+bugs were found and fixed.  
+New skeleton-flesh method is implemented, which is stable.
+See UserHook/SkelFlesh/Readme
+
+
+uv6.00
+Release 20.May.2001.
+Total xsection calculation routine for P< 20 GeV is added (ctotx.f)
+This is needed for dpmjet3 at E< 5 GeV.
+Known bugs are fixed.
+dpmjet3:
+  skeleton flesh has always some problems.
+PC Linux with Absoft Pro Fortran is supported.
+
+
+
+uv5.99
+dpmjet3 inclusion.test status.
+PCLinux support with Absoft pro Fortran.
+In some system (e.g, Kondara MNU Linux), Import/DPM/pythia.f
+may not be compiled successfully.  In that case, you will get
+a lot of errors at FirstKiss.  To work around this problem,
+you may goto Import/DPM and
+ f77 -c pythia..f
+ ar r ../../lib/PCLinux/libcosmos.a  pythia...o
+ ranlib ../../lib/PCLinux/libcosmos.a
+
+There was no such failure in RedHat Linux.  
+
+
+uv5.66
+Release  Mar. 19 2000
+A bug for ObsPlane=1 was found in the recent versions; 
+when a particle gose up outer atmosphere, it dosen't
+stop at he BorderHeightH but runs until PathLimit is
+reached. In some case, this resulted in flowting overflow.
+This was corrected. From this version,
+if BorderHeightL is 0 ( default), it is adjusted
+to be -1 m below the deepest given ObsSites.  ObsSites organization
+is changed so that ObsSites(0) is BorderHeightH and
+ObsSites(NoOfSites+1) = BorderHeightL
+
+uv5.65
+Release
+For Zcondc.h, DETAILED_TRACKING is added to specify a number upto 3.
+	0 is default.
+
+     if you want to have a detailed info. for particle tracking
+     make DETAILED_TRACKING  >=1.  The user observation routine is called
+     with the following id  on the following  conditions:
+              chookobs(a, id)
+     1)  if it is >=1,  a particle is going to interact at a point given in
+         the track information, id=4
+     2)  if it is >=1,  a particle is going to die, id=5
+     3)  if it is >=2,  a particle is being discarded due to the large
+          angle (cos(angle relative to the parent) > BackAngLimit). id=6
+     4)  if it is >=3,  a particle makes a step. id=7
+
+AMS observation conditions can be fully implementable.  LABELING is more
+systematically treated. Default value of LABELING is 0.
+     If 1; after any interaction (except for continuous energy
+     loss by dE/dx and deflection by B or scattering), label is
+     changed.
+     If 2: For knockon and Bremstrahlung, the survival particle
+     will have the same label. In the case of Moller scattring
+     higher enregy electrons are regarded as the survival one.
+     track.info can be used to know that if it  crossed the
+     highest level.(>0 ---> crossed info times).
+
+Geomagnetic deflection has been updated to have better accuracy.
+
+	
+
+uv5.62
+Release
+For ObsPlane != 1 or 2, time data is not converted into
+  relative n sec.
+
+uv5.61
+Released  Nov.2000
+Very rare error in cdeayLeng.f was corrected.
+dE/dx energy loss was too much when the observation
+depths are near.  
+
+uv5.60
+Release Oct. 01, 2000
+One variable 'label' in track record is added.
+This is used to put a label (1,2,...) on each particle.
+There is a global Labelcounter which
+is cleared at the start of 1 event generation.
+It is counted up when a particle is poped up from the
+stack. The Labelcounter is given to the label of 
+the poped up particle. This may be needed to judge
+if the same particle crosses a given observation place
+more than once. This 'label' becomes  usable if LABELING
+in Zcondc.h is made to be 1.  
+
+Manager/copenf2.f copenwf2.f cskiptoEOF2.f  are introduced 
+which are upgraded verison of copenf.f etc. They can 
+specify the binary or character file.
+
+MAX_SEGMENTS for the primary is made to be 60 (old one was 40).
+
+HeightOfInj may not be necessarily > max of Observation heights
+or < min of Observation heights.
+
+
+
+uv5.55
+Release Sep. 15, 2000
+1) Until now, the geomagnetic field (IGRF data) has been hard
+   wired in the program. Now the Geomagnetic field data can be
+   specified as a file. To specify it, two parameters, YearOfGeomag
+   and GeomagFile (new; in the second namelist) are used.
+   YearOfGeomag specifies the year (like 2000.5 the same as in
+   the older versions).  GeomagFile specifies the path to the
+   data. If ' ' (default), the IGRF data is automatically read.
+   The coefficients to calclate the geomagnetic field are obtained
+   by the linear interplotion of two data of which years are nearest
+   to  YearOfGeomag.  If YearOfGeomag is the latest one, say. 2000.5,
+   the linear extrapolation is done using the last coefficients given in
+   the table.  If YearOfGeomag is  >= 2000, you can specify
+   WMM (DoD) data.  IGRF and WMM data are in Cosmos/Data/Geomag.
+   WMM uses the Legendre expansion which has 2 terms more than that
+   of IGRF. However, the difference is very small and there is no
+   reason to use WMM data.
+        You can also specify a dipole field by giving a virtual
+   WMM data consisting of only first term.
+   You can veryfy the geomagnetic field values by using
+        make -f Geomag.mk
+   or create a data to draw the field by using
+        make -f drawGeomag.mk
+
+   These are the same as the older versions.
+   The values are  checked by comparing those obtainable
+   on web sites. There is always small diffences (order of 1%
+   or at worst case ~5%). The data among the web sites are also
+   scattering. The reason is  not clear.( This time, the values
+   are computed by  completely different programs and the results
+   were the same. So the program seems to be correct.
+   --Older versions  have small bug).
+2) This version contains one C code in Manager/Ccode. (kgetenv.c).
+   This is to get the value of an enviromental variable and used
+   to set the path to the IGRF data when GeomagFile=' '.
+   The usage of the C code  from the Fortran seems to be dependent on
+   the system.  I have verified it on Digital  Unix(Tru64),
+   Compaq Fortran on alpha linux, Solaris, NEXTSTEP. But not
+   on IBM IRIX, old SUN OS and HP.  If it dosen't work, you may
+   use Manager/Ccode/test.f to see what kind of modification is
+   needed.
+
+2') To be able to compile the C code, you have to update the site.config
+
+3) The photon energy distribution at the pair creation was sometimes
+   odd. Although the effect will not be seen in the cascade showers,
+   the code (together with brems code) are entirely replaced by
+   new ones which are adapted version from Epics.
+4) Now you can produce showers to be compared with the AMS results.
+   Job='skeleton' and Reverse=1 can first test the rigidity
+   cutoff, and you may record only those primaries > cutoff.
+   Then, you may use Job='flesh' and Reverse=0 and set observation
+   height at,  say, 400 km.   These task is done by ObsPlane=3.
+
+uv5.51
+Release Sep.03, 2000
+ObsPlane=3 and Reverse !=0 results in an error; primary dose
+not move to the reverse direction. This was corrected.
+Now, one can use Job='skeleton' and Reverse=1 to see if
+the primary is cut-off or not, and  if not cut-off, 
+save the seed.  After that, one can make Job='flesh'
+and use 'Seed' to make a full simulation. In this case,
+only the primary may be the same as the 'skeleton' time
+so that one can change arbitrarily the observation depths etc.
+
+
+uv5.50
+Release Aug.28, 2000
+This version corrected a bug which appears when the injection
+height > 1000 km and the zenith angle is not near vertical 
+( ~ > 50 deg); particles don't move in that case (only ~0.2 m 
+or less at each step).  This version can simulate the e+/e-
+ratio at 400 km etc with ObsPlane=3 (AMS).
+The scripts for converting trace data for Geomview use are
+ready. 
+
+
+uv5.40
+Release Jul.28, 2000
+Bug correction for Obsplane=3 (in cmkIncident.f).
+The default executable module name will be cosmos$ARCH
+where $ARCH means ARCH in site.config.
+
+
+uv5.35
+Release Jul.21, 2000
+Very rare error for random number < 10^-8 or so which
+happens at cdecayLeng.f.  cdecayWEL.f has /sqrt(x*x-1.0)
+and x may become 1.0 exactly very rarely. This was fixed.
+
+
+uv5.34
+Release Jul.17, 2000
+There was a bug which may happen for  iclined muons which emit 
+knock-on electrons so many times; eventually the stack overflow
+occurs.  This was corrected by reversing the order of stacking
+of muon and electron. 
+
+uv5.33
+Release Jul. 10,2000
+It is found that the namelist problem can be solved by using
+-f77rtl option at comilation. 
+
+uv5.32
+Release Jul. 9. 2000
+cxyz2ned had bug (no body has been used it yet so far).
+(n comp. was not correctly obtained).
+It was corrected.
+
+It was found that the Compaq Fortran on Alpha linux  
+produces character constant values without quotation mark
+in the namelist (i.e, xxx = 'abc' is ouptut as xxx = abc)
+thus the output cannot be used as an input anymore.
+This fualt stops program running when such a namelist is
+read again when Cont = t or Job='skeleton' is specified.
+So,  at present,  Compaq. fortran on Alpha linux cannot use
+Cont=t, or Job = 'skeleton'.
+
+
+
+uv5.31
+Release Jun.29. 2000
+Error in site.configCF_AlphaLinux is corrected
+Some error related to single " is corrected.
+
+
+uv5.30
+Release Jun.26, 2000
+This version support site.config for Alpha Linux by two ways:
+  1) If you have True64(digital unix), you may make libraries and
+     executables on that O.S, and run the program on both Alpha-Linux
+     and True64.  To be able to do so at Alpha Linux, you must
+     rewrite kernel to enable ECOFF. (see web faq.)
+    You may use site.configTrue64orAlphaLinux
+  2) If you  have no True64 system, but have only Alpha Linux, 
+    you may get Compaq Fortran for Alpha Linux (see Web).
+    Although the complilation is very slow, it seems to work.
+    You may use site.configCF_AlphaLinux
+   (At me, after introducing ECOFF, the program cannot run, why??).
+
+
+uv5.23
+Realese Feb.19, 2000
+ cut off routine has been moved to Tracking/cmkIncident.f
+(old one is  in  Primary/csampPrimary.f).
+
+
+uv5.22
+Release Jan.18. 2000
+ Some bug fixes for ObsPlane=3
+
+uv5.20
+Release Jan. 7. 2000
+1) support for new cutoff table which is azimuthal-angle-integrated
+  (See Cosmos/Contrib/Data/CutoffNew/sanriku-10kcut etc.)
+2) Decay in flight is treated  more accurately at low enregies in
+   which life time change due to  the ionization loss is considered.
+    The muon decay is affected at < 1 GeV. The effect is small
+    and  at most  ~5% at 100 MeV region. Consequently, the neutrino
+    flux increases a bit.
+3) There will be no error of unresolved external ref. due to
+   change of atmosphere treatment without commenting a line in
+   Cosmos/cosmos/BlockData/cextGener.h
+4) uv5.15 is unable to use  'skelton-flesh' method.  This was
+   corrected.  'skeleton-flesh' method is even usable in distributed 
+   job.
+   If the user wants to lower the minimum energy at fleshing time,
+   KnockOnRatio x KEmin at skeleton making time must be
+   smaller than KEmin at fleshing time.
+5) ObsPlane = 3( =spherical) is fully supported.  The primary 
+   can be injected  uniformly around (LatitOfObs, LongitOfObs, HeightOfInj).
+  The region of the injection point is so determined that the opning
+  angle spans from real(Azimuth) to imag(Azimuth). Thereore Azimuth
+  is not used  in the usual  sense.  The CosZenith is understood as
+  the primary zenith angle range around the injection point.
+  The obseration is done at DepthList (or HeightList).  For 
+  ObsPlane=0 and 3, the user will get (x,y,z) in  Exyz.
+  For ObsPlane=1,2, if the user wants to  get (x,y,z) in Exyz
+  ObsPlane may be made to be nagtive.
+
+   
+
+uv5.15
+Release Aug. 10. 1999
+1) catmosutil.f
+   sintp > 1 check is relaxed.
+2) KnockOnRatio is introduced which determines the electron minimum
+   energy  above which the knock on process is actually radomly 
+   sampled. The method is; if KnockOnRatio < 1, (default is 0.1)
+   KEminObs x KnockOnRatio is the minimum energy. If it is
+   > 1, RecoilKineMinE is used as older versions. For
+   non e+/e-, actual random sampling is performed from this
+   verison.
+
+uv5.14
+Releas Jul. 23
+1) New value of HowGeomag; 31 can be specified. In that case,
+   Geomagnetic field is neglected until the first collision.
+   After the first collision, the geomagnetic field is applied 
+   depending on the particle position.
+   If HowGeomag is so set that the geomagnetic field is not
+   applied, dE/dx has also been neglected aft. uv4.92. This
+   is resumed to be the same as bef.4.92 (dE/dx is considered) 
+   from this  version again.
+
+uv5.13
+Release Jul. 15
+Bug fixes:
+1)Although rare. Lund Fritiof (aath.f) goes into an endless loop. 
+  One of the causes (I hope it be the last one) was detected
+  (with the help by C.SZhang). It is caused by a low energy
+  pion ( ~6 GeV).  I changed the code so that such an interaction
+  is discarded.
+2)If the injection point of the incident is very high (>> 1000 km)
+  and Reverse=0, and the KEminObs is small (say, GeV order or less),
+  a backward going particle causes arithmetic overflow.  This was
+  fixed.
+
+New feature: (related to 2) above).
+  So far the user couldn't employ her/his own atmospheric model. 
+  The new version reads a table in which atmospheric data is
+  written so that the user may change it if he/she wants.
+
+  The atmosphere is approximated by a number of segmented data.
+  A raw of the data consists of 
+
+    height (a.s.l m), pressusre (hP), Temperature(K), density(kg/m^3)
+
+  at each nodal point of the atmosphere.  (see Data/Atmos/stdatmos1.d).
+  It is used after being  smoothly interpolated by  cubic splines.
+  The new or old version can be specified in Cosmos/cosmos/Zcondc.h
+
+
+uv5.12
+Release Jun. 30
+Bug correction for E**(-b)dE (b=1) spectrum sampling.  If a segment
+has such a spectrum shape, sampling fails.  There was also
+not desirable use of random numers, although the sampled 
+primary spectrum for b!=1 case seems to be good.
+uv5.11 is erased.
+
+uv5.11
+Release Jun. 29
+A kind of  bug of ThinSampling is corrected. (Average may be correct
+but too large fluctuation). EthinRatio may be negative. 
+In that case, its absolute is used as the thinning threshold energy (GeV). 
+  Also a bug was corrected which is rather
+serious if em cascades at electron mass scale are considered. 
+  Default  SucInt is again changed to 1.
+
+uv5.10
+Release 26 May. 1999
+Longstanding bug of cutoff table: Definition of azimuthal angle is fixed.
+The south is 0. + direction is anticlock wise.
+Talbes in Contrib/Data/CutOff  was revised. But the table is not so 
+accurate. Use better table in Contrib/Data/CutOffNew/.
+The program code is now made to consistent with the above definition.
+(Note: In default, the x-axis is chosen as the magnetic east.)
+The longstanding bug in Lund was resolved. It is related to
+single precision random nubmer generator which results in exact 1.0.
+Thinsampling is made  possilbe without 'as' in Generate.
+Appendix to the manual is ready; mainly related to how to get
+absolute flux from simulated data. how to make graphs, etc.
+
+
+uv5.03
+Release May, 8, 1999
+main routine is made not to be included in the library.
+(some system has problem when EPICS is linked).
+UserHookr, UserHooki, UserHookc are introduced in the
+namelist;(real*8, integer,  character*100)
+  they are freely usable by the user. The default array
+size is 10, 10, 5. 
+
+uv5.02
+Release May 03, 1999
+Zero divide in Lund Fritiof aath.f (~ 515-th line) is corrected.
+Bug in Ke3 decay corrected.
+
+
+uv5.01
+Re
+DistJob/bin/[distjob, collect] were updated so that final main ouput data
+filne name can be different  from  $datafile.
+
+"lastev' (in DistJob/bin) command is added.  
+
+collection for rigidity cutoff case.
+  Primary/crigCut.f  message area 'msg' is too small.
+  DistJob/bin/distjob cutoff for input and out put must be
+       distinghshed.
+
+uv5.00
+Release '99/04/04
+So far  muon decay is treated only for inclusive observation
+of neutrinos and electrons are neglected. This version correctly
+include electrons (with polarization considered).
+Muon interaction (pair, brems, nuci) are included. 
+For 1 TeV muons running 1000 g/cm^2, the energy loss will be
+1 % larger than without the effects.
+There some change to be good for distjob command.
+
+uv4.94
+Release '99/03/17
+   Infinite loop in charge conservation routine is fixed.
+
+uv4.93
+Release '99/01/28
+   Some additional channels which lead to neue prodction in decay of D are
+   added. 
+   Different Lorentz transformations are used for decay of particles
+   depending on polarization should be considered or not.
+
+uv4.92
+Release '98/10/25
+   IBM users can now complile all programs without manual modification.
+   If mod(HoWGeomag,10)==1, the charged particle deflection by
+   geomagnetic field has been neglected untill the incident particle
+   makes the first collision.  To have consititency with such an
+   idea, energy loss due to ionization is also made to be neglected
+   in this version.
+uv4.91
+Release  '98/10/24
+   One bug in Moliere multiple scattering is corrected. Effect
+   to the Cosmos user is small (but, if the user don't use
+   default parameter setting for Moliere,  gamma /electron primary
+   showers will have larger lateral  spread than the correct one).
+   Effect to Epics users is none,  except for some pepole who
+   used unanounced recent versions. 
+
+uv4.90
+Release  '98/06/29
+   Ad-hoc model tuning is again made. When a calculation for the LHC calibration
+was performed, it was found that Pt is ~15% larger than experimetnal data
+so that Pt was adjested to be compatible with sps data.
+A big bug was in the QCD multiplicity dependence treatemnt.
+(MulLow=1, which is not default). 
+The multiplicty was almost twice as large as the aimed one.
+This is due to the confusion of charged and total multiplicity.
+
+
+uv4.75
+Release  '98/05/03
+   Inclusive particle production can be used as in Contrib/Inclusive. 
+   This is for neutrino observations.
+  To use this option,
+  1)  INCLUSIVE in cosmos/Zcondc.h must be given a
+      value of 1 when making the library.
+  2)  IntModel ='inclusive' must be given int the 2nd parameter group.
+
+  3)  InclusiveFile must be given to show the path to the
+      xdist.d which is normally in Contrib/Inclusive/xdist.d
+   As long as INCLUSVIE in cosmos/Zcondc.h is 0, the user need not
+   down load Contrib/Inclusive.
+uv4.72
+Release  '98/03/28
+   Bug fix.  For the Fe primary, one may encounter a case where
+ the total sum of the charge of break-up products exceeds the
+ Fe charge and the program stops.  Similar  problem may happen
+ for other heavy primaries.  This was corrected.
+
+uv4.71
+Release  '98/03/21
+Bug fix
+	If the KEminObs is very small, one might encounter a
+ case with the zero divide in cadjm.f.  This was corrected.
+ This correction is important if the library is used by
+Epics to simulate showers as low as 100 keV. 
+
+ The difference in the K0 and K0_bar collisions are taken into
+account seriously in the Lund/NewLund/Nucrin routines.
+However, low energy K0's  almost all decay in  the atmosphere,
+it is expected that we cannot observe the difference in the 
+results.  The difference in their decay has been treated
+correctly so far.
+
+uv4.70
+Release  '98/03/14
+Bug fix.
+  1) Related to all users;
+    a) There is a part in Nucrin (aado.f) that
+       results in the zero divide. This was corrected.
+    b) There is a part in Nucrin (aadn.f) which leads to
+       semi infinite loop (To generate one random variable with
+       the exp distribution, one may need more than a minute or 
+       much more depending on  how small a uniform random number
+       produced is.  Nucrin used a sophisticated method (a la
+       Neymann; see rexpC in aadn.f). This was changed to use
+       log(uniform random number).
+    c) One dimensional calculation sometimes went into infinite
+       loop, especially for a large zenith angle. This was 
+       corrected.
+    d) The following was detected on an alpha machine, but may be seen
+       on other platforms (NEXT with absoft and  HP did not
+       see it); "particle code=0 is invalid".  A potential cause 
+       (may be dependent on the compiler) was eliminated.
+        This bug was introduced in a previous release.
+  2) Related to the DEC alpha (compatible) with Digital unix users.
+       The Lund code Fritiof produces an invalid particle
+       code, though  very rare. The cause was not resolved.
+       Since the events  without such a strange code seem to
+       quite heathy, the present system issues a warning message
+       (on error out) and neglects such an event and continues the job.
+       If you want not to show the message, see cosmos/ZstrangeCode.h.
+
+uv4.60
+Release  '98/02/26
+Bug fix. In Tracking/cxyz2prim.f, 
+       subroutine cxyz2primD(a, b)
+       gave a wrong answer when 'a' and 'b' are the same variable.
+       This was corrected. This gave a wrong direction cosine if
+       ObsPlane=2.
+
+       Some bug correction of Lorentz boost for special conditions.
+ 
+       Probably due to this, DEC alpha machine become to be able 
+       use the Lund code  without problems. (i.e., Elund*=500 is ok).
+       
+       Now, the random number seed and event number are written automatically
+       to SeedFile if it is not ' ' even when Job!='skelton'.
+      (In the case of Job = 'flesh', it is read).
+       
+       ObsPlane = -1 or -2 is supported.  Everything is the same as
+       ObsPlane = 1 or 2, respectively except that the coordinate 
+       system of particles given to UserHook is the Exyz.
+     
+       XaxisFromSouth is added to the 2nd group of the input parameters.
+       This is to specify the angle between the horizontal detector 
+       X-axis and the south (deg). (+ is counter clockwise, i.e,  90.0 is
+       east).   If its absolute value is > 360.0,  it is computed so that
+       the magnetic east becomes the detector x-axis direction.
+
+uv4.51
+Release  '97/12/03
+Bug fix.  In primary energy sampling, if the all of the following
+          condition is met,
+    1) energy is not in GeV
+    2) mass is not negligible
+    3) energy is by kinetic energy or momentum (optionaly in  /n)
+  Then sampled energy was not correct or sampling failed.
+  The bug was in cconv_prim_e of csampPrimary.f
+  
+  Change: In Zmaxdef.h,   max num.  of sites and AS sites is made to be
+    20.
+
+uv4.50
+Release  '97/11/27
+Bug correction.  The treatment of  the Lorentz boost  was
+    not appropriate due to the change of the coordinate system
+    from the main frame version. This was most strongly demonstrated
+    in mu/e-neutrino ratio because the z-axis of the Lorentz boost is
+    that of the muon direction. The ratio was too big in all the unix
+    versions.
+    The effect seems to be also seen in the spread of high energy particles
+    (say, gamma family), and in their bit smaller energies.  Accordingly, A.S
+    size has been underestimated by 10~15 %. 
+*** Gamma/Electron primary showers are free from this bug.
+*** Also if only the Lund code is used for hadronic interactions,
+*** the bug effect will be seen in the mu/e-neutrino ratio.
+
+Bug correction. (no effect on the result).  The subcode for the gamma ray
+    should be different  whether it suffers from cascade or not.
+    This was not realized so far, but is implemented in this version.
+   (subcode = kcasg, kdirectg)
+Bug correction.  One dimensional mode calculation was totally not
+    usable in the recent versions (>=uv4.0).  This was corrected.
+   OneDim =0:  three dimensional.
+           1:  One dimensional without table use for length<->gramage
+           2:  One dimensional with table use for primary cos < 0.5.
+           3:  One dimensional with table use for any angle.
+
+Improvement:
+   In the primary table, you can specify a minimum energy which  is 
+ higher than the one given in table columns. This will enable the
+ use to use the same table with different minimum energy without
+ changing the table content.
+
+   Some users prefer to use larger arrays than the system defaults.
+ (say, for larger number of observation sites). For such purpose,
+ cosmos/Zmaxdef.h may be used.
+     
+Bug correction.  Tracking/Atmosphere/cthick2len.f had a line
+containing "maxkg2=1000".  This was too large if the particle angle is
+large and resulted in an occasional incredibly long computation time.
+If we put the value 100, everything seems to go well.
+However, I put a more sophisticated modification.
+
+ The explicit Moliere scattering formula is added for 
+multiple scattering(see Note below). Before this version, a sophisticated
+Gaussian approximation has been used in which the gradual
+change of air density and constant dE/dx were taken into account.
+The Gaussian approximation is very good for e-m cascade and the result
+shows no difference from the Moliere method; this is due to the
+fact that distant particles are mainly composed of low energy
+particles suffered from scattering angle in the Gaussian part,
+but not of those suffered from large angle scattering.
+
+  One may, however, think that muons might be affected 
+by large angle scattering since they don't suffer from cascade process.
+For muons in the atmosphere, however, the large angle effect is 
+expected to be masked due to the magnetic deflection and 
+moreover transverse momentum at particle production.
+
+ In fact, as shown in the following table I, the effect for
+proton primary showers are not well seen in spite of the fact 
+that the clear effect is obvious for virtual single muon incident case. 
+(Table II).
+ Although the previous treatment is good enough we introduced a parameter
+"Moliere" in this version as follows.
+
+ Moliere =0:  Old scattering formula is used. No change from 
+	       the  older versions.
+ |Moliere| =1:  Moliere scattering formula is employed only for 
+               non-electrons. If this 1, for the
+               angular-lateral correlation, we use the correlation
+               function obtained by the Gaussian approximation.
+               If it is -1, we neglect the lateral deflection.
+ |Moliere|= 2: The same as above applies to all charge particles.
+
+*** Note *** 
+ Many of you might think that Moliere's theory is almighty (or best)
+for multiple scattering. But things are not so simple in
+Monte Carlo's which must see angles as well as positions.
+
+ There is a certain correlation between scattering 
+angle and lateral spread.  With the Gaussian approximation, the
+lateral spread <r'> = a'*t/2, where t is the distance travelled,
+a' the scattered angle.  For a given sampled a', the Gaussian 
+approximation gives us an explicit correlated function for r'.
+This correlation is important to get a correct lateral spread.
+However, it is not possible to obtain a correlated distribution
+in the Moliere theory. We follow the Gaussian prescription
+after obtaining a scattering angle by Moliere's theory if 
+Moliere > 0.  I am not sure whether this prescription is very
+good or not. (At least for e-m cascade, the results are the
+same as the Gaussian case).
+
+
+uv4.12
+Release  '97/06/21
+Since the source file in the web site was short in the total
+file size (due to ftp problem?), the complete one is 
+sent again.  To do so, I changed the logic employed in
+uv4.11 a bit.  In version 4.11, I used
+  leng = leng * 1.005
+This worked fine at least for 1000 showers.  When I made
+  leng = leng * 1.0005
+I met failure after some shower generation.  In this, version
+I put absolute value shift to the leng, i.e.,
+  leng = leng + |0.01/dircos.r(3)|
+This means the crossing point is made to be 1 cm apart from
+the real observation level. 
+
+
+uv4.11
+Release  '97/06/17
+Bug correction for infinite loop.
+In  cifXObsSites.f,  at line 175,  there is a line
+
+ leng= (ObsSites(loc).zpl - ...
+
+one more line should be added after this to make sure that
+the particle crosses the plane.
+
+ leng = leng * 1.005
+
+
+
+uv4.10
+Release  '97/06/14
+Bug correction and improvement:
+
+1) If "generate" included 'as' and a high energy electron  goes
+upward,  A.S generation routine encountered an error in
+clenbetween2h and stopped (That is,  the generation of A.S by up going 
+particles was not possible).  This bug was corrected.
+
+2) Also there was a problem in individual particle
+observation  when a particle goes backward.  This was
+corrected so that up going particles can be observed.
+
+3) If ObsPlane is 1 (horizontal) and a particle crosses an observation
+plane at very far distant place from the core,  the trace information
+z-coordinate value (expressed in air thickness) was not correct.
+This bug was also corrected. (This is due to the Earth curvature).
+
+4)If an incident particle had negative zenith cos angle, 
+   it was regarded that the particle was injected at the
+   "conjugate point" of the earth with the positive cos angle.
+  (This is for neutrino observation when a primary comes from
+   below the horizon).
+   If the negative zenith angle is taken always like this, we
+   cannot simulate the case where an incident particle really
+   goes upward direction (to the outer atmosphere; this may happen 
+   if an up going  neutrino makes an interaction near the
+   surface of the earth and produced particles emerge from
+   the surface).   In this version, we interpret the
+   negative zenith angle (given by coszenith) as that of an up going particle
+   if HeightOfInj is lower than the deepest observation level.
+   In this case, you must give BorderHeightH explicitly.
+
+Release	 '97/05/17
+1) A new user interface routine, chookHybAS, is added to manage hybrid
+  air shower generation.  It is called when a component shower from an
+  electron is added so that the user can make some additional
+  computation for such a component air shower.  The routine is
+  primarily intended to be used for generation of air fluorescence light.
+  The file chookHybAS.f is in UserHook. Every one must include it by putting
+  #include "chookHybAS.f"  in one's hook routine to avoid unresolved
+  external reference.
+2) For air fluorescence light, new routines are added to be able to
+   get the temperature of the atmosphere, and effective <dE/dx>.
+   The interface is:
+     real*8 cvh2temp(vh, tk)
+     call cavedEdx(eno, age, dedx)	
+   where vh: vertical height, tk: temperature in Kelvin,  eno: Ne
+   age: age of the shower, dedx: effective  <dE/dx>.
+   tk and dedx are output and others are input.
+
+The assumed usage for air fluorescence light generation is one of the
+following two:
+1) manage fluorescence light generation business for each component
+   shower.  The user may enrich chookHybAS.f  for this end.  
+2) manage fluorescence light generation at the end of each shower generation.
+  That is, the user may manage it in chookEnEvnet.  
+   
+
+uv4.01
+Release  '97/02/12
+
+1) A new treatment is introduced to have a faster execution of one
+   dimensional calculation at large angles (cos(zenith) < 0.5).
+   Although it uses tables and interpolation, accuracy is high.
+2) For Cerenkov light calculation, the user can give Trace > 160,
+   in which case the user can manage the charged particle track
+   information in the user hook. This means, the user can convert
+   the track  information into Cerenkov light in his/her desired
+   form on fly. This is to save large disk volume which might be
+   needed if the user writes the track information directly.
+   For this end, template routines, chookCerenS, chookCeren
+   and chookCerenE, are supplied in the ctemplCeren.f file in
+   UserHook. The user may copy these into chookCeren.f and
+   fill the content. (See ctemplCeren.f).  The track info
+   coordinate is the same as Trace-100 --> Trace.
+3) DestEventNo is now an integer array of dimension 2. 
+   The first one is the number of events to be generated
+   ultimately, and the second one the number to be generated 
+   in the current run.  If it is not given, DestEventNo(2) is 
+   the same as DestEventNo(1).  If you give some value smaller
+   than DestEventNo(1), the current run will stop when Cosmos
+   generated such a number of events in the run.  The user may
+   give 'Cont =t' in the  parameter file and continue the 
+   next run to generate another DestEventNo(2).
+
+   For first run:   cosmos < param     
+   Then, change "Cont = t" in param.
+   For 2nd run, 2rd run,  cosmos < param.
+
+4) Bug correction, at very high energies, the eta meson may not decay,
+  and may collide with an air nucleus. The leading particle treatment
+  was missing for eta and this was corrected (in cfclp of cs2lp.f)
+  so that the program  execution dose not stop. 
+  	
+uv4.00
+Release '96.11/04
+
+Bug corrections:
+First of all,  who is safe ?
+
+1) If you are using gamma/electron primary. (Provided that
+   you are not dealing with muons coming from photo-production
+   of hadrons). 
+2) If you are not using uv3.00 to 3.50, not using Absoft Fortran
+   and primary enegy is < ~10 TeV. (There is known bugs in versions
+   before uv2.203, so you must bypass such bugs in this case).
+3) Relatively safe:  If your condition violates 2) above, but if you 
+   are doing simulations at high energies and not dealing with muons in A.S.
+   Effect will be small. There might be some over production of 
+   gamma/electrons.
+
+----------bug details.
+
+1)  Version uv2.203 to 3.50 have a bug in a nuclear interaction routine,
+    nucrin, which is used for hadoron nucleus collisions  below 5 GeV.
+   (No particle is produced). This is due to a mistake introduced when
+    I changed all external names in old Lund-related codes so that
+   they might not collide with those in the new Lund code.  
+    Some external names had not been detected for change.
+
+2) In the adhoc phenomcnological model, pion interaction has a bug.
+   Due to a mistake when the code for the main frame was rewritten for  
+   unix, the leading pion after a collision all changed into pi zero.
+   This has a big effect on the low energy muons in  air showers.  The
+   effect is as large as factor 1.6. (For 100 TeV protons; if one doesn't
+   use Absoft fortran which employs the adhoc even below 500 GeV. 
+   The Abosft fortran users would have a correction factor as large as
+   2. There  will be some over production of gamma rays.  
+
+3)  Successive interaction probability in a nucleus is revised and it is found
+   that the  probability of larger number of successive interactions is 
+   bigger than  than older version.  The multiplicity increase as compared
+   with the older  versions is rather tremendous.  However, the effect is 
+   only in the  muon numbers in the air shower and estimated to be order
+   of 15 % at 100 TeV region. But the effect will be much large at higher
+   energy.  Since the treatment is based on a geometrical picture, I am
+   not completely confident with this new version. The user can choose
+   the old version or this new version by giving SucInt = 0 or 1,
+   respectively.   The default value is 1.
+
+4) One can specify the azimuthal angle range for isotropic zenith angle
+   input.  The new parameter is Azimuth. For example, Azimuth=(0d0,35.d0),
+   will limit the azimuthal angle range between 0 to 35 degrees. The 
+   angle is measured in the (lowest level)  detector system of which
+   x-coordinate  is directed to the magnetic east and the y to 
+   magnetic north.
+
+
+uv3.50
+Release '96.10/01
+
+ 1) Bug correction: Infinite loop sometimes occurred with small KEminObs
+    (say, KEminObs=0.5)  has been corrected. 
+    The problem with small KEminObs has been treated very carefully, but
+    there still existed a bug. For example, even when an anti proton energy
+    becomes  smaller than KEminObs, we cannot discard that anti-proton if
+    KEminObs is small, because, anti-proton annihilation may generate
+    particles with kinetic energy > KEminObs.  This fact brings some
+    difficulty in particle following;  Some worst case may be stated that
+    anti-proton stops in "vacuum" so that it cannot move nor annihilate.
+    Similar problems occurred for particles that can decay.  These
+    bugs are eliminated in this version.
+      Floating exception bugs:  There found two of such; one in ckaonDecay.f
+    and the other in aadn.f. There are both sqrt(-eps) problem, where eps is
+    ~10^-6.
+
+ 2) A class of calculations such as muon observation with hybrid air shower
+    size is assured to be run fast, if one dose not need to
+    include small number of muons coming from photo-hadron production.
+    In this case,  one need not follow e-m cascading to a low energy.
+    The codes so far released should have been constructed to be able to do
+    such jobs, but I am not sure it was really supported correctly,  
+    because some user reported he needed  30 min. for making one
+    event with KEminObs = 1.0 for a proton primary of 100 TeV. 
+    The event could be generated in 10 seconds or so with Pentium
+    100 MHz machine. The present version is confirmed that such a 
+    function really works.  Also I confirmed applicability of
+    'skeleton/flesh-out' method. 
+ 3) Some inconvenience for simulating very high energy showers (gamma with E
+    > 10^19 eV) have been eliminated. (Say, overflow due to multiple scattering
+    at very high altitude such as 1000 km where there is no air
+    and the scattering can be neglected).  The default parameter values
+    for the LPM and magnetic effects was adequately fixed.
+
+ 4) Eta-meson production is explicitly taken into account from this version.
+    Etas are neglected at low energies because it is almost equivalent to
+    pi0's.  (We explicitly  introduce eta if the number of pi0 exceeds 10).
+    However, the role of eta is at E > 10^19 eV where pi0 becomes
+    unable  to decay and only eta's can be a source of high energy gammas
+    for which the LPM effect may works. Its finite life time is also taken
+    into account because it will become important for proton primary of
+    ~ 10^22 eV.  There is a parameter, Eta2Pi0,  which is the ratio: eta/pi0.
+    The default value is 0.2
+   
+uv3.10
+Release '96.09/18
+ 1) The second  random number generator which is used only in flesh-out
+    time is found to generate exact 0; this is not desirable and corrected.
+
+ 2) The skeleton/flesh-out logic was changed to be much simpler one, 
+    although  the  usage is unchanged except for the following case.
+    There was one bug in skeleton/flesh-out method when the user add
+    deeper observation level(s) at flesh-out time;
+    fortunately this function has not been used any body yet.
+
+    To correct the bug, the following change has been introduced.
+    If the user wants to add deeper observation level(s) at flesh-out time,
+    he/she must give the entire observation depths (let the number of depths 
+    be N) at the  skeleton making  time. To be able to terminate the
+    particle following  at some depth which is not the deepest one,
+    the user may specify the depth by the 'EndLevel' parameter (<N;
+    2nd parameter) at the skeleton-making time. This number must 
+    be changed to a larger one at flesh-out time.
+
+ 3) Easier parameter setting is possible for
+    the hybrid AS simulation at very high energies
+    where we must take care of LPM and magnetic effects (This is owing
+    to the simplification of the skeleton/flesh-out logic).
+    Also  less  time is needed to get reliable results.
+
+    The meaning of RatioToE0 has been changed:
+    The parameter, RatioToE0  (default value is 10^-5), is used to
+    compute the minimum energy of (hadronic) particles to be  followed
+    as minimum=(E0/nucleon)*RatioToE0.  At very high energies, 10^-5
+    may not be small enough; ~10 percent smaller AS size may be obtained.
+    However, you must know decreasing this by one order results in 
+    ~5 time longer execution time.  In normal applications, WaitRatio
+    may be 1.0 for non-e/g primary, and 0.01 for e/g primary.  However, 
+    it must  be as small as (E0/nucleon)*WaitRatio = 2x10^16 ~ 10^17 eV
+    to take into account the LPM and magnetic effect properly.
+    For 10^21 eV primaries,   WaitRatio of 2x 10^-5 ~ 10^-4 is needed.
+5)  Probably you noticed the following bug; the standard chook program
+    out put the parameters and some others on stderr. However, some of 
+    them appeared on stdout and this cannot be ceased until you
+    comment out the corresponding subroutine call.  This was corrected
+    so that you can redirect standard output to a disk file without 
+    contamination. (Note: Absoft Fortran produces 1 line out put
+    on stdout when it read namelist data.  This cannot be avoided,
+    so the standard output always  involves contamination)
+------------------------------------------    
+uv3.02
+Release '96.09/14
+ There is another problem for DEC compiler.  Manager/cmanager.f has
+lines:
+      external ludata
+      external luedat
+      external luhdat
+We have to append C (capital C) to each of the three lines;
+      external ludataC
+      external luedatC
+      external luhdatC
+
+
+
+uv3.01
+Releas '96.09/14
+
+ Since DEC Fortran cannot properly treat statement like
+  sing(1., x)  
+  cmplx(1., y)
+where x and y are double precision real variables, corrections
+are made in Import/NewFritiof/pythia.f and jetset.f
+
+uv3.00
+Release '96/09/13
+
+I)   A new Lund Monte Carlo program, Fritiof (V.7.02), was implemented for 
+     the hadronic interaction model. This one has been supposed (by me) to
+     be applicable upto the SSC energies. (But there are problems and I am 
+     skeptical about its applicability to cosmic ray  physics. See
+     details later).
+
+II)  Accurate formulas including quantum effect were implemented for the
+     magnetic bremsstrahlung and pair creation (The previous version had
+     almost correct ones, but there was one problem in tracking particles
+     when the magnetic effects are important).  
+
+III) The default interaction model for NEXT (Absoft Fortran) is changed to
+     IntModel='int1' instead of 'int2'. It has been found by some users 
+     that the Gheisha code (which has been the default for NEXT) gives too 
+     wide lateral distributions for muons  and electrons as compared to the
+     Lund/ad hoc model which give consistent results with the experimental 
+     data.  Gheisha is now put to a non-default code.
+
+IV)  The program was modified so that the user may get the nuclear interaction
+     height of a given observed particle.
+
+V)   There are two changes in the ad hoc model tuning.
+     One is the transverse momentum at very high energies (> 10^16 eV).  The 
+     (hopefully) correct high Pt tail can be reproduced in this version 
+     (older versions have smaller probability of producing high Pt), 
+     although its effect is expected to be very small in the observation.
+
+     The other one is related to the multiplicity .  This version has 
+     SMALLER multiplicity (by about 10 %) than the older ones at > 10^14 eV, 
+     in spite of the fact that many cosmic ray people tend to like a higher 
+     multiplicity models. Why the change ? See later.
+     
+     Effect: May be seen only in muon numbers with low energy threshold;
+     I expect a few percent reduction.  Air shower size will not be 
+     affected.
+VI)  Spell check has been done for Doc/ParamUsage* which are generated from
+     some #include files. Since many #include files have been touched,
+     'make' will recompile many files. 
+
+
+-----------------------
+Details:
+I)
+The new Lund Fritiof consists of:
+Fritiof      (managing interactions)
+Jetset       (for fragmentation)
+Pythia       (for hard scattering)
+Ariadone     (for gluon radiation)
+
+The model is said to be applicable at  E(lab)> ~100 GeV. (At least root
+ s > 10 GeV).
+Accordingly, new parameters, Elund2, Elund3, LundPara were introduced.
+The new Lund codes are employed if the particle energy, E,  is 
+ Elund2 < E < Elund3.
+In this case, Elund2 must be > ~ 100 GeV.  
+
+The energy scale and code to be used are;
+--------- 5 GeV---------Elund--------Elund2------------Elund3---------------
+Nucrin/Hadrin     Old Lund     adhoc          new Lund         adhoc  (int1)
+        Gheisha                adhoc          new Lund         adhoc  (int2)
+
+However, the user can adjust Elund/Elund2/Elund3 so that, for example,
+one can use only the adhoc model at E> 5 GeV. 
+The typical setting will be:
+1)  Elund=Elund2=Elund3=500 (default). Effect: the same as the older version.
+2)  Elund=Elund2=Elund3=4.99 (default for  Absoft compilers).   Effect:
+    only adhoc model is used at E> 5 GeV.
+3)  Elund=500, Elund2=500, Elund3=1.e30. Effect:
+    At 5 < E <500 GeV, old Lund is used.
+    At E> 500 GeV,     new Lund is used.
+Caution:
+ Although the new Lund codes may be good for hard processes,
+ its use for cosmic ray is very much questionable.
+
+Some characteristic features of the new Lund code relevant to cosmic 
+ray physics are:
+
+1) The x-distribution of pions and kaons in the fragmentation region 
+   almost completely scales. This is different from the adhoc model where
+   we see some weak scale breaking in the fragmentation region.
+2) On the contrary, the x distribution of nucleons in pp collisions dose
+   not scale.  Especially, the diffraction peak disappears
+   and the leading particle becomes less and less prominent at higher 
+   energies.  This would be inconsistent with the tipple Regge theory.
+   (See fig. in the Web site).
+3) The average multiplicity (as a function of energy for pp collisions) is
+   smaller than the adhoc model, if we use Fritiof hard process (see below).
+   (at > 10^15eV).  However, at SPS energies the Lund gives a little too
+   high multiplicity than the adhoc and UA5 data.
+   If we use Pythia hard process (see also below). the multiplicity is
+   increased and in some case exceeds the adhoc model.
+  
+     For p-air collisions, the Lund code gives higher effect than the
+   adhoc model.
+4) The new Lund codes cannot reproduce UA5 results (pseudo rapidity data).
+   The difference from the  experimental data seems too large to be
+   attributed to some experimental biases.  (See Web fig).
+5) The x-distribution of nucleons in pp collisions differs from that of
+   old Lund even at few hundred GeV, and seems contradicting to
+   experimental data  (see Web fig).
+
+New Lund code has some tuning parameters. Typical ones are:
+  a) use Pythia for multiple hard scattering process or use Friitof's
+     simplified method.
+  b) OPAL or DELPHI parameterization for some hard process.
+
+Other problems:
+  As mentioned in 3) above, depending on whether we use 
+Pythia hard process(Fritiof parameter, kfr(7)=2) or Fritiof hard
+process( kfr(7)=1), the average multiplicity  changes considerably;
+
+            ---Table---(See also Web fig) 
+ The total multiplicity for pp collisions (upper)
+ and p-Nitrogen (lower). (excluding the elastic events)
+Errors in the table values are expected to be order of few percents.
+(Typically 2000 events are generated, the standard deviation is order of
+the average value (bit smaller), so you can estimate the errors. Only 1000
+events were generated in some high energy cases) 
+                          pp
+---------------------------------------------------------------
+E0                10^12  10^14  10^15  10^16  10^18   10^20  10^21 eV
+---------------------------------------------------------------
+adhoc before v3     19.1    48   69.2  100     207      390    558  
+     charged        11.7         40.7          117             308
+
+        v3          18.2    43.6 63.1   91.1   181      369    489  
+     charged        11.4         37.2          103             268       
+ 
+
+
+Lund    kfr(7)=1    19.1         62.5          151             313  
+  // charged        11.1         37.4           90             186
+
+Lund    kfr(7)=2                 75.4          201
+                                 44.9          120
+
+Lund    kfr(7)=1    19.3    45   67.5   85     153      248    336  p-d
+Lund    kfr(7)=2    20      53          99     199      381         p-d
+
+                        p-Nitrogen
+---------------------------------------------------------------
+adhoc  bef.v3       27	    70   112  160      336             892   p-Nitrogen
+
+  v3.0 SucPw=1.5    25.3         104           312             869   //
+  charged           15.3          61           177             477  
+
+  //   SucPw=0.5                 108                                 //
+
+Lund    kfr(7)=1    28.6         118           313             697  p-Nitrogen
+                    17.1         70.4          186             413
+ 	                                                     (681 events)
+
+Lund    kfr(7)=2    30.0
+		    18.0
+-----------------------------------------------------------
+
+                   comparison with the  ua5 data
+
+roots (GeV)      53         200         546        900
+
+ua5 data        
+    charged     11.7        19.5        27.5       32~33
+
+adhoc v3.0      19.9        33.5        47.2       55.3
+	        12.3        20.2        28.1       32.7
+
+Lund  kfr(7)=1  20.6        35.0        47.4       56.1     
+                12.5        21.0        28.5       33.7  
+
+Lund  kfr(7)=2  22.2        43.3        56.7       65.6      
+                13.5        26.0        34.0       39.4
+ 
+------------------------------------------------------------------
+at 10^15 eV
+               Lund                             Adhoc  
+         pC       pN         pO              pC        pN        pO 
+       114        118        114            104        104       110    
+        67	  70.4       68              61.2       61       64.7  
+
+
+ 
+When we look into the multiplicity distribution of the Lund result with
+ kfr7)=2, the shape is roughly as follows and it indicates  kfr(7)=2  has 
+a problem.  (See also Web fig). I wrote a letter to the auther of Fritiof
+about this but no respose yet.
+
+|    +
+|   + +      rough sketch of multiplicity
+|     +     distribution at 10^20 eV with kfr(7)=2
+|   + +           +
+|  +   +        +    +
+|  +    +     +       + +
+| +      +   +            +   +
+|---------|----------------|----->
+0        500              2000   # of total particles
+
+
+The  kfr(7)=1 case gives smaller average transverse momentum (13% smaller
+than the case of kfr(7)=2 at 10^18 eV).  The OPAL and DELPHI groups
+parameterizations for some hard process are giving  some difference 
+at very high energies:  DELPHI parameterization gives little bit 
+larger transverse momentum (but may be negligible).
+
+ The valley seen in the figure of multiplicity distribution with kfr(7)=2 is 
+somewhat smeared out in p-air collisions.
+  One more problem in the New Lund code is that it cannot treat
+kaon collisions properly, since Pythia cannot accept it. Therefore, the 
+code regards all sort of kaons as a negative pion. This will not be
+harmful in may respect except for high energy muon observation. If
+one is interested in high energy muons, such a treatment may have a big
+effect, since the leading kaon  (which has still large energy) after 
+collision has larger probability of decay than leading pion.
+
+----------- change from original Lund code ----------
+   To be able to use the New Lund code at very high energies, I made 
+all real variable to be double precision and expanded some array size.
+However, the array size is still not enough for 0.3 % of events at 10^21
+eV p-O collisions.  The external names in old Lund code have been changed
+so that they don't collide with the ones in New Lund code. (Actually, 
+this had been done in the previous version already--> not true).
+I confirmed that the strange results  are not due to this change; at
+lower energies where the original code can work, we already see similar
+phenomena and they coincide with  results by the changed  code.
+
+  The random number generator is changed to the Cosmos supplied one
+so that skelton/fleshout method is applicable.
+-----------------------------------------------
+
+************ Tentative conclusions about new Lund code ***********
+
+You may use it as one class of models in which
+
+1) secondary particle x-distribution completely scales,
+2) leading particle becomes less and less at higher energies
+   (increasing inelasticity with energy). No diffraction peak
+   at high energies
+3) inconsistent with UA5 data
+
+and see what is the effect on observations.
+	
+To be able to choose the parametarization or modeling, LundPara
+is introduced; it is a dimension 10 integer array and currently 1~5 are
+used.
+LundPara(1) (Default = 1); value for kfr(7)
+        (2) (Default = 1); OPAL(=1) or DELPHI(=2)
+        (3) (Default = 0); to suppress  some message from Fritiof(=0)
+                           or positive value for message. It is put stderr.
+        (4) (Default = 0): to suppress some message from pythia (=0)
+                           or positive value for message. It is put stderr.
+        (5) (Default = 1); When New Lund is used, kaon collision is treated
+                           by the adhoc model (=1) or regarded as a negative
+                           pion (!=0) in New Lund.
+
+
+
+
+IV)
+  Since one user wanted to know the production height of an observed
+particle, the Cosmos code was modified a little bit. (This feature was
+supported in the main frame version). 
+  One may wonder how one should define the production height of a given
+particle.  Take an electron, should we define it as the point where a
+gamma ray made pair creation (then, if there is a lot of cascade, 
+which pair creation?), or pi-0 decay point, or nuclear collision point ?
+  The resolution here is to take the nearest hadronic collision point where
+the parent of a given particle is produced.  To be able to get such info,
+we have to increase the track attribute; if 'aTrack' is a
+ record /track/ aTrack,
+then
+ aTrack.colheight
+is to keep such height in m from the sea level. 
+(colheight is the vertical height).  One may subtract the  height of
+an observation site from this value to get the production height.
+If a primary is a non-hadronic particle, or a hadronic primary dose
+not interact and reach an observation level,  colheight becomes very large
+value(> 10^37), and if you convert it single precision, you may get
+ +INF (I am afraid you may get error in some system)
+  Since there is changes in the program,  skeleton data created by the older
+versins  is not usable for fleshing-out in this version.
+
+
+V)
+    I found one mistake in the previous tuning in the phenomenological 
+    ad hoc model. It intruded when I rewote the main frame version 
+    for the unix version. At that time, I retuned the code using UA5 data.
+    When I should have used UA5 inelastic data, I used UA5 non-single 
+    diffractive data by mistake.  This resulted in higher multiplicity 
+    and stronger energy dependence of the average multiplicity increase
+    than the present correct tuning. 
+    You will see a figure in the Web site that shows very good fit to
+    UA5 inelastic (minimum bias) data by the present version.
+    The tuning is very sensitive to the multiplicity and its energy
+    dependence. The absolute value of the (charged particle) multiplicity
+    must be tuned within ~0.5 particles and the power of the  energy 
+    dependence is within ~0.003.  However, nobody knows that the
+    extrapolation of this to 10^21 eV is valid or not.
+
+
+---------------------------
+uv2.203
+Release '96/02/26
+   A bug correction. The number of particles observed at near sea level 
+was too small; such particles were counted as being reached the
+BorderHieghtL and not judged as crossing the observation plane.
+This was corrected.  The effect was serious for muons at near
+sea level.
+
+uv2.202
+Release '96/02/02
+   In the previous version, I forgot to correct a mistake in
+the charge assignment; in the photo-hadron production, 
+positive charge excess occurred which must not exist with
+the air target.
+
+uv2.201
+Release '96/02/02
+  Bug correction for photo-production of hadrons.
+  There is still one more fatal mistake in Particle/Event/GammaN/cgpHad.f.
+  At around line 83.
+
+        elseif(jtype .ge.  3 .or. jtype .eq. 4) then
+c         now in cms. boot to lab
+
+  should be read as
+
+        elseif(jtype .eq.  3 .or. jtype .eq. 4) then
+c         now in cms. boost to lab
+
+       There was a misleading comment in chook.f, chookSample.f
+   etc, about particle trace by the user option, like, if
+    Trace > 60, chookTrace is called.
+   This should be read as Trace > 100.
+   In chook.f, one example of  using Trace > 100 is embedded;
+   This example is to use standard output procedures for Trace
+   but output only muons.
+
+
+ 
+
+uv2.200
+Release '96/01/24
+
+  Bug correction for photo-production of hadrons.
+  There is mistakes in particle number setting.
+  4 body decay( gx --> x + 3pi, x= p/n ) sometimes fails after 20 trials
+  due to wight problem (few %). However, failed events have statistically
+  no special bias, they are now accepted, and program execution continues.
+  
+
+uv2.107
+Release '96/01/01
+
+Effect: For cosmos users, none.  This is to eliminate some name
+      collisions with epics.  (Zdedx.h)
+
+
+uv2.106
+Release '95/12/27
+
+  Effect: In the E> 10^15 eV region.  There may appear some
+	difference if you investigate high energy muon bundle
+	dicoherence curve etc.  In the older versions, the 
+	occurrence of high 
+	transverse momentum was somewhat underestimated.
+  All figures in the Web site were created by using this version.
+
+uv2.105
+Release '95/12/20
+
+  Effect:
+  1)  Hadron primaries (p, Alpha, ...Fe;  E/A > 500 GeV).
+    As to the heavy particle interactions, there was a typo which 
+    invaded into the code after program check!
+    The effect is in the number of successive interactions of
+    a leading hadron  and the inelasticity of successive interactions
+    inside an air nucleus.
+       This effect, however, was compensated at very high energies due to
+    other inconsistency of the sampling method of interacting nucleon
+    numbers :-).  These were modified in this version.  Also the energy
+    dependence of heavy interaction cross-section is introduced (See below).
+
+    There is some theoretical uncertainty in how to count the number of
+    interacting nucleons in heavy nucleus interactions. (I think).  The
+    resolution is to make a new parameter 'HowIntNuc':
+    HowIntNuc = 1 (default) will give larger number of interacting  nucleons
+    than HowIntNuc=0.
+	
+  2) Air showers generated by the hybrid method was wrong for
+     zenith angles > 60 degrees. It is obvious when you look
+     at the result. So I believe no body has tried it yet. This
+     was already reported soon after the release of uv2.000. Also
+     the cause of an arithmetic error which takes place on some machines
+     was eliminated. This is also the one reported at the same time.
+  
+  3) Some corrections for DECALPHA compilers.  (common data alignment,
+     save statement for record)
+
+  4) The adhoc model of nuclear interactions is modified so that the
+     x-distributions of pions and kaons etc are little bit softer
+     than the older versions.  This effect is expected very small.
+     Although the adhoc model has been used at > 500 GeV, the new
+     version can be used down to 5 GeV or so. (See fig. on Web)
+	
+
+ New features.
+  1)  DECALPHA with a new environment (Digital Unix) is supported.
+    The DECALPHA users  may copy site.configDECALPHA2 to site.config.  
+    Both the native "make" and "GNU make" should work.
+    If new site.config  fails, try, site.condfigDEDALPHA as previously. 
+  2)  SGI has been verified to work (from Dr. Dai, Utha). 
+     site.configSGI is ready for use.
+     To be able to use SGI, you have to copy cmain.f in Manager directory 
+     to the UserHook directory and explicitly use it at the compilation 
+     time. Equivalently you may add a line #include "Zcmain.h"
+     at the top of your user hook routine.
+  3) The Gheisah code for hadronic interactions is available for use.
+     Gheisha is a code for hadronic interactions in GEANT. To use it
+     instead of the  Lund/Fritiof/Nucrin/Hadrin set, give IntModel="inte2".
+
+     *********************************************************************
+     In particular, Absoft compiler users should use this parameter value.
+     or make Elund=4.99 with IntModel='int1'. In the latter case, the adhoc
+     nuclear interaction model is used at E > Elund;  at  E< Elund, Nucrin/
+     Hadrin are used.
+     *********************************************************************
+
+     If IntModel='int2', Gheisha will be used when a hadron energy becomes
+      < Elund,  of which default is 500 GeV. Above this energy, the adhoc 
+     model is used as in the case of 'int1'.  Some comparison data among
+     Gheisha, Lund/Fritiof and adhoc model is available  on the Web site. 
+       As you see in a figure there, Gheisha behaves rather awkwardly at
+     500 GeV. I don't think it's good to put Elund > 500 GeV for Gheisha, 
+     too.  Also Gheisha seems to give some strange results for nucleus 
+     target as  you see in Figs in the Web site (I hope this is not due
+     to my mistake). The effect may not be seen in the Cosmos results.
+
+     Some detailed notes:  Gheisha 
+     produces alpha, triton and deuteron from the break up of a target
+     nucleus, while Nucrin treats the evaporation  process as 
+     energy loss.  Alpha, triton and deuteron can be an input to Gheisha;
+     however, if you have a chance to use Gheisha code yourself, you 
+     should not try to input  such a particle at high energies to Gheisha,
+     because they never break up in Gheisha.   (Cosmos
+     does not input heavy particles directly to Gheisha/Lund.)
+
+     . Gheisha gives systematically smaller multiplicity than Lund
+     . Gheisha gives less significant quasi-elastic peak of the leading
+       particle than Lund.  ( Gheisha includes elastic scattering
+       separately).  
+     . Gheisha seems to break  the energy conservation by about 10 % in
+       the worst case. (see fig. for 10 GeV)
+     . In Gheisah code, there is a switch for using Nucrin/Hadrin code at
+       energy < 5 GeV.  This is set to be off in default.  Since the codes
+       for Nucrin/Hadrin are the same as in the existing Cosmos codes,
+       those in Gheisha are hidden for the compilation, otherwise the
+       external name collision occurs.  Although the names are the same,
+       some subroutines have the different number of arguments and/or
+       different internal code, the user should never make the switch for
+       Nucrin on in Gheisha code.  (Therefor, there is no parameter for
+       that in Cosmos).
+     . Gheisha seems to behave awkwardly at 500 GeV and for nucleus targets.
+
+  4) Air shower generation by heavy primaries such as Fe at 10**18 eV takes
+     very long time(~4 hours/shower on HP735),  even if we use the
+     hybrid method.  
+     To save this, a new feature is introduced.  The idea is to replace
+     an interacted nucleons by a precomputed air showers generated by 
+     a nucleon.  You may use chookASbyH.f  and chookASbyH2.f in UserHook.
+     I didn't encapsulated the necessary procedures inside the Cosmos library,
+     so you need some programming in chookASbyH2.f.  
+     This is to keep flexibility for handling air shower generation 
+     in future; we need to include muon  generation, their lateral
+     distribution etc.  After every details are fixed, I would encapsulate
+     the procedures.  To enable the feature, put Generate ='qas', 
+     instead of 'as'. For  further details, see chookASbyH.f.
+
+  5) The interaction cross-section of heavy primaries has been kept constant
+     in the older versions, since it is weakly energy dependent even if the
+     proton interaction cross-section increases as energy goes higher. In 
+     this version, I included their energy dependence at high energies
+     (E/A > 500 GeV).  I found a good formula for this; when the
+     pp cross-section goes as E**d (which is a good approximation at
+     E> 1000 GeV), AB interaction cross-sections goes  like E**d' with
+      
+        d' =   2.5d/(p + q + pq/2)
+
+     where p= A**(1/3) and q = B**(1/3) (A and B are the mass number of
+     projectile and target nucleus). The cross-sections thus obtained
+     are compared with  Engel, Gaisser et al's calculations
+     (PRD vol.46, (1992)5013 on the Web site.
+  6) In the adhoc model, the inelasticity of a leading particle at
+     the 2nd, 3rd,.. collisions inside a nucleus should be more
+     elastic than normal ones; the x distribution is expressed
+     simply as  x**SucPw dx.  SucPw is known to be good within 1. to
+     3. The default is 1.5. The user can adjust this value in the 2nd
+     namelist parameter.
+  7) The total particle multiplicity in the adhoc model is expressed by 
+     7.2 roots**0.254 - 7 
+     according to UA5 parameterization.  Another choice is possible by
+     giving MulLow = 1 for which we use QCD jet prediction at high
+     energies ( roots > 1000 GeV );
+     0.6135exp(sqrt(23/18* 2log(roots/0.3))).
+     The default value of MulLow is 0.  This latter formula is adjusted
+     to coincide with the first formula at roots = 1000 GeV.
+ 
+
+uv2.000
+Release 19, Sep.1995
+A lot of things.
+!!!!!  Things not listed in the release time
+      The size of the particle array to store produced particles
+      at an interaction is enlarged to 4500. This will be enough
+      to contain particles at 10^21 eV proton interaction which
+      produces about 900 particles on the average.  10^22 eV may
+      be also acceptable.
+      The size of the stack to store particles for tracking is
+      enlarged to 15000.  This will also enough for 10^22 eV.
+
+      The output format of trace data (not of Cerenkov) is 
+      changed so that the size of the data becomes small
+      (as small as half, probably).  If the old systematic format
+      is better, it can be done by changing the one variable
+      in the trace routine. (but not by input parameter).
+
+**********
+Magnetic bremsstrahlung and pair creation have been introduced at 
+high energies.
+
+For gamma primaries, they are significantly effective above 5 x 10^19 eV.
+The m.f.p of M.B is about 5 km at 10^17 eV, and becomes gradually 
+longer (due to less deflection). However, the emitted photon energy
+becomes gradually higher and hence it becomes catastrophic.  The total
+energy loss at 5 x 10^19 eV is about 10 % for single emission.
+The m.f.p of M.P  is 6 km at 5x10^19 eV and becomes 400 m at 10^20 eV.
+At 3x10^20 eV it is as small as 20 m.
+The following parameters are introduced in the second group.
+
+MagBrem =0  Magnetic bremsstralhung is not considered.
+            (see also UpsilonMin)
+        =1  Total energy loss is considered.
+        =2  Actual emission of gamma is considered.
+            Default is 2.  If you simulate really high energy air showers
+            with generate='as' and MagBrem !=0, you should set
+	    WaitRatio ~ min(MagBremEmin/Primary Energy, 1)
+MagBremEmin = 1.e9 (i.e. 10^18 eV.).  Above this energy, the effect is
+              considered.
+
+MagPair =0 Magnetic pair creation is not considered
+        =1 Actual creation process is taken into account
+           Default is 1
+MagPairEmin = 3.e10 (i.e  3x10^19 eV.)  Above this energy, the M.P is 
+             considered. 
+UpsilonMin = 10^-3.  The M.B is actually considered only if the 
+             upsilon=Ee/Me * Bsin/Bcrit > UpsilonMin.  Bsin is the effective
+             magnetic field strength (i.e., abs(B x p/|p|))
+       
+          In the case of M.P, a similar parameter, xai, is used in the
+          final decision and it must be > 0.2. For this there is no
+          control parameter.
+
+********
+The Landau-Pomeranchuk effect has been included as described by  Migdals's
+formulas.  The air density change has been adequately considered.
+The relevant parameters are:
+
+LpmEffect: (1st group).  T ==> effect is taken into account else no.
+           The next two are in the  2nd group.
+LpmBremEmin:  If the electron energy is > this && LmpEffect, the LPM effect is
+        taken into account for bremsstrahlung.
+LpmPairEmin:  If the photon energy is > this && Lpmeffect, the LPM effect is
+        taken into account for pair creation.
+
+********
+Thin Sampling has been supported.  Although the parameters needed for this
+existed from the first, real support in the unix version comes this time.
+The relevant parameters are:
+
+ThinSampling = F  Make this one .true. if you want thin sampling.
+EthinRatio   = 3 x 10^-4. 
+             If particle energy becomes < E0/nucleon * EthinRatio, 
+	     thin sampling is actually attempted.
+             A.S size calculation automatically takes the weight by
+             the thin sampling.  If you look individual particles,
+	     you have to account for the weight in aTrack.wgt.
+  <<<<I don't recommend to use Thin Sampling because it leads to 
+      very large fluctuations,  esp. in the 3 dimensional treatment >>>  
+      Don't use with the skeleton/fleshing method.
+
+
+********
+The A.S lateral distribution by formula is  available for use.
+At the end of an event simulation, in chookEnEvent,  you can call cqPtclDen
+to get effective particle number (/m2) at a given core distance.
+The present version should be taken as a tentative trial, though the
+formula itself is reliable. Why ?  Ne or related observational quantities
+are rather dependent on the detector structure and sometimes we have to
+consider the cascading in the detectors.  The lateral distribution
+supplied this time assumes some kind of detector structures.
+ 
+During the computation of a shower, the air shower size is computed  for
+a certain class of electrons and they are summed up to get final total size.
+In the present version, lateral distributions for those ingredients are not
+supplied.
+
+********
+The Air Shower generation has been made to be more systmatic.  The minimum 
+energy the user can give is KEminObs which is for the observation of each
+particle.  If AS observation is specified, Cosmos uses various minimum 
+energy internally.  Roughly speaking, if only air shower generation is 
+desired, hadrons are followed until they reach the energy, (irrespectively
+of KEminObs, hence, you may give this a very large value if you don't
+observe individual particles),
+
+EminAS = E0/nucleon x RatioToE0.
+ (note: for gamma, for instance, per nucleon energy is the primary energy)
+
+Electrons and gamma rays are followed until they reach 1/30 of this energy.
+(In the previous version, they are not followed to such a low energy).
+Air Showers are generated by formula from each electrons.
+
+
+Hence, at high energies, AS generation will have the following scheme.
+     
+
+                       EminAS              E0
+        hadrons:       |--------------------|  
+                              full M.C
+                 EminAS/30
+        gammas     |------------------------| 
+                              full M.C
+
+                                 WaitRaio*E0
+        electrons  |***************|--------|   
+                                     full M.C
+                     Electrons falling in the * region will generate
+                  A.S by formula and then discarded.
+
+At moderate energies where the LPM, the Magnetic effects are negligible,
+you may use WaitRatio = 1, for hadron primaries.
+
+*********
+Energy loss formula was updated so that dE/dx at Ekin < mass is correct.
+This effect would be small but the user should see it.
+
+*********
+Infinite Loop at very low energies (Ee < 1 MeV) was corrected.
+This happened in Molloer scattering.
+
+*********
+Backward going particles sometimes generated errors; this was corrected
+so that we can trace a particle until the height of Earthradius x 10 
+safely. 
+
+To make sure that infinite cyclotron loop be sidestepped,
+
+PathLimit
+
+may be given.  Default is 20 x Earth_radius.  If a particle move more than
+this length, it is judged as dead. Note, however, if you use the default
+parameters setting, this value is not referenced actually; BackAngLimit
+will prevent the particle going backward.
+
+  We can use Cosmos to make geomagnetic cut off table.
+To do so, new parameters have been introduced, (2nd group)
+
+Reverse:   0(default) ==> normal simulation.
+           1  ==> given incident particle is charge-conjugated and
+                  made to go to a direction opposite to the given
+                  direction. All interactions except for magnetic
+                  deflection are neglected.
+           2  ==> the same as 1 but energy gain (not loss) in 
+                  air is considered. 
+Note that to use Reverse !=0, the following point should be
+considered.
+
+HeightOfInj;  if you want to see that an anti-proton you observed at
+              a balloon  altitude really came from outside of Earth,
+	      you may give anti-proton as a primary, and give the 
+	      balloon altitude to this. Note this is in m. 
+              It's better to give the same height
+	      as an observation level. DepthList is by kg/m2 so
+	      you may give a negative value to this  and give the
+              same value to HeightList.  
+ObsPlane:     Give 0 to this. (Observation is at BorderHightH or
+              BorderHightL).
+KEminObs      Lower than a test particle energy.
+TimeStructure T (this is to make PathLimit effective)
+Trace         41 or 0. If you want to see trace, get it in Exyz system.
+BackAngLimit  <-1 so that particle can go backward freely.
+BorderHeightH give a large value such as 10 times of Earth radius where
+	      geomagnetism becomes as week as interstellar field.
+              If a test particle reach here, it is judged as escaped
+	      from the earth.
+HowGeoMag     2 should be given, unless the geomagnetic filed is assumed
+	      to be constant. 
+BorderHeightL give a value about Observation height( <= HeightOfInj).
+	      If a test particle  altitude become less than this,
+              it is judged as being not  escapable from the earth.    
+PathLimit     a particle may make a (semi-)infinite cyclotron loop.
+              To avoid this, if the total path length/beta exceeds
+              this, it is judged as dead.
+      
+              In chookObs routine you may get id=1 o 3 (1 is escape,
+              3 is capture).
+++++++++++
+	If you want to make a cut off table or to see a number of 
+	observed anti-protons with Reverse mode, you want to input
+	primary particles freely rather than by normal primary setting.
+	You can do it by calling cresetPrim routine in the chookBgEvent
+	routine.  
+	
+	call cresetPrim(aPtcl, dircos)
+
+	where aPtcl is a /ptcl/ record and dircos is a /coord/ record.
+	You must give energy, code, subcode, charge to aPtcl,
+	and direction cos of a particle and direcos.sys='det', i.e.,
+	the direction cos should be given in the system where x is
+	directed to south, y to east, z to the vertical. Code fragment
+	will be
+
+	#include "Zptcl.h"
+	#include "Zcode.h"
+	
+	...
+	call cmkptc(aPtcl, knuc, antip, -1)  ! make anti particle
+        aPtcl.fm.p(4) = energy             ! give total energy
+        dircos.x = ..
+	dircos.y = ..
+	dircos.z = ..        
+        dircos.sys ='det'            
+	call cresetPrim(aPtcl, dircos)
+
+****************
+   Rigidity cut off table can be read and particles of  primary energy below
+  the cut off are rejected at sampling. The relevant parameter is in
+  the 1st group;
+CufOffFile = ' '
+  To activate this, you may give a file name (path), containing the cut off
+  table. Note, the zenith angle can be given in degree or in cos value in
+  the table. (In the main frame version, it should be in degree)
+  A table example can be seen in Contrib/Data/Cutoff/Kamioka
+
+***********************
+In the adhoc model, the treatment of intra-nuclear cascading has been
+changed so that it is the same as the main frame version.  The
+purged version has some defect in the complete momentum conservation,
+and somewhat complex.  The effect is, however, very small, and
+would not be detected statistically.
+ 
+----------------------------------------------------
+uv1.0002
+Release 1995.08.12
+Event number counting is corrected. Stack size limit is reduced
+to 5000 to 3000.
+
+uv1.0001
+Release 1995.08.11
+Two lines in cinteraction are missing and fatal for the IMB AIX version.
+(when particle is pushed, its code was wrong).  This was corrected.
+Also, in the photo hadron production, there is one mistake for code setting.
+Stack size limit is expanded from 2000 to 5000.
+
+uv1.0000
+Release 1995.08.08
+One bug in adhoc nuclear interaction routine was removed (which gives
+too large Pt to a leading particle with multiple collisions inside
+a nucleus).
+
+uv0.64560
+Release 1995.08.07
+The  correction of the previous version  was wrong. In all previous versions,
+the user may use the results obtained for proton primaries below 500 GeV,
+and for all primaries of non hadronic origin ( irrespective of energy).
+The adhoc nuclear interaction routine is modified so that the incident
+particle is directed to the z-axis, and later the momentum rotation is
+performed.  A bug in the cross-section calculation for heavy particles are
+fixed.
+
+uv0.64474
+Release 1995.08.05
+There was  some fatal bug in some illconditioned cases at high energies. 
+This caused higher efficiency of heavy primary showers.
+Also there was one fatal bug in the fragmentation
+treatment where the charge sum of fragments was incorrectly counted. The
+effect at E < 500 GeV should be small.
+
+uv0.64279
+Release 1995.07.22
+Bug fix.  There is a case in which an infinite loop takes place in the
+event generation; the adhoc high energy nuclear interaction model
+some times uses the isotropic phase space for multiparticle decay (cnbdcy.f).
+If the phase space is very small, this routine goes into the infinite loop,
+and Cosmos gets into such a loop once for 20000 events or so. Such events
+are discarded in this version.
+
+
+uv0.64064
+Release 1995.07.10
+csampPrimry.f cannot understand "p/n" energy sampling. (momentum/nucleon)
+This is corrected.  
+The bug in the skeleton-fleshing method has been detected and corrected.
+The bug was due to a trick to get gaussian random numbers quickly by
+Box-Master method. (Trick is that one gaussian variable at a time without minimum loss 
+of speed in the Box-Masster method which produces two variables at
+time).  kgauss.f is modifed so that the speed becomes slower in general.
+
+
+ 
+uv0.64046
+Release 1995.03.17
+For compilers such as IBM AIX which cannot understand union/map in
+the structure construct, "Zunionmap.h" is introduced to define 
+the availability of UNION/MAP.  This defines UNIONMAP if union/map
+conttruct can be used.  Using this, the program has been made to
+be compilable by IBM type compilers.  
+Important note. In UserHook, the IBM users should move chookSampleIBM.f to
+chookSample.f.  Also they should move chookIBM.f to chook.f.
+
+
+uv0.64016
+Release 1995.03.01
+
+One dimensional mode is supported. All particles are made to go
+the same directions as the primary.  Many bugs (compiler dependent)
+are removed.  In Util, new utility to draw rigidity cutoff is added.
+However, rigidity cutoff itself is not incorporated into Cosmos yet.
+Bugs related to the  particle going outer space still remain.
+The body of cmain.f is moved to Zcmain.h and cmain.f itself is
+made to include that file.
+
+
+uv0.64010
+Release  1995.01.13
+
+More correct grammar.  Bug fix. Especially, for the case of a particle
+going outer space. (not complete yet).
+
+
+uv0.64001
+Release 1994.12.26
+
+List of un-supported stuffs.
+
+1) Magnetic brems and pair creation
+2) LPM effect
+3) Muon nuclear interaction
+4) Automatic  Solar Modulation and cutoff
+5)  Bug: Infinite loop of charged particles in vacuum.
+6) Lateral distribution of air showers and muons lateral distribution
+7) QCD jet inclusion in adhoc model.
+8) Pithia
+9) To finish the job before specified time
+10) Parallel processing

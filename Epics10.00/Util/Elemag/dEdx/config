@@ -1,0 +1,7 @@
+#  type  matter  c    de maxpath  / x y z  a  b c 
+ This is to test <dE/dx> of a given media.  Only one component
+ may be written
+-------------------------------------------------------------------
+1   box  SCIN  0  0      / 0  0  0  10 10 1
+-------------------------------------------------
+

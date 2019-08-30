@@ -1,0 +1,49 @@
+*********************************************************************
+*     This is to print out xsection for h-p h-A.
+*     output routine in xs-table in dpmjet3 has been modifed
+*     (only inelastic xs is obtained so that output follows so
+*      which is on stdout.)
+*  Don't use EMULSION unless you want to get xs for the compound
+*  Name of  .inp file should be dpmjet.inp
+**********************************************************************
+*
+* projectile / target
+* -------------------
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7...
+PROJPAR          1          1 
+* PROJPAR                                                               KAON+
+*PROJPAR                                                               PROTON
+TARPAR         1        1
+*EMULSION          1         1         1
+*EMULSION         12         6         1
+*EMULSION         14         7         1
+*EMULSION         16         8         1
+*EMULSION        184        74         1
+* TARPAR         184         74
+*
+* energy of interaction
+* ---------------------  ! not referred.
+ENERGY          920.0
+*
+*...+....1....+....2....+....3....3....4....+....5....+....6....+....7...
+XS-TABLE        50      1e11     -85                            5
+* PHOJET-specific input
+* ---------------------
+* The following lines control the event-generation with PHOJET for
+* individual photon/nucleon-nucleon collisions.
+* Any options explained in the PHOJET-manual can be used in between
+* the "PHOINPUT" and "ENDINPUT" cards.
+PHOINPUT
+PROCESS           1 0 1 1 1 1 1 1
+ENDINPUT
+*
+* Output
+* ------
+*   some default output (particle multiplicities etc.)
+* HISTOGRAM      101.0     102.0
+*
+* Start of event generation
+* ------------------------- ! neglected
+START        500.0       0.0
+STOP
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7...

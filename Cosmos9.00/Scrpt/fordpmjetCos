@@ -1,0 +1,76 @@
+#!/bin/csh -f
+#  This is fordpmjet for Cosmos application
+#    sort and awk must be gnusort and gnuawk
+#   if the script said you should set an alias, see
+#   the lines down to "-----------" below
+if( $#argv != 1 && $#argv != 2 && $#argv != 4 ) then
+    cat<<EOF
+    Usage: fordpmjetCos atmosfile [mediadir] [GLBfile INPfile]
+      where 
+        atmosfile: is the filename containing the atmosphere profile
+                
+        mediadir: directory where media files such as Pb.GLB are placed
+                the default is $LIBLOFT/Data/Media
+        GLBfile: .GLB file. The name of the Glaubar file to be created which
+                 corresponds to the  medias in atmosfile
+                 The defualt is  dpmjet.GLB and is put in PWD
+        INPfile: .inp file to be created for dpmjet.  The default is 
+                 dpmjet.inp
+EOF
+  exit
+endif
+set awkex = `which awk ` 
+if( x$awkex  == "x" )  then
+	echo "set awk as an alias of gnu awk in Scrpt/fordpmjet"
+	exit 1
+endif
+set sortex = `which sort`
+if( x$sortex == "x" ) then
+	echo "set sort as an alias of gnu sort in Scrpt/fordpmjet"
+	exit 1
+endif
+
+# --------------------------
+if( $#argv == 2 || $#argv == 4  ) then
+  set GLBdir=$2
+else
+  set GLBdir=$LIBLOFT/Data/Media
+endif
+if( $#argv == 4 ) then
+    set GLBfile=$3
+    set INPfile=$4
+else
+    set GLBfile=dpmjet.GLB
+    set INPfile=dpmjet.inp
+endif
+# atmosfile
+set configpath = $1:h
+  #   /tmp/xy/abc.x --> /tmp/xy
+  #   ./a.x -->  .
+  #   abc-->  abc
+  #   ../../abc.x -->  ../..
+if ( $configpath == $1 ) then
+    # ! config file name itself
+  set configpath = .
+endif
+#         see $GLBdir/Pb.GLB to judge that .GLB is upto Fe or Pb
+set inpnum = `awk '(NR==4 || NR==5) && index($1,":") > 0 {print NR-3;exit}' $GLBdir/Pb.GLB`
+if( $inpnum == 2 ) then
+    set msg="The files created are usable for projectiles upto Pb"
+else    
+    set msg="The files created are usable for projectiles upto Fe"
+endif    
+
+##########
+ echo configpath GLBDir: ${configpath} $GLBdir
+##########
+#    echo "$1  is a simple config file"
+
+#    (source $COSMOSTOP/Scrpt/fordpmjetCosGLB ${configpath} $GLBdir) > ${configpath}/$GLBfile
+     (source $COSMOSTOP/Scrpt/fordpmjetCosGLB $1 $GLBdir) > ${configpath}/$GLBfile
+    echo $GLBfile "has been created"
+#    ($COSMOSTOP/Scrpt/fordpmjetCosINP ${configpath} $inpnum ) > ${configpath}/$INPfile
+    ($COSMOSTOP/Scrpt/fordpmjetCosINP $1 $inpnum ) > ${configpath}/$INPfile    
+    echo $INPfile "has been created"
+echo "they were put in " ${configpath}/
+echo $msg

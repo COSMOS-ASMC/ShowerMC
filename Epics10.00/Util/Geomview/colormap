@@ -1,0 +1,38 @@
+Acrylic p420	0.671   0.651	0.596	0.5
+Air     p573	0.698	0.835	0.741	0.1
+Al	yellow	1	1	0 	1
+Al7075  wheet   0.961  0.871   0.701    1
+Al2024  silver  0.847   0.847  0.847    0.8
+Argas   p516	0.843	0.5	0.723 	0.25
+Au      gold    1.      0.843   0.      0.8
+BGO     cyan	0	1	1 	0.35
+Bakelite  p167	0.522	0.102	0.039	0.75
+CH4	p256	0.698	0.565	0.698	0.4
+Carbon  orange	1	0.5	0	1      
+CFRP   lightcyan 0.878 1       1       1
+CsI     mazenda	1	0	1	0.35
+PWO     mazenda	1	0	1	0.35
+Cu	p151	1	0.169	0.0196	1
+Fe	brown	0.6	0.4	0.2 	1
+G5	p335	0	0.243	0.145	1
+Gten	p169	1	0.494	0.471	1
+H2	pcg5	0.506	0.502	0.482	0.2
+H2O	p376	0.302	0.498	0.0196	0.4
+Hegas	p516	0.843	0.537	0.726	0.25
+LiqH2	p542	0.098	0.369	0.549	0.25
+LiqXe	p541	0.008	0.106	0227	0.25
+Pb	gray    0.664	0.664	0.664  	1
+SCIN    blue  	0	0	1 	0.4
+SciFi   cyan	0	1	1 	0.35
+Si	green   0	1	0  	1
+StRock  p5835	0.376	0.329	0.125	1
+Ta	p375	0.353	0.635	0.0156	1
+W	purple  0.5	0	0.5 	1
+xxxhollow  p5815	0.098	0.0902	0.043	0.2
+sp      white  1     1     1     0.2
+YBAir   white  1     1     1     0.2
+hollow  gray    0.664	0.664	0.664  	1
+
+
+
+

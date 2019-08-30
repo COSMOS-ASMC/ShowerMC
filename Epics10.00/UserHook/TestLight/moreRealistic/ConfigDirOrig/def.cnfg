@@ -1,0 +1,69 @@
+
+## frame ##
+#eq   cos45  0.707106781186548 
+#eq   ncos45  -0.707106781186548 
+#eq anglelA1  61.8
+#eq anglelA1_2  59.8
+#eq anglelA2  29.7
+#eq anglelA3  28.1
+#eq anglelA4  30.1
+#eq anglelA5  12.6
+#eq anglelA6  16.6
+#eq anglelA7  31.9
+#eq anglelA8  74.9
+#eq anglelA9  35.9
+#eq anglelBx  31.9
+#eq anglelBx2  35.9
+#eq anglelBy  31.9
+#eq anglelBy2  35.9
+#eq anglelC1  18.6
+#eq anglelC2  37.0
+#eq anglelDy  31.9
+
+## SciFi ##
+#eq  SciFiXsec  0.1
+#eq  SciFiL     25.6
+#eq  spSciFi   	0
+
+## IMC ##
+
+
+## TASC ##
+#eq  bgoXsec 	2.5
+#eq  bgoL    	30
+#eq  spbgo      0.165   ## 0.05+0.08*2
+#eq  spbgoz     0.17   ## 0.05*2+(0.1+0.06)
+#eq  BGOOZ	0.105
+#eq  xBGOOX	-13.2425 ##-(2.5*5 + spBGO*4.5)
+#eq  xBGOOY	-15     ##-bgoL/2.0
+#eq  yBGOOX	-15     ##-bgoL/2.0
+#eq  yBGOOY	-13.2425 ##-(2.5*5 + spBGO*4.5)
+
+
+## SIA ##
+#eq  siaThick   0.22
+#eq  siaLa	35.4
+#eq  siaLb	35.4
+#eq  siaLb1	34.96  ## siaLb-2xsiaThick
+#eq  siaLc	12.5
+#eq  siaLc1	12.06  ## siaLc - 2xsiaThick
+#eq  siaZ0	12.28  ## siaLc - siaThick
+#eq  siaY0	35.18  ## siaLb - siaThick
+#eq  siaX0	35.18  ## siaLa - siaThick
+#eq  siabTa	0.8
+#eq  siabTb	1.0
+#eq  siabLa	34.96
+#eq  siabLb	33.36
+#eq  siabY0	34.38
+#eq  siabX0	34.38
+#eq  siabZ0	11.28
+#eq  siapriz	5.5
+#eq  siaprizm	-5.5
+#eq  siaprizm1	29.9 ##siaLb - siaprizm
+
+## WORLD (sphere origin is set to be center of S2) ##
+#eq  worldOX   0
+#eq  worldOY   0
+#eq  worldOZ   15.6 ## new Ver.1
+#eq  worldR    60.0
+

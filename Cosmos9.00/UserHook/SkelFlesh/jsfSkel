@@ -1,0 +1,13 @@
+jobclass=qb32s
+nodes=8
+inputfile=/dev/null
+outputfile=/dev/null
+#   at smash, see skelmemo and select good shower (i.e, Zfirst should be
+#   normal). 
+errorfile=/bghome/sctasim/kasahara/Cosmos/UserHook/D-Skel/Smash/skelmemo
+workingdir=/bghome/sctasim/kasahara/Work
+executable=/bghome/sctasim/kasahara/Cosmos/UserHook/SkelFlesh/skelKEKB
+environment="COSMOSTOP=/bghome/sctasim/kasahara/Cosmos";"PARAMPATH=/bghome/sctasim/kasahara/Cosmos/UserHook/SkelFlesh/paramForTAHist";"HOST=bg"
+mode=co
+connection=mesh
+#mapfile=xxx

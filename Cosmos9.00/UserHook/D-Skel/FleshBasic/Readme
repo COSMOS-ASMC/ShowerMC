@@ -1,0 +1,8 @@
+1)  adjust setupenv.sh (EXECID, OUTDIR)
+2)  ./setupenv.sh
+3)  If needed, modify chookFlesh.f
+4)   make  clean ; maken
+5)  ../execflesh.sh  sge (or  ssh)
+
+
+

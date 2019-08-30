@@ -1,0 +1,83 @@
+c         test kpolintpEs
+c
+      implicit none
+      integer n
+      parameter (n = 20)
+      real*8 xa(n), ya(n), x, y, error
+      integer i, loc, m, k
+c
+      do i = 1, n
+         xa(i) = i/3.d0
+         ya(i) = exp(xa(i))
+      enddo
+      m = 5   ! use m points around x.
+      do i =1, n
+         x = xa(i) - 0.2
+         call kdwhereis(x, n, xa, 1,  loc)
+         k = min(max(loc - (m-1)/2,1), n+1-m)  ! max of m points from k
+         call kpolintpEs(xa(k),1.d0/3.d0, ya(k), 1, m, x, y, error)
+         write(*, *) x, exp(x), y, error
+      enddo
+      end
+
+c     polynomial interploation/extrapolation, based on p.103 of 
+c     Numerical Recipes.  Neville's algorithm
+c
+      subroutine kpolintpEs(x0, xstep, ya, ystep, n,  x, y, error)
+c   
+c      integer   n. input. number of points.   
+c      real*8   x0. input.  first x
+c      real*8   xstep. input.  x values are x0, x0+xstep, ... 
+c      real*8   ya(ystep, n). input.  function values at x0, x0+xstep,...
+c      real*8   x.  input.
+c      real*8   y.  output.  interepolated functon value at x.
+c      real*8  error. output. estiamted rough error.
+c
+      implicit none
+      integer n,  ystep
+      real*8 x0, xstep,  ya(ystep, n), x, y, error
+
+      integer i, maxm
+      parameter (maxm = 10)
+      real*8  c(maxm), d(maxm), diff, difft
+      integer ns,  m
+      real*8 h0, hp, w, den
+      real*8 xa
+      xa(m, i)= (i-1)*xstep + x0
+
+      if(n .gt. maxm) then
+         write(*, *) ' kpolintp: use lesser number of points'
+         stop
+      endif
+      ns = 1      
+      diff = abs(x - xa(1,1))
+      do i = 1, n
+         difft= abs(x - xa(1, i))
+         if(difft .le. diff) then
+            ns = i
+            diff = difft
+         endif
+         c(i) = ya(1, i)
+         d(i) = ya(1, i)
+      enddo
+      y = ya(1, ns)
+      ns = ns-1
+      do m = 1, n-1
+         do i=1, n-m
+            h0 = xa(1,i) -x
+            hp = xa(1, i+m) - x
+            w = c(i+1) - d(i)
+            den = h0- hp
+            den = w/den
+            d(i) = hp*den
+            c(i) = h0*den
+         enddo
+         if(2*ns .le. n-m) then
+            error = c(ns+1)
+         else
+            error = d(ns)
+            ns = ns-1
+         endif
+         y = y + error
+      enddo
+      end

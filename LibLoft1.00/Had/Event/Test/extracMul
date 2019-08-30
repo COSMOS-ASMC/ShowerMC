@@ -1,0 +1,6 @@
+mul != $7 && $1 != "#" { mul = $7; nc = 0; if($6 != 0) nchg=0 }
+mul == $7 && $1 != "#" {nc++;if($6 != 0) nchg++; if(nc == mul) {print mul, nchg ; nchg=0; mul = 0}}
+
+
+
+

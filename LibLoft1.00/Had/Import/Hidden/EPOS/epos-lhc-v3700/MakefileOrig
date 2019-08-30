@@ -1,0 +1,108 @@
+VER=lhc-v3400
+SOURCE_DIR=
+OUTDIR=outputs/
+TAR_DIR=epos-$(V-lhc-v3400ER)
+UNAME=$(shell uname)
+ifeq ($(OBJ),"")
+  LIBDIR=$(OBJ)/$(UNAME)/
+else
+  LIBDIR=Lib/$(UNAME)/
+endif
+TMPDIR=tmp/
+COMP=`which gfortran 2>&1 | grep -v which`
+COMPIL="$(shell echo $(COMP))"
+#COMPIL=""
+
+LFLAGS=
+FFLAGS= 
+
+FC=f77
+SFFLAGS= -Wall #-fbounds-check -pg
+SLFLAGS= #-g -pg
+
+ifeq ($(COMPIL),"")
+  FC=g77
+##   ---     -pg for using gprof
+  SFFLAGS+= -fno-automatic -finit-local-zeros
+else
+  FC=gfortran
+  SFFLAGS+= -std=legacy -Wunused -Wuninitialized -O2
+endif
+
+  URQMD=
+#   URQMD= -g ../urqmd23/obj/Linux/urqmd/*.o 	   
+
+
+FILES=  \
+epos-bas-lhc-v3400.f  epos-con-lhc-v3400.f                 \
+epos-dky-lhc-v3400.f  epos-dro-lhc-v3400.f epos-ems-lhc-v3400.f  \
+epos-fra-lhc-v3400.f  epos-ico-lhc-v3400.f epos-hnb-lhc-v3400.f \
+epos-ids-lhc-v3400.f  epos-int-lhc-v3400.f epos-jps-lhc-v3400.f  \
+epos-omg-lhc-v3400.f  epos-par-lhc-v3400.f epos-sem-lhc-v3400.f  \
+epos-rsh-lhc-v3400.f  epos-qsh-lhc-v3400.f epos-tim-lhc-v3400.f  \
+epos-uti-lhc-v3400.f  epos-xan-lhc-v3400.f epos-xpr-lhc-v3400.f
+
+MFILE=epos-app-lhc-v3400.f
+
+EFILE=example.f
+
+AFILES= \
+eposm.f                             \
+epos_j.f                                     \
+eposu_no.f                         \
+#eposu.f  urqmdepos.f                          \
+ 
+CFILES=epostrapfpe.c epostimer.c
+
+IFILES= epos.inc epos.incems epos.incico epos.incpar epos.incsem epos.param \
+	epos.inirj epos.inidi epos.iniev epos.initl eposm.f  \
+	epos.inics epos smake isigma.optns epos_all add.pl epos_j.f \
+	iems.optns imule.optns imuhe.optns iptle.optns ipthe.optns \
+	eposu_no.f epos.inchy input.optns README epos-lhc-lhc-v3400-v3400.ps\
+	epos.inirj.lhc epos.inics.lhc example.f example.param\
+#	epos.ini1*
+
+X: dirs Xepos
+	@echo $(SOURCE_DIR)
+example: dirs EposEx
+	echo $(SOURCE_DIR)
+Xepos: $(FILES:%.f=$(LIBDIR)%.o) $(AFILES:%.f=$(LIBDIR)%.o) $(MFILE:%.f=$(LIBDIR)%.o) $(CFILES)
+	$(FC) $(SLFLAGS) $(LFLAGS) $(URQMD) -o $(LIBDIR)$@ $^ $(TRAP:.c=.o) 
+EposEx: $(FILES:%.f=$(LIBDIR)%.o) $(AFILES:%.f=$(LIBDIR)%.o) $(EFILE:%.f=$(LIBDIR)%.o) $(CFILES)
+	$(FC) $(SLFLAGS) $(LFLAGS) -o $@ $^ $(TRAP:.c=.o) 
+$(FILES:%.f=$(LIBDIR)%.o) : $(LIBDIR)%.o : $(SOURCE_DIR)%.f  
+	$(FC) $(SFFLAGS) $(FFLAGS) -o $@ -c $<
+$(AFILES:%.f=$(LIBDIR)%.o) : $(LIBDIR)%.o : $(SOURCE_DIR)%.f  
+	$(FC) $(SFFLAGS) $(FFLAGS) -o $@ -c $<
+$(MFILE:%.f=$(LIBDIR)%.o) : $(LIBDIR)%.o : $(SOURCE_DIR)%.f  
+	$(FC) $(SFFLAGS) $(FFLAGS) -o $@ -c $<
+$(EFILE:%.f=$(LIBDIR)%.o) : $(LIBDIR)%.o : $(SOURCE_DIR)%.f  
+	$(FC) $(SFFLAGS) $(FFLAGS) -o $@ -c $<
+$(FILES:%.f=%-$(VER).f) : %-$(VER).f : %.f  
+	@if [ ! -d $(TAR_DIR)  ]  ;then                       \
+	set -x; mkdir -p $(TAR_DIR); set +x;                  \
+	fi    ; \
+	cp $<  $(TAR_DIR)/$@
+tar:  $(FILES:%.f=%-$(VER).f)
+	@cp  $(CFILES) $(IFILES) $(TAR_DIR) ; \
+	cp epos-app-lhc-v3400.f $(TAR_DIR)/epos-app-lhc-v3400-$(VER).f ; \
+	rm -fr $(TAR_DIR)/.svn  ; \
+	sed "s/epos-...-lhc-v3400/&-$(VER)/g" Makefile > $(TAR_DIR)/Makefile ; \
+	sed "s/setenv OPT .*/setenv OPT  \./g" .epos > $(TAR_DIR)/.epos ; \
+	tar -zcv --remove-files -f epos-$(V-lhc-v3400ER).tgz $(TAR_DIR)
+cors: $(FILES) epos.inc epos.incems epos.param epos.inirj epos.inics
+	scp $^ $(HOME)/corsika/corsika.svn/epos/
+copy: $(FILES) epos.inc epos.incems epos.param Makefile
+	scp $^ iklx62.fzk.de:nexus/epos/epos.svn
+cpcc: $(FILES) epos.inc epos.param epos.inirj epos.inics
+	scp $^ ccali.in2p3.fr:epos
+dirs:
+	@if [ ! -d $(LIBDIR)  ]  ;then                       \
+	set -x; mkdir -p $(LIBDIR); set +x;                  \
+	fi     
+	@if [ ! -d $(TMPDIR)  ]  ;then                       \
+	set -x; mkdir -p $(TMPDIR); set +x;                  \
+	fi     
+clean:
+	/bin/rm -r $(LIBDIR)
+

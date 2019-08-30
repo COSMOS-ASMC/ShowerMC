@@ -1,0 +1,111 @@
+This is to get the intrinsic dpmjet3 cross-sections.
+It seems difficult to get it on fly during simulation.
+(Also for nucleus target, cross-section oscilates as 
+energy goes higher)  
+
+
+1) To get p-A.dat pi-A.dat K-A.dat ("A" target mass #).
+ make -f test.mk to make a.out from user3.0-6.f
+
+  Depending on p,pi,K, adjust projectile in dpmjet.inpSave.
+  and also adjsut getXsec.sh (p- pi- or K-)
+  Then, use getXsec.sh. This will create p-A.dat (pi-A.dat K-A.dat)
+  consisting of E (GeV) vs Sigma (mb). (A =1 ,2...)
+
+2) After getting such table, use seeFit.sh in Fit/
+to get coefficients a,b,c of sigma= a+b*log(E) + c*log(E)**2.
+(For each p, pi, K table).
+They are put in p.coef etc.    Energy region is divided into
+3.  50 to 10^5  10^5 to 10^8  10^8 to 10^11 GeV.
+
+They are now stored in pData/ piData/ and KData/
+
+3)  (You have to have finished  'make' in Cosmos/Util/Minui )
+    Goto Fit/
+    and 
+  make -f xsecFit.mk to make execFit.
+  Then,  use
+
+   ./seeFit.sh ../pData  (as well as ../piData ../KData)
+  after confirming the fitting, click to proceed.
+  (actually, ../piData case will not be used for further
+     processing)
+  This will create p.coef, pi.coef, K.coef
+For  p.coef, the content will be like (They are now
+stored in Coef/)
+
+p    1   1     32.80        -1.396        0.2236    
+p    1   2     6.505         2.658        7.5697E-02
+p    1   3    -8.455         5.114       -1.5349E-02
+p    2   1     59.57        -2.157        0.3668    
+p    2   2    -12.00         8.943       -4.5979E-02
+p    2   3    -14.17         9.136       -5.0369E-02
+p    4   1     100.7        -2.071        0.5266    
+
+---------------- meaningof each column :
+#1  p/pi/K
+#2  A (A=3 is strange so eventually remove them).
+#3  energy region index (3 regions)
+      50 - 1e6 - 1e8 -1e11 GeV
+#4  a
+#5  b
+#6  c 
+Inelastic sigma pA is expressed by    a+ b*log(E)+ c*log(E)**2
+
+4) To create  SxA/Sxp as a funcion of Sxp and A, in Fit/, 
+       (x= p,  pi, K) 
+   do
+     ifort toSpAbySp.f90 to make a.out
+  Then ./a.out < Coef/p.coef > sigpAbysigpp
+       ./a.out < Coef/K.coef > sigKAbysigKp
+    (sigpiAbysugpip may be created but not needed). 
+  Since SxA/Sxp is independent of x if Sxp is the same and
+  minimum Sxp (~ 16mb) is obtained by x=K and max Sxp(~110mb)
+  is by x=p  (for E=50 to 1e11 GeV). The data file will look like
+#    Sxp mb         SxA/Sxp    A      E
+     16.13         1.897       2     50.00    
+     16.13         3.532       4     50.00    
+     16.13         4.289       5     50.00    
+     16.13         5.258       6     50.00    
+     16.13         6.670       8     50.00    
+     16.13         7.846      10     50.00 
+
+5) Create sigxAbysigxp in Cosmos/Data/DPM/, of which content 
+  is like
+
+16.13 2 1.897
+16.13 4 3.532
+16.13 5 4.289
+16.13 6 5.258
+16.13 8 6.670
+16.13 10 7.846
+16.13 12 9.089
+16.13 14 10.36
+16.13 16 11.69
+16.13 18 12.96
+
+-----------
+#1:  Sxp (mb)
+#2: A
+#3:  SxA/Sxp
+
+use sigKAbysigKp and sigpAbysigpp.  
+(from 16 mb to ~35 mb, use  sigKAbysigKp , and
+ > 35 mb, use  sigpAbysigpp and concatinate them-->temp).
+
+(If A=3 data remains, elminate them from temp)
+ and rearranging the content by
+  awk '$3 != 3 {print $1,$3,$2}' temp  > sigxAbysigxp 
+
+6) The table, sigxAbysigxp, stored in Cosmos/Data/DPM
+ is used by Cosmos/Particle/Event/Xsection/cxAbyxpXsec.f 
+ 
+
+
+
+
+
+
+
+
+

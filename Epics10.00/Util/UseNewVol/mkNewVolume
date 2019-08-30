@@ -1,0 +1,23 @@
+#!/bin/csh -f
+if ( $#argv != 1 ) then
+   echo "Usage: mkNewVolume  configFile"
+	exit 1
+else
+	if( ! -f $1 ) then
+	   echo  $1 not exist
+	   echo "Usage: mkNewVolume  configFile"
+	   exit 1
+        endif	
+endif	
+
+
+./ToUseNewVol $1
+./ToDrawNewVol $1
+
+(cd $EPICSTOP; make)
+
+echo "you need not 'make' in Epics home; it has been done"
+
+
+
+

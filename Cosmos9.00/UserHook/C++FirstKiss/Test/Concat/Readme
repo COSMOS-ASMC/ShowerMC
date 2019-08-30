@@ -1,0 +1,21 @@
+`cat ifclib ` dosen't expand $COSMOSTOP so that we must show the
+cosmos library in the command line directory.
+
+
+Be carefull to use strncpy;
+
+To append some string (s) to another string (fs) made in Fortran;
+Character length from for Fortran is needed as the last part of
+the argument list; it must be given by value. (not by pointer
+as in all  other arguments).
+
+  extern int klena_(char *, int );
+
+  char x[20];
+  strcpy(x,fs);
+  x[ klena_(x, strlen(x)) ] = '\0';
+  strcat(x, s);
+  strcpy(fs, x);
+
+-------------------
+ c++ testc.cc testf.o -L$COSMOSTOP/lib/PCLinuxIFC -lcosmos  `cat ifclib `

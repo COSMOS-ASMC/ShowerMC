@@ -1,0 +1,99 @@
+#
+# IMC Box
+#
+
+#inc CnfgDir/chd.cnfg
+#inc CnfgDir/chd-member.cnfg
+#inc CnfgDir/pmt-plate.cnfg
+
+#inc CnfgDir/imc-w.cnfg
+#inc CnfgDir/imc-honey.cnfg
+#inc CnfgDir/imc-scifi.cnfg
+
+#inc CnfgDir/imc-corner.cnfg
+#inc CnfgDir/imc-top.cnfg
+#inc CnfgDir/imc-side1.cnfg
+#inc CnfgDir/imc-side2.cnfg
+#inc CnfgDir/imc-back.cnfg
+
+
+#subd imc-in
+1 chd sp  0 0 0 / -20.6 -20.6 0.725
+#
+2 sfx1sheet sp  0 0 0 / -20.5 -20.5 5.035
+3 sfy1sheet sp  0 0 0 / =  =  5.175
+4 optx14u sp  0 0 0 /   =  =  5.035
+5 opty14u sp  0 0 0 /   =  =  5.175
+6 sfx1sheet sp  0 0 0 / =  =  7.335
+7 sfy1sheet sp  0 0 0 / =  =  7.475
+8 sfx1sheet sp  0 0 0 / =  =  9.635
+9 sfy1sheet sp  0 0 0 / =  =  9.775
+10  optx14u sp  0 0 0 /  =  =  9.635
+11 opty14u sp  0 0 0 /  =  =  9.775
+12 sfx1sheet sp  0 0 0 / =  =  11.935
+13 sfy1sheet sp  0 0 0 / =  =  12.075
+14 sfx1sheet sp  0 0 0 / =  =  14.235
+15 sfy1sheet sp  0 0 0 / =  =  14.375
+16 optx14u sp  0 0 0 /   =  =  14.235
+17 opty14u sp  0 0 0 /   =  =  14.375
+18 sfx1sheet sp  0 0 0 / =  =  16.535
+19 sfy1sheet sp  0 0 0 / =  =  16.675
+20 sfx1sheet sp  0 0 0 / =  =  18.835
+21 sfy1sheet sp  0 0 0 / =  =  18.975
+22 optx14u sp  0 0 0 /   =  =  18.835
+23 opty14u sp  0 0 0 /   =  =  18.975
+24 sfx1sheet sp  0 0 0 / =  =  21.135
+25 sfy1sheet sp  0 0 0 / =  =  21.275
+#
+26 wA  sp  0  0  0  / -20.5  -20.5  7.245
+27 wA  sp  0  0  0  / -20.5  -20.5  9.545
+28 wA  sp  0  0  0  / -20.5  -20.5 11.845
+29 wA  sp  0  0  0  / -20.5  -20.5 14.145
+30 wA  sp  0  0  0  / -20.5  -20.5 16.455
+31 wB  sp  0  0  0  / -20.5  -20.5 18.465
+32 wC  sp  0  0  0  / -18.5  -18.5 20.775
+#
+33 substchd sp  0 0 0 / -26.20 -26.20  2.860
+34 subst2u  sp  0 0 0 / -26.20 -26.20  5.335
+35 subst3l  sp  0 0 0 / -26.20 -26.20  7.635
+36 subst2u  sp  0 0 0 / -26.20 -26.20  9.935
+37 subst3l  sp  0 0 0 / -26.20 -26.20  12.235
+38 subst2u  sp  0 0 0 / -26.20 -26.20  14.545
+39 subst2l  sp  0 0 0 / -26.20 -26.20  16.855
+40 subst1u  sp  0 0 0 / -26.20 -26.20  19.165
+41 subst1l  sp  0 0 0 / -26.20 -26.20  21.410
+#
+42 pmt-plt1 sp 0 0 0 / -21.325  -26.275  3.005
+43 pmt-plt1 sp 0 0 0 / -26.275   25.175  3.005    0 -1 0  1 0 0
+44 mapmt-plt2 sp 0 0 0 / -21.325  -26.275  7.355
+45 mapmt-plt2 sp 0 0 0 / -26.275   25.175  7.355  0 -1 0  1 0 0
+46 mapmt-plt2 sp 0 0 0 / -21.325  -26.275  11.955
+47 mapmt-plt2 sp 0 0 0 / -26.275   25.175  11.955   0 -1 0  1 0 0
+48 mapmt-plt2 sp 0 0 0 / -21.325  -26.275  16.555
+49 mapmt-plt2 sp 0 0 0 / -26.275   25.175  16.555   0 -1 0  1 0 0
+50 mapmt-plt1 sp 0 0 0 / -21.325  -26.275  20.985
+51 mapmt-plt1 sp 0 0 0 / -26.275  25.175  20.985   0 -1 0  1 0 0
+#
+52 box_w sp 0 0 0 / 0 0 0
+#end imc-in
+
+
+#subd imcbox
+1 imc-top sp 0 0 0 /  -25.125  -25.125  0.0
+2 imc-side1 sp 0 0 0 / -33.125  25.175  0.40
+3 imc-side2 sp 0 0 0 /  25.175 -33.125  0.40
+4 imc-back sp 0 0 0 /  25.175  -37.525  2.95   -1 0 0  0 -1 0
+5 imc-back sp 0 0 0 / -37.525  -21.325  2.95    0 1 0  -1 0 0
+#
+6 imc-corner sp 0 0 0 /  -26.825  -26.825  0.40
+#
+7 chdassy1 sp 0 0 0 / -21.68208   25.09330  0.40
+8 chdassy2 sp 0 0 0 /  25.09330  -21.68208  0.40
+9 chdmemb1 sp 0 0 0 / -24.375  -33.175  -0.75
+10 chdmemb2 sp 0 0 0 / -33.175  -24.375  -0.75
+#
+11 imc-in sp 0 0 0 /  0.0  0.0  0.0
+#
+12 box_w sp 0 0 0 / 0 0 0
+#end imcbox
+

@@ -1,0 +1,21 @@
+#!/bin/csh -f
+cd $COSMOSTOP/UserHook/
+if(! -e FirstKiss/chook.f.Orig) then
+#	echo "not exist chook.f.Orig"
+	mv FirstKiss/chook.f FirstKiss/chook.f.Orig
+endif
+if(! -e Template/chook.f.Orig) then
+	mv Template/chook.f Template/chook.f.Orig
+endif
+cp FirstKiss/chook.f.IBM  FirstKiss/chook.f
+cp Template/chook.f.IBM  Template/chook.f
+
+cd $COSMOSTOP/Data/Namelist
+if(! -e ParamDefault.Orig) then
+#	echo "not exist ParamDefault.Orig"
+	mv ParamDefault ParamDefault.Orig
+endif	
+
+cp ParamDefault.IBM ParamDefault
+
+exit 0

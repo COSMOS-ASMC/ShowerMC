@@ -1,0 +1,3 @@
+NF == 0 {print maxv; ++nev; sum+=maxv; maxv=0}
+NF >0   {if($2 > maxv) maxv=$2}
+END {print nev, sum/nev}

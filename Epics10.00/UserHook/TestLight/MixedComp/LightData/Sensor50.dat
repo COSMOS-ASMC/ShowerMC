@@ -1,0 +1,21 @@
+  The format is the same as Lightxx
+  This gives the properties of light sensor (PD etc)
+------------------------------------------------------------
+ Qeff 0.80  / 0.8
+     Quantum efficiency of the sensor. Used when QeffFile is dummy
+ QeffFile  'testqeff.dat'/ 'dummy'.
+     Quantum efficienty of the sensor as a function of wavelength.
+     Pairs of (wavelength,  efficiency) in unit of (nm, %) must be
+     given  in each line. If dummy, Qeff is used for all wavelength. 
+     Note that efficiency is expressed by percentage.
+ mnOfScinti   10 /
+    this sensor is attached to a scintillator of which property
+    is specified by 'mn' of countDE part of the scintillltor in config.
+    (even indirectly via light guide).  This is used to get
+     the scintillator's  peakWL when converting charged particle
+     effect to number of p.e. The charged particle direct hit is
+     nomally converted to the number of p.e by  dE*cF/Ex where dE
+     is the energy deposited in the sensor, Ex the energy
+     corresponding to peakWL of the scintillator and cF the correction factor.
+ cf         1. / 1.
+    see above

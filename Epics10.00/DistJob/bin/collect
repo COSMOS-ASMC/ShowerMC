@@ -1,0 +1,273 @@
+#!/usr/local/bin/tcsh -f
+#  collect: collect data made by distjob
+#  This verison should be invoked at some of
+#  the hosts where you used distjob.
+#   
+if ($#argv == 0) then
+    echo " Usage: collect configFile [host host ...]"
+    exit 1
+endif
+if (! -f $1)  then
+    echo $1 not exists
+    exit 1
+else
+    echo config file is: $1 
+endif
+
+
+
+#  get base directory where data is stored
+set datadir=`awk '$1=="datadir" {print $2}' $1 `
+if ( "x$datadir" == "x") then
+  echo  no datadir in config file 
+  exit 1
+endif
+echo $datadir is the base directory to store data
+#  get file for data
+set datafile=`awk '$1=="datafile" {print $2}' $1`
+if ( "x$datafile" == "x") then
+  echo  no datafile in config file 
+  exit 1
+endif
+echo $datafile is the name of each data file as 
+echo $datadir/hostname/$datafile
+
+
+#  get parameter output base dir
+set paramOut=`awk '$1=="paramOut" {print $2}' $1` 
+if ( x$paramOut == "x") then
+    echo paramOut not exists in $1
+    exit 1
+else if (! -d $paramOut ) then
+    echo directory $paramOUt not exists
+    exit 1
+endif
+echo $paramOut is the base directory where the parameters are saved
+#    get alive 
+set alive=`awk '$1=="alive" {print $2}' $1` 
+if ( x$alive == "x") then
+    echo alive not exists in $1
+    exit 1
+else if (! -f $alive ) then
+    echo alive file  $alive not exists
+    exit 1
+endif
+echo $alive contains the machine list as follows:
+cat $alive
+
+set x=`awk '$1=="collector" {print}' $1 `
+if( "x$x" == "x" ) then
+    echo no collector in config file $1
+    exit 1
+endif
+set collector="$x[2-]"
+echo data collection is by $collector
+
+set media=`awk '$1=="media" {print $2}' $1 `
+if( "x$media" == "x" ) then
+    echo no media in config file $1
+    exit 1
+endif
+
+
+set obs=`awk '$1=="obs" {print $2}' $1 `
+if( "x$obs" == "x" ) then
+    echo no obs in config file $1
+    exit 1
+endif
+
+
+set minsize=`awk '$1=="minsize" {print $2}' $1 `
+if( "x$minsize" == "x" ) then
+    echo no minsize in config file $1
+    exit 1
+endif
+
+
+set consecutive=`awk '$1=="consecutive" {print $2}' $1 `
+if( "x$consecutive" == "x" ) then
+    echo no consecutive in config file $1
+    exit 1
+endif
+
+
+
+set epics=`awk '$1=="epics" {print $2}' $1 `
+if( "x$epics" == "x" ) then
+    echo no epics in config file $1
+    exit 1
+endif
+set sepics=`awk '$1=="sepics" {print $2}' $1 `
+if( "x$sepics" == "x" ) then
+    echo no sepics in config file $1
+    exit 1
+endif
+
+set detconfig=`awk '$1=="detconfig" {print $2}' $1 `
+if( "x$detconfig" == "x" ) then
+    echo no detconfig in config file $1
+    exit 1
+endif
+
+set primary=`awk '$1=="primary" {print $2}' $1 `
+if( "x$primary" == "x" ) then
+    echo no primary in config file $1
+    exit 1
+endif
+
+set execconfig=`awk '$1=="execconfig" {print $2}' $1 `
+if( "x$execconfig" == "x" ) then
+    echo no execconfig in config file $1
+    exit 1
+endif
+#
+#  judge if media is tape or disk
+#
+(echo $media | grep ^/dev/ > /dev/null ) >& /dev/null
+if ( $status == 0 ) then
+    set tape="y"
+else
+    set tape="n"
+endif
+#
+#    echo  $execconfig, $epics, $detconfig, $primary, $sepics, $tape
+#
+#          start collection job at each machine
+#
+  @ n = 0
+foreach machine (`cat $alive`)
+   if(  $#argv >= 2) then
+      if(`echo "$argv[2*]" | gawk '{if(index($0, h) >0 ) print "x";else print "y"}' h=$machine -` == "y") continue
+      endif
+##  see the file size
+set mainsize=`rsh $machine ls -l $datadir/$machine/$datafile | awk '{print $5}'`
+echo $machine has $mainsize B data
+if( $mainsize  > $minsize ) then
+    @ n += 1
+else
+    echo size is too small as compared with $minsize
+    echo so that the data is ignored.
+    goto nextmachine
+endif
+onintr -
+#  
+
+onintr delete
+echo "Now starting  collection job at $machine"
+#   echo $n, $execconfig
+if( $tape == "y" ) then
+    if( $execconfig != "0"  &&  $n == 1 ) then
+	echo output execconfig
+	rsh $machine cat $paramOut/$machine/execConfig | rsh $collector dd of=$media obs=$obs 
+    endif
+ 
+    if( $epics != "0" &&  $n == 1 ) then
+	echo output epics
+	rsh $machine cat $paramOut/$machine/epics | rsh $collector dd of=$media obs=$obs
+    endif
+
+ 
+    if( $detconfig != "0" && $n == 1 ) then
+	echo output detconfig
+	rsh $machine cat $paramOut/$machine/detConfig | rsh $collector dd of=$media obs=$obs
+    endif
+
+ 
+    if( $primary != "0" && $n == 1 ) then
+	echo output primary
+	rsh $machine cat $paramOut/$machine/primary | rsh $collector dd of=$media obs=$obs
+    endif
+   
+ 
+    if( $sepics != "0" && $n == 1 ) then
+	echo ouput sepics
+	rsh $machine cat $paramOut/$machine/sepics | rsh $collector dd of=$media obs=$obs
+    else if( $sepics == "2"  && $n > 1 ) then
+	echo ouput sepics
+    	rsh $machine cat $paramOut/$machine/sepics | rsh $collector dd of=$media obs=$obs
+    endif
+else
+#         disk output
+    if( $execconfig != "0" && $n == 1 ) then
+	echo output execconfig
+	rsh $collector mkdir -p $media
+	rsh $machine cat $paramOut/$machine/execConfig | rsh $collector dd of=$media/execConfig
+    endif
+ 
+    if( $epics != "0" && $n == 1 ) then
+	echo  ouput epics
+	rsh $machine cat $paramOut/$machine/epics | rsh $collector dd of=$media/epics 
+    endif
+
+ 
+    if( $detconfig != "0" && $n == 1 ) then
+	echo output detconfig
+	rsh $machine cat $paramOut/$machine/detConfig | rsh $collector dd of=$media/detConfig
+    endif
+
+ 
+    if( $primary != "0" && $n == 1 ) then
+	echo output primary
+	rsh $machine cat $paramOut/$machine/primary | rsh $collector dd of=$media/primary
+    endif
+   
+ 
+    if ( $sepics == "1" && $n == 1 ) then
+	echo output sepics
+	rsh $machine cat $paramOut/$machine/sepics | rsh $collector dd of=$media/sepics
+    else if ( $sepics == "2"  &&  $n == 1  &&  $consecutive == "yes" ) then
+	echo output speics
+	rsh $machine cat $paramOut/$machine/sepics | rsh $collector dd of=$media/sepics
+    else if ( $sepics == "2"  &&  $consecutive == "no" ) then
+	echo output sepics
+	rsh $collector mkdir -p $media/$machine
+	rsh $machine cat $paramOut/$machine/sepics | rsh $collector dd of=$media/$machine/sepics
+    endif
+endif
+
+## ************** main data output
+
+# get pipe2 information
+#        to inhibit removing {}
+#     ********
+    set noglob
+#     ********
+    set x=`awk '$1=="pipe2" {print}' $1`
+    if ( "x$x" == "x" ) then
+        echo pipe2 not exists in $1
+        exit 1
+    endif
+    if ("$x" == "pipe2") then
+        set pipe2=
+        echo no pipe operation on output
+    else
+        set pipe2="$x[2-]"
+        echo pipe operation specified is $pipe2
+    endif
+if( $tape == "y" ) then
+    echo  output  main  data
+    rsh $machine cat $datadir/$machine/$datafile $pipe2 | rsh $collector dd of=$media  obs=$obs
+else
+#      disk
+    if( $consecutive == "yes" ) then
+	echo output main data consecutively
+	rsh $machine cat $datadir/$machine/$datafile $pipe2 | rsh $collector cat ">>" $media/$datafile
+    else
+	echo output main data separately
+	rsh $collector mkdir -p $media/$machine
+	rsh $machine cat $datadir/$machine/$datafile $pipe2 | rsh $collector cat ">" $media/$machine/$datafile
+    endif
+endif
+echo   output  of the main data ended at $machine
+
+delete:
+#            disable double interupt   
+	onintr -
+	echo sleep 1 second
+	sleep 1 
+nextmachine:
+end
+echo  all data has been collected
+
+
+

@@ -1,0 +1,9 @@
+1) Confirm the current atmosphere modle by using
+    atmosModel.sh
+2) If it is not your target model, change the model.
+3) make clean; make
+4) If the model is e NRL, adjust NRL_period
+5) ./a.out < param
+
+
+  

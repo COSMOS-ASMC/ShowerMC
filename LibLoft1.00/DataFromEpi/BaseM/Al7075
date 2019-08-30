@@ -1,0 +1,13 @@
+#name   Format    Al-alloy 7075 (Vol. Al:93.3%, Zn:2.2%, Mg:4.0%, Cu:0.5%)
+Al7075     2
+#
+#  Elem  rho(g/cm^3)    Gas/Solid(1/0)   refl.index Birks C
+
+4         2.81         0                   0     0 0 0
+#       Z       A       N
+        13      26.98   9.33
+	30      65.41   0.22
+        12      24.31   0.40
+        29      63.55   0.05
+#  <Z/A>   I[eV]   a       k      x0    x1     Cbar  delta0
+ -100.0  -100.0 -100.0  -100.0 -100.0 -100.0 -100.0 -100.0

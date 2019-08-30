@@ -1,0 +1,13 @@
+
+ &PARAM
+ IntModel ='"phits" 2  "dpmjet3" '
+ XsecModel ='"phits" 2  "dpmjet3" 80 "special"  '
+ &END
+  
+ ------------------ Don`t worry about the following for normal applications
+ &HPARAM
+ Kpilog = 6.200000178068880E-003,
+ &END
+
+ IntModel = '"nucrin" 5 "ad-hoc" 10 "dpmjet3"',
+

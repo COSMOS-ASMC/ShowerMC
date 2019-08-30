@@ -1,0 +1,1 @@
+rep "<awk -f hnmode /tmp/$USER/trace1" w l

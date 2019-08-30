@@ -1,0 +1,3 @@
+-L/usr/intel/ifc8/lib -L/usr/lib -Bstatic  -lifport -lifcoremt -limf  -lm  -lcxa -lunwind  -lpthread  -lirc  -lc -lirc 
+
+ 

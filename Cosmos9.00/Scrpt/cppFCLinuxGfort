@@ -1,0 +1,224 @@
+#!/bin/bash
+
+#	usage:	cppFC [-g] [-O] [-o absfile] [-c] files [-l library]
+
+#		-o objfile	Override default executable name a.out.
+
+#		-c		Do not call linker, leave relocatables in *.o.
+
+#		-S		leave assembler output on file.s
+
+#		-l library	(passed to ld).
+
+#		-u		complain about undeclared variables
+
+#		-w		omit all warning messages
+
+#		-w66		omit Fortran 66 compatibility warning messages
+
+#		files		FORTRAN source files ending in .f .
+#				C source files ending in .c .
+#				Assembly language files ending in .s .
+#				efl source files ending in .e .
+
+#		-D def		passed to C compiler (for .c files)
+#                                or cpp for .f files
+#		-I includepath	passed to C compiler (for .c files)
+
+#		-Ntnnn		allow nnn entries in table t
+##   echo "  cppFC: nparam=$# $*"
+s=/tmp/stderr_$$
+#t=/tmp/f90_$$.o
+t=/tmp/gfort_$$.o
+#FC=${F77:-f77}
+
+
+source $COSMOSTOP/Scrpt/setarch.sh
+now=`pwd`
+if [ ${now##*/} == "Bertini" ]; then
+       FC="gfortran -O3 -std=legacy -fno-align-commons -J$LIBLOFT/lib/$ARCH"
+elif [ ${now##*/} == "Minuit" ]; then
+       FC="gfortran -O3  -std=legacy -fno-align-commons -J$LIBLOFT/lib/$ARCH"
+elif [  ${now##*/}  == "JQMD" ] || [  ${now##*/}  == "PHITS" ] ||  \
+	 [  ${now##*/}  == "JQMD" ] || [  ${now##*/}  == "nela" ] ||  \
+	 [  ${now##*/}  == "Com" ] || [ ${now##*/}  == "Xsec" ]; then
+        FC="gfortran -O3  -std=legacy -fno-align-commons -J$LIBLOFT/lib/$ARCH"
+else
+       FC="gfortran -O3  -std=legacy -fno-align-commons -J$LIBLOFT/lib/$ARCH"
+fi
+CC=cc
+# FFLAGS=
+EFL=${EFL:-/v/bin/efl}
+EFLFLAGS=${EFLFLAGS:-'system=portable deltastno=10'}
+#CPPF77=${F2C:-/usr/local/bin/f2c}
+#F2CFLAGS=${F2CFLAGS:='-ARw8 -Nn802'}
+CPPFLAGS=
+rc=0
+keeptemp=0
+trap "rm -f $s $t; exit \$rc" 0
+OUTF=a.out
+cOPT=1
+CCFLAGS=
+
+while
+	test -n "$1"
+do
+	case "$1"
+	in
+	-c)	cOPT=0
+		shift
+		;;
+
+	-D*)	CCFLAGS="$CCFLAGS $1"
+	        CPPFLAGS="$CPPFLAGS $1"
+		shift 1
+		;;
+
+	-g)	FFLAGS="$FFLAGS -g"
+		keeptemp=1
+		shift;;
+
+        +z)      FFLAGS="$FFLAGS +z"
+	        shift
+		;;
+
+       +U77)    FFLAGS="$FFLAGS +U77"
+	        shift
+		;;
+   
+	-I*)	CPPFLAGS="$CPPFLAGS $1"
+		shift
+		;;
+
+	-arch)	FFLAGS="$FFLAGS -arch $2"
+		shift 2
+		;;
+
+	-o)	OUTF=$2
+		shift 2
+		;;
+
+	-O)	FFLAGS="$FFLAGS -O"
+		shift
+		;;
+
+	-u)	CPPFLAGS="$CPPFLAGS -u"
+		shift
+		;;
+
+	-w)	CPPFLAGS="$CPPFLAGS -w"
+		case $2 in -6) CPPFLAGS="$CPPFLAGS"66; shift
+			case $2 in -6) shift;; esac;; esac
+		shift
+		;;
+
+	-N)	CPPFLAGS="$CPPFLAGS $1""$2"
+		shift 2
+		;;
+
+	-S)	FFLAGS="$FFLAGS -S"
+		cOPT=0
+		shift
+		;;
+
+	*.[fF])
+		case "$1" in *.f) f=".f";; *.F) f=".F";; esac
+		b=`basename $1 $f`
+		echo $1
+
+
+#	        /lib/cpp -C -P -traditional  $CPPFLAGS $1  > /tmp/temp$$.f
+#	        /usr/bin/cpp -C -P -traditional  $CPPFLAGS $1  > /tmp/temp$$.f
+	        /usr/bin/cpp  -P -traditional  $CPPFLAGS $1  > ./temp$$.f
+
+
+		case $? in 0);; *) exit;; esac
+		echo "*********" $FC  $1
+#                -trap=exception[,exception,...]
+#                 Enable one or more  FPU  floating  point  excepｭ
+#                 tions.  Exception can be one or more of INVALID,
+#                 DIVBYZERO, OVERFLOW, UNDERFLOW, INEXACT, or ALL.
+#                 This  option  only  applies  to the MAIN program
+#                 unit.
+
+#                $FC -trap=INVALID,DIVBYZERO,OVERFLOW -YEXT_NAMES=UCS -YCOM_NAMES=UCS  -c -s  $FFLAGS /tmp/temp$$.f -o $b.o > $s
+                $FC  -c -s  $FFLAGS ./temp$$.f -o $b.o > $s
+
+#                  f77 is script and does not see -o so we need  below
+#		mv temp$$.o  $b.o
+#	        rm -f /tmp/temp$$.d
+	        rm -f ./temp$$.d
+		rc=$?
+#		sed '/parameter .* is not referenced/d;/warning: too many parameters/d' $s 1>&2
+		case $rc in 0);; *) exit;; esac
+		OFILES="$OFILES $b.o"
+#		rm $b.c
+		if [ $keeptemp = 0 ] ;	then
+#                  rm /tmp/temp$$.f
+                  rm ./temp$$.f
+		fi
+#		rm /tmp/temp$$.f
+		case $cOPT in 1) cOPT=2;; esac
+		shift
+		;;
+	*.f90)
+		f=".f90"
+		b=`basename $1 $f`
+
+	        /lib/cpp -P -traditional  $CPPFLAGS $1  > ./temp$$.f90
+
+
+		case $? in 0);; *) exit;; esac
+		echo "*********" $FC
+                $FC  -c   $FFLAGS ./temp$$.f90 -o $b.o > $s
+	        rm -f temp$$.d
+		rc=$?
+		case $rc in 0);; *) exit;; esac
+		OFILES="$OFILES $b.o"
+#		rm $b.c
+		if [ $keeptemp = 0 ] ;	then
+                  rm ./temp$$.f90
+		fi
+#		rm /tmp/temp$$.f
+		case $cOPT in 1) cOPT=2;; esac
+		shift
+		;;
+
+
+	*.c)
+		echo $1: 1>&2
+		OFILE=`basename $1 .c`.o
+                $CC -c $CFLAGS $CCFLAGS $1
+		rc=$?; case $rc in 0);; *) exit;; esac
+		OFILES="$OFILES $OFILE"
+		case $cOPT in 1) cOPT=2;; esac
+		shift
+		;;
+	*.o)
+		OFILES="$OFILES $1"
+		case $cOPT in 1) cOPT=2;; esac
+		shift
+		;;
+	-l)
+		OFILES="$OFILES -l$2"
+		shift 2
+		case $cOPT in 1) cOPT=2;; esac
+		;;
+	-l*)
+		OFILES="$OFILES $1"
+		shift
+		case $cOPT in 1) cOPT=2;; esac
+		;;
+	-o)
+		OUTF=$2; shift 2;;
+	*)
+		OFILES="$OFILES $1"
+		shift
+		case $cOPT in 1) cOPT=2;; esac
+		;;
+	esac
+done
+
+case $cOPT in 2) $FC -o $OUTF -u MAIN__ $OFILES -lf2c -lm;; esac
+rc=$?
+exit $rc

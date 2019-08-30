@@ -1,0 +1,133 @@
+\documentclass[a4paper]{article} 
+\usepackage[dvipdfmx]{color,graphicx}
+%\usepackage{nruby} %ルビ
+%\usepackage{shadow}  % 影付の四角枠
+%\usepackage{fancybox} % いろいろ凝った枠
+%\usepackage{longtable} %  ページを跨ぐ大きな表( Tabularもある )
+%\usepackage{mathrsfs}  %  花文字ローマ字他にもいろいろある
+%\usepackage{amsmath,amsthm,amssymb} % アメリカ数学会の記号など
+%\usepackage{ascmac}  %  角の丸い枠で複数行を囲む
+%\usepackage{multicolpar} % 対訳文のように左右に文を分けて書く
+%\usepackage{fancyvrb} % 書いてあるままの出力に対する周辺装飾
+%\usepackage{alltt}  % verbatimでは困るときに使える?
+%\usepackage{here}
+%\setlength{\textwidth}{15.5cm}  % テキストの幅を指定
+%\setlength{\textheight}{24cm}  % テキストの高さを指定
+\title{Brems energy sampling}
+\author{KK}
+\begin{document}
+ \maketitle
+ For  treating electron bremshtralung, we need to get the total brems 
+ cross-section  (say, probability or brems occurence / r.l)  and must be able
+ to sample the emitted gamma ray energy. Normally, the total cross-section
+ diverges when the minimum gamma ray energy  is set to 0 (though, if the
+  LPM is effective, divergnece dose not happen).
+
+  The gamma ray energy is  usually expressed by $k=E_\gamma/E_e$ where
+  $E_e$ is the electron totalc energy.  To avoid divergence, we normally
+  set a minimum value of  $k=k_{m}$ above which  gamma ray energy is
+  sampled. This is applied also for the LPM case.
+
+  However, some times we may want to use a  lower $k_{m}$ than
+  predefined one. To prepare a sampling table for each different $k_m$
+  is not practical.
+
+  
+
+  \section{Sampling Method}
+  We express the differential brems cross-section by
+  \begin{equation}
+     \frac{d\sigma}{dk}=f(k)
+  \end{equation}
+  This is dependent on $E_e$.
+  For a typical $k_m$, we make a table with various $E_e$'s.
+First,  the total cross-section, i.e,  integration from $k=k_{m} $ to  $1-m_e/Ee$,
+\begin{equation}
+   T(k_m)= \int_{k_m} f(k)dk
+\end{equation}
+is  tabulated. 
+
+
+  For $k\sim 1$, $f(k)$ is not a simple function, so we must
+   also make a sampling table for $k$,
+  beforehand.
+  For a lower $k_c$ ($<k_m,$),
+  $T(k_c)$ can be obtained by a simple formula, since $f(k)$
+  becomes a simple function for sufficiently small $k$.
+  That is,
+  when the LPM is to be applied:
+  \begin{equation}
+ f(k) =f_1\equiv  f_m\cdot(k/k_m)^{-1/2} =f_{m1}/\sqrt{k}  
+  \end{equation}
+  where $f_m=f(k_m)$ and $f_{m1}=f_m\sqrt{k_m}$.
+When the LPM should not be applied:
+  \begin{equation}  
+f(k)=f_2\equiv  f_m\cdot(k/k_m)^{-1} = f_{m2}/k
+  \end{equation}
+  where  $f_{m2}=f_mk_m$.
+  Both of $f_{m1}$ and $f_{m2}$ are tabulated together with
+  $T(k_m)$
+  \begin{equation}  
+T(k_c)= \int_{k_c}  f(k)dk = \int_{k_c}^{k_m}f(k)dk + T(k_m)
+\end{equation}
+Defining
+  \begin{equation}  
+   t_i(k_c) \equiv  \int_{k_c}^{k_m}f_idk
+=  \left \{
+\begin{array}{l}
+2f_{m1}(\sqrt{k_m}-\sqrt{k_c}) \hspace{1cm}(i=1)\\
+f_{m2}\log(k_m/k_c)\hspace{1.8cm}(i=2)
+\end{array}
+\right.
+  \end{equation}
+%
+We can express
+  \begin{equation}  
+T(k_c)= t_i(k_c) + T(k_m)
+\end{equation}
+ For a given uniform random number $0<u<1$,
+if $u>t_i(k_c)/T(k_c)$,  we may sample $k$ by using the sampling table.
+Otherwize, we may  sample $k$ from $f_i$.  Using a new $u$,
+  \begin{equation}  
+   k=  \left \{
+\begin{array}{l}
+k_c(1+u(\sqrt{k_m/k_c} -1))^2\hspace{1cm}(i=1)\\
+k_c(\frac{k_m}{k_c})^u\hspace{3.5cm}(i=2)\\
+\end{array}
+\right.
+  \end{equation}
+  
+  \section{Summary}
+  \begin{itemize}
+   \item Besides $T(k_m)$, $f_{m1}$ and $f_{m2}$ must be tabulated as
+	 a function of  $E_e$.
+   \item If  $f_{m1}$ or $f_{m2}$ is not given in the table, old style
+	 format is
+	 assumed, and giving an new $k_c$ is not allowed (negelcted)
+   \item  If a new $k_c$ is larger than the current $k_m$,  it is
+	  neglected
+	  (or $k_c=k_m$ is forced. )
+	 
+   \item Normally the minimum gamma ray energy must be $\ge$ 1 keV.
+	 (It can be smaller without error;
+	 If $E_e<$100 MeV,
+	  the absolute
+	 $E_\gamma$ minimuum has been  set to be 1 keV in default).
+	 At higher energies, $k_m=10^{-5}$ is default and this is
+	 enough small for many of applications.  If $E_e$ is as
+	 high as 10 TeV, it means the minimum gamma energy becomes
+	 100 MeV. One may think this is too high, but for many
+	 applications where energy deposit is measured,  results
+	 with this cut would give a result which is almost the
+	 same one by the default setup
+   	 
+   \item The total cross-section table, say, BrTXL(mxBrTXL),
+	 is now made to be BrTXL(2, mxBrTXL).  The first index is
+	 for the total cross-section, and the second one is
+	 for $f_{m1}$ or $f_{m2}$.
+
+	 BrTXL, BrTXH, BrTXS, BrTXS2 are also changed.
+	 
+  \end{itemize}
+\end{document}
+

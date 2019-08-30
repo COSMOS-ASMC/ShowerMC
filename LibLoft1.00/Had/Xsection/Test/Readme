@@ -1,0 +1,39 @@
+1) make clean
+make -f cgetXsTest.mk
+
+a.out > output
+
+will create  E vs cross-section table for
+various projectile and  target combinaitons
+
+If pj is non nucleus or 
+   pj is nucleus and target is p/n,
+ inelastic, total and elastic  cross-sections 
+are obtained.  E is the total energy in GeV.
+
+Otherwise, i.e, pj and tg are  both nuclues
+only inelastic cross-sections are obtained.
+
+2)
+make clean
+make -f  cgetXsRatio.mk
+
+./a.out > output
+
+will produce data of
+ pj   E(GeV)  Tartget A s(xp)(mb)  s(xA) s(xA)/s(xp)
+
+where a pj is the code of projectile (6 p, 5 Kaon 4  pion)
+
+you may modify some of module part of cgetXsRatio.f
+
+Also you may fix the following to in   cgetXsInterface2.f
+
+SxAbySxpOpt = 0  ! same as 2:  QGS2 like
+           !  1.  use table derived from  QGSJET-II-04  (default)
+           !  2.  use table derived from dpjmet3
+           !  3.  use table dervied from EPOS  
+TotXSopt =  2    ! For stotal(pp)  use  1: PDG  3: Totem data
+                 !  2 is midlle of 1 and 3.        
+
+

@@ -1,0 +1,142 @@
+  open(fno, file='mytest1.hist', form='formatted')
+  call kwhistso(1)
+    init
+  call kwhisti(k(i), 1.5, 0.1, 30, b'01111' )
+    clear
+  call kwhistc(k(i))
+
+  loop
+     !               take histo of a variable
+  call kwhist( k(i), sngl(x), 1.0 )
+!             make arg 0 for integral from -inf. 
+                       1 for //            +inf.
+  call kwhists0(0)
+  !        output 
+
+   call kwhists(k(i), 0.)
+   call kwhistp(k(i), fno )
+
+------------------------------------
+
+        !             init.
+   call kwhisti(h(i, j), sngl(av-7*sig), sngl(av+7*sig),   &
+             500,  b'10000')
+        !             clear
+   call kwhistc(h(i, j))
+        loop 
+            !                 take histo of a variable
+      call kwhist(h(i,j), sngl(x), 1.0 )
+
+
+!             give additional info.
+   call kwhistai(h(i,j),  &
+                "Test Gaussian dist.",  &
+                "gauss", "event", .false., 0.,  &
+                "x", "m") 
+!             make key for diff. parameers
+         write(key,'(1p2E11.3)' ) av, sig
+!              inform it
+         call kwhistid(h(i,j), key)
+!              make directory: maindir/gauss/{av1,av2}
+         write(dirstr,'("av",i2,"/")')  i
+!                   next two is better to shrink the string length
+!                   but only 3rd line can be  ok. (white blank will 
+!                   be eliminated inside).
+!            call kseblk(dirstr,"|", nc)
+!            call kwhistdir(h(i,j), dirstr(1:nc))
+          call kwhistdir(h(i,j), dirstr)
+     
+!         output.
+     do i = 1, nav
+        do j = 1, nsig
+           call kwhists(h(i,j), 0.)
+           call kwhistp(h(i,j), fno)
+        enddo
+      enddo
+!            get (x,y) of integral dist.
+      nnn=kwhistIxy(h(2,2), xxx, yyy, 500)
+      write(0,*) ' nnn-', nnn
+     do i = 1, nnn
+        write(0,*) xxx(i), yyy(i)
+     enddo
+
+The 1, 2, 3 dimensional histogram routines. The programs can be
+compliled only by Intel Fortran 90/95. (Absoft fortran 90/95 is
+unable to compile them).  The programs need to use dyanmic
+array allocation inside a structure; this feature is not supported by
+Absoft.  To use these prorams, just specify the *.o in the link 
+process.
+
+compile k90*.f in this directory and make
+object by
+
+ifort -c k90*.f
+
+
+A)  3D histogram.  overlap display (xyz)
+	do i =  ..	
+	   do j = ..
+      	    call kwhistp3( h(i,j) ...)
+           enddo
+	enddo
+           each *.dat ccontaines spectram of Z in the specified (X,Y) region.
+           dir(i) is the name dependent on i
+	   dir(j) is the name dependetn on j
+	maindir/what/dir(i)/dir(j)/dirX1/fileY1.dat   
+	maindir/what/dir(i)/dir(j)/dirX1/fileY2.dat   
+...
+
+	 fileY1.dat ... to fileYn.dat will be overlapped
+ 
+	maindir/what/dir(i)/dir(j)/dirX2/fileY1.dat   
+	maindir/what/dir(i)/dir(j)/dirX2/fileY2.dat 
+...
+	...
+	 fileY1.dat ... to fileYn.dat will be overlapped
+
+B)  2D histogram   overlap display (XY)
+
+	do i =  ..	
+	   do j = ..
+      	    call kwhistp2( h(i,j) ...)
+           enddo
+	enddo
+           each *.dat ccontaines spectram of Y in the specified (X) region.
+           dir(i) is the name dependent on i
+	   dir(j) is the name dependetn on j
+	maindir/what/dir(i)/dir(j)/fileX1.dat   
+	maindir/what/dir(i)/dir(j)/fileX2.dat   
+...
+
+	 fileX1.dat ... to fileXn.dat will be overlapped
+ 
+	maindir/what/dir(i)/dir(j)/fileX1.dat   
+	maindir/what/dir(i)/dir(j)/fileX2.dat 
+...
+	...
+	 fileX1.dat ... to fileXn.dat will be overlapped
+
+C )  1D histogram   overlap display (X)
+
+	do i =  ..	
+	   do j = ..
+      	    call kwhistp( h(i,j) ...)
+           enddo
+	enddo
+           each *.dat ccontaines spectram of X 
+           dir(i) is the name dependent on i
+	   file(j) is the name dependetn on j (fileJ1, fileJ2...)
+	maindir/what/dir(i)/fileJ1.dat   
+	maindir/what/dir(i)/fileJ2.dat   
+...
+
+	 fileJ1.dat ... to fileJn.dat will be overlapped
+ 
+	maindir/what/dir(i)/fileJ1.dat   
+	maindir/what/dir(i)/fileJ2.dat 
+...
+	...
+	 fileJ1.dat ... to fileJn.dat will be overlapped
+
+
+----------------

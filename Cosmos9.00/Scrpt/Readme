@@ -1,0 +1,19 @@
+cosmkmf  : basic script to make a Makefile.  If -l  is atouched, it is for library making.
+cppFC    : invoking fortran compiler after interpreting cpp directive
+cppf77   : simplified cppFC for compilation and making executable.  cppf77 
+           files.
+cppfc    : the same as cppf77 but only for compilation
+makeMakefile: If you issue this at some directory, Makefiles for making the
+             cosmos library are created (after removing the existing one)
+             in all its subdirectories.
+NLM      : manages all sort of jobs about Namelist. Other Namelist related
+           stuffs are used from this script.  Use this here.
+pretty   : show the default namelist in a  pretty format or
+           rewrite namelist output from the sytem (which has only captial letters
+           in the name) into a pretty style.
+getName  : gets variable names to be used in the Namelist data. Used by makeNL.
+makeNL   : makeNL 1 (or  2) is to  generate Znamelist1.h or Znamelist2.h
+putName  : put variable names as namelist data.  Used by makeNL
+ListNameLD: List Namelist data descriptions.  1 line for each item.
+ListNameLDawk1,2:  awk script for  ListNameLD
+

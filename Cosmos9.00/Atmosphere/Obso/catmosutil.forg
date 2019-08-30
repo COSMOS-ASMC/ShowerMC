@@ -1,0 +1,129 @@
+c         Compute geometrical relation in the spherical env.
+c
+c                |
+c                |
+c                |               /               *          .
+c                |              /              * t    .
+c                |             /             *.  
+c                |            /         .  * A
+c                |           / t'   .    *
+c                |          /   . L    *         zenith angle t, t'
+c                |      B  /.        *           at vertical height h and h'
+c                |      . /        *  H=R0+h     Radius of the earth R0
+c             ^  |  ^.   / H'    *               length AB =L
+c        ^       |      /  ^   *            
+c                |     /     *^       H cos(t) - H'cos(t')=L  
+c                | R0 /    *    ^     H sin(t) = H'sin(t')    
+c                |   /   *        ^   H' = sqrt(L**2 +H**2 - 2LHcos(t))
+c                |  /  *          ^        
+c                | / *                   
+c                |/                 ^  cos(t')= (Hcos(t) - L)/H'
+c                                        
+c                                   ^         
+c                                      sin(t')=Hsin(t)/H'
+c                                        
+c
+c        test program.
+c
+c      program testutil
+c      implicit none
+c      include '../../Zglobalc.h'
+c      include 'Zearth.h'
+c      
+c      real*8  H, sh, cosz, L, hp, cnewcos, cnewsin, cnewh, cost, sint
+c      
+c      do sh = 0., 30.d3, 10000.
+c         H = Eradius + sh
+c         do cosz=1., 0., -0.2
+c            do L=0., 100.d3, 1000.
+c               cost = cnewcos(H, cosz, L)
+c               sint = cnewsin(H, cosz, L)
+c               if(abs(cost**2 + sint**2 -1.d0) .gt. 1.d-7) then
+c                  write(*,*) ' ***** '
+c               endif 
+c               write(*, *) cost**2 + sint**2 
+c               hp = cnewh(H, cosz, L) - Eradius
+c               write(*, *)' h=', sh, ' cosz=', cosz, ' L=', L, ' hp=',hp
+c            enddo
+c         enddo
+c      enddo
+c        another test; for clenbetween2h
+c+++++++++++++++++++++++++++++++++++++++++++++++++++
+c      program testutil
+c      implicit none
+c#include "Zearth.h"
+c         real*8 clenbetween2h, h1, h2, cost, ans, cnewcos
+c         real*8 costp
+c         h1 = Eradius + 0.d3
+c         h2 = Eradius + 100.d3
+c         cost = -1.
+c         ans = clenbetween2h(h1, h2, cost)
+c         write(*,*) ans
+c         costp = cnewcos(h1, cost, ans)
+c         ans = clenbetween2h(h2, h1, -costp)
+c         write(*,*) ans
+c       end
+cc 
+c     ----------------get cos(t')------------------------    
+c         to get cos(t')and sin(t') both, use subroutine cnewcossin
+      real*8 function cnewcos(H, cost, L)
+c 
+      implicit none
+      real*8 H, cost, L
+c
+      real*8 eps/1.d-5/,  tmp
+      
+      tmp = L/H
+      if(tmp .lt. eps) then
+          cnewcos = (cost - tmp) / 
+     *      ( ( tmp * (1.-cost**2)/2 -cost)*tmp +1.)
+      elseif(abs(cost) .ne. 1.d0) then
+            cnewcos = (cost - tmp)/ sqrt( (tmp - cost*2)*tmp +1.)
+      else
+            cnewcos = cost
+      endif
+      end
+c     ---------------get sin(t') -----------------------
+      real*8 function cnewsin(H, cost, L)
+      implicit none
+      real*8 H, cost, L
+c
+      real*8 cnewh, eps/1.d-5/, sint
+      
+      sint = sqrt(1.d0 - cost**2)
+      cnewsin = H * sint/ cnewh(H, cost, L)
+      end
+c     ------------- get H'----------------------------
+      real*8 function cnewh(H, cost, L)
+      implicit none
+      real*8 H, cost, L, tmp
+
+      real*8 eps/1.d-5/
+
+      tmp = L/H
+      if(tmp .lt. eps) then
+         cnewh = H * ( (tmp * (1.d0 -cost**2)/2 - cost )* tmp + 1.d0)
+      else
+         cnewh =H* sqrt( ( tmp - cost*2)*tmp + 1.d0 )
+      endif
+      end
+c     ------------- get L----------------------------
+c       get length between two points with radius h1
+c       and h2. The zenith angle at h1 is cost.
+       real*8 function clenbetween2h(h1, h2, cost)
+       implicit none
+       real*8 h1, h2, cost
+
+       real*8 sint, costp, sintp
+
+       sint = sqrt(1.d0 - cost**2)
+       sintp = h1*sint /h2
+       if(h1 * sint .le. h2) then
+c              
+          costp = sqrt(1. - sintp**2)*sign(1., cost)
+       else
+          costp = -sqrt(1. - sintp**2) *sign(1., cost)
+       endif
+c          always >=  0
+       clenbetween2h = h1* cost - h2 * costp
+      end

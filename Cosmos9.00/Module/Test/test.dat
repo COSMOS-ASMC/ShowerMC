@@ -1,0 +1,19 @@
+ $param
+ HowEfield = 1
+ myEf(1)%Ef=1e5,0,1e5,
+ myEf(1)%EfH1=1000,
+ myEf(1)%EfH2=3000,
+ myEf(1)%EfR1=0.,
+ myEf(1)%EfR2=1000.,
+
+ myEf(2)%Ef=0,0,1e5,
+ myEf(2)%EfH1=3000,
+ myEf(2)%EfH2=5000,
+ myEf(2)%EfR1=0.,
+ myEf(2)%EfR2=1000.,
+
+ $end
+
+
+
+

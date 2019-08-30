@@ -1,0 +1,76 @@
+This directory containes the stuff for getting max depth  of
+    Ng, Ne, Ne(hybrid), dE
+in .hyb files.  max position is apparent one as well as
+fitted one.
+(To get simple average of the transition curve, you may use
+awk -f ~/Cosmos/UserHook/mkLDD/getAveTran.awk hyb-files > average.dat 
+ items 2: depth 3: <Ng> 4: <Ne>  5:<Nmu> 6:<Nh>: 7 <Neh> 8 <dE/dx> 
+  9 <dE> 10 <dE>death )
+
+0) once for all: make clean; make 
+ This makes tranFit$ARCH. tranFit is linked to this
+ so you may access tranFit which is to  make a fitting
+ of f(x) = a*(x/x0)**b exp(-c(x/x0)**d)  to the transition
+ curve. (As far as you use the scripts below, no need to use
+ this directly).
+
+1)  To get max depth and apprent max depth of each event. Use
+   
+  ./procAll.sh  directory  resultfile [maxleft maxright]
+
+  where
+   directory:  the path to a directory where .hyb files are
+	contained.
+   resultfile:  file name to contain  (Xmax, aXmax) of Ng, Ne, dE and hybNe + coszenith for
+	each event.  (One event in one line).  Xmax is by fitting
+	aXmax apparent max pos.  They are slant depth.
+   maxleft and maxright:  optional. how many layers are to be used
+	before and after apparant max pos.  Default is 3 3.
+	For overall fitting of the transition, these values may
+	be bettter to be set larger.
+ 1-1)  To know the average of Xmax, use
+	awk -f getave.awk resultfile; and you will get a line like
+     Ng( 771.0 770.8 ) Ne( 738.7 739.58 ) dE( 737.8 738.4 ) hNe ( 739.9 740.3 )
+ 1-2)  To get cumulative <Xmax>, <aXmax> (with respect to # of events),  use
+
+	awk -f getcumave.awk resultfile > cumave.dat
+	and then, 
+	plot item 1 vs 4 (for event# vs <fitted Xmax of Ne>)
+        plot item 1 vs 5 (for event# vs <apparent Xmax of Ne>)
+	plot item 1 vs 6 (for event# vs <fitted Xmax of dE>)
+	plot item 1 vs 7 (for event# vs <apparent Xmax of dE>)
+	plot item 1 vs 8 (for event# vs <fitted Xmax of hNe>)
+	plot item 1 vs 9 (for event# vs <apparent Xmax of hNe>)
+	(item 2,3 are for Ng)
+ 2)  To see fitting result event by event (via gnuplot)
+	./seeFit.sh directory   [maxleft maxright]
+     directory: same as in 1)
+     [maxleft maxright]	: same as in 1).
+   *a Click the figure by mouse to see next event.
+   *b The last command in the file, gnutemplate.cmd,  is 
+	pause mouse
+     Some gnuplot may not support this and  *a may not work.  In that case
+     you may set pause -1, and push return to proceed the next event.
+   *c If you want to send the figure to a file, uncomment the part  
+     below "### file output" in seeFig.sh.  The current setting is to
+     get .eps file but the line width is not reflected.  If pdf is
+     usable, better to use it.
+
+3)  splitHyb.sh
+	The command so far assumes that your .hyb file has only one
+	hyb data.  In some case, you have concatinated many .hyb files
+	in a file (events are separated by a blank line).  In such a 
+	case, you may use this.  
+	./splitHyb.sh   a-hyb-file
+	This splits "a-hyb-file"  and creates file1.hyb file2.hyb in ./Work. 
+	(NOTE: all existing .hyb files in Work will be deleted
+	before creating file1.hyb etc).
+
+
+
+	
+
+
+
+
+	

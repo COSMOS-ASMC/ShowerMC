@@ -1,0 +1,166 @@
+Interface with cosmos.
+
+  When a hadron appears, 
+    1) ep2cosCond is called.
+	       This sets average Target A and Z and also
+                       TrackBefMove.
+    2) ciniSmpIntL is called to initialize the interaction
+       length sampling.
+    3) csampNEPIntL is called to sample the interaction length.
+    4) epfixProc is called to fix a process.
+
+  When a new media appears, 
+     ep2cosCond is called, too.
+
+  When a hadronic  particle is made to interact,
+    1) ep2cosPtcl is called to make cosmos particle.
+    2) ep2cosCond2 is called. This sets the average target A, Z
+       and MovedTrack. Also Target mass A and Z  (integers) are
+       fixed. (TargetNuceonNo and TargetProtonNo)
+    3) cphotop or cinteNEP is called to produce particles.
+       (for gamma had. production, and hadrons )
+    4) eppushPtcl is called to get particles and stack them
+       in the epics stack area.
+
+To make a new volume shape. 
+
+    For a given shape, we must make the following routines:
+
+1) A routine that returns the value of distantce to the
+   nearest boundary of the volume from  a given position with
+   given direction. The routine is called from epbndry2 in epbndry.f
+
+   Interface:
+	subroutine  xxxx(cnx, length, icon)
+	implicit none
+#include "ZepTrackv.h"
+#include "Zcnfig.h"
+
+	integer cnx ! input. component number, by which  this
+                    !        shape is specified.
+        real*8  length ! output length cm
+        integer icon  ! output
+                      ! 0: length obtained 
+                      ! 1: the line dose not cross the volume
+
+	record /epPos/   posw, posl
+        record /epDirec/ dirw, dirl
+        if(Cn .eq. cnx) then
+c            no need to conv. to local.coor.
+           call xxxx1(cTrack.pos, cTrack.w, Det.cmp(cnx), length, icon)
+        else
+           call epl2w(Cn, cTrack.pos, posw)
+           call epw2l(cnx, posw, posl)
+           call epl2wd(Cn, cTrack.w, dirw)
+           call epw2ld(cnx, dirw, dirl)
+           call xxxx1(posl, dirl, Det.cmp(cnx), length, icon)
+        endif
+       end	
+       subroutine xxxx1(pos, dir, comp, length, icon)
+       implicit none
+#include "ZepTrackv.h"
+#include "Zcnfig.h"
+c
+c          you may assume that pos, dir are given in the
+c       canonical local coordinate. of the volume.
+c
+
+       record /epPos/ pos   ! input.  position
+       record /epDirec/ dir  ! input. direction cosinse
+       record /Component/comp  ! input. you can extract volume parameters
+                               !  by comp.vol(1), etc
+       real*8  length !  output length cm from pos to the boundary
+       integer icon  ! outpu. 0: length obtained 
+                     !  1: the line dose not cross the volume
+       ....
+
+       ....
+       end
+
+
+2)    For a new volume which is  spcified by a component number,
+      a rouitne that judges that a given position is inside the
+      volume. The routine is called from epsOne in eppos2cn.f
+      Interface.
+
+	subroutine  yyyy(ncx, pos, icon)
+	implicit none
+#include "ZepTrackv.h"
+#include "Zcnfig.h"
+	integer ncx  ! input. component nubmer
+        record /epPos/pos  ! input. 3D point which is local of
+                           ! ncx-th component. 
+        integer iocn  ! output.  0--> pos is inside
+                      !          1--> pos is outside.
+
+         ...
+         end
+
+3)  A  routine  that reads configuration of the volume.
+    The routine is called from eprcnf.
+       subroutine  zzzz
+       implicit none
+#include  "Zcnfig.h"
+#include  "ZepTrackv.h"
+#include  "ZepManager.h"
+
+
+c             read part of the structure
+        call eprpst(x,xx, xxx) 
+c        x is number of attributes representing the volmume
+c        There are 9 direction cosines (3 for x,  3 for y  3 for z)
+c        which specifies the orientation of the volmue. Normally 9 is
+c        not needed.  Say, for box, first 6 is enough. Then, give
+c        xx=1, and xxx=6.  For the cylinder, last 3 is needed to
+c        specify the axis. Then xx=7 and xxx=9.
+c 
+c
+c             If variant forms are available as a rotation of
+c             the canonical form, add lines below
+
+        call eprotation
+c
+	if( canonical form) then
+c          nothing to do
+        elseif( index(confdata, 'xxxx_some') .ne. 0) then
+c              do transformation that the give volume can be
+c             expressed by a rotation of the canonical form.
+        ....
+        endif
+
+        end
+
+
+4) A routine that returns the min and max of (x,y,z) of a given
+    component in world coord.
+    The routine is called from epcmmx in epmcnf.f
+    If you put a "world" in the config file 
+    (which envelops this volume), you may  simply give all zeros.
+    It is probally sufficient to give the min/max for
+    non-rotated configuration.
+
+     subroutien  pppp(cnx, maxpos, minpos)
+     implicit none
+#include "ZepTrackv.h"
+#include "Zcnfig.h"
+
+
+     integer cnx  ! input.  cnx-th component is specified.
+     record  /epPos/ maxpos  ! output  max  of (x,y,z)
+     record  /epPos/ minpos  ! output  min  of (x,y,z)
+
+
+     record /epPos/ posw 	
+c       you may transform nodal points of the volume
+c       to world coodinate and get min and /max.
+	
+c       get posl of some nodal  point of the volume  
+
+     call epl2w(cnx, posl, posw)
+c      get max/min from posw.
+c       if more nodal points, do the same.
+
+     end
+
+
+

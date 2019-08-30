@@ -1,0 +1,10 @@
+INST
+geom{ < "./Array/ground" }
+
+#   convert to to E-xyz system conversion
+transforms { 
+ TLIST
+< "./Array/matrix"}
+ }
+
+

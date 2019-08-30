@@ -1,0 +1,3 @@
+-L/usr/intel/compiler/ia32/lib  -lintrins   -L/usr/lib     -lIEPCF90     -lF90 -limf     -lm     -lirc     -lcxa     -lunwind     -lc
+
+

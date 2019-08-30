@@ -1,0 +1,12 @@
+#name   Format ; CH2C(CH3)(COOCH3)]n -->C5H8O2 polymethylmethacrylate 
+Acrylic 2
+#
+#  Elem	 rho(g/cm^3)	Gas/Solid(1/0)  refr.index Birks c
+
+3         1.19             0              1.49       0 0 0
+# 	Z	A  	N
+	6	12	5
+	1	1	8
+	8	16	2
+#  ⟨Z/A⟩   I[eV]   a       k      x0    x1     Cbar  delta0
+   0.53937 74.0 0.1143  3.3836  0.1824  2.6681  3.3297 0.00

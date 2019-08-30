@@ -1,0 +1,445 @@
+#
+# PWO
+#
+
+#subd cfrp-sheet
+1 box CFRP 0 0 0 / -19.3  -16.55 0 38.6 33.1 0.052
+2 box CFRP 0 0 0 / -16.55 -19.3  0 33.1 38.6 0.052
+#
+3 box_w sp 0 0 0 / 0 0 0
+#end cfrp-sheet
+
+#subd cfrp-sheetya
+1 box CFRP 0 0 0 / -16.55  -19.3 0 33.1 2.75 0.052
+#end cfrp-sheetya
+
+#subd cfrp-sheetyc
+1 box CFRP 0 0 0 / -16.55  16.55 0 33.1 2.75 0.052
+#end cfrp-sheetyc
+
+#subd cfrp-sheetxa
+1 box CFRP 0 0 0 / -19.3  -16.55  0 2.75 33.1 0.052
+#end cfrp-sheetxa
+
+#subd cfrp-sheetxc
+1 box CFRP 0 0 0 /  16.55 -16.55 0 2.75 33.1 0.052
+#end cfrp-sheetxc
+
+#subd cfrp-sheetb
+1 box CFRP 0 0 0 / -16.55 -16.55 0 33.1 33.1 0.052
+#end cfrp-sheetb
+
+#subd pwocellx
+1 box CFRP 0 0 0 / 0.0 0.0 0.0            0.052 38.60 2.09
+## silicone pad
+2 box sp 0 0 0    / 0.0570 0.0 0.0050   1.980 0.30 2.08
+3 octagon_y PWO 0 2 0 / 0.097 3.0 0.045  32.60 1.900 2.000 0.1882
+## silicone pad
+4 box sp 0 0 0    / 0.0570 35.6 0.0050    1.980 3.00 2.08
+5 box_w sp 0 0 0 / 0 0 0   2.042 38.60 2.09
+#end pwocellx
+
+#subd pwocellxa
+1 box CFRP 0 0 0 / 0.0 0.0 0.0            0.052 2.75 2.09
+## silicone pad
+2 box sp 0 0 0    / 0.0570 0.0 0.0050   1.980 0.30 2.08
+3 box_w sp 0 0 0 / 0 0 0   2.042 2.75 2.09
+#end pwocellxa
+
+#subd pwocellxb
+1 box CFRP 0 0 0 / 0.0 2.75 0.0            0.052 33.1 2.09
+2 octagon_y PWO 0 2 0 / 0.097 3.0 0.045  32.60 1.900 2.000 0.1882
+#2 octagon_y PWO 0 2 0 / 0.097 2.9 0.045  32.60 1.900 2.000 0.1882
+## silicone pad
+3 box sp 0 0 0    / 0.0570 35.6 0.0050    1.980 0.25 2.08
+4 box_w sp 0 0 0 / 0 2.75 0   2.042 33.1 2.09
+#end pwocellxb
+
+#subd pwocellxc
+1 box CFRP 0 0 0 / 0.0 35.85 0.0            0.052 2.75 2.09
+## silicone pad
+2 box sp 0 0 0    / 0.0570 35.85 0.0050    1.980 2.75 2.08
+3 box_w sp 0 0 0 / 0 35.85 0   2.042 2.75 2.09
+#end pwocellxc
+
+#subd tascx
+1 cfrp-sheet sp 0 0 0 / 0 0 0
+2 box CFRP 0 0 0 / -19.30 -16.55 +  0.20 33.10 2.09 
+3 box CFRP 0 0 0 / -16.414 -19.30 =  0.052 38.60 2.09 
+4 pwocellx sp 0 0 0 / + = =
+5 pwocellx sp 0 0 0 / + = =
+6 pwocellx sp 0 0 0 / + = =
+7 pwocellx sp 0 0 0 / + = =
+8 pwocellx sp 0 0 0 / + = =
+9 pwocellx sp 0 0 0 / + = =
+10 pwocellx sp 0 0 0 / + = =
+11 pwocellx sp 0 0 0 / + = =
+12 pwocellx sp 0 0 0 / + = =
+13 pwocellx sp 0 0 0 / + = =
+14 pwocellx sp 0 0 0 / + = =
+15 pwocellx sp 0 0 0 / + = =
+16 pwocellx sp 0 0 0 / + = =
+17 pwocellx sp 0 0 0 / + = =
+18 pwocellx sp 0 0 0 / + = =
+19 pwocellx sp 0 0 0 / + = =
+20 box CFRP 0 0 0 / + = =  0.104 38.60 2.09
+21 box CFRP 0 0 0 / 19.10 -16.55 =  0.20 33.10 2.09
+22 cfrp-sheet sp 0 0 0 / 0 0 +
+23 box_w sp 0 0 0 / 0 0 0 
+#end tascx
+
+#subd tascxb
+1 cfrp-sheetb sp 0 0 0 / 0 0 0
+2 box CFRP 0 0 0 / -16.414 -16.55 +  0.052 33.10 2.09 
+3 pwocellxb sp 0 0 0 / + -19.30 =
+4 pwocellxb sp 0 0 0 / + = =
+5 pwocellxb sp 0 0 0 / + = =
+6 pwocellxb sp 0 0 0 / + = =
+7 pwocellxb sp 0 0 0 / + = =
+8 pwocellxb sp 0 0 0 / + = =
+9 pwocellxb sp 0 0 0 / + = =
+10 pwocellxb sp 0 0 0 / + = =
+11 pwocellxb sp 0 0 0 / + = =
+12 pwocellxb sp 0 0 0 / + = =
+13 pwocellxb sp 0 0 0 / + = =
+14 pwocellxb sp 0 0 0 / + = =
+15 pwocellxb sp 0 0 0 / + = =
+16 pwocellxb sp 0 0 0 / + = =
+17 pwocellxb sp 0 0 0 / + = =
+18 pwocellxb sp 0 0 0 / + = =
+19 box CFRP 0 0 0 / + -16.55 = 0.104 33.10 2.09
+20 cfrp-sheetb sp 0 0 0 / 0 0 +
+21 box_w sp 0 0 0 / 0 0 0 
+#end tascxb
+
+#subd tascxxa
+1 cfrp-sheetxa sp 0 0 0 / 0 0 0
+2 box CFRP 0 0 0 / -19.30 -16.55 +  0.20 33.10 2.09 
+3 cfrp-sheetxa sp 0 0 0 / 0 0 +
+4 box_w sp 0 0 0 / 0 0 0 
+#end tascxxa
+
+#subd tascxxc
+1 cfrp-sheetxc sp 0 0 0 / 0 0 0
+2 box CFRP 0 0 0 / 19.10 -16.55 +  0.20 33.10 2.09
+3 cfrp-sheetxc sp 0 0 0 / 0 0 +
+4 box_w sp 0 0 0 / 0 0 0 
+#end tascxxc
+
+#subd tascxya
+1 cfrp-sheetya sp 0 0 0 / 0 0 0
+2 box CFRP 0 0 0 / -16.414 -19.30 +  0.052 2.75 2.09 
+3 pwocellxa sp 0 0 0 / + = =
+4 pwocellxa sp 0 0 0 / + = =
+5 pwocellxa sp 0 0 0 / + = =
+6 pwocellxa sp 0 0 0 / + = =
+7 pwocellxa sp 0 0 0 / + = =
+8 pwocellxa sp 0 0 0 / + = =
+9 pwocellxa sp 0 0 0 / + = =
+10 pwocellxa sp 0 0 0 / + = =
+11 pwocellxa sp 0 0 0 / + = =
+12 pwocellxa sp 0 0 0 / + = =
+13 pwocellxa sp 0 0 0 / + = =
+14 pwocellxa sp 0 0 0 / + = =
+15 pwocellxa sp 0 0 0 / + = =
+16 pwocellxa sp 0 0 0 / + = =
+17 pwocellxa sp 0 0 0 / + = =
+18 pwocellxa sp 0 0 0 / + = =
+19 box CFRP 0 0 0 / + = =  0.104 2.75 2.09
+20 cfrp-sheetya sp 0 0 0 / 0 0 +
+21 box_w sp 0 0 0 / 0 0 0 
+#end tascxya
+
+#subd tascxyc
+1 cfrp-sheetyc sp 0 0 0 / 0 0 0
+2 box CFRP 0 0 0 / -16.414 16.55 +  0.052 2.75 2.09 
+3 pwocellxc sp 0 0 0 / + -19.30 =
+4 pwocellxc sp 0 0 0 / + = =
+5 pwocellxc sp 0 0 0 / + = =
+6 pwocellxc sp 0 0 0 / + = =
+7 pwocellxc sp 0 0 0 / + = =
+8 pwocellxc sp 0 0 0 / + = =
+9 pwocellxc sp 0 0 0 / + = =
+10 pwocellxc sp 0 0 0 / + = =
+11 pwocellxc sp 0 0 0 / + = =
+12 pwocellxc sp 0 0 0 / + = =
+13 pwocellxc sp 0 0 0 / + = =
+14 pwocellxc sp 0 0 0 / + = =
+15 pwocellxc sp 0 0 0 / + = =
+16 pwocellxc sp 0 0 0 / + = =
+17 pwocellxc sp 0 0 0 / + = =
+18 pwocellxc sp 0 0 0 / + = =
+19 box CFRP 0 0 0 / + 16.55 =  0.104 2.75 2.09
+20 cfrp-sheetyc sp 0 0 0 / 0 0 +
+21 box_w sp 0 0 0 / 0 0 0 
+#end tascxyc
+
+
+#subd silic-sht1
+1 box sp 0 0 0 / -19.2  -16.45 0 38.4 32.9 0.10
+2 box sp 0 0 0 / -16.45 -19.2  0 32.9 38.4 0.10
+3 box_w sp 0 0 0 / 0 0 0
+#end silic-sht1
+
+#subd silic-sht2  
+1 box sp 0 0 0 / -19.2  -16.45 0 38.4 32.9 0.30
+2 box sp 0 0 0 / -16.45 -19.2  0 32.9 38.4 0.30
+3 box_w sp 0 0 0 / 0 0 0
+#end silic-sht2
+
+#subd pwocelly
+1 box CFRP 0 0 0    / 0.0 0.0    0.0     38.60 0.052 2.090
+## silicone pad
+2 box sp 0 0 0    / 0.0 0.0570 0.0050   0.30 1.980 2.080
+3 octagon PWO 0 2 0 / 3.0 0.097 0.045  32.60 1.900 2.000 0.1882
+## silicone pad
+4 box sp 0 0 0    / 35.6 0.0570 0.0050  3.00 1.980 2.080
+5 box_w sp 0 0 0 / 0 0 0   38.60 2.042 2.09
+#end pwocelly
+
+#subd pwocellya
+1 box CFRP 0 0 0    / 0.0 0.0    0.0     2.75 0.052 2.090
+## silicone pad
+2 box sp 0 0 0    / 0.0 0.0570 0.0050   0.30 1.980 2.080
+3 box_w sp 0 0 0 / 0 0 0   2.75 2.042 2.09
+#end pwocellya
+
+#subd pwocellyb
+1 box CFRP 0 0 0    / 2.75 0.0    0.0     33.1 0.052 2.090
+2 octagon PWO 0 2 0 / 3.0 0.097 0.045  32.60 1.900 2.000 0.1882
+## silicone pad
+3 box sp 0 0 0    / 35.6 0.0570 0.0050  0.25 1.980 2.080
+4 box_w sp 0 0 0 / 2.75 0.0 0   33.1 2.042 2.09
+#end pwocellyb
+
+#subd pwocellyc
+1 box CFRP 0 0 0    / 35.85 0.0    0.0     2.75 0.052 2.090
+## silicone pad
+2 box sp 0 0 0    / 35.85 0.0570 0.0050  2.75 1.980 2.080
+3 box_w sp 0 0 0 / 35.85 0 0   2.75 2.042 2.09
+#end pwocellyc
+
+
+#subd tascy
+1 cfrp-sheet sp 0 0 0 / 0 0 0
+2 box CFRP 0 0 0 / -16.55 -19.30 +  33.10 0.20 2.09 
+3 box CFRP 0 0 0 / -19.30 -16.414 =  38.60 0.052 2.09 
+4 pwocelly sp 0 0 0 / = + =
+5 pwocelly sp 0 0 0 / = + =
+6 pwocelly sp 0 0 0 / = + =
+7 pwocelly sp 0 0 0 / = + =
+8 pwocelly sp 0 0 0 / = + =
+9 pwocelly sp 0 0 0 / = + =
+10 pwocelly sp 0 0 0 / = + =
+11 pwocelly sp 0 0 0 / = + =
+12 pwocelly sp 0 0 0 / = + =
+13 pwocelly sp 0 0 0 / = + =
+14 pwocelly sp 0 0 0 / = + =
+15 pwocelly sp 0 0 0 / = + =
+16 pwocelly sp 0 0 0 / = + =
+17 pwocelly sp 0 0 0 / = + =
+18 pwocelly sp 0 0 0 / = + =
+19 pwocelly sp 0 0 0 / = + =
+20 box CFRP 0 0 0 / = + =  38.60 0.104 2.09
+21 box CFRP 0 0 0 / -16.55 19.10 =  33.10 0.20 2.09
+22 cfrp-sheet sp 0 0 0 / 0 0 +
+23 box_w sp 0 0 0 / 0 0 0 
+#end tascy
+
+
+#subd tascyya
+1 cfrp-sheetya sp 0 0 0 / 0 0 0
+2 box CFRP 0 0 0 / -16.55 -19.30 +  33.10 0.20 2.09 
+3 cfrp-sheetya sp 0 0 0 / 0 0 +
+4 box_w sp 0 0 0 / 0 0 0 
+#end tascyya
+
+#subd tascyyc
+1 cfrp-sheetyc sp 0 0 0 / 0 0 0
+2 box CFRP 0 0 0 / -16.55 19.10 +  33.10 0.20 2.09
+3 cfrp-sheetyc sp 0 0 0 / 0 0 +
+4 box_w sp 0 0 0 / 0 0 0 
+#end tascyyc
+
+#subd tascyb
+1 cfrp-sheetb sp 0 0 0 / 0 0 0
+2 box CFRP 0 0 0 / -16.55 -16.414 +  33.1 0.052 2.09 
+3 pwocellyb sp 0 0 0 / -19.30 + =
+4 pwocellyb sp 0 0 0 / = + =
+5 pwocellyb sp 0 0 0 / = + =
+6 pwocellyb sp 0 0 0 / = + =
+7 pwocellyb sp 0 0 0 / = + =
+8 pwocellyb sp 0 0 0 / = + =
+9 pwocellyb sp 0 0 0 / = + =
+10 pwocellyb sp 0 0 0 / = + =
+11 pwocellyb sp 0 0 0 / = + =
+12 pwocellyb sp 0 0 0 / = + =
+13 pwocellyb sp 0 0 0 / = + =
+14 pwocellyb sp 0 0 0 / = + =
+15 pwocellyb sp 0 0 0 / = + =
+16 pwocellyb sp 0 0 0 / = + =
+17 pwocellyb sp 0 0 0 / = + =
+18 pwocellyb sp 0 0 0 / = + =
+19 box CFRP 0 0 0 / -16.55 + =  33.1 0.104 2.09
+20 cfrp-sheetb sp 0 0 0 / 0 0 +
+21 box_w sp 0 0 0 / 0 0 0 
+#end tascyb
+
+#subd tascyxa
+1 cfrp-sheetxa sp 0 0 0 / 0 0 0
+2 box CFRP 0 0 0 / -19.30 -16.414 +  2.75 0.052 2.09 
+3 pwocellya sp 0 0 0 / = + =
+4 pwocellya sp 0 0 0 / = + =
+5 pwocellya sp 0 0 0 / = + =
+6 pwocellya sp 0 0 0 / = + =
+7 pwocellya sp 0 0 0 / = + =
+8 pwocellya sp 0 0 0 / = + =
+9 pwocellya sp 0 0 0 / = + =
+10 pwocellya sp 0 0 0 / = + =
+11 pwocellya sp 0 0 0 / = + =
+12 pwocellya sp 0 0 0 / = + =
+13 pwocellya sp 0 0 0 / = + =
+14 pwocellya sp 0 0 0 / = + =
+15 pwocellya sp 0 0 0 / = + =
+16 pwocellya sp 0 0 0 / = + =
+17 pwocellya sp 0 0 0 / = + =
+18 pwocellya sp 0 0 0 / = + =
+19 box CFRP 0 0 0 / = + =  2.75 0.104 2.09
+20 cfrp-sheetxa sp 0 0 0 / 0 0 +
+21 box_w sp 0 0 0 / 0 0 0 
+#end tascyxa
+
+#subd tascyxc
+1 cfrp-sheetxc sp 0 0 0 / 0 0 0
+2 box CFRP 0 0 0 / 16.55 -16.414 +  2.75 0.052 2.09 
+3 pwocellyc sp 0 0 0 / -19.30 + =
+4 pwocellyc sp 0 0 0 / = + =
+5 pwocellyc sp 0 0 0 / = + =
+6 pwocellyc sp 0 0 0 / = + =
+7 pwocellyc sp 0 0 0 / = + =
+8 pwocellyc sp 0 0 0 / = + =
+9 pwocellyc sp 0 0 0 / = + =
+10 pwocellyc sp 0 0 0 / = + =
+11 pwocellyc sp 0 0 0 / = + =
+12 pwocellyc sp 0 0 0 / = + =
+13 pwocellyc sp 0 0 0 / = + =
+14 pwocellyc sp 0 0 0 / = + =
+15 pwocellyc sp 0 0 0 / = + =
+16 pwocellyc sp 0 0 0 / = + =
+17 pwocellyc sp 0 0 0 / = + =
+18 pwocellyc sp 0 0 0 / = + =
+19 box CFRP 0 0 0 / 16.55 + =  2.75 0.104 2.09
+20 cfrp-sheetxc sp 0 0 0 / 0 0 +
+21 box_w sp 0 0 0 / 0 0 0 
+#end tascyxc
+
+
+#subd tasc-xy
+1 tascx sp 0 0 0 /  0 0 0
+2 tascy sp 0 0 0 /  0 0 2.22
+3 box_w sp 0 0 0 / 0 0 0
+#end tasc-xy
+
+#subd tasc-xyb
+1 tascxb sp 0 0 0 /  0 0 0
+2 tascyb sp 0 0 0 /  0 0 2.22
+3 box_w sp 0 0 0 / 0 0 0
+#end tasc-xyb
+
+#subd tasc-xyxa
+1 tascxxa sp 0 0 0 /  0 0 0
+2 tascyxa sp 0 0 0 /  0 0 2.22
+3 box_w sp 0 0 0 / 0 0 0
+#end tasc-xyxa
+
+#subd tasc-xyxc
+1 tascxxc sp 0 0 0 /  0 0 0
+2 tascyxc sp 0 0 0 /  0 0 2.22
+3 box_w sp 0 0 0 / 0 0 0
+#end tasc-xyxc
+
+#subd tasc-xyya
+1 tascxya sp 0 0 0 /  0 0 0
+2 tascyya sp 0 0 0 /  0 0 2.22
+3 box_w sp 0 0 0 / 0 0 0
+#end tasc-xyya
+
+#subd tasc-xyyc
+1 tascxyc sp 0 0 0 /  0 0 0
+2 tascyyc sp 0 0 0 /  0 0 2.22
+3 box_w sp 0 0 0 / 0 0 0
+#end tasc-xyyc
+
+
+#subd tasc-in  ## height=27.014cm
+1 silic-sht1 sp 0 0 0 / 0 0 0
+2 tasc-xy sp 0 0 0 / 0 0 0.10
+3 tasc-xy sp 0 0 0 / 0 0 4.54
+4 tasc-xy sp 0 0 0 / 0 0 8.98
+5 tasc-xy sp 0 0 0 / 0 0 13.42
+6 tasc-xy sp 0 0 0 / 0 0 17.86
+7 tasc-xy sp 0 0 0 / 0 0 22.30
+8 silic-sht2 sp 0 0 0 / 0 0 +
+9 box_w sp 0 0 0 / 0 0 0
+#end tasc-in
+
+#subd tasc-inb  ## height=27.014cm
+##1 silic-sht1 sp 0 0 0 / 0 0 0
+1 tasc-xyb sp 0 0 0 / 0 0 0.10
+2 tasc-xyb sp 0 0 0 / 0 0 4.54
+3 tasc-xyb sp 0 0 0 / 0 0 8.98
+4 tasc-xyb sp 0 0 0 / 0 0 13.42
+5 tasc-xyb sp 0 0 0 / 0 0 17.86
+6 tasc-xyb sp 0 0 0 / 0 0 22.30
+##8 silic-sht2 sp 0 0 0 / 0 0 +
+7 box_w sp 0 0 0 / 0 0 0
+#end tasc-inb
+
+#subd tasc-inxa  ## height=27.014cm
+##1 silic-sht1 sp 0 0 0 / 0 0 0
+1 tasc-xyxa sp 0 0 0 / 0 0 0.10
+2 tasc-xyxa sp 0 0 0 / 0 0 4.54
+3 tasc-xyxa sp 0 0 0 / 0 0 8.98
+4 tasc-xyxa sp 0 0 0 / 0 0 13.42
+5 tasc-xyxa sp 0 0 0 / 0 0 17.86
+6 tasc-xyxa sp 0 0 0 / 0 0 22.30
+##8 silic-sht2 sp 0 0 0 / 0 0 +
+7 box_w sp 0 0 0 / 0 0 0
+#end tasc-inxa
+
+#subd tasc-inxc  ## height=27.014cm
+##1 silic-sht1 sp 0 0 0 / 0 0 0
+1 tasc-xyxc sp 0 0 0 / 0 0 0.10
+2 tasc-xyxc sp 0 0 0 / 0 0 4.54
+3 tasc-xyxc sp 0 0 0 / 0 0 8.98
+4 tasc-xyxc sp 0 0 0 / 0 0 13.42
+5 tasc-xyxc sp 0 0 0 / 0 0 17.86
+6 tasc-xyxc sp 0 0 0 / 0 0 22.30
+##8 silic-sht2 sp 0 0 0 / 0 0 +
+7 box_w sp 0 0 0 / 0 0 0
+#end tasc-inxc
+
+#subd tasc-inya  ## height=27.014cm
+##1 silic-sht1 sp 0 0 0 / 0 0 0
+1 tasc-xyya sp 0 0 0 / 0 0 0.10
+2 tasc-xyya sp 0 0 0 / 0 0 4.54
+3 tasc-xyya sp 0 0 0 / 0 0 8.98
+4 tasc-xyya sp 0 0 0 / 0 0 13.42
+5 tasc-xyya sp 0 0 0 / 0 0 17.86
+6 tasc-xyya sp 0 0 0 / 0 0 22.30
+##8 silic-sht2 sp 0 0 0 / 0 0 +
+7 box_w sp 0 0 0 / 0 0 0
+#end tasc-inya
+
+#subd tasc-inyc  ## height=27.014cm
+##1 silic-sht1 sp 0 0 0 / 0 0 0
+1 tasc-xyyc sp 0 0 0 / 0 0 0.10
+2 tasc-xyyc sp 0 0 0 / 0 0 4.54
+3 tasc-xyyc sp 0 0 0 / 0 0 8.98
+4 tasc-xyyc sp 0 0 0 / 0 0 13.42
+5 tasc-xyyc sp 0 0 0 / 0 0 17.86
+6 tasc-xyyc sp 0 0 0 / 0 0 22.30
+##8 silic-sht2 sp 0 0 0 / 0 0 +
+7 box_w sp 0 0 0 / 0 0 0
+#end tasc-inyc
+

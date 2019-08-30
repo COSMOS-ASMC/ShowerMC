@@ -1,0 +1,66 @@
+Although, "Non-Standard"  the ingredients are essentially the same
+as the "Standard" one. The difference is only in the table defining
+the atmosphere so that the user can use "Standard" with "AtmosFile"
+specifying such a non-standard file.  The difference will appear
+(at present) only in the difference of media composing the atmosphere
+(and possibly density profile).
+
+ Inspite of that, for such an atmosphere, probably it would be better
+to use "Non-Standard".  One example of such an atmosphere is contained
+in $COSMOSTOP/Atmosphere/AtmosModel/withIceH2O.d (If the current
+atmosphere model is already "3: Non-Standard"; if not, it is seen in
+$COSMOSTOP/Atmosphere/Hidden/"3: Non-Standard"/withIceH2O.d )
+
+
+A)  If the current atmosphere model is "3: Non-Standard" and
+   AtmosFile is blank,
+     $COSMOSTOP/Atmosphere/AtmosModel/withIceH2O.d
+   is used.
+
+B)  If "AtmosFile" specifies a file, it will be used.
+
+The example data in "withIceH2O.d" looks like:
+
+# height(m)     Temp(K) Press(hP) density(kg/m3)    media
+#-----------------------------------------------------------------
+  -400    290.75  1062.2          1.2790       ice
+     0    288.15  1013.25         1.2250
+  1950    275.4    873.24         1.0715
+  2000    275.15   869.65         1.068
+  3.e3    268.7    797.85         0.9889      Air
+  5.e3    255.6    654.25         0.8315     H2O*0.01
+  5.1e3   255.0    647.07         0.8236     Air
+  6.e3    249.2   582.45          0.7528
+  11.1e3  216.65  223.46          0.35932
+   ....
+
+
+Except for the "media" column, the table values are the
+same as the standard atmosphere.  When non blank data appears
+in the media column, it is assumed to specify a medium.
+
+The data is given from lower heights (m; 0 is the sea level).
+In this example, the first line has "ice" as a medium.
+Since ice is defined as non-gas, the data for "temperature, 
+pressure, density"  is ignored and the density defined in the
+"ice" media file is employed.  The density is assumed to be
+constant in the case of "non-gas".   The next line has
+no specification for the media. In that case, the same medium
+as the lower one is assumed. (If the first line has no medium
+specification, "Air" is assumed).
+ So in this example, "ice" continues up to 3000 m where
+the medium changes to "Air" for which we use data in
+"temperature  pressure density" fields. (Actually, we don't use
+pressure values anywhere).  
+"Air" fills up to 5000 m. From 5000 to 5100 m, H2O is assumed.
+H2O*0.01 means that its density is 1/100 of the value given in the
+H2O media file (don't discuss here realistic or not).
+(For gas medium, Air*0.1 type notation should not be used).
+Above 5100 m, "Air" is assumed.  The highest medium must be "gas".
+
+
+
+
+
+
+

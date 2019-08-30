@@ -1,0 +1,246 @@
+write "!###############################################################"
+write "! cross section"
+write "!###############################################################"
+
+write "!-----------------------------"
+write "! sigtot     "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt sigtot 4  egy egy 1
+binning log
+endhisto
+write "openhisto name sigtot xrange 2 50000 yrange 30 150"
+write "htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title  "" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis total CS "" }"
+write "{column c3 = ( 0. ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh htyp fun function 21*x**0.17+44.*x**(-0.8) from 2 to 40000 ch plot 0-"
+write "input xsections/sig-pp2003 total plot 0-"
+write "input xsections/sig-pp2003 total-totem plot 0-"
+write "input xsections/sig-pbarp total-high plot 0- plot sigtot"
+write "!-----------------------------"
+write "! sigine     "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt sigine 4  egy egy 1
+binning log
+endhisto
+write "openhisto name sigine xrange 2 50000 yrange 10 120"
+write "htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title  "" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis inelastic CS "" }"
+write "{column c3 = ( 0. ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+beginhisto 
+histogram egyevt sigiex 4  egy egy 1
+binning log
+endhisto
+write "openhisto name sigiex xrange 2 50000 yrange 10 120"
+write "htyp pgs xmod log ymod lin"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto"
+write "input xsections/sig-pp inelastic plot 0-"
+write "input xsections/sig-pp inelastic-alice plot 0-"
+write "input xsections/sig-pp inelastic-totem plot 0-"
+write "input xsections/sig-pbarp inelastic-high plot 0- plot sigine- plot sigiex"
+write "!-----------------------------"
+write "! sigela     "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt sigela 4  egy egy 1
+binning log
+endhisto
+write "openhisto name sigela xrange 2 50000 "
+write "htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title " "" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis elastic CS "" }"
+write "{column c3 = ( 0. ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh htyp fun function 30.*(x-1)**(-3)+17*x**(-0.47)+0.3*alog(x)**2 from 2 to 10000 ch plot 0-"
+write "input xsections/sig-pp2003 elastic plot 0-"
+write "input xsections/sig-pp2003 elastic-totem plot 0-"
+write "input xsections/sig-pbarp elastic-high plot 0- plot sigela"
+write "!-----------------------------"
+write "! sigsdif     "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt sigsd 4  egy egy 1
+binning log
+endhisto
+write "openhisto name sigsd xrange 2 50000 yrange 0 30 "
+write "htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title " "" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis single diffractive CS "" }"
+write "{column c3 = ( 0. ) }"
+histoweight nozero writearray 3 write "closehisto plot 0- "
+beginhisto 
+histogram egyevt sigsex 4  egy egy 1
+binning log
+endhisto
+write "openhisto name sigsdex xrange 2 50000 yrange 0 30 "
+write "htyp pgs xmod log ymod lin"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto"
+beginhisto 
+histogram egyevt sigdif 4  egy egy 1
+binning log
+endhisto
+write "openhisto name sigdif xrange 2 50000 yrange 0 30 "
+write "htyp prt xmod log ymod lin"
+write "{column c3 = ( 0. ) }"
+histoweight nozero writearray 3 write "closehisto"
+beginhisto 
+histogram egyevt sigdex 4  egy egy 1
+binning log
+endhisto
+write "openhisto name sigdifex xrange 2 50000 yrange 0 30 "
+write "htyp pgt xmod log ymod lin"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto"
+write "input newdata/ua5c sig-sd plot 0- "
+write "openhisto htyp poq input xsections/sig-pp sigsd plot 0-"
+write "plot sigsd- plot sigsdex- plot sigdif- plot sigdifex"
+
+write "!-----------------------------"
+write "! sigddif     "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt sigdd 4  egy egy 1
+binning log
+endhisto
+write "openhisto name sigdd xrange 2 50000 yrange 0 20 "
+write "htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title " "" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis double diffractive CS "" }"
+write "{column c3 = ( 0. ) }"
+histoweight nozero writearray 3 write "closehisto plot 0- "
+write "openhisto htyp poq input xsections/sig-pp sigdd plot 0"
+
+write "!-----------------------------"
+write "! slope     "
+write "!-----------------------------"
+
+beginhisto
+histogram egyevt sloela 4  egy egy 1  !bins
+binning log
+endhisto
+write "openhisto name sloela xrange 2 50000 "
+write "yrange 9 25 htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title  " "" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis slope "" }"
+write "{column c3 = ( 0. ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "openhisto htyp poq input xsections/sig-pp slope plot 0-"
+write "openhisto htyp pfs input xsections/sig-pp slope-totem plot 0-"
+write "openhisto htyp poc input xsections/sig-pbarp slope plot 0- plot sloela"
+
+write "!-----------------------------"
+write "! fraction of finally (after pom absorption) diffractive events     "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt difevt 4  egy egy 1
+binning log
+endhisto
+write "openhisto name difevt xrange 2 50000  "
+write "htyp pbs xmod log ymod lin"
+write "{text 0.05 0.90 ""titlediffrac - hard P - soft P" "" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+beginhisto 
+histogram egyevt dixevt 4  egy egy 1
+binning log
+endhisto
+write "openhisto name dixevt xrange 2 50000  "
+write "htyp prs xmod log ymod lin"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "!-----------------------------"
+write "! hard and soft pomerons   "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt nhpevt 4  egy egy 1
+binning log
+endhisto
+write "openhisto name nhp xrange 2 50000 "
+write "htyp pfc xmod log ymod lin"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+beginhisto 
+histogram egyevt nspevt 4  egy egy 1
+binning log
+endhisto
+write "openhisto name nsp xrange 2 50000 "
+write "htyp poc xmod log ymod lin"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0"
+
+write "!-----------------------------"
+write "! fraction of NS, SD, DD    "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt numevt 1  egy egy 1
+binning log
+trigger typevt 1 1
+endhisto
+write "openhisto name ndevt xrange 2 50000  "
+write "htyp pbs xmod log ymod lin"
+write "{text 0.05 0.90 ""title ND - DD - SD" "" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "!-----------------------------"
+write "! double diffractif   "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt numevt 1  egy egy 1
+binning log
+trigger typevt 2 2
+endhisto
+write "openhisto name ddevt xrange 2 50000  "
+write "htyp prs xmod log ymod lin"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "!-----------------------------"
+write "! central diffractif   "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt numevt 1  egy egy 1
+binning log
+trigger typevt 3 3
+endhisto
+write "openhisto name cdevt xrange 2 50000 "
+write "htyp pgc xmod log ymod lin"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "!-----------------------------"
+write "! single diffractif pro  "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt numevt 1  egy egy 1
+binning log
+trigger styevt 4 4
+endhisto
+write "openhisto name sdevtpro xrange 2 50000 "
+write "htyp pgc xmod log ymod lin"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "!-----------------------------"
+write "! single diffractif tar  "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt numevt 1  egy egy 1
+binning log
+trigger styevt -4 -4
+endhisto
+write "openhisto name sdevttar xrange 2 50000 "
+write "htyp pgc xmod log ymod lin"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+histoweight nozero writearray 3 write "closehisto plot 0"

@@ -1,0 +1,5 @@
+#!/bin/awk -f
+NF ==5 {save=$0}
+NF==3 {print save, $0}
+NF==0 {print}
+

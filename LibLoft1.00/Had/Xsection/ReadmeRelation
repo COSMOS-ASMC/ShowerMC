@@ -1,0 +1,205 @@
+cAAXsec2.f
+  subroutine cAAXsec2
+     Ta =1 --> call cinelx
+     AAXsec = 1
+        at low E:  call shen
+        else       call cAAxsec0  but normalize at 5GeV to shen
+     AAXsec = 0
+        at low E:  call shen and normalzie to cAAxsec0
+        else       call cAAxsec0  but normalize at 5GeV to shen
+   subroutine cAAxsec0
+        Frier etal.  we add  increase of XS with energy
+-----------------
+cgpXsec.f
+    call cgpxs1;   gP
+cgpxs1.f
+    Use pdg parameterization	
+    subroutine cgppi0; low energy gp -->p+pi0; etc
+               cgppip;  cgppi2  cgppi3  
+------------------
+cinelx.f;    xA  and AA' ;
+    call cinelx0;  normalized by PDB at 200 GeV
+ subroutine cinelx0(pj, A, Z, xs)
+
+    call cppInelaXs
+    call cnpInelaXs
+    call cxp2xAXsec
+    call cpbarpInelaXs
+    call cnbarpInelaXs
+    call cpippInelaXs
+    call cpimpInelaXs
+    call ckppInelaXs
+    call ckpnInelaXs
+    call ckmpInelaXs
+    call ckmnInelaXs
+    call cAAXsec2  
+--------------------
+cixsec.f
+       call cxp2xAXsec
+   entry cfixTarget	
+       after fixing target, xs for the target A is obtained
+-------------------
+ckmnTotXs.f
+      call ckmpTotXs
+   subroutine ckmnElaXs
+      call ckmpElaXs
+   subroutine ckmnInelaXs
+-----------------
+ ckmpTotXs.f
+     ckmpTotXs:  use pdg at p>300
+     call ckmpElaXs
+   subroutine ckmpElaXs
+     call ckmpTotXs
+   subroutine ckmpInelaXs
+     call ckmpTotXs
+     call ckmpElaXs
+-------------------
+ckpnTotXs.f 
+    ckpnTotXs:   use pdg at  > 250 
+    call ckpnElaXs
+    subroutine ckpnElaXs:   assume prop.to total
+       call ckpnTotXs 
+    subroutine ckpnInelaXs
+      call ckpnTotXs
+      call ckpnElaXs
+-----------------
+ckppTotXs.f
+     ckppTotX:   use pdg at p>  250.
+       call ckppElaXs 
+    subroutine ckppElaXs
+       call ckppTotXs
+    subroutine ckppInelaXs
+       call ckppTotXs
+       call ckppElaXs
+-------------------
+cnbarpTotXs.f
+      subroutine cnbarpTotXs
+          call cpbarpTotXs
+      subroutine cnbarpElaXs
+          call cpbarpElaXs
+      subroutine cnbarpInelaXs
+          call cnbarpTotXs
+          call cnbarpElaXs
+-------------------
+cnpTotXs.f
+      subroutine cnpTotXs   use pdg p> 390.
+         call cnpElaXs
+      subroutine cnpElaXs
+         call cnpTotXs
+      subroutine cnpInelaXs
+         call cnpTotXs
+         call cnpElaXs 
+-----------------
+cpbarpTotXs.f
+      subroutine cpbarpTotXs; use pdg p>15000.
+      
+      subroutine cpbarpElaXs
+          call cpbarpTotXs 	
+      subroutine cpbarpInelaXs
+         call cpbarpTotXs
+         call cpbarpElaXs
+-------------------------------
+cpdgXs.f90   pdg sigma at 200 GeV use for normalzation
+     function cPDGsigmaTotpA
+     function cPDGsigmaInepA
+-------------------------
+cpimnTotXs.f
+   subroutine cpimnTotXs
+     call cpippTotXs
+   subroutine cpimnElaXs
+     call cpippElaXs
+   subroutine cpimnInelaXs
+     call cpippInelaXs
+----------------------
+cpimpTotXs.f
+   subroutine cpimpTotXs  use PDG at p>300
+      call cpimpElaXs
+   subroutine cpimpElaXs
+      call cpimpTotXs
+   subroutine cpimpInelaXs
+      call cpimpTotXs
+      call cpimpElaXs
+----------------------
+cpipnTotXs.f 
+   subroutine cpipnTotXs
+      call cpimpTotXs
+   subroutine cpipnElaXs
+      call cpimpElaXs
+   subroutine cpipnInelaXs
+      call cpimpInelaXs
+------------------
+cpippTotXs.f
+   subroutine cpippTotXs:  use pdg p> 30
+       call cpippElaXs
+   subroutine cpippElaXs
+       call cpippTotXs
+   subroutine cpippInelaXs
+       call cpippTotXs
+       call cpippElaXs
+--------------------
+cppTotXs.f
+   subroutine cppTotXs   use pdg p>2000
+      call cppElaXs
+   subroutine cppElaXs
+      call cppTotXs
+   subroutine cppInelaXs
+      call cppTotXs
+      call cppElaXs
+-------------------------
+cppXsec.f
+   subroutine cppXsec;  inela
+        call cppInelaXs        
+   subroutine cpbarpXsec
+        call cpbarpInelaXs
+ 　subroutine cpiMinuspXsec
+　　　　call cpimpInelaXs
+ 　subroutine cpiPluspXsec　　　
+        call cpippInelaXs
+   subroutine ckMinuspXsec
+        call ckmpInelaXs
+   subroutine ckPluspXsec
+        call ckppInelaXs
+----------------------------
+---------------------
+ctotx.f
+      subroutine ctotx
+          call ctotx0
+      subroutine ctotx0
+          call cppTotXs
+          call cnpTotXs
+          call cxp2xAXsec
+          call cpbarpTotXs
+          call cnbarpTotXs
+          call cpippTotXs
+          call cpimpTotXs
+          call ckpnTotXs
+          call ckmpTotXs
+          call ckmnTotXs
+---------------------
+cxp2xAXsec.f
+
+==============> moved to Obso
+
+ cprotonAXsec.f   p-A, pi-A, k-A  inelastic cross-seciton
+      subroutine cprotonAXsec
+           call cppXsec
+           call cxp2xAXsec
+      subroutine cpbarAXsec
+           call cpbarpXsec
+           call cxp2xAXsec
+      subroutine cpiMinusAXsec
+           call cpiMinuspXsec
+           call cxp2xAXsec 
+      subroutine cpiPlusAXsec
+           call cpiPluspXsec(e, xsxp)
+           call cxp2xAXsec
+      subroutine ckMinusAXsec
+           call ckMinuspXsec
+           call cxp2xAXsec
+      subroutine ckPlusAXsec
+           call ckPluspXsec
+           call cxp2xAXsec
+
+
+
+

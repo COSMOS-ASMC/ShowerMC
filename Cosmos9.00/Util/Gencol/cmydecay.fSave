@@ -1,0 +1,111 @@
+c  activate next to see how the charged ptcl # changes by decay
+#define SEEDETAIL
+      subroutine cmydecay(Jdecay, tau,  a, nin, nout)
+      implicit none
+#include "Zcode.h"
+#include "Zptcl.h"
+#include "Zprivate.h"
+
+      integer,intent(in)::Jdecay(klast)  ! if Jdecay(i) !=  0
+         !  the ptcl is decayed, if i is one of
+         !  kbomega, kdmes, keta, kgzai,  klambda, klambdac, kpion, ksigma
+         !  (kpion --> pi0)
+      real(8),intent(in)::tau ! life time (sec), above which the partcles
+                 ! are  regarded as stable and not made to decay.
+                 ! Below this, decay is forced. For the decay product,
+                 ! the same is applied.
+      integer,intent(in):: nin  ! # of ptcls in a
+      record /ptcl/ a(nin)  ! input/output.  size of a must be large
+                            ! say, > (nout - nin) *3 + nin
+      integer,intent(out):: nout   !  ptcls in a. nout >= nin.
+
+
+      record /ptcl/ b(maxn)  ! working
+      integer i, j, code, m, n
+      real(8):: pol, ctau
+c//////
+#ifdef  SEEDETAIL
+      integer nchgin, nchgout
+      nchgin = 0
+      do i = 1, nin
+         if(a(i).charge /= 0) nchgin= nchgin+1
+      enddo
+#endif
+c//////////////
+
+      n = nin
+      m = n
+
+      i = 0
+      do  while ( i <   m )
+         i = i + 1
+         code = a(i).code
+         j = 0
+         if( Jdecay(code) /=  0 ) then
+            call cgetctau(a(i), ctau)
+            if( ctau/3.e8 > tau ) cycle
+
+            if( code == kpion ) then
+               if( a(i).charge == 0) then
+                  call cpi0Decay( a(i),  a(n+1), j)
+               endif
+            elseif( code == kkaon ) then
+               if( a(i).subcode == k0s ) then
+                  call ckaonDecay(a(i), .false.,  a(n+1), j, pol)
+               endif
+            elseif( code .eq. kdmes ) then
+               call cdDecay( a(i), a(n+1), j)
+            elseif( code .eq. keta ) then
+               call cetaDecay( a(i), a(n+1), j)
+            elseif( code .eq. kgzai ) then
+               call cgzaiDecay( a(i), a(n+1), j ) 
+            elseif( code .eq. klambda ) then
+               call clambdaDcy( a(i), a(n+1), j ) 
+            elseif( code .eq. klambdac ) then
+               call clambdacDcy( a(i), a(n+1), j ) 
+            elseif( code .eq. ksigma ) then
+               call csigmaDecay( a(i), a(n+1), j ) 
+            elseif( code .eq. kbomega ) then
+               call cbomegaDcy( a(i), a(n+1), j ) 
+            else
+               write(*,*)  ' code =', code
+               call cerrorMsg('cmydecay error', 0)
+            endif
+            if(j > 0 ) then
+c/////////////////////
+#ifdef SEEDETAIL
+               write(0,*) ' j=',j, ' code=',code, ' chg=',a(i).charge
+#endif
+c///////////////
+               a(i).code = -10000
+            endif
+            n = n + j
+            m = m + j
+         endif
+      enddo
+
+c           x x x -1  x x  -1 x x x x -1 -1 x x x x
+      nout = 0
+      i = 1
+      do  while( i <= n )
+         do while ( a(i).code == -10000 ) 
+            i = i + 1
+         enddo
+         nout = nout + 1
+         if(nout /= i ) then
+            a(nout) = a(i)
+         endif
+         i = i + 1
+      enddo
+
+c/////////
+#ifdef SEEDETAIL
+      nchgout = 0
+      do i = 1, nout
+         if(a(i).charge /= 0) nchgout = nchgout+1
+      enddo
+      write(0,*) ' chgin out', nchgin, nchgout
+#endif
+c/////////////////
+
+      end

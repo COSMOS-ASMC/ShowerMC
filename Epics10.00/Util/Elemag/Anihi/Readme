@@ -1,0 +1,8 @@
+1) make -f DrawAnihiXS.mk
+2) ./drawanihi.out > outfile
+
+output 
+Ek    /r.l  /(g/cm2)     /cm   mb/Atom
+
+Ek is K.E in MeV
+

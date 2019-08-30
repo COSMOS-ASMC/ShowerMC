@@ -1,0 +1,32 @@
+ifort  qmd*f testqmd.f  mdp-uni.f  ../Com/{utl01.f,utl02.f,jamcomp.f,ndata01.f} -I../Com/
+
+in qmdmfld.f:  ippad is used when undef.  save is attached.
+
+
+ichgf:   in utl02.f.   function ichgf(ityp,ktyp); get charge
+ibryf:   in utl02.f.   function ibryf(ityp,ktyp); get baryon  number
+pcmsr:   in utl01.f:   function pcmsr(a,b,c); get  Pcm from energy and mass 
+bindeg:  in ndata01.f: function bindeg(nz,nn); get binding energy
+rn:      in unix.f:    function rn(idumm)
+            random number from NMTC( MCNP4A )
+            rn = unirn(dummy)
+parastop: in mpi-non.f:      subroutine parastop(idnum)
+	  simply stop in it.
+
+unirn:   in utlnmtc.f:      function unirn(dummy)
+
+
+jamcomp and jamcomp0:   in jam.f.  these two  (jamcomp*) are extracted
+               from  jam.f and placed in this directory as jamcomp.f
+
+
+for f in *.f; do
+  echo $f
+  awk '$1=="end" && NF==1 {$1="      end subroutine"}; {print }' $f > /tmp/temp.f 
+  mv /tmp/temp.f $f
+done
+
+
+jamcomp.f :  pydat2-->cpydat2
+jam2.inc:    pydat3-->cpydat3
+	     pydat2-->cpydat2

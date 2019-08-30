@@ -1,0 +1,74 @@
+*********************************************************************
+* Example for a DTUNUC input file.
+* Uncomment the input-cards according to your requirements.
+*
+* Format: A10,6E10.0,A8
+*        (except for the section enclosed by "PHOINPUT" and "ENDINPUT"
+*         which is format-free)
+*         lines starting with "*" are comment lines
+**********************************************************************
+*
+* projectile / target
+* -------------------
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7...
+*  PROJPAR                                                               ALAMBDA
+* PROJPAR                                                               PION-
+PROJPAR       1         1
+*TARPAR        27       13
+TARPAR        207       82
+*
+* energy of interaction
+*   give two energy  E1 may be bit larger than the one ins param,
+*    E2 is bit larger than E1
+*ENERGY     E1         E2
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7...
+ENERGY       100.01    100.03
+* CENTRAL          -2        0        0.
+*
+*   syout--> errorout for Jetset/pythia; no ouput from
+* PHOJET-specific input
+* ---------------------
+* The following lines control the event-generation with PHOJET for
+* individual photon/nucleon-nucleon collisions.
+* For details see the PHOJET-manual available at
+*        http://lepton.bartol.udel.edu/~eng/phojet.html
+* Any options explained in the PHOJET-manual can be used in between
+* the "PHOINPUT" and "ENDINPUT" cards.
+PHOINPUT
+PROCESS           1 0 1 1 1 1 1 1
+ENDINPUT
+*      suppress message from Lund
+LUND-MSTU       12.0         0.0
+LUND-MSTU       11.0         0.0
+LUND-MSTU       127.0        0.0
+LUND-MSTU       122.0        0.0
+LUND-MDCY       411     1
+LUND-MDCY       421     1
+LUND-MDCY       431     1
+LUND-MDCY       441     1
+LUND-MDCY       443     1
+LUND-MDCY      4112     1
+LUND-MDCY      4122     1
+LUND-MDCY      4132     1
+LUND-MDCY      4212     1
+LUND-MDCY      4222     1
+LUND-MDCY      4232     1
+* LUND-MDCY      3122     1
+LUND-MDCY      3222     1
+LUND-MDCY      3212     1
+LUND-MDCY      3322     1
+LUND-MDCY      3312     1
+LUND-MDCY      3334     1
+*
+*
+* Output
+* ------
+*   some default output (particle multiplicities etc.)
+*HISTOGRAM      101.0     102.0
+*
+* Start of event generation
+* -------------------------
+* START        50000.0       0.0
+START       500000.0         0.0
+STOP
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7...

@@ -1,0 +1,12 @@
+
+ $PARAM
+ DestEventNo = 100000
+ InitRN = 5431, 777663,
+ PrimaryFile = 'primary'
+ $END
+ 
+ 
+ ------------------ Don`t worry about the following for normal applications
+ $HPARAM
+ EventNo = 0,
+ $END

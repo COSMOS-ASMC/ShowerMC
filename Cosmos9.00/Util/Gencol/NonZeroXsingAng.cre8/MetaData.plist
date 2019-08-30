@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>MetaData</key>
+	<dict>
+		<key>kMDItemCreator</key>
+		<string>Create</string>
+		<key>kMDItemNumberOfPages</key>
+		<integer>3</integer>
+		<key>kMDItemPageHeight</key>
+		<integer>842</integer>
+		<key>kMDItemPageWidth</key>
+		<integer>595</integer>
+		<key>kMDItemTextContent</key>
+		<string>workaround
+epos:    p=(0, 4600, 4600) vs -p
+gencol---&gt;xxxx
+p=(0, 4600, 4600)  vs -p
+p=(0,100,100) vs -p
+qgsjet2
+qgsjet2
+p
+p
+UserHookc ='6 1  1   0.  -4600   4600.',
+            '6 1  1   0.  -4600  -4600.',
+ dpmjet3
+ qgsjet2
+dpmjet3
+ epos
+</string>
+	</dict>
+</dict>
+</plist>

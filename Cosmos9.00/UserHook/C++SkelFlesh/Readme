@@ -1,0 +1,327 @@
+	make -f chookSkel.mk
+for skelton making.
+
+
+
+This directory contains the all stuff for new skeleton-flesh method.
+
+The new one is completely different from the old method.
+The basic idea is to memorize nodal point information;
+the nodal point means in principle, each interaction point of
+particles.   At skeleton making time, only high energy particles
+are traced, and low energy particles generated at the nodal
+points are only memorized. At flesh time, those low energy 
+partilces are really traced. Therefore, you need larger disk
+memory as compared with the old method for which we need only
+two random number seeds for fleshing.
+
+However, the old method sometimes fails to reproduce the
+high energy partilces at fleshing time due to how an
+interaction code is organized. (Some code cannot generate
+the same particles even if the initial random seeds,
+the projectile and target are the same; it is dependent
+on the previous particle generation).
+If this condition happens, the old method cannot be used
+without modifying the interaction code.
+
+The new method is free from such danger.
+
+Two Essential Programmes: 
+
+     chookSkel.f:  to make skeleton
+     chookFlesh.f:  to flesh skeleton
+
+There are other utility programs.
+
+     select.f: From the skeleton events you created,
+               you may extract  some by requiring that
+               the event number be inbetween specified two numbers,
+               and creat new skeleton file.
+  randomsel.f: Similar to select.f. Event selection is done by
+               referring to another file in which event numbers
+               to be extracted are memorized (from small to large).
+	       Optionally, random seed may be contained in that 
+               file like standard SeedFile.
+   seeascii.f: skeleton information is written in binary.  To see
+               the essential content of such file by converting
+               it into ascii.  Event selection is done like
+               select.f
+ ranseeascii.f: similar to seeascii.f. Event selection is done
+               like randomsel.f
+
+     reanal.f: Although choolSkel.f does some level of event selection
+	       when making skeleton,  you may re-analyse such skeleton
+	       events by this program, and select special events to 
+               be fleshed.  The program writes event numbers to be
+               fleshed (optionally with two random seeds). 
+               Then. you may use randomsel.f to extract desired 
+               skeleton events for later fleshing.
+	       What kind of events must be fleshed is dependent on
+               the user, so that you must do some coding in
+               cgetHES (see ========= part there).
+
+   
+How to do.
+
+Skeleton making. 
+    Important differences from the old method are:
+
+      You have to specify Job = 'newskel'
+      You have to fix the fleshing condition at skeleton making
+      time.  At fleshing time, you may relax the condtions but
+      generally cannot make the conditions more 'severe' 
+      (Say,  if you give 100 GeV to the  minimum energy for future
+       flesh-time, you cannot lower it at real flesh-time, but 
+       you may change it to, say,  300 GeV).
+      To fix the future fleshing conditons, you must give
+
+         Generate2     (say, Generate2= 'em/as' while Generate='em')
+         KEminObs2     (say, 1 GeV, while KEminObs = 1000 GeV)
+         EndLevel2     (say, 3, while EndLevel= 1;  Leave these two
+	                as zeros if you don't follow the particles
+                        to lower depth at fleshing time than the
+                        depth at skeleton making time. If you 
+                        put, EndLevel=1, EndLevel2=3, you have to
+                       give three depths; at skeleton making time,
+                       particles are followed only the first depth
+                      in this case.)
+         WaitRatio     If hybrid AS is to be generated in flesh-time.
+                     (or if you generate hybrid AS at skeleton-time;
+	              though, this is probaly not the case).
+         RatioToE0   Also for hybrid AS.
+       ------
+         ASDepthList You can give this later, but better to give
+                     at skeleton time, if you need hybrid AS.
+
+      Besides these, you have to give some user parameter values
+      at the end of 'param' (template is paramSkel).  
+      First one is 
+
+         UserHookc = '@_skelnode','@_skelwork','noappend',
+
+           which means 
+           1) the file name to memorize skeleton node informtion,
+           2)  working disk file name,
+           3)  and 'append' or 'noappend' depending on
+               whether you want to apped the node information when
+               old node file  already exist. 
+
+     Second one is
+
+           UserHooki =    71,  70,   4       15,         3
+
+           1)  71 and, 70 are logical disk file numbers for
+               node info. and working file. Probalby no need to 
+               change this.
+
+           2)  The last three are used to judge if an event is
+               to be kept as skeleton or not.
+               4:  minium number of  e/g with E> KEminObs
+              15:  //             hadrons/muons with E> KEminObs.
+               3:  This specifies the depth where you judge the 
+                   event is worth for skeleton. From  the upper
+                   depth, you may count from 1.
+
+     Third one is
+        
+            UserHookr =             16000,   150000,
+   
+        Also used to judge the event is worth for skeleton.
+
+         16000:   sum e/g >  16000 GeV (16TeV) is needed for skeleton.
+        150000:   sum had > 150 TeV is needed for skeleton.
+
+Note:   e/g and hadron conditions are used with 'OR'.
+      That is,
+              Ng >= min && Sum Eg >= min
+       or
+              Nh >= min && Sum Eh >= min
+
+     It may be better not to use hadron criteria; in that
+     case put large values for hadrons threshold.
+
+
+     If only these are too simple for your judgement, you may
+     modify the chookSkel.f (The place is in chookEnEvent).
+     See ================ lines.  You may also some more
+     modifications in other places, and the place is probably
+     somewhere inbetween ============= lines.
+
+
+******* comile and execution  for skeleton *******
+      make clean
+      make -f chookSkel.mk
+         Then, skel$(ARCH) is created.  $(ARCH) may be DECALPHA etc 
+         depending on you host.
+      
+     skel$(ARCK)  < paramSkel
+
+
+     This will make skeleton node info. file. It is binary; to see
+     its essential info. you may use seeascii.f or ranseeascii.f
+     If	give,
+
+        UserHookc = '@_skelnode','@_skelwork','noappend',
+
+     hostname_skelnode (hostname is your cpu's host name) will
+     be the skeleton node file.
+
+     Other importan files are those specified by
+    
+   'SkeletonFile'.
+         (bad naming). This is the inut parameter file  for flesh-job.
+
+   'SeedFile'
+         Seed and event number of the Skeleton events are seen here.
+
+
+********* complile and execution for flesh *******
+    make clean
+    make -f chookFlesh.mk
+      This will create 
+           flesh$(ARCH).
+
+    Unlike the old method, you may simply feed parameter file,
+
+	flesh$(ARCH) < paramForFlesh
+
+   where paramForFlesh is the file specified by  'SkeletonFile'
+   in you paramSkel.   So if you give,
+
+   SkeletonFile = '@_paramforflesh'
+      
+   You may do
+
+      flesh$(ARCH) < hostname_paramforflesh
+
+   where hostname is your cpu host at skeleton making.
+
+   Usually you don't need edit the parameter file for fleshing.
+
+   However, you may want sometimes to change the skeleton node file name.
+  (Say, if you make new node file by using select, reanal etc).
+
+   You may also relax the fleshing conditions by editing the file.
+  
+   If you see the parameter file for fleshing,  you will see
+
+        Job = 'newflesh'
+
+   in stead of Job = 'flesh' used in the old method.
+
+ ( As in the old method, you may specify the fleshing-parameter
+   indirectly; you may edit paramSkel and change Job='newskel'
+   to Job='newflesh' and feed it to flesh$(ARCH). Then, 
+  fleshing-parameter file is automatically sought for).
+
+  You may need to modify chookFlesh.f for your own purpose.
+  The place for your coding is inbetween =========== lines.
+
+
+********** compilation of utility programs and execution ******
+
+     To compile xxxx.f
+       (xxx.f = one of  
+
+         randomsel.f    reanal.f      select.f
+         ranseeascii.f  seeascii.f )
+
+    use  
+         make -f xxx.mk
+
+    and this  will create 
+        xxx$(ARCH)
+
+    You may feed a 1 line data for these progams.
+
+     echo  "......."  |  xxx$(ARCH)
+
+   or   
+        xxxx$(ARCH)  <  somefile
+
+   where  'somefile' containes "......."
+
+   What  should be "......" 
+
+   select:  inputfile event1 event2  outputfile
+          where
+            inputfile:  is a skeleton node file
+            event1:  first event number
+            event2:  last event number
+           outputfile: events with  event1 <= event #<= event2 
+                       are selected from input and copied to this.
+
+ randomsel: inputfile  numberfile flag  outputfile
+           where
+            inputfile: same as above.
+            numberfile: contains event number to be copied into 
+                       outputfile. 
+             flag:     0 --> numberfile contains event number
+                       in each line.
+                     non 0 -->number  file format is the same as the
+                       SeedFile.
+            outputfile: see above.
+
+  seeascii:  inputfile  event1 event2
+
+              see select.  you may use the same one as
+              select. The 4th value is neglected.
+
+ ranseeascii:  inputfile  numberfile flag 
+     
+              see randeomsel.  you may use the same one as
+              randomsel. The 4th value is neglected.
+             
+  reanal:    inputfile  event1 event2
+
+      	      same as seeascii.
+
+---------------------
+How to confirm your skeleton is successfully fleshed.
+
+This is rather difficult to see.  High energy partilces are
+memorized in skeleton node file, so it is natural that you see
+the same high energy particls at fleshing time.  The problem is
+low energy particles at each node are really correct and well
+treated in the fleshing job.  
+
+	In the node, not every particle generated at interaction
+is recorded; very low energy particles that are not needed in the
+fleshing job are not recorded from the first.  This is to minumize
+the node file volume, and that's why we cannot shift the fleshing
+conditions to 'sever' side. 
+
+The most convenient method of having ease for what you are doing is 
+to take 'trace' at skeleton and flesh time.  
+
+  As usual, trace info.  easily becomes large, you may do this
+for relatively small energy ratios (E1ry/KEminObs).   
+At skeleton making time,  trace of  only the high energy particles
+are taken.  
+At fleshing time, trace of only low energy particles is taken.
+(Note that high energy particles are not produced in the flesh-job,
+ but is read from the node file).
+
+If you show both the trace information,  you can get the complete
+trace picture.   If the low energy particles emerge from somewhere
+not in the nodal part of high energy partilce trace, it means
+the method fails.   
+
+An example is  trace.eps in this directory.  Green lines are
+for high energy partilces at skeleon making time and blue ones
+for low energy partilces at fleshing time.  They all emearge
+from the green lines.
+
+Since it is enough to see that low energy particle trace appears
+from high energy particle trace, we may use following parameter
+values for check.
+
+    DestEventNo = 5,
+    Trace = 1
+    KEminObs ~ E1ry/300.
+    Generate = 'em'
+ 
+    KEminObs2 ~ KEminObs/10
+    Generate2 = 'em'  (don't inclde as; for too much trace)
+
+

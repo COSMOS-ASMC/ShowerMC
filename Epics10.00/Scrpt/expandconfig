@@ -1,0 +1,24 @@
+#!/bin/tcsh -f
+if ( $#argv != 1) then
+   cat << EOF
+   Usage: expandconfig  configpass
+          expanded config will be on stdout
+	  so redirect it to save in a file.
+EOF
+exit
+endif
+
+set pwd=`pwd`
+
+
+cd $EPICSTOP/Util; make clean;make -f testCnf1.mk
+
+cd $pwd
+
+echo $1 | $EPICSTOP/Util/a.out 
+
+
+
+
+
+

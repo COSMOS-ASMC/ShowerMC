@@ -1,0 +1,23 @@
+This directory contains stuffs for manipulating 
+the time dependent atmosphere model by NRL.
+
+The subprougram  used by Cosmos is nrlmsise00_sub.f in 
+this directory.  It is included by Cosmos/Atmosphere/cNRLAtmos.f
+so it must not be moved or renamed.
+
+
+To generate or see how  NRL-atmospheric data looks, 
+goto Util and see Readme there.
+
+Test directory constains original programs but not used
+by Cosmos. 
+  nrlmsise00_driver.for
+      is  a test program.
+  nrlmsise00_output.txt 
+      is the output by the test program.
+
+---------------
+common /FIT/FAT
+in nrlmsise00_sub.f  is not used at all but
+collides with the same name  in epos code.
+So, it was comment out. 

@@ -1,0 +1,85 @@
+'/Loft/kasahara/traceC12-600TeV' '/tmp'  14501. 14800.  1.0  1.0  2.   t  2 0.5 0 200.
+ 0.610866585     -0.791733551      0.000000000
+ 0.728356973      0.561968021     -0.392030692
+ 0.310383852      0.239478450      0.919952138  
+
+ tracefile outputdir  mint, maxt, dt, pixel, pixelinc, split, outtype mulalpha
+ maxppt, rmax
+
+tracefile:   path to the tracefile ; format is 
+	x y z t  code
+       .....
+
+outputdir:  dirctory where time sorted data file(s) are placed.
+	(ts00001.dat,... etc if split=t, else timesorted.dat is put)
+mint:  minimum time above which data is manipulated. (m. mint/c is
+	 actual time in s where c is the light velocity in m/s).
+maxt:  maximum time below //                      
+	   (m. maxt/c //                 ).
+dt:    unit step of the time (same unit as mint,maxt)
+pixel:  If two points are within this distance (m), they are supposed
+	 to be displayed in the same pixel.
+       (|r1 -r2|< pixel, (for r= (x,y,z)) )
+
+pixelinc:  If the array becomes full to store x,y,z ..  we try thinningr
+	by using pixel defined as above.   In some case the thinning
+	dose not work; then we try brute thinning using larger pixel
+	value by multiplying pixelinc to current  pixel.  This continues
+	until we get free space in the array.
+	
+
+split:  If t, we will make files
+	 ts00001.dat,  ts00002.dat,...(outtype
+	LSB bit = on)
+	
+	or ts
+	 corresponding to time sliced data.
+        IF f, we will make only one file "timesorted.dat" where one
+	 time bin data to the other one
+	is separated by a blank.
+
+      data format is
+     x y z  code
+     x y z  code
+        ......
+
+for split date. For Non split data.  
+
+     x y z  code
+     x y z  code
+        ......
+        ......
+        ......
+    blank line
+     x y z  code
+     x y z  code
+        ......
+        ......
+        ......
+    blank line
+     x y z  code
+     x y z  code
+        ......
+
+outtype LSB bit 1--> output  x,y,z,code,chg;
+                0--> no output of above
+   		filename is  ts000001.dat etc or timesorted.dat
+        2nd bit 1--> output  skel file for Geomview 
+                0--> no output of above
+		filename is ts000001.skel or timesoreted.skel
+
+mulalpa   : alpha factor in colortab  is multiplied by this factor
+
+
+maxppt    :  max particles per time.  maxp in Zprivate.f is the
+	     limit at each time plane, but if you want make it  less,
+	      you may give this.  Default is maxp
+    	     (0 is converted to maxp).
+
+rmax      :   x**2+y**2 > rmax**2  are discaded
+
+matrix:  Primary axis unit vector in Detctor system.
+       Used to convert (x,y) in det. system into primary system.
+
+
+	   

@@ -1,0 +1,187 @@
+c        testing cpairPath.
+c      implicit none
+c      real*8  eg, t, e1
+c      integer i
+c      read(*, *) eg
+c      do i = 1, 10000
+c         call cpairPath(eg, t)
+c         call cpairEnergy(eg, e1)
+c         write(*, *)  t, e1, e1/eg
+c      enddo
+c      end
+c     ****************************************************************
+c     *                                                              *
+c     *  pair creation  in air.   Energy in GeV. path in r.l         *
+c     *                                                              *
+c     *  cpairPath:   samples path for pair creation                  
+c     *  cpairEnergy: samples energy of pair electron (higher energy) 
+c     *                                                              *
+c     this is a version  without Landau effect.
+c
+c
+c      for Eg <2 MeV, very small x-secion is used and e1 is sampled by
+c               complete screening even if scorec=t
+c
+c       use r.l=36.4 g/cm**2
+c
+c         sampling table for pair in air
+c
+c      
+c   /usage/          call cpairPath(eg, t)
+c                    call cpairEnergy(eg, e1)
+c
+c
+c       t:  sampled path length in r.l
+c      eg:  gamma energy
+c      e1:  sampled electron energy (higher energy in pair)
+c
+c          to call  cpairEnergy, cpairPath must have
+c        been called.
+c
+c
+c
+      subroutine cpairPath(eg, t)
+c
+      implicit none
+      real*8 eg, t, e1
+c
+c                  total cross section of paire creation/r.l
+c        see cbreamPath for energy scale
+      integer i
+c
+      real*8 tcp(16)
+c
+      real*8 up3(160)
+      real*8 up4(176)
+c
+c
+      logical screen
+c
+c                  log 2e-3
+      real*8 epmni /-2.698971/
+      real*8 escp/10./
+      real*8 emass/.511e-3/
+c
+      real*8 rx0/0.98 /
+c       rx0=x0(true)/x0(in nishimura text)
+c
+      logical scorec/.true./
+c
+      real*8  u, alu, tp, xe, vmax, ale, ans
+
+      data (tcp   (i),i=   1,  16)/
+     1 0.0082, 0.0923, 0.1977, 0.3115, 0.4246, 0.5306, 0.6190, 0.6806,
+     2 0.7198, 0.7434, 0.7570, 0.7645, 0.7686, 0.7708, 0.7720, 0.7726/
+c
+
+c                  2dim. pair sampling table
+c                  table of v/(vmax - u*(vmax -.5))
+c                  for u=.1 to 1. step .1.  energy scale is same as
+c                  vb1       dim. up3(10,16)
+c
+c        sample higher energy electron from a gamma by
+c
+c                ee=eg* y* (vmax - u*(vmax - .5))
+c
+c        where vmax=1.- electron mass / eg
+
+      data (up3   (i),i=   1,  72)/
+     1 1.0000, 0.8680, 0.8771, 0.8885, 0.9021, 0.9176, 0.9351, 0.9546,
+     2 0.9761, 1.0000, 1.0000, 0.9425, 0.9404, 0.9421, 0.9467, 0.9534,
+     3 0.9619, 0.9726, 0.9853, 1.0000, 1.0000, 0.9527, 0.9517, 0.9537,
+     4 0.9578, 0.9633, 0.9703, 0.9785, 0.9884, 1.0000, 1.0000, 0.9627,
+     5 0.9632, 0.9657, 0.9696, 0.9743, 0.9796, 0.9855, 0.9922, 1.0000,
+     6 1.0000, 0.9728, 0.9746, 0.9777, 0.9815, 0.9853, 0.9889, 0.9925,
+     7 0.9961, 1.0000, 1.0000, 0.9820, 0.9848, 0.9886, 0.9922, 0.9953,
+     8 0.9975, 0.9993, 0.9999, 1.0000, 1.0000, 0.9909, 0.9953, 0.9998,
+     9 1.0036, 1.0061, 1.0069, 1.0064, 1.0039, 1.0000, 1.0000, 1.0000/
+      data (up3   (i),i=  73, 144)/
+     1 1.0059, 1.0111, 1.0149, 1.0166, 1.0161, 1.0132, 1.0077, 1.0000,
+     2 1.0000, 1.0071, 1.0140, 1.0195, 1.0232, 1.0242, 1.0228, 1.0181,
+     3 1.0106, 1.0000, 1.0000, 1.0123, 1.0196, 1.0253, 1.0289, 1.0296,
+     4 1.0274, 1.0216, 1.0125, 1.0000, 1.0000, 1.0156, 1.0232, 1.0291,
+     5 1.0325, 1.0330, 1.0302, 1.0239, 1.0137, 1.0000, 1.0000, 1.0176,
+     6 1.0255, 1.0313, 1.0347, 1.0351, 1.0321, 1.0251, 1.0145, 1.0000,
+     7 1.0000, 1.0188, 1.0268, 1.0326, 1.0359, 1.0363, 1.0330, 1.0259,
+     8 1.0148, 1.0000, 1.0000, 1.0196, 1.0275, 1.0334, 1.0367, 1.0368,
+     9 1.0336, 1.0263, 1.0150, 1.0000, 1.0000, 1.0199, 1.0279, 1.0337/
+      data (up3   (i),i= 145, 160)/
+     1 1.0370, 1.0372, 1.0337, 1.0265, 1.0152, 1.0000, 1.0000, 1.0202,
+     2 1.0280, 1.0340, 1.0372, 1.0373, 1.0339, 1.0267, 1.0152, 1.0000/
+c
+c          2dim. pair table for u<.1      dim. up4(11,16)
+c          table of  v/(vmax - (vmax-.5)*u)    (same as up2)
+c          from u=0 to .1 step .01
+c          energy step is same as previous case
+c
+c
+
+      data (up4   (i),i=   1,  81)/
+     11.0000,0.8602,0.8601,0.8602,0.8603,0.8604,0.8605,0.8608,0.8611,
+     20.8615,0.8619,1.0000,0.9841,0.9764,0.9709,0.9667,0.9632,0.9603,
+     30.9578,0.9556,0.9536,0.9520,1.0000,0.9862,0.9796,0.9751,0.9716,
+     40.9687,0.9663,0.9642,0.9625,0.9610,0.9597,1.0000,0.9874,0.9822,
+     50.9786,0.9758,0.9736,0.9717,0.9702,0.9690,0.9679,0.9670,1.0000,
+     60.9894,0.9853,0.9825,0.9805,0.9789,0.9777,0.9767,0.9758,0.9750,
+     70.9745,1.0000,0.9915,0.9884,0.9865,0.9851,0.9840,0.9833,0.9825,
+     80.9822,0.9817,0.9815,1.0000,0.9936,0.9914,0.9902,0.9894,0.9888,
+     90.9885,0.9882,0.9881,0.9880,0.9881,1.0000,0.9954,0.9941,0.9936/
+      data (up4   (i),i=  82, 162)/
+     10.9933,0.9933,0.9934,0.9935,0.9938,0.9941,0.9945,1.0000,0.9970,
+     20.9965,0.9965,0.9967,0.9970,0.9975,0.9980,0.9986,0.9994,1.0000,
+     31.0000,0.9982,0.9983,0.9988,0.9993,1.0000,1.0008,1.0015,1.0023,
+     41.0031,1.0040,1.0000,0.9992,0.9997,1.0004,1.0013,1.0022,1.0031,
+     51.0039,1.0049,1.0058,1.0067,1.0000,0.9999,1.0007,1.0015,1.0025,
+     61.0035,1.0044,1.0055,1.0064,1.0074,1.0084,1.0000,1.0004,1.0013,
+     71.0023,1.0033,1.0044,1.0054,1.0064,1.0074,1.0085,1.0094,1.0000,
+     81.0007,1.0017,1.0028,1.0038,1.0049,1.0059,1.0070,1.0080,1.0091,
+     91.0100,1.0000,1.0009,1.0019,1.0030,1.0042,1.0052,1.0062,1.0072/
+      data (up4   (i),i= 163, 176)/
+     11.0083,1.0093,1.0104,1.0000,1.0010,1.0020,1.0031,1.0043,1.0053,
+     21.0064,1.0075,1.0085,1.0096,1.0105/
+      save  screen
+
+      call rndc(u)
+      alu = -log(u)
+      if(.not. scorec .or. eg .gt. escp) then
+             screen=.false.
+          tp=0.758
+c              !    0.758 =(7/9-b)*rx0
+      else
+c           partial screening correction imposed.
+         if(eg .lt. 2.e-3) then
+             tp=1.e-35
+             screen=.false.
+         else
+             screen=.true.
+             ale = log10(eg)
+             call kintp3(tcp, 1, 16,   epmni, .3333333333d0, ale, tp)
+         endif
+      endif
+      t= alu/tp
+      return
+c
+c     ***********
+      entry cpairEnergy(eg, e1)
+c     ***********
+c
+c
+      call rndc(u)
+      if(.not.screen) then
+c           complete screening
+         e1=(((.0441223*u-.173755)*u-.3708608)*u+1.)*eg
+      else
+c          partial screening effect
+         xe = log10(eg)
+         vmax=1.-emass/eg
+         if( u .gt. .1) then
+              call k4ptdi(up3,10,16, 10, .1d0, epmni, 0.1d0, 
+     *        .3333333333d0,  u, xe, ans)
+              e1= ans  *  ( vmax - (vmax -.5)*u) *eg
+         else
+              call k4ptdi(up4, 11, 16, 11,  0.d0, epmni, .01d0, 
+     *        .33333333333d0,  u, xe, ans)
+              e1= ans * ( vmax - (vmax - .5)*u) *eg
+         endif
+      endif
+      end

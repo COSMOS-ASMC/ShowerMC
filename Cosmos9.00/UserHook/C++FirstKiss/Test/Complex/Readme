@@ -1,0 +1,14 @@
+c++ -c  test.cc
+ifc  testf.f test.o
+
+
+The size in C++ of Fortran complex*16  abc
+is double zzz[2]; (not double zzz[1]);
+
+complex zzz can be used in c++ but the
+compatiblity between different  g++ is
+questionable.
+
+
+
+

@@ -1,0 +1,18 @@
+0) procAllLDDLat.sh  indir  outdir putage
+  indir: dir where *-r.hist exist
+  outdir:dir  to store *lat 
+  putage: 0--> no age/cog is put in the output
+          1--> age/cog is put in the output
+1)getRhoAtFewR.csh dir
+   dir: directory where *lat files eist
+   output  rhoAtRs.data in the current dir.
+   This will contain
+code fai  age cog    R       rho(R)*2piR  same for R=7       R=10 ..  upto  R=50
+1 1  1.004  0.924    5.0    1.338e-02    7.0    4.983e-03   10.0    1.325e-03   20.0    6.899e-05   30.0    9.950e-06   50.0    6.385e-07 
+1 2  1.004  0.924 ...
+
+2) ./selectDataForPlot.csh
+
+
+
+

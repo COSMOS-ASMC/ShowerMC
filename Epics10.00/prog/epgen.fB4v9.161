@@ -1,0 +1,2819 @@
+#include "ZsubstRec.h"
+#include "Zepcondc.h"
+c        epifCross is changed radically.
+c        epbndry; icon is changed to get el in real*8
+c        *********************************************************
+c        *
+c        *  epgen:generate  showers until stack area becomes empty
+c        *
+c        *********************************************************
+c
+      module moddedx
+c         work common block for dedx (GeV/g/cm2) (epEloss / epchcke)
+      real(8):: dedx  !  restricted dE/dx 
+      real(8):: dedxf  ! full dE/dx
+      end module moddedx
+
+      subroutine epgen
+      implicit none
+#include  "ZepTrackv.h"
+#include  "ZepTrackp.h"
+#include  "Zcnfig.h"
+#include  "ZsepManager.h"
+c >>>>>>>>>>>>>>>light
+      integer,save::onlyonce
+c      common /dddebug/ onlyonce
+c<<<<<<<<<<<<<
+      integer icon
+c         init. for 1 event has been finished, next is
+c       to put other final init. for 1 event
+
+      call epr1ev
+c>>>>>>>>>>>>>>>>>>>light
+      onlyonce = 0
+c<<<<<<<<<<<<<<<<<<
+c         *** until loop*** 
+      icon = 0
+      do while (icon .eq. 0)
+c                get 1 particle from stack area 
+         call eppop(cTrack, icon)
+c                icon=0: 1 ptcl gotten in cTrack
+c                       -1: no more ptcl  in the stack
+         if(icon .eq. 0) then
+            call epfl1
+         else
+           !  all of normal tracking finished.>>>>>>>>>>>>>>>>light
+            if( Light == 12 .and. onlyonce == 0 ) then
+              ! energy deposit has been stored in cells.  we must generate
+              ! scinti light and do ray tracing.  We first push Edepo as
+              ! psudo ptcls
+               call epLightPushCells(0, 0)
+               icon = 0  ! now many cells stacked; reset icon
+               onlyonce = 1
+            endif   
+           !<<<<<<<<<<<<<<<<<<<<<<<<<<
+         endif
+      enddo
+       !>>>>>>>>>>>>>>>>>>>>>>>light
+      if( Light == 21 ) then
+         ! cell stored deposit should be put in a disk  as primary
+         ! for another job (file name with + or -)
+         if( FirstC ) then
+            ! no interatcion of incident so far; we must write
+            ! event header
+            call epLightIOwrite1stCol
+         endif
+         call epLightIOwriteCell
+         call epLightIOwritedE(OutPrimEff, Det.nct)
+             ! enery deposit of all comp. with d /=0
+      endif
+       !<<<<<<<<<<<<<<<<<<<<<<
+      end
+      subroutine epicosmos(param)
+      implicit none
+c          read parameter file for Cosmos.
+#include  "Zmanagerp.h"
+      integer  icon
+      character*(*) param       ! input. Cosmos param file path.
+      call copenNLf(TempDev, param, icon)
+      if(icon .ne. 0) then
+         call cerrorMsg('epicosmos cannot open parameter file',0)
+      endif
+      call creadParam(TempDev)
+      close(TempDev)
+      end
+      
+      subroutine epiaev(dsn1, dsn2)
+      implicit none
+c             init for all event; read epics data and cofig data
+#include  "ZepManager.h"
+#include  "ZsepManager.h"
+#include  "ZepTrackv.h"
+#include  "ZepTrackp.h"
+#include  "Zcnfig.h"
+
+
+      character*(*) dsn1        ! input epics data file path
+      character*(*) dsn2        ! input config data file path
+
+      integer klena
+      character*16 uid
+      integer i, icon
+c
+c                 open basic data residence file for epics
+c              component # is undefined yet
+      Cn=-1
+      call epempty
+c      Stack_pos = 0
+c      StackDisk = 0
+      Nevrun=1   !  >= 9.06 (<=9.05; Nevrun=0)
+      DoUpdateNo =.true.  ! >=9.06
+c                read basic parameter
+
+      call epprmr(dsn1)
+c                compute something using basic parameters
+      call epcmp1
+
+c                read configuration
+
+c     
+       call eprcnf(dsn2)
+       call epiniXsMedia  ! make media info needed for H.I
+                           ! under Cosmos
+c      *********************
+c               init for nuclin, hadrin
+cc       call haddenC
+cc       call chanwnC
+         call cintModels('epics')  
+c       ################
+c                user dependent init
+       call uiaev
+c>>>>>>>>>>>>>>>>light
+c         if Light >0, manipulate CountDE of each component
+       if(Light >  0) then
+          call epLightCountDE ! 0 means from system
+
+          call epLightAlloc  ! alloc arrays
+          if(Light == 21) then
+             call epLightIOwriteIni
+          endif
+       endif
+c<<<<<<<<<<<<<<
+       !  allocate Eloss array for all comp. (always)
+       call epAlloc(Det.nct)
+
+       if(MagField .eq. 1)then
+          Bfield.x = Bxu
+          Bfield.y = Byu
+          Bfield.z = Bzu
+       endif
+       if(ElecField.eq. 1) then
+          Efield.x = Exu
+          Efield.y = Eyu
+          Efield.z = Ezu
+       endif
+c
+c          fix tracedir ; This must be before uiaev in future
+       if(Trace) then
+          if(TraceDir .eq. ' ') then
+             call cgetLoginN(uid) ! cosmos function
+             TraceDir ='/tmp/' // trim(uid)
+          endif
+       endif
+       end
+       subroutine  epi1ev(icon)
+c             init for 1 event
+       use modIntInfo
+       implicit  none
+#include "ZepManager.h"
+#include "ZepTrackp.h"
+#include "ZepTrackv.h"
+
+       integer icon ! output. if  0,  user has set ptcl in stack
+                   !             1,  no ptcl has set in stack
+      character*200 msg
+      character*128 filen
+      character*16 uid
+      integer jcon, leng
+      integer  klena, i
+
+       Bndryerr = 0   ! counter for bundary search failures/ event
+       Making1ry = 1  ! Now preparing 1 event so 1ry is being made
+                    ! will be made to be 0 at epr1ev.
+                    ! If this is 1, partcles being stacked are 1ry
+                    ! we counts total energy of 1ry.
+       Total1ryE = 0. ! clear total 1ry K.E counter of the current event
+       Cn=-1
+       Firsti=.true.
+       FirstC=.true.
+       Proc1 = '   '   ! first collision process.
+       FirstInt.x = -100000.d0
+       FirstInt.y = -100000.d0
+       FirstInt.z = -100000.d0
+       FirstCn = 0 
+       FirstMedia.colElem = 0
+
+#if defined (INTINFO)
+c       By  next, the user interface epUI is called 
+       codeAforInt(:)= 0
+#endif
+
+
+c       Nevrun = Nevrun + 1     ! <= 9.05
+       pathInB=0.
+       SumDe = 0.
+       Move.Abort = 0     !  if this become non zero for an event, 
+                     !  the particle is discarded or event is discarded
+c                 user dependent init
+       call epcEloss  ! clear Eloss counters
+c>>>>>>>>>>>>>>>Light
+       if(Light > 0) then
+          call epLighti1ev
+          if(Light == 21 ) then
+             call epLightIOwriteiev
+          endif
+       endif
+c<<<<<<<<<<<<<<<<<
+       call ui1ev
+c               next call sets to icon=1,    if usetip is not
+c               user made.
+       call usetip(icon)
+
+
+c                 icon=0-->user routine already set prtcl
+c                 icon=1-->no user routine for incident
+       if(Trace) then
+          write(filen, *) trim(TraceDir)//'/trace',
+     *         Nevrun 
+          call kseblk(filen, ' ', leng)
+          call copenfw(abs(IoTrace), filen,  jcon)
+          if(jcon .ne. 0) then
+             call cerrorMsg('**************** Fatal error ', 1)
+             write(0,*) ' cond code for copenfw =',jcon
+             call cerrorMsg(
+     *       'You gave Trace=t in sepicsfile, but the file ', 1)
+             write(0,*) trim(filen), '<---|'
+             write(msg, '(a,a,a)')
+     *       ' cannot be opened: Probably you have to make', 
+     *         trim(uid), ' directory. Or if no need trace info, make'//
+     *       ' Trace f in sepicsfile ' 
+              call cerrorMsg(msg, 0)
+          endif
+       endif
+
+       end
+c      *******************
+       subroutine  epe1ev
+c      ******************* end of 1 event
+       implicit none
+#include "ZepManager.h"
+#include  "ZepTrackp.h"
+#include "ZepTrackv.h"
+
+c>>>>>>>>>>>>>>>>>Light
+       if(Light >  0) then
+          call epLighte1ev
+       endif
+c<<<<<<<<<<<<<<<<<<<
+c               user dependent end process
+
+       if(Move.Abort .le. 1) call ue1ev
+       if( DoUpdateNo ) then 
+          Nevrun = Nevrun +1
+       else
+          DoUpdateNo = .true.
+       endif
+       if(Trace) then
+          close(abs(IoTrace))
+       endif
+       end
+c      *************  now 1 event is ready to start
+       subroutine epr1ev
+       implicit none
+#include "ZepTrackv.h"
+#include "ZepTrackp.h"
+
+       integer icon
+
+c          the procedures to be performed after the completion of
+c          init. for 1 event must be placed here
+c          save first stacked track as  incident
+       if( Light /= 22 ) then
+               ! in the case of 22, primary info has been
+               ! read alredy, since it is placed at the top
+               ! of each event
+          call epgetTrack(1, Incident, icon)
+       endif
+c        if(icon .ne. 0) then
+c           call cerrorMsg('no incident found in epr1ev', 0)
+c        endif
+c
+        call uafi1ev            ! after init of 1 event
+        Making1ry = 0        
+        end
+c      ****************************
+c                user dependent all event end
+       subroutine epeaev
+       implicit none
+
+       call ueaev
+       end
+
+cc      ***********************
+      subroutine epSkipUpdateNo
+      implicit none
+#include  "ZepManager.h"
+c            disable the update of Nevrun
+      DoUpdateNo = .false.
+
+      end
+
+       subroutine epfl1
+       implicit none
+c           follow 1 particle
+c              until current partile dies or all are put into stack.
+#include  "ZepTrackp.h"
+#include  "ZepTrackv.h"
+#include  "Zcnfig.h"
+#include  "ZepManager.h"
+
+      integer icon, info
+
+      do while (.true.)
+c                current track is in  cTrack
+c          fix process and free path
+c          and compute tentative new pos.--> Move
+         call epnewp(icon)
+
+         if(icon .ne. 0) goto 100 ! abort is specified by the user
+c          energy loss count in user hook
+c         if(Det.cmp(Cn).CountDE .gt. 0 .and. >>>>>>>>>light
+          if(  cTrack.p.charge .ne. 0) then  ! <<<<<<<<< 
+c             if( Move.Track.p.fm.p(4)-Move.Track.p.mass
+c     *                                     .le. KEmin ) then
+c                info = 1
+c             else
+                info = 0
+c             endif
+!               info may be used only to set Move.Abort    
+             call epLightPreUserde(info, cTrack)
+             if(Move.Abort /= 0 ) then
+                if(Move.Abort /= 3 ) then
+                   call  epempty ! empty the sack. discard ev.
+                   call  epSkipUpdateNo
+                else
+                   Move.Abort = 0
+                endif
+                icon = 1
+                goto 100
+             endif
+
+          endif
+c          add  time  
+         if(TimeStruc) then
+            call epaddTime
+         endif
+
+c           adjust momentum; because of  energy change
+         if(cTrack.p.charge .ne. 0) then
+            call epe2p(Move.Track)  ! not Move.Track.p; bug <=v9.13
+         endif
+
+c            if(.not. Move.Cross .and. cTrack.p.charge .ne. 0) then
+c               we don't use above judgement; later at epCross, we use new
+c               angle due to scattering at Move.boundary. (don't use
+c               new  position due to scattering in epCross)
+c           ++++++++++
+         if(cTrack.p.charge .ne. 0) then
+c                 multiple scattering, magnetic deflection
+c                 electric deflection
+            call epdeflection(icon)
+         endif
+c              take trace info.
+         if(Trace) then
+            if(IoTrace .lt. 0 .or. (IoTrace .gt. 0 
+     *           .and. cTrack.p.charge .ne. 0)) then
+               call epTrace
+            endif
+         endif
+c              really move
+#ifdef  SUBSTREC
+         cTrack = Move.Track
+#else
+         call epsubstTRK( cTrack, Move.Track)
+#endif
+         if(.not. Move.Trunc) then
+
+            call epint(icon)    ! interaction routine
+c                icon =  1 always.
+         elseif(Move.Cross) then
+            call epCross(icon)
+         endif
+         if         (icon .ne. 0)
+     *                       goto 100
+      enddo
+ 100  continue
+      end
+c     *****************
+      subroutine epnewp(icon)
+c     *****************
+c   1)    copy current track to Move.track
+c   2)    compute lenghtToB= length (cm) to the boundary
+c          or crossing point with contained component
+c          if somethig very strange, icon =2 and return
+c   3)    chckE0: simple energy check. 
+c      If E< Emin, 
+c         3-1) compute the ragne of the ptcl.
+c             if the range < lengthToB, absorbe energy
+c                   and return with icon = 1
+c             elseif( Ek < AEmin ) , abosrbe energy 
+c                   and return with icon =1  ; to avoid
+c                   delicate problem when lengthToB ~0 and E is
+c                   very small
+c             endif
+c             do as if E> Emin (go next) 
+c      endif
+c
+c                
+       use modepRange, only:       attenF
+      implicit none
+#include  "ZepManager.h"
+#include  "ZepTrackv.h"
+#include  "ZepTrackp.h"
+#include  "Zcode.h"
+
+      integer icon
+      logical Absorb
+      real(8)::AbsoEmin=2.d-6
+      real(8)::lengthToB, Rgm, Rcm
+      real(8):: u, fpos
+
+c    *********************** sample interaction length ****************
+
+c        copy current track  to Move
+#ifdef  SUBSTREC
+      Move.Track = cTrack
+#else
+      call epsubstTRK( Move.Track, cTrack)
+#endif
+c        get the crossing point of the current track
+c        with the current component or contained component
+c        el is the length to the crossing point  
+      call epbndry(Move.boundary, lengthToB, icon)
+      if(icon == 2 )  return  ! *****
+c       icon =1 indicates something wrong. but 
+c       it should have been corrected safely so we don't
+c       care.
+      call epchckE0(cTrack, icon)  ! simple energy check
+      if( icon /= 0 ) then
+         if( ImperativeEmin .or. icon == -1 ) then
+            Absorb = .true.
+            Move.dl = 0.
+            Move.dx = 0.
+            Move.dt = 0.
+         elseif(( AutoEmin == 2 .or. AutoEmin == 4 ) .or.
+     *     (cTrack.p.code == kphoton .and. !  for photon v9.154
+     *       AutoEmin == 3 ) ) then
+c             energy is low, see if the range is < el
+            call epGetRange(MediaNo, Media(MediaNo), cTrack.p,
+     *                      Rgm, Rcm)
+            Absorb =  Rcm < lengthToB 
+            if( Absorb ) then
+            !  current ptcl KE may be absorbed during path = Rcm
+            !  suppose particle can run Rcm (for charge).
+            !  For photons, sample the absroption point by
+            !  using attentuation length (=Rcm/attenF)
+               if( cTrack.p.code == kphoton ) then
+                  call rndc(u)
+                  fpos=min( -log(u)/attenF, 1.d0)  ! l
+                  Rcm = Rcm * fpos
+                  Rgm = Rgm * fpos 
+               endif
+               Move.dl = Rcm
+               Move.dx = Rgm
+               Move.dt = Move.dx/Media(MediaNo).X0g
+            elseif ( cTrack.p.fm.p(4) - cTrack.p.mass < AbsoEmin) then
+              ! for e, very rare to come.  neutrons are more 
+              ! others are very very rare
+!
+!               write(0,*)  ' code=',cTrack.p.code, cTrack.p.subcode,
+!     *         ' chg=', cTrack.p.charge,
+!     *           'ke=', cTrack.p.fm.p(4) - cTrack.p.mass,
+!     *           ' lengToB=', lengthToB,
+!     *           ' Rcm=',Rcm, ' Rgm=',Rgm,' MediaNo=', MediaNo,
+!     *            '  Media=',Media(MediaNo).name
+!               write(0,*) '----------'
+!////////////////////
+               Absorb = .true.
+               Move.dl = lengthToB/3.
+               Move.dx = Move.dl/Media(MediaNo).gtocm
+               Move.dt = Move.dx/Media(MediaNo).X0g
+            endif
+         else
+            Absorb = .true.
+            Move.dl = 0.
+            Move.dx = 0.
+            Move.dt = 0.
+         endif
+         if( Absorb ) then
+            Move.Track.p.fm.p(4) = Move.Track.p.mass
+            Move.Track.pos.x = cTrack.pos.x + cTrack.w.x*Move.dl
+            Move.Track.pos.y = cTrack.pos.y + cTrack.w.y*Move.dl
+            Move.Track.pos.z = cTrack.pos.z + cTrack.w.z*Move.dl
+            call epAbsorb(cTrack, icon)  ! icon = 1
+            if(Trace) then
+               if(IoTrace .lt. 0 .or. (IoTrace .gt. 0
+     *              .and. cTrack.p.charge .ne. 0)) then
+!                      next moved above
+!                  Move.Track.p.fm.p(4) = Move.Track.p.mass
+!                  Move.Track.pos.x = cTrack.pos.x + cTrack.w.x*Move.dl
+!                  Move.Track.pos.y = cTrack.pos.y + cTrack.w.y*Move.dl
+!                  Move.Track.pos.z = cTrack.pos.z + cTrack.w.y*Move.dl
+                  call epTrace
+               endif
+            endif
+            icon = 1
+            return
+         endif
+      endif
+c           ptcl still alive;  interaction path     
+c       do for each ptcl
+      if(cTrack.p.code .eq. kphoton) then
+         call epprog  ! Move.proc, Move.dt fixed
+      elseif(cTrack.p.code .eq. kelec) then
+         call epproe  ! Move.proc, Move.dt fixed
+      elseif( cTrack.p.code > 0 ) then
+         call epNonEleMag
+c>>>>>>>>>>>>>light
+      elseif( Light > 0 ) then
+         if( cTrack.p.code == klight ) then
+            call epproLight
+         else
+            write(0,*) " invalid  code=",cTrack.p.code
+            write(0,*) " for light related ptcl's path sampling"
+            stop
+         endif
+      endif
+c<<<<<<<<<<<<<<<<<<<
+      if(Firsti) then
+         Firsti=.false.
+         if(.not. FreeC) then
+            Move.dt=0.
+            Move.dl=0.
+            Move.dx=0.
+         endif
+      endif
+c     *************** truncate if too long  **********************
+c              trancate if dt is too long (set Trunc=t/f)
+      call eptrunc
+c        move track tentatively
+c              local. coord..
+      Move.Track.pos.x = cTrack.pos.x + Move.dl * cTrack.w.x
+      Move.Track.pos.y = cTrack.pos.y + Move.dl * cTrack.w.y
+      Move.Track.pos.z = cTrack.pos.z + Move.dl * cTrack.w.z
+
+c     *************** see if Move.Track crosses the boundary ******
+c              set Cross=t/f, if t, adjust path and set Trunc=t
+
+      call epifCross(lengthToB, icon)
+         ! icon =1 , cross. = 0  not cross ; don't care
+      icon = 0 
+c     
+c     ************** energy loss consideration ******************
+c        if E becomes <= m,  adjust path and set Trunc=t,
+c        and reset Cross.
+c            kchgPath case Move.dl=0 so light related
+c            ptcl will not goto epEloss
+      if(cTrack.p.charge .ne. 0 .and. Move.dl .gt. 0.) then
+         call epEloss
+      else
+         Move.dE = 0.
+      endif
+cc      endif
+      end
+      subroutine epqProc(proc)
+c          inquire the current process fixed
+      implicit none
+#include  "ZepManager.h"
+#include  "ZepTrackv.h"
+      character(8),intent(out)::proc
+      proc = Move.proc
+      end
+c     *******************************
+      subroutine epCross(icon)
+      implicit none
+c          manager when a particle crosses the boudarynon
+#include "ZepTrackv.h"
+#include "ZepTrackp.h"
+#include "Zcnfig.h"
+#include "Zcode.h"
+
+      integer icon ! input/ouptut  1--> discard this particle
+c                                 other values are not given here
+      integer cnx, info
+      record /epPos/postemp
+      record /epDirec/ dirtemp
+
+      record /epTrack/ aTrack
+      integer n
+
+c
+c      save the cTrack
+      aTrack = cTrack
+c       cross the boundary;  use  new angle at the boundary.
+c      (not cTrack.w.x etc)
+      cTrack.pos.x = Move.boundary.x +
+     *     EpsLeng* Move.Track.w.x  
+ccccc          if EpsLeng and w.x are both small, and x is large
+ccccc          no move may happen, avoid such case.
+ccccc               You may give larger EpsLeng in input data.
+ccccc
+ccc      if( cTrack.w.x .ne. 0. ) then
+ccc         n = 2
+ccc         do while( cTrack.pos.x .eq. Move.boundary.x .and.
+ccc     *             n .lt. 10 ) 
+ccc           cTrack.pos.x = Move.boundary.x +
+ccc     *           n*EpsLeng* Move.Track.w.x
+ccc            n = n * 2
+ccc         enddo
+ccc      endif
+ccccccc
+      cTrack.pos.y = Move.boundary.y +
+     *     EpsLeng* Move.Track.w.y
+ccc      if( cTrack.w.y .ne. 0.) then
+ccc         n = 2
+ccc         do while( cTrack.pos.y .eq. Move.boundary.y
+ccc     *             .and. n .lt. 10 ) 
+ccc           cTrack.pos.y = Move.boundary.y +
+ccc     *           n*EpsLeng*  Move.Track.w.y
+ccc           n = n * 2
+ccc         enddo
+ccc      endif
+ccc
+      cTrack.pos.z = Move.boundary.z +
+     *     EpsLeng* Move.Track.w.z
+ccc       if(cTrack.w.z .ne. 0. ) then
+ccc         n = 2
+ccc         do while( cTrack.pos.z .eq. Move.boundary.z  .and.
+ccc      *          n .lt. 10 )
+ccc            cTrack.pos.z = Move.boundary.z +
+ccc      *           n*EpsLeng* Move.Track.w.z
+ccc            n = n * 2
+ccc          enddo
+ccc       endif
+ccc 
+#ifdef  SUBSTREC
+      cTrack.w = Move.Track.w
+#else
+      call epsubvec(Move.Track.w, cTrack.w)
+#endif
+
+c         new comp. number;  new position would be, in principle,
+c         in a new component. but scattering at the boundary may
+c         cause the new pos to be in the same component.
+      call eppos2cn(Cn, cTrack, cnx)   ! cnx is not yet set in cTrack
+ 
+
+      if(Cn .eq. cnx) then
+         Move.Cross = .false.
+      elseif(cnx .gt. Det.nct) then
+         info = 0   ! exiting to void
+      else
+         info = -cnx   ! exiting to cnx
+      endif
+      cTrack.cn = cnx
+c         update coord. to local one in new  comp.; this part was inside
+c              " elseif(Move.Cross) then"
+c         which appears later; since it is used in LightAbBndry
+      if(Move.Cross) then
+         call epl2w(Cn, cTrack.pos, postemp)
+         call epw2l(cnx, postemp,  cTrack.pos)
+         call epl2wd(Cn, cTrack.w,  dirtemp)
+ccc         call epw2ld(cnx, dirtemp, cTrack.w)
+         call epw2ldm(cnx, dirtemp, cTrack.w, cTrack.p)
+      endif
+
+       !>>>>>>>>>>>>>>>>>>>>>>>>>>>>>light
+      if(Move.Cross .and.  cTrack.p.code < 0 ) then
+         call epLightAtBndry( cnx, icon )
+            ! cTrack, Move and Cn are implicit  in/out param.
+            ! if refraction happens, cTrack's direction becomes 
+            !    refracted direc. pos, cnx are unchaged
+            !    icon = 0
+            ! if reflection happens, Move.Cross=F, cnx will become Cn.
+            !    cTrack's pos  is made to be that of  Move. 
+            !    icon = 0
+            ! if absorbed at the boundary,  icon = 1 Move.Cross=F
+            ! if light passes thru the component, icon = 0. cTrack
+            !   unchaged. cnx unchaged
+      endif
+         !<<<<<<<<<<<<<<<<<<<<<<<<<<<
+      if(Det.cmp(Cn).CountIO .ge. 2 .and. Move.Cross) then
+c          user hook for  counting exiting ptcls 
+c                    exiting from Cn to cnx
+         if(Light > 0 .and. aTrack.p.code == klight) then
+            call epLightPC(info)  ! photon counter  for exiting light
+         endif
+         call userbd(info, aTrack, Move, Media(MediaNo))
+         if(Move.Abort .ne. 0) then
+            if(Move.Abort .eq. 3) then
+               icon = 1         ! discard this particle
+               Move.Abort = 0   ! but continue simulation
+            else
+               call  epempty    ! empty the sack. discard ev.
+               call  epSkipUpdateNo
+            endif
+         endif
+      endif
+
+
+      if(cnx .gt. Det.nct) then
+c          void
+         icon = 1
+      elseif(Move.Cross) then
+         info = Cn            ! save the current cn
+c            update comp. info (Cn, MediaNo etc are updated)
+         call epnewComp(cTrack)
+#ifdef  SUBSTREC
+         aTrack = Move.Track
+#else
+         call epsubstTRK(aTrack, Move.Track)
+#endif
+#ifdef SUBSTREC         
+         Move.Track = cTrack      ! copy the track which is  now in new comp.
+#else
+         call epsubstTRK(Move.Track, cTrack)
+#endif
+
+         if(Det.cmp(Cn).CountIO .eq. 1 .or.
+     *      Det.cmp(Cn).CountIO .eq. 3 ) then
+c             count entering ptcls;  from info to Move.Track.cn (=Cn)
+            if( Det.cmp(Cn).CountIO == 1 ) then
+               if(Light > 0  .and. aTrack.p.code == klight) then
+                  call epLightPC(info) ! photon counter  for entering light
+               endif
+            endif
+            call userbd(info, aTrack, Move, Media(MediaNo)) 
+            if(Move.Abort .ne. 0) then
+               if(Move.Abort .eq. 3) then
+                  icon = 1      ! discard this particle
+                  Move.Abort = 0 ! but continue simulation
+               else
+                  call  epempty ! empty the sack. discard ev.
+                  call  epSkipUpdateNo
+               endif
+            endif
+         endif
+      endif                  
+      end
+c         for ibm
+      subroutine epsubvec(inp,out)
+      implicit none
+#include "Zep3Vec.h"
+      record /ep3Vec/  inp,out
+      out = inp
+      end
+      subroutine epsubstTRK(left, right)
+      implicit none
+#include "ZepTrack.h"
+      record /epTrack/left, right
+      left = right
+      end
+
+c     **********************
+      subroutine epNonEleMag
+      use modXsecMedia, xmedia=>media, xelement=>element
+      implicit none
+#include "ZepTrackp.h"
+#include "ZepTrackv.h"
+#include "Zcode.h"
+c////////////////
+!      real(8):: pathp, pathb, pathn  
+c///////////       
+      integer jcon
+c          sample interaction length for non-e/g
+      real*8 prob, path, tokgpm2
+
+c          set cosmos condition(TrackBefMove,
+      tokgpm2 = Media(MediaNo).X0g *10.d0 ! r.l --> kg/m^2
+
+      call ep2cosCond
+      call cfixModel( cTrack.p )
+      call ciniSmpIntL
+
+      call epsmpNEPIntL(xmedia(mediumNo))
+c         reset muon interaction conditions
+      call ep2cosCondr
+c
+      if(cTrack.p.charge .ne. 0 .and. Knckon) then
+c                add knock on 
+         call epKnockp(Media(MediaNo), cTrack.p, prob, path)
+         path = path * tokgpm2
+         call csetIntInf(path, .false., 'knoc') ! cosmos
+      endif
+      if(cTrack.p.code .eq. kmuon) then
+c            add muon pair, brems, n.i if requested.
+         if( Media(MediaNo).mu.MuPr .ge. 2 .and. 
+     *       cTrack.p.fm.p(4) .gt.  Media(MediaNo).cnst.muPrEmin ) then
+            call epmuPrsmpP(Media(MediaNo),
+     *                      cTrack.p.fm.p(4), prob, path)
+c               path is in r.l. convert  it to kg/m2
+            path = path * tokgpm2 
+            call csetIntInf(path, .false., 'pair')
+         endif
+         if(Media(MediaNo).mu.MuBr  .ge. 2 .and.
+     *       cTrack.p.fm.p(4) .gt.  Media(MediaNo).cnst.muBrEmin ) then
+            call epmuBrsmpP(Media(MediaNo), 
+     *                      cTrack.p.fm.p(4), prob, path)
+c               path is in r.l. convert  it to kg/m2
+            path = path*tokgpm2
+            call csetIntInf(path, .false., 'brem')
+c//////////////
+c            pathb = path
+c/////////////
+         endif
+         if( Media(MediaNo).mu.MuNI  .ge. 2 .and.
+     *       cTrack.p.fm.p(4) .gt.  Media(MediaNo).cnst.muNEmin ) then
+            call epmuNsmpP( Media(MediaNo),
+     *           cTrack.p.fm.p(4), prob, path)
+c               path is in r.l. convert  it to kg/m2
+            path = path*tokgpm2
+            call csetIntInf(path, .false., 'nuci')
+         endif
+      endif
+
+      call epfixProc(Media(MediaNo).rho*Media(MediaNo).rhoc,
+     * Move.dx, Move.proc)
+
+      if( Move.proc == 'coll' ) then
+         call  cseeColPossible( cTrack.p, jcon)
+         if(jcon == -1) then
+            Move.proc = 'decay'
+            call cresetIntInf   ! this rest is needed
+         endif
+      endif
+
+
+      Move.dt = Move.dx/Media(MediaNo).X0g ! in r.l
+      Move.dl = Move.dx * Media(MediaNo).gtocm / ! in cm
+     *         Media(MediaNo).rhoc
+      end
+c     ******************
+      subroutine epEloss
+      use moddedx
+      use modGUI
+      implicit none
+#include "ZepTrackp.h"
+#include "ZepTrackv.h"
+#include "Zcnfig.h"
+#include "Zcode.h"
+
+      type(gui),save:: sinfo  ! for quenching
+      integer::modif
+      integer k
+      
+      real*8  dx, up, dedxmu, dedlmu,
+     *      s1, s2, scol2, schg2, sigma
+      real*8 cupsilon, csyncTELoss, cf, qf, cff
+      real(8):: dEdxbyBrems, dEdxbyBremsf
+      real(8):: dEdlBrems, FbyR
+      logical lowehvyion
+      real(8),save::  dedl
+      real(8):: dedxout, dedlout
+       !>>>>>>>>>>>>>>>light
+      integer::epLightGetd  !  function for extracting d part from countDE
+       !<<<<<<<<<<<<<<<<<
+      qf = 0.  ! quenching fraction. 
+      k = cTrack.p.code
+c              compute energy loss rate
+      if(EdepdEdx) then
+         dEdxbyBrems = 0.
+         dEdxbyBremsf = 0.
+         dEdlBrems = 0.
+         lowehvyion  = .false.
+         if(cTrack.p.fm.p(4) .le. cTrack.p.mass) then
+            dedx = 0.
+            Move.dE = 0.
+            Move.dEeff = 0.
+            Move.dEioni = 0.
+         else
+            if(k .eq. kelec) then
+c                            dedx is in GeV/(g/cm^2)
+               call epdedxe(Media(MediaNo), cTrack.p, dedx, dedxf)
+               dedxmu = 0.
+            else
+               if( abs( cTrack.p.charge ) .gt. 1 ) then
+                  if( k /= kgnuc ) then  
+                       ! may appear once 1/10^8 col. ?
+                     call epStrange
+                     dedx = 0.
+                     Move.dE = 0.
+                     Move.dEeff = 0.
+                     Move.dEioni = 0.
+                     return
+                  endif
+                  lowehvyion  = 
+     *              (cTrack.p.fm.p(4)-cTrack.p.mass)/cTrack.p.subcode
+     *               < 0.7
+                  call epdedxhvy(Media(MediaNo), cTrack.p, dedx,dedxf)
+               else
+                  call epdedxNone(Media(MediaNo), cTrack.p, dedx,dedxf)
+                  call epdedxTargetBrems(Media(MediaNo), cTrack.p, 
+     *               dEdxbyBrems, dEdxbyBremsf)
+               endif
+
+
+
+               if(cTrack.p.code .eq. kmuon) then
+                  call epmudEdx(Media(MediaNo).mu.MuNI, 
+     *                 Media(MediaNo).mu.MuBr, 
+     *                 Media(MediaNo).mu.MuPr, 
+     *                 Media(MediaNo),
+     *                 cTrack.p.fm.p(4), dedxmu)
+               else
+                  dedxmu = 0.
+               endif
+            endif
+
+            if( abs(cTrack.p.charge) .gt. 1 ) then
+c                 below for test; use above  normally
+c            if( cTrack.p.charge >= 1) then ! ????
+               modif = Det.cmp(Cn).modifier
+               sinfo%modif = modif
+!                   next Birks is for Talre, Birks or Log
+               if(modif > 0 .or.
+     *            Media(MediaNo).Birks /= ' ') then
+c                even if no quenching is specified in media file,
+c                modifier can  force quenching. inside of the next,
+c                kind is checked if really quenching is specified by modifier
+
+                  if( HowQuench == 0 )  then
+!                   employ cf as it is (same as old) "dedx" 
+                     call epOrgCorrec( modif,
+     *                    Media(MediaNo), cTrack.p, dedx, cf)
+                     qf= 1.0
+                  elseif( HowQuench >= 1 ) then
+                     call epOrgCorrec( modif,
+     *                    Media(MediaNo), cTrack.p, dedxf, cff)
+                     sinfo%dedx = dedx
+                     sinfo%dedxf = dedxf
+                     call epGUI(1, sinfo)
+                     cf = sinfo%cf
+                     qf = sinfo%qf
+                  else
+                     write(0,*) ' HowQuench=',HowQuench,
+     *               ' invalid '
+                     stop
+                  endif
+               else
+                  cf = 1.
+               endif
+            else
+               cf = 1.
+            endif
+
+            dedl = dedx /Media(MediaNo).gtocm * ! GeV/cm
+     *         Media(MediaNo).rhoc
+            dedlmu = dedxmu /Media(MediaNo).gtocm * ! GeV/cm
+     *         Media(MediaNo).rhoc
+            if( btest(TargetElecBrems, 2)) then
+!                         this will overestimate for thin media
+               dEdlBrems = dEdxbyBremsf/Media(MediaNo).gtocm * 
+     *         Media(MediaNo).rhoc   
+            elseif( btest(TargetElecBrems, 0) .or.
+     *           btest(TargetElecBrems, 1)  ) then
+!                     this will underestimate
+               dEdlBrems = dEdxbyBrems/Media(MediaNo).gtocm * 
+     *         Media(MediaNo).rhoc   
+            endif
+            if( abs( epLightGetd( Det.cmp(Cn).CountDE) ) .eq. 2) then
+c                Enery loss fluctuation; use  Urban model for singl charge
+c                 or  high energy
+               if( lowehvyion ) then
+                  call epdedxflhv(Media(MediaNo), cTrack.p,
+     *                scol2, schg2)
+                  sigma = sqrt( (scol2 + schg2)* Move.dx )
+                  call kgauss(0.d0, sigma, s1, s2)
+                  Move.dEioni = max(dedx*Move.dx + s1, 0.d0)
+               else   
+                  call epUrban(Media(MediaNo).urb, dedl, Move.dl,
+     *                 cTrack.p,  Move.dEioni)
+               endif
+c                    Move.dEioni = GeV  in 'dl' cm
+            else
+               Move.dEioni = dedl * Move.dl
+            endif
+
+            Move.dE = Move.dEioni + dedlmu*Move.dl  
+     *            + dEdlBrems*Move.dl  ! total loss without quenching
+            Move.dEeff = Move.dEioni *(qf* cf + (1-qf))
+     *            + dedlmu*Move.dl  
+     *            + dEdlBrems*Move.dl   ! effective loss with quenching
+         endif
+      else
+c            use constant energy loss at minimum ionization; actually not used
+c            In this case, knock-on process should be prohibitted  by
+c            giving large Tcut.   Birks etc correction not applied.
+         dedx = Media(MediaNo).dEdxatp3m * cTrack.p.charge**2  ! GeV/(g/cm2)
+         Move.dE = dedx * Move.dx
+         Move.dEioni = Move.dE
+         Move.dEeff = Move.dEioni
+         SumDe = SumDe + Move.dE 
+      endif
+c    ****************** synchrotron loss; only in 'sp' and for electrons
+c        This is normally completely negligible
+      if(Sync .eq. 1) then
+         if(Media(MediaNo).name .eq. 'sp' ) then
+            if(MagField .gt. 0 .and. k .eq. kelec) then
+               up = cupsilon(cTrack.p, Bfield) ! Upsilon value
+               dedl = csyncTELoss(up) * 10.d-2
+                               !  GeV/cm: dedl by cosmos is GeV/m
+               Move.dE = Move.dE + dedl*Move.dl
+            endif
+         endif
+      endif
+c
+c  
+      Move.Track.p.fm.p(4) = cTrack.p.fm.p(4) - Move.dE
+      if(Move.Track.p.fm.p(4) .le. Move.Track.p.mass) then
+c          this will not happen if muon specific loss exists.
+         Move.dE = max(cTrack.p.fm.p(4)- cTrack.p.mass, 0.d0)
+
+         if(dedx .le. 0. .or. Move.dE .eq. 0.) then
+            dx = 0.
+            Move.Cross = .false.
+            Move.Trunc = .false.
+            Move.dE = 0.
+            Move.dEeff = 0.
+            Move.dEioni = 0.
+         else
+            dx = max(Move.dE/dedx, 0.d0)
+            Move.Trunc=.true.
+            Move.Cross = .false.   
+            Move.dEeff = Move.dE*(cf*qf+(1.0-qf))
+            Move.dEioni = Move.dE
+         endif
+
+         Move.Track.p.fm.p(4) = Move.Track.p.mass
+         Move.Track.p.fm.p(1:3) = 0.
+!           in priciple, min need not be take
+!            but is some strange case, dl becomes large
+!            than old dl. 
+         Move.dl =min( dx * Media(MediaNo).gtocm /
+     *     Media(MediaNo).rhoc, Move.dl)
+         Move.dx = dx
+         Move.Track.pos.x = cTrack.pos.x + Move.dl* cTrack.w.x 
+         Move.Track.pos.y = cTrack.pos.y + Move.dl* cTrack.w.y
+         Move.Track.pos.z = cTrack.pos.z + Move.dl* cTrack.w.z
+      endif
+
+      SumDe = SumDe + Move.dE
+      end
+c     ******************
+      subroutine epTrace
+c     ******************
+c         take trace of paritcles
+       implicit none
+#include  "ZepTrackp.h"
+#include  "ZepTrackv.h"
+#include  "Zcode.h"
+#include  "ZepManager.h"
+c #include  "Zcnfig.h"
+#if defined NEXT486
+#define IMAG_P dimag
+#elif defined PCLinux
+#define IMAG_P dimag
+#else
+#define IMAG_P imag
+#endif
+      
+
+c          standard Trace information
+      record /epPos/ posbw, posw
+      real*8 xxx/-1.d37/, yyy/-1.d36/, zzz/1.d34/ 
+      integer kkk/-1000/, chkchg/-1000/
+      real*8 erg
+      integer k
+      save xxx, yyy, zzz, kkk, chkchg
+
+c
+c          Trace informaion  ccc if for putting only electorns
+c
+c             convert to world coord. starting point of the segment
+
+      erg= Move.Track.p.fm.p(4)-Move.Track.p.mass
+      if( TraceErg(1) .le. erg .and.  erg .le. TraceErg(2) ) goto 100
+      if( TraceErg(3) .le. erg .and.  erg .le. TraceErg(4) ) goto 100
+      if( TraceErg(5) .le. erg .and.  erg .le. TraceErg(6) ) goto 100
+      return  !  ***************
+ 100  continue
+      call epl2w(Cn, cTrack.pos, posbw)
+      
+      k = cTrack.p.code
+ccc      if(k .eq. kelec) then
+         if(kkk .ne. k .or. xxx .ne. posbw.x .or. 
+     *                      yyy .ne. posbw.y .or.
+     *                      zzz .ne. posbw.z .or. 
+     *                   chkchg .ne. cTrack.p.charge ) then
+            if(xxx .ne. -1.d37) then
+               write(abs(IoTrace), *)
+               write(abs(IoTrace), *)
+            endif
+            if(TimeStruc) then
+               write(abs(IoTrace),
+     *          '(3g16.8, i4, g11.4, i4, g16.8)')
+     *            posbw.x, posbw.y, posbw.z, k,
+     *            erg,
+     *            cTrack.p.charge,
+     *            cTrack.t
+            else
+               write(abs(IoTrace),'(3g16.8,i4,g11.4, i4,1x, a)')
+     *            posbw.x, posbw.y, posbw.z, k,
+     *            erg,               
+     *            cTrack.p.charge,  Media(MediaNo).name
+            endif
+         endif
+c            end point of  the segment
+         call epl2w(Cn, Move.Track.pos, posw)
+         if(TimeStruc) then
+            write(abs(IoTrace),'(3g16.8,i4,g11.4, i4, 
+     *         g16.8)')
+     *           posw.x, posw.y, posw.z, k,
+     *           erg,
+     *           Move.Track.p.charge,
+     *           Move.Track.t
+         else
+            write(abs(IoTrace),'(3g16.8,i4,g11.4, i4, 1x,a)')
+     *           posw.x, posw.y, posw.z, k,
+     *           erg, 
+     *           Move.Track.p.charge, Media(MediaNo).name
+         endif
+         xxx = posw.x
+         yyy = posw.y
+         zzz = posw.z
+         kkk = k
+         chkchg = Move.Track.p.charge
+ccc      endif
+       end
+c      ****************************************
+       subroutine epprog
+       use modXsecMedia, xmedia=>media, xelement=>element
+       implicit none
+c
+c     5     processes, i.e, pair creation, compton, Photo-electric
+c     effect, coherent scatt.
+c      and Photo-production of pions are considered.
+c
+#include  "ZepTrackv.h"
+#include  "ZepTrackp.h"
+#include  "Zevhnv.h"
+
+c
+      real*8 tcomp, tphot, tpair, tgp, tcoh,  t
+      real*8 E, prob, xprob(5), txray(5)
+      real*8 xs, mfp
+      real*8  pairmfp, dl, dx, tmpair, u
+      real*4  xsec(5)  !  coh, incoh,  P.E  1/(g/cm2)
+c      real*8  Excom1, Excom2  !now in ZepTrackp.h
+      integer icon
+c            where xcom data is used. 
+c       Excom1: compton/photo abs/coherent scat
+c       Excom2: pair; default is  not use xcom
+c              both must be < 100 GeV
+c      data Excom1/1.d-3/, Excom2/1.d-3/
+c      save Excom1, Excom2
+
+      E = cTrack.p.fm.p(4)
+      if(E .le. EupperBndCS) then
+         xprob(3)= 0.
+         if( Media(MediaNo).xcom.size .gt. 0 .and.
+     *        E .lt. Excom1 ) then
+c               below 1MeV, use accurate xs.
+            call epXrayp(Media(MediaNo), E, 1,  3,  xprob, txray)
+            tcomp=txray(2)
+            tcoh = txray(1)
+            tphot = txray(3)
+         else
+            tcoh = 1.e35
+            call epcompp(Media(MediaNo), E, prob, tcomp)
+         endif
+         if(Photo) then
+            if(xprob(3)  .eq. 0.) then
+               call epphotoEp(Media(MediaNo),  E, prob, tphot) ! v8.0
+            endif
+         else
+            tphot = 1.e35
+         endif
+      else
+         tcomp =1.e35
+         tphot= 1.e35
+         tcoh = 1.e35
+      endif
+      if(E .gt. ElowerBndPair) then
+         if( Media(MediaNo).xcom.size .gt. 0 .and.
+     *        E .lt. Excom2 ) then
+            call epXrayp(Media(MediaNo), E, 4, 5,  xprob, txray)
+            prob= xprob(4)+xprob(5)
+            call rndc(u)
+            tpair = -log(u)/prob
+         else
+            call epPrSampP(Media(MediaNo), E, prob, tpair)
+         endif
+      else
+         tpair=1.e35
+      endif
+      if(IncGp > 0 .and. E .gt. 153.d-3) then ! > 0.152431798977028
+         call ep2cosCond
+         call cfixModel( cTrack.p )
+         call cgetPhotoPxs(ActiveMdl2, cTrack.p, xmedia(mediumNo),
+     *      xs, mfp)
+         prob = xs*Media(MediaNo).mbtoPX0 ! prob/r.l
+         call rndc(u)
+         tgp = -log(u)/prob          ! sampled path in r.l
+      else
+         tgp=1.e35
+      endif
+
+      if(MagPair .eq. 1) then
+         call epmpairp(cTrack.p, Bfield, Xai, pairmfp, dl)
+         dx = dl / Media(MediaNo).gtocm *
+     *     Media(MediaNo).rhoc
+         tmpair = dx / Media(MediaNo).X0g
+      else
+         tmpair = 1.e35
+      endif
+      t=min(tpair, tcomp, tphot, tgp, tmpair, tcoh)
+      if(t .eq. tpair) then
+         Move.proc='pair'
+      elseif(t .eq. tcomp) then
+         Move.proc='comp'
+      elseif(t .eq. tphot) then
+         Move.proc='phot'
+      elseif(t .eq. tcoh) then
+         Move.proc='coh'
+      elseif(t .eq. tgp) then
+         Move.proc='photop'
+      else
+         Move.proc='mpair'
+      endif
+      Move.dt = t   ! in r.l
+      Move.dx = Move.dt * Media(MediaNo).X0g
+      Move.dl = Move.dx * Media(MediaNo).gtocm /
+     *     Media(MediaNo).rhoc
+      end
+c     *************
+      subroutine  epproe
+c     *************
+      implicit none
+c
+c   electron:     brems, knock-on, and anihilation, synchrotron
+c                 radiation are considered
+c
+#include  "ZepTrackv.h"
+#include  "ZepTrackp.h"
+c
+      real*8 E, prob,  tbrem, tknock, tanihi, t, dt, dl, dx, syncmfp
+
+       
+      E = cTrack.p.fm.p(4)
+c             sample path for brems
+      call epBrSampP(Media(MediaNo),  E, prob, tbrem)
+
+      if(Knckon) then
+         if(cTrack.p.charge .eq. -1) then
+            call epmollerp(Media(MediaNo), E, RecoilKEmin, prob, tknock)
+         else
+            call epbhabhap(Media(MediaNo), E, RecoilKEmin, prob, tknock)
+         endif
+         if(tbrem .le. tknock) then
+            t = tbrem
+            Move.proc='brem'
+         else
+            t = tknock
+            Move.proc='knoc'
+         endif
+      else
+         t = tbrem
+         Move.proc='brem'
+      endif
+      if(cTrack.p.charge .eq. 1 .and. E .lt. Eanihi) then
+         call epanihip(Media(MediaNo), E, prob, tanihi)
+         if(tanihi .lt. t) then
+            t = tanihi
+            Move.proc='anih'
+         endif
+      endif
+      Move.dt = t
+      Move.dx = Move.dt * Media(MediaNo).X0g
+      Move.dl = Move.dx * Media(MediaNo).gtocm /
+     *    Media(MediaNo).rhoc
+
+c                     only if X0 > 10 km; may be 30 km is o.k
+      if(Sync .eq.  2 .and.
+     *    Media(MediaNo).X0/Media(MediaNo).rhoc .gt. 10.d5 ) then
+c          sample synchrotron emission path
+         call epsyncp(cTrack.p, Bfield, Upsilon, syncmfp, dl)
+         dx = dl / Media(MediaNo).gtocm *
+     *    Media(MediaNo).rhoc
+         dt = dx / Media(MediaNo).X0g
+         if(dt .lt.  t) then
+            Move.dt = dt
+            Move.dx = dx
+            Move.dl = dl
+            Move.proc = 'sync'
+         endif
+c      else
+      endif
+      end
+c     ******************
+      subroutine eptrunc
+      implicit none
+c          truncate path if it is too long.  
+c          Move.dt,dx,dl is adjusted if truncated, and Trunc is set to T.
+c
+#include  "ZepTrackv.h"
+#include  "ZepTrackp.h"
+#include  "Zcode.h"
+
+c           max length movable
+      real*8 tmax, r
+      if(cTrack.p.charge .eq. 0) then
+c           neutral particle can move any length basically
+         Move.Trunc = .false.
+c           but we set max r.l be 100 r.l so that
+c           boundary calculation has high accuracy
+         if(Move.dt .gt. 100.) then
+            Move.dt = 100.
+            Move.dx = Move.dt * Media(MediaNo).X0g
+            Move.dl = Move.dx * Media(MediaNo).gtocm /
+     *           Media(MediaNo).rhoc
+            Move.Trunc = .true.
+         endif            
+      elseif( Light > 0  .and.  cTrack.p.code == kchgPath ) then
+         Move.Trunc = .false.   
+             ! Move.dt  etc is 0
+
+c<<<<<<<<<<<<<<<<<
+c      elseif(Move.proc .eq. 'no') then
+c         Move.Trunc=.false.
+c         if(MagField .gt. 0 .or.  ElecField .gt. 0) then
+c            Move.dt = min( max( Tcoefx*cTrack.p.fm.p(4), Tminx), 
+c     *           Move.dt, MaxPath )
+c         endif
+      else
+
+         tmax = min(
+     *     max( Tcoefx*(cTrack.p.fm.p(4)-cTrack.p.mass), Tminx), 
+     *     MaxPath )
+
+
+
+         if(Move.dt .lt. tmax) then
+            Move.Trunc=.false.
+         else
+            Move.Trunc = .true.
+            Move.dt = tmax
+            Move.dx = Move.dt * Media(MediaNo).X0g
+            Move.dl = Move.dx * Media(MediaNo).gtocm /
+     *           Media(MediaNo).rhoc
+         endif
+         if(MagField .gt. 0 ) then
+            call epGetB
+            call epmagDefR(cTrack, Bfield, r)
+c              assume we can go r/10 streight way.
+            if(Move.dl .gt. r/10.d0) then
+               Move.dl = r/10.d0
+               Move.dx = Move.dl/Media(MediaNo).gtocm *
+     *          Media(MediaNo).rhoc
+               Move.dt = Move.dx/ Media(MediaNo).X0g
+               Move.Trunc = .true.
+            endif
+         endif
+         if(ElecField .gt. 0) then
+            call epGetE
+c                 to be implemented in future
+         endif  
+      endif
+      end
+c     ****************
+      subroutine epGetB
+      implicit none
+#include "ZepTrackv.h"
+#include "ZepTrackp.h"
+c          if MagField=1, Bfield is unchanged from the start time
+      if(MagField .eq. 2) then
+         call eppos2B(cTrack, Bfield)
+c             Bfield is in local coordinate
+      endif
+      end
+c     *****************
+      subroutine epGetE
+      implicit none
+#include "ZepTrackv.h"      
+#include "ZepTrackp.h"      
+c          if ElecField=1, Efield is unchanged from the start time
+      if(ElecField .eq. 2) then
+         call eppos2E(cTrack, Efield)
+      endif
+      end
+c     *******************
+      subroutine epifCross(el, kcon )
+      implicit none
+#include "ZepTrackv.h"
+#include "ZepTrackp.h"
+#include "Zcnfig.h"
+c             see if Move.Track crosses a boundary and set Cross = t/f
+c        If t, reset Move.Track.pos just before the boundary.
+c         kcon  = 0--> not cross
+c               = 1--> cross
+      integer kcon, icon
+
+
+      real*8 el
+
+      if(Move.dl .lt. el) then
+         kcon = 0
+         Move.Cross = .false.
+      else
+         kcon = 1
+         Move.Cross = .true.
+         Move.Trunc = .true.
+         Move.Track.pos.x = Move.boundary.x -
+     *        EpsLeng* cTrack.w.x
+         Move.Track.pos.y = Move.boundary.y -
+     *        EpsLeng* cTrack.w.y
+         Move.Track.pos.z = Move.boundary.z -
+     *        EpsLeng* cTrack.w.z
+         Move.dl = el - EpsLeng
+c                X0=X0g/rho
+         Move.dt = Move.dl/Media(MediaNo).X0 *
+     *         Media(MediaNo).rhoc
+c            gtocm = X0/X0g
+         Move.dx = Move.dl/Media(MediaNo).gtocm *
+     *         Media(MediaNo).rhoc
+      endif
+      end
+c
+      subroutine epchckE0(aTrack, icon)
+      use epModify
+      use moddedx
+      implicit none
+#include "ZepTrackv.h"
+#include "ZepTrackp.h"
+#include "Zcnfig.h"
+#include "Zcode.h"
+#include "Zmass.h"
+c            aTrack is examined if it's  energy is too low
+c
+      record /epTrack/ aTrack   ! input. this track's energy is examined
+      integer icon              ! output. 0. the particle is still alive
+                                !         1. death. 
+
+      logical ok, kbtest, needdedx
+      integer k
+      real*8 ke
+      integer,save::nstrange=0
+c////////////////                                                              
+c      logical show
+c      common /showshow/ show
+c///////////       
+
+      ke = aTrack.p.fm.p(4)- aTrack.p.mass
+      k =  aTrack.p.code
+c >>>>>>>>>>>>>>>>>>light
+      if(k .eq. klight) then
+         if(Light <=  0 ) then
+            write(0,*) ' Light =0 but light appeared'
+            icon = 1   ! light is not treated, so death
+            stop
+         endif
+         call epLightchkE( aTrack, icon) ! check wave length
+         return  ! *************
+      endif
+c<<<<<<<<<<<<<<<<<<<<light
+      if(k .eq. kelec) then
+          if(aTrack.p.charge .eq. -1) then
+             ok=aTrack.p.fm.p(4) .gt. EminElec
+          else
+c              positron
+             ok=aTrack.p.fm.p(4) .gt. EminGamma
+          endif
+       elseif(k .eq. kphoton) then
+          ok= aTrack.p.fm.p(4) .gt. EminGamma
+       elseif(k .eq.  knuc) then
+          if(aTrack.p.subcode  .eq. regptcl) then
+             if( aTrack.p.charge == 0 ) then
+                ok = ke .gt. EminH
+             else
+                ok = ke > KEmin
+             endif
+          else
+c              anti particle
+             ok=aTrack.p.fm.p(4) > KEmin
+          endif
+       elseif( k .eq.  kpion .or.
+     *         k .eq.  kkaon .or.
+     *         k == kmuon ) then
+c            can decay
+          ok = aTrack.p.fm.p(4) > KEmin
+       else
+          if(k == kgnuc ) then
+             ok = ke  > KEmin
+          else
+             ok = ke  >  KEmin
+          endif
+       endif
+       if(ok) then
+          icon=0
+       else
+          icon=1
+          if( k == knuc .and. aTrack.p.charge == 0 ) then
+             icon = -1
+          endif
+       endif
+       end
+
+      subroutine epAbsorb(aTrack, icon)
+      use epModify
+      use moddedx
+      use modUI
+      use modGUI
+      implicit none
+#include "ZepTrackv.h"
+#include "ZepTrackp.h"
+#include "Zcnfig.h"
+#include "Zcode.h"
+#include "Zmass.h"
+
+      record /epTrack/ aTrack   ! input. this track's energy is examined
+      integer icon              ! output. 0. the particle is still alive
+                                !         1. death. 
+
+      logical ok, kbtest, needdedx
+      integer k
+      real*8 ke, qf
+      type(gui)::sinfo
+      integer::modif
+      real*8 cf, qg, cff
+      integer,save::nstrange=0
+c////////////////                                                              
+c      logical show
+c      common /showshow/ show
+c///////////       
+      qf = 0.
+      ke = aTrack.p.fm.p(4)- aTrack.p.mass
+      k =  aTrack.p.code
+      icon = 1
+
+      Move.dE= 0.
+      Move.dEeff= 0.
+      Move.dEioni = 0.
+
+      if(k .eq. kelec) then
+          if(aTrack.p.charge .eq. -1) then
+             if(kbtest(Eabsorb, BitElectron)) then
+                Move.dE = ke
+                Move.dEeff = ke
+                Move.dEioni= Move.dE  
+                SumDe = SumDe + Move.dE
+                call epLightPreUserde(1, aTrack)
+             endif
+          else
+c              positron
+             if(kbtest(Eabsorb, BitPositron)) then
+                Move.dE = aTrack.p.fm.p(4) + masele
+                SumDe = SumDe + Move.dE
+                Move.dEeff = Move.dE
+                Move.dEioni= Move.dE  
+                call epLightPreUserde(1, aTrack)
+             endif
+          endif
+       elseif(k .eq. kphoton) then
+          if(kbtest(Eabsorb, BitPhoton)) then
+             Move.dE = aTrack.p.fm.p(4)
+             Move.dEeff = ke
+             Move.dEioni= Move.dE    ! photo-electric electron's
+             SumDe = SumDe + Move.dE
+             call epLightPreUserde(1, aTrack)
+          endif
+       elseif(k .eq.  knuc) then
+          if(aTrack.p.subcode  .eq. regptcl) then
+             if( (aTrack.p.charge .eq. 1 .and. 
+     *            kbtest(Eabsorb, BitProton)) .or.
+     *            (aTrack.p.charge .eq. 0 .and.
+     *            kbtest(Eabsorb, BitNeutron))) then
+                Move.dE = ke
+                Move.dEeff = ke
+                Move.dEioni= Move.dE  
+                SumDe = SumDe + Move.dE
+                call epLightPreUserde(1, aTrack)
+             endif
+          else
+c              anti particle
+c             energy to be liberated further cannot be estimated.
+c               (dependent on the ptcl type)
+             if(kbtest(Eabsorb, BitAntiNuc)) then
+                Move.dE = aTrack.p.fm.p(4) + aTrack.p.mass
+                Move.dEeff = ke
+                Move.dEioni= Move.dE  
+                SumDe = SumDe + Move.dE
+                call epLightPreUserde(1, aTrack)
+             endif
+          endif
+       elseif( k .eq.  kpion .or.
+     *         k .eq.  kkaon .or.
+     *         k == kmuon ) then
+c            can decay
+          if(kbtest(Eabsorb,BitDecay)) then
+             Move.dE = ke
+             Move.dEeff = ke
+             Move.dEioni= Move.dE  
+             SumDe = SumDe + Move.dE
+             call epLightPreUserde(1, aTrack)
+          endif
+       else
+          if(k == kgnuc ) then
+             if(   kbtest(Eabsorb, BitProton) ) then
+                if( aTrack.p.charge > 1  ) then
+                   needdedx = Media(MediaNo).Birks /= ' '
+                   modif = Det.cmp(Cn).modifier
+                   sinfo%modif = modif
+                   if(.not. needdedx) then
+                      if(modif > 0 .and.
+     *                   allocated( modify) ) then
+                         needdedx =
+     *                        IBITS(modify( modif )%kind, bitQuench,
+     *                          1)  > 0  
+                      endif
+                      if(needdedx ) then
+c                        to get queching effect we need dedx
+                         call epdedxhvy(Media(MediaNo), 
+     *                   aTrack.p, dedx, dedxf)
+                         if(HowQuench == 0 ) then
+                            call epOrgCorrec(modif, 
+     *                        Media(MediaNo), aTrack.p, dedx, cf)
+                         elseif( HowQuench >= 1 ) then
+                            call epOrgCorrec( modif,
+     *                    Media(MediaNo), cTrack.p, dedxf, cff)
+                            sinfo%dedx = dedx
+                            sinfo%dedxf = dedxf
+                            call epGUI(1, sinfo)
+                            cf =  sinfo%cf
+                            qf =  sinfo%qf
+                         endif
+                      else
+                         cf =1.0
+                      endif
+                   else
+                      cf = 1.0
+                   endif
+                   if( aTrack.p.charge /= 0  ) then  ! for safety
+                      Move.dE = ke
+                      Move.dEeff = ke *(cf*qf+ 1.-qf)
+                      Move.dEioni= Move.dE  
+                      SumDe = SumDe + Move.dE
+                      call epLightPreUserde(1, aTrack)
+                   endif
+                endif
+             endif
+          else
+             if(k /= kneue .and. k/= kneumu ) then
+                if(kbtest(Eabsorb, BitOther)) then
+                   Move.dE = ke
+                   Move.dEeff = ke
+                   Move.dEioni= Move.dE  
+                   SumDe = SumDe + Move.dE
+                   call epLightPreUserde(1, aTrack)
+                endif
+             endif
+          endif
+       endif
+
+
+       if(Move.Abort .ne. 0) then
+          if( Move.Abort == 3 ) then
+             Move.Abort = 0
+          else
+             call epempty       ! empty the stack
+             call epSkipUpdateNo
+          endif
+          icon = 1
+       endif
+       end
+      subroutine epchckE(aTrack, icon)
+      use epModify
+      use moddedx
+      use modGUI
+      implicit none
+#include "ZepTrackv.h"
+#include "ZepTrackp.h"
+#include "Zcnfig.h"
+#include "Zcode.h"
+#include "Zmass.h"
+c            aTrack is examined if it's  energy is too low
+c
+      record /epTrack/ aTrack   ! input. this track's energy is examined
+      integer icon              ! output. 0. the particle is still alive
+                                !         1. death. 
+
+      logical ok, kbtest, needdedx
+      integer k
+      real*8 ke
+      real*8 cf,qf,cff
+      type(gui):: sinfo
+      integer:: modif
+c////////////////                                                              
+c      logical show
+c      common /showshow/ show
+c///////////       
+
+      ke = aTrack.p.fm.p(4)- aTrack.p.mass
+      k =  aTrack.p.code
+c >>>>>>>>>>>>>>>>>>light
+      if(k .eq. klight) then
+         if(Light <=  0 ) then
+            write(0,*) ' Light =0 but light appeared'
+            icon = 1   ! light is not treated, so death
+            stop
+         endif
+         call epLightchkE( aTrack, icon) ! check wave length
+         return  ! *************
+      endif
+c<<<<<<<<<<<<<<<<<<<<light
+      if(k == kgnuc ) then
+c         ke = ke/aTrack.p.subcode  ! dE is by total K.E
+      endif
+      
+      if(k .eq. kelec) then
+          if(aTrack.p.charge .eq. -1) then
+             ok=aTrack.p.fm.p(4) .gt. EminElec
+             if(.not. ok .and. ke .gt. 0.) then
+                if(kbtest(Eabsorb, BitElectron)) then
+                   Move.dE = ke
+                   Move.dEeff = ke
+                   Move.dEioni= Move.dE  
+                   SumDe = SumDe + Move.dE
+c                   if(Det.cmp(Cn).CountDE .ge. 1) then >>>>>>light
+                      call epLightPreUserde(1, aTrack)
+c                   endif                               <<<<<<<<<<
+                endif
+             endif
+          else
+c              positron
+             ok=aTrack.p.fm.p(4) .gt. KEmin
+             if(.not. ok) then
+                if(kbtest(Eabsorb, BitPositron)) then
+                   Move.dE = aTrack.p.fm.p(4) + masele
+
+                   SumDe = SumDe + Move.dE
+                   Move.dEeff = Move.dE
+                   Move.dEioni= Move.dE  
+c                   if(Det.cmp(Cn).CountDE .ge. 1) then >>>>>>>light
+                      call epLightPreUserde(1, aTrack)
+c                   endif                               <<<<<<<<<<< 
+
+                endif
+             else
+                if(aTrack.p.fm.p(4) .lt. masele*1.001d0 ) then
+c                   if energy is very low, forced anihilation 
+                   Move.proc='anih'
+                   Move.Trunc=.false.
+                endif
+             endif
+          endif
+       elseif(k .eq. kphoton) then
+          ok= aTrack.p.fm.p(4) .gt. EminGamma
+          if(.not. ok) then
+             if(kbtest(Eabsorb, BitPhoton)) then
+                Move.dE = aTrack.p.fm.p(4)
+                Move.dEeff = ke
+                Move.dEioni= Move.dE  
+                SumDe = SumDe + Move.dE
+c                if(Det.cmp(Cn).CountDE .ge. 1) then  >>>>>>>>>>>light
+                   call epLightPreUserde(1, aTrack)
+c                endif                                <<<<<<<<<<<
+             endif
+          endif
+       elseif(k .eq.  knuc) then
+          if(aTrack.p.subcode  .eq. regptcl) then
+c             ok= ke .gt. KEmin
+             if( aTrack.p.charge == 0 ) then
+                ok = ke .gt. EminH
+             else
+                ok = ke > KEmin
+             endif
+             if(.not. ok) then
+                if( (aTrack.p.charge .eq. 1 .and. 
+     *             kbtest(Eabsorb, BitProton)) .or.
+     *              (aTrack.p.charge .eq. 0 .and.
+     *             kbtest(Eabsorb, BitNeutron))) then
+                   Move.dE = ke
+                   Move.dEeff = ke
+                   Move.dEioni= Move.dE  
+                   SumDe = SumDe + Move.dE
+c                   if(Det.cmp(Cn).CountDE .ge. 1) then >>>>>>>>>>>>light
+                      call epLightPreUserde(1, aTrack)
+c                   endif                               <<<<<<<<<<<  
+                endif
+             endif
+          else
+c              anti particle
+             ok=aTrack.p.fm.p(4) .gt. KEmin
+             if(.not. ok) then
+c                energy to be liberated further cannot be estimated.
+c                (dependent on the ptcl type)
+                if(kbtest(Eabsorb, BitAntiNuc)) then
+                   Move.dE = aTrack.p.fm.p(4) + aTrack.p.mass
+                   Move.dEeff = ke
+                   Move.dEioni= Move.dE  
+                   SumDe = SumDe + Move.dE
+c                   if(Det.cmp(Cn).CountDE .ge. 1) then >>>>>>>>>>>>light
+                      call epLightPreUserde(1, aTrack)
+c                   endif                               <<<<<<<<<<<<<
+                endif
+             endif
+          endif
+       elseif( k .eq.  kpion .or.
+     *         k .eq.  kkaon .or.
+     *         k == kmuon ) then
+c            can decay
+c          ok = aTrack.p.fm.p(4) .gt. KEmin
+          ok = aTrack.p.fm.p(4) > EminH
+          if( ok .and. ke <= EminH ) then
+             if( k == kmuon .and.  aTrack.p.charge == -1) then
+                ! can be abosrbed by capture so follow until death
+             elseif( .not. Move.trunc ) then
+                ! force to decay
+                Move.proc='decay'
+                call cresetIntInf   ! this rest is needed
+             endif
+          endif
+          if(.not.ok) then
+             if(kbtest(Eabsorb,BitDecay)) then
+                Move.dE = ke
+                Move.dEeff = ke
+                Move.dEioni= Move.dE  
+                SumDe = SumDe + Move.dE
+c                if(Det.cmp(Cn).CountDE .ge. 1) then  >>>>>>>>>>>>light 
+                   call epLightPreUserde(1, aTrack)
+c                endif                                <<<<<<<<<<<<<<<
+             endif
+          endif
+       else
+          if(k == kgnuc ) then
+             ok = ke  > KEmin
+             if(.not. ok) then
+                if(   kbtest(Eabsorb, BitProton) ) then
+                   if( aTrack.p.charge > 1  ) then
+                      needdedx = Media(MediaNo).Birks /= ' '
+                      modif = Det.cmp(Cn).modifier
+                      sinfo%modif = modif
+                      if(.not. needdedx) then
+                         if(modif > 0 .and.
+     *                      allocated( modify) ) then
+                            needdedx =
+     *                      IBITS(modify(modif )%kind,
+     *                      bitQuench, 1) > 0  
+                         endif
+                      endif
+                      if(needdedx ) then
+c                        to get queching effect we need dedx
+                         call epdedxhvy(Media(MediaNo), 
+     *                   aTrack.p, dedx, dedxf)
+                         if( HowQuench == 0 ) then
+                            call epOrgCorrec(modif, 
+     *                       Media(MediaNo), aTrack.p, dedx, cf)
+                         elseif( HowQuench >= 1 ) then
+!                                next call is not needed now
+                            call epOrgCorrec( modif,
+     *                    Media(MediaNo), cTrack.p, dedxf, cff)
+                            sinfo%dedx = dedx
+                            sinfo%dedxf = dedxf
+                            call epGUI(1, sinfo)
+                            cf = sinfo%cf
+                            qf = sinfo%qf
+                         endif
+                      else
+                         cf =1.0
+                      endif
+                   else
+                      cf = 1.0
+                   endif
+                   if( aTrack.p.charge /= 0  ) then  ! for safety
+                      Move.dE = ke
+                      Move.dEeff = ke *(cf*qf+1.0-qf)
+                      Move.dEioni= Move.dE  
+                      SumDe = SumDe + Move.dE
+                      call epLightPreUserde(1, aTrack)
+                   endif
+                endif
+             endif
+          else
+             ok = ke  >  KEmin
+             if(.not.ok) then 
+                if(k /= kneue .and. k/= kneumu ) then
+                   if(kbtest(Eabsorb, BitOther)) then
+                      Move.dE = ke
+                      Move.dEeff = ke
+                      Move.dEioni= Move.dE  
+                      SumDe = SumDe + Move.dE
+c                if(Det.cmp(Cn).CountDE .ge. 1) then >>>>>>>>>>>>light
+                      call epLightPreUserde(1, aTrack)
+c                endif                               <<<<<<<<<<<<
+                   endif
+                endif
+             endif
+          endif
+       endif
+       if(ok) then
+          icon=0
+       else
+          icon=1
+       endif
+       if(Move.Abort .ne. 0) then
+          if( Move.Abort /= 3 ) then
+             call epempty       ! empty the stack
+             call epSkipUpdateNo
+          else
+             Move.Abort = 0
+          endif
+          icon = 1
+       endif
+       end
+c      *****************
+       subroutine epaddTime
+!           >>>>>>>>>>>>>>>light
+       use modepLightPty
+!           <<<<<<<<<<<<<<<
+       implicit none
+c        new position is assumed to be fixed.
+c        (however, before scattering, and energy check).
+c        update time and take trace
+#include  "Zglobalc.h"
+#include  "ZepTrackp.h"
+#include  "ZepTrackv.h"
+
+       real*8 ctau, u
+       real*8 beta1, betaav
+c
+       if(Move.Track.p.mass .eq. 0.) then
+c   >>>>>>>>>>>>>>>>>>>light
+          if(Move.Track.p.code < 0 .and. cLcompNo > 0 ) then
+             betaav = 1./Lcomp( cLcompNo )%refracN
+          else
+c  <<<<<<<<<<<<<<<<<<<<<<<
+             betaav=1.d0
+          endif
+       else
+          call cgetBeta( Move.Track.p,  betaav)
+          if(betaav .lt. 0.98) then
+             call cgetBeta(cTrack.p, beta1)
+             betaav = (betaav+beta1)/2.
+          endif
+       endif
+       if(betaav .gt. 0.) then
+          Move.Track.t = cTrack.t + Move.dl/betaav
+       else
+c               stopped one. add decay time if possible
+          call cgetctau(cTrack.p, ctau)
+          if(ctau .eq. Infty) then
+c               If the particle is still to be treated
+c               even after it stops, the ptcl 
+c               should be antiprpton or anti-somthing to
+c               anihilate in the next step. We assume
+c               the anihilation takes place instantly
+c               after stopping. so don't add any time
+c               
+c                Move.Track.t= cTrack.t+1.e8  ! version <= 8.62
+                Move.Track.t = cTrack.t
+          else
+             call rndc(u)
+             Move.Track.t = cTrack.t - log(u)*ctau
+          endif
+       endif
+       end
+
+c      ************************
+       subroutine epint(icon)
+       use modIntInfo
+       use modXsecMedia, xmedia=>media, xelement=>element
+       implicit none
+#include  "ZepTrackv.h"
+#include  "ZepTrackp.h"
+#include  "Zcode.h"
+#include  "Zevhnv.h"
+      integer icon  ! output.  always 1
+
+      character*100 msg
+      integer k,  ia, iz
+      real*8 xs
+      integer inela
+      record /epPos/temppos
+
+c
+c/////////////
+c      logical show
+c      common /showshow/show
+c///////////////
+
+      k = cTrack.p.code
+!         almost dummy setting 
+!      ia =Media(MediaNo).A
+!      iz =Media(MediaNo).Z
+
+#if defined (INTINFO)
+      kintInfo = min(k, maxcodeForInt)
+      if( codeAforInt(kintInfo) == 0 ) then
+          !  we have to inform int info to epUI
+          !  get current stack pos
+         call epqstn(IntInfo1) ! product is put from posIntInfo1+1
+         IntInfo1 = IntInfo1 + 1
+      endif            
+#endif
+
+
+      if(k .eq. kphoton) then
+         if(Move.proc .eq. 'comp') then
+            call epcmpt
+         elseif(Move.proc .eq. 'pair') then
+            call eppair
+         elseif(Move.proc .eq. 'phot') then
+            call epphot
+         elseif(Move.proc .eq. 'coh') then
+            call epcoher
+         elseif(Move.proc .eq. 'photop') then
+c
+            call ep2cosPtcl( cTrack.p )
+            call cfixTarget(xmedia(mediumNo)) ! 
+            call epcpTargetInfo  ! cp target info 
+            call ep2cosCond2  !  
+            call cphotop        ! Cosmos function
+            call eppushPtcl(cTrack)  ! use pos. info from this ptcl
+         elseif(Move.proc .eq. 'mpair') then
+            call epmpair
+         else
+            write(msg,
+     *       '('' proccess='',a4,'' for gamma undefined'')')
+     *       Move.proc
+            call cerrorMsg(msg,0)
+         endif
+      elseif(k .eq. kelec) then
+
+         if(Move.proc .eq. 'brem') then
+            call epbrem
+         elseif(Move.proc .eq. 'knoc') then
+            call epknoc
+         elseif(Move.proc .eq. 'anih') then
+            call epanih
+         elseif(Move.proc .eq. 'sync') then
+            call epsync
+         else
+            write(msg,
+     *         '('' process='',a4, '' for e is undef.'')') Move.proc
+            call cerrorMsg(msg, 0)
+         endif
+       !>>>>>>>>>>>>>>>>>>>>>>light
+      elseif( k == klight) then
+         if(Move.proc == "pe" ) then
+                  ! photo electron generation at sensor
+            call epLightAtSensor
+         elseif( Move.proc == "rayl" ) then
+                  ! Rayleigh scattering; use Xray region fomulat since
+                  ! (1+cos^2)dcos
+            call epcoher
+         elseif( Move.proc == "absorb" ) then
+                  ! absorbed. nothing to do;  not push any thing
+         elseif( Move.proc == "wls" ) then
+                   ! wave length shift
+            call epLightPreWLS
+         else
+            write(0,*) ' light interacion=', Move.proc
+            write(0,*) ' not defined '
+            stop
+         endif
+        !<<<<<<<<<<<<<<<<<<<<<<
+      else
+         if(Move.proc .eq. 'knoc') then
+
+            call epNEPknoc
+
+         elseif(cTrack.p.code .eq. kmuon ) then
+            if( Move.proc == 'decay') then
+               call ep2cosPtcl( cTrack.p ) ! set
+               call ep2coscond2            ! Move.Track
+               call cinteMuon  ! capture is also treated
+                           !   don't use nuc. interaction there
+            elseif(Move.proc .eq.'pair') then
+               call epmuInte
+            elseif(Move.proc .eq.'brem') then
+               call epmuInte
+            elseif(Move.proc .eq.'nuci') then
+               call epmuInte
+            endif
+         else  
+            ! hadronic ptcls
+            call ep2cosPtcl( cTrack.p )
+c            if(  k == kmuon .and. cTrack.p.charge == -1  .and.
+c     *           cTrack.p.fm.p(4) <= cTrack.p.mass*1.001) then
+c                        1.001 must be the same as in cinteMuon
+c                 for decay of stopping mu-, 
+c                 we must fix target for capture case; really captured
+c                 or decay  is determined in cinteMuon; 
+
+            call cfixTarget(xmedia(mediumNo))
+            call epcpTargetInfo ! cp target info 
+            call ep2cosCond2 
+            call cinteNEP       ! cosmos eppp
+            call eppushPtcl( cTrack )
+         endif
+      endif
+
+      if(FirstC) then
+         if(Incident.p.code .eq. kelec
+     *        .or. Incident.p.code .eq. kphoton ) then
+            if( cTrack.p.code == Incident.p.code 
+     *        .and. cTrack.p.charge  == Incident.p.charge ) then
+               FirstInt = cTrack.pos
+               FirstIntTrack =cTrack
+               Proc1 = Move.proc
+               FirstC=.false.
+            endif
+         elseif(Move.proc .eq. 'coll' .or.
+     *           Move.proc .eq. 'decay') then
+            if(Move.proc == 'coll') then
+               if(ActiveMdl == 'jam') then
+c                            if hadron proj, inela could be 0 or 1
+                  call cjamElaInfo(1, inela)
+               else
+                  inela = 1
+               endif
+            else
+               inela = 1
+            endif
+            if( inela == 1 
+!           next is added v9.161; photo hadron->pion col. may come
+     *           .and. cTrack.p.code == Incident.p.code 
+     *           .and. cTrack.p.subcode == Incident.p.subcode 
+     *           .and. cTrack.p.charge  == Incident.p.charge ) then
+c                   ielastic/decay so  regard as 1st interaction   
+               FirstInt = cTrack.pos
+               FirstIntTrack = cTrack
+               Proc1 = Move.proc
+               call epsaveFirstCol
+               FirstC=.false.
+            endif
+         elseif(cTrack.p.code .eq. kmuon .and.
+     *         (  Move.proc .eq. 'pair' .or.
+     *           Move.proc .eq. 'brem' .or.
+     *           Move.proc .eq. 'nuci' ) ) then
+            if( cTrack.p.code == Incident.p.code 
+     *        .and. cTrack.p.charge  == Incident.p.charge ) then
+               FirstInt = cTrack.pos
+               FirstIntTrack =cTrack
+               Proc1 = Move.proc
+               FirstC=.false.
+            endif
+         endif
+         if(.not. FirstC) then
+!            the interaction was recognized as the first one
+            call epl2w(cTrack.cn, FirstInt, temppos)
+            FirstInt = temppos
+            FirstMedia = Media(MediaNo)
+            FirstIntTrack.pos = temppos
+            firstCn = cTrack.cn
+            if(Light == 21 ) then
+               call epLightIOwrite1stCol
+            endif
+         endif
+      endif
+
+#if defined (INTINFO)
+      if( codeAforInt(kintInfo) == 0 ) then
+         call epqstn(IntInfo2)
+         codeAforInt(kintInfo) = kintInfo
+         call epUI(codeAforInt(kintInfo), IntInfo1, IntInfo2)
+      endif
+#endif
+
+      icon = 1
+      end
+      subroutine epcpTargetInfo    
+!       copy target info in xmedia to Epics Media
+      use modXsecMedia, only: TargetNucleonNo, TargetProtonNo,
+     *  TargetXs, colElemNo
+      implicit none
+#include  "ZepTrackv.h"
+#include  "ZepTrackp.h"
+#include  "Zcode.h"
+#include  "Zevhnv.h"
+      Media(MediaNo).colA = TargetNucleonNo
+      Media(MediaNo).colZ = TargetProtonNo
+      Media(MediaNo).colXs = TargetXs
+      Media(MediaNo).colElem = colElemNo
+      end 
+c     ******************
+      subroutine epcoher
+c        coherent scattering
+c           since coherent scattering is effective at
+c           low energies where angular distribution can be
+c           approximated by (1+cos^2) dcos, we simply use this
+       implicit none
+#include  "ZepTrackv.h"
+c
+       record /epDirec/ w
+
+       real*8  eg, tmp, cosg
+       real*8  cs, sn, sing
+
+c             sample scattering angle from (1+cos^2)dcos
+       call ksampRSA(cosg)
+       tmp=1.d0-cosg*cosg
+       sing = sqrt(tmp)
+       call kcossn(cs,sn)
+
+       w.x = cs*sing
+       w.y = sn*sing
+       w.z = cosg
+       call eptransVect(cTrack.w,  w, cTrack.w)
+c        energy unchaged;  
+       call epe2p(cTrack)
+       call eppush(cTrack)
+       end
+c     ******************
+      subroutine epcmpt
+       implicit none
+#include  "ZepTrackv.h"
+#include  "Zcode.h"
+
+c
+       record /epTrack/ electron
+       record /epDirec/ w
+
+       real*8 e1, eg, tmp, cosg, cose
+       real*8 sine, cs, sn, sing
+
+c             sample energies of compton elec. and gamma
+       call epcompea(cTrack.p.fm.p(4), eg, e1, cosg, cose)
+       tmp=1.d0-cose*cose
+       if(tmp .lt. 0.d0) then
+          tmp=0.d0
+          cose=-1.d0
+       endif
+       sine = sqrt(tmp)
+       call kcossn(cs,sn)
+
+       electron = cTrack        ! copy everything from cTrack 
+
+       electron.w.x = cs*sine
+       electron.w.y = sn*sine
+       electron.w.z = cose
+c            w  get new direc-cos
+       call eptransVect(cTrack.w,  electron.w,  electron.w)
+
+       call cmkptc(kelec, regptcl, -1, electron.p)
+       electron.p.fm.p(4) = e1
+       call epe2p(electron)
+c
+c                treat gamma as counterpart of electron (negative d.c)
+c
+       tmp=1.d0-cosg*cosg
+       if(tmp .lt. 0.) then
+          cosg=-1.
+          tmp=0.
+       endif
+       sing=sqrt(tmp)
+       w.x = -cs*sing
+       w.y = -sn*sing
+       w.z = cosg
+
+       call eptransVect(cTrack.w,  w, cTrack.w)
+       cTrack.p.fm.p(4) = eg
+       call epe2p(cTrack)
+c            since gamma is likely to have large energy, save first
+
+       call eppush(cTrack)
+       call eppush(electron)
+
+       end
+c
+c     ************
+      subroutine eppair
+c     ************
+       implicit none
+#include  "ZepTrackv.h"
+#include  "Zcode.h"
+#include  "Zmass.h"
+
+c
+       record /epTrack/ elec1, elec2
+
+
+       real*8  e1,  e2,  cos1, cos2
+c       real*8 cs, sn,  u,  teta1, teta2
+       real*8 cs, sn,  u,  teta2
+       real*8 sin1, sin2
+       
+       integer ic
+       
+       real*8 Eg
+c     
+       Eg = cTrack.p.fm.p(4)
+c           sample higher energy of pair
+       call epPrSampE(Media(MediaNo),  Eg, e1)
+c            assign charge
+       call rndc(u)
+       if(u .lt. .5) then
+          ic=-1
+       else
+          ic=1
+       endif
+c            the other electron energy
+       e2 = Eg - e1
+c         sample angle; smaller enery electron must be put
+c         last
+       call epPairAng(e2, masele, teta2) ! teta2 < pi/2
+       if(teta2 .lt. 0.03d0) then
+          cos2 = 1. - teta2**2/2
+          sin2 = teta2
+       else
+          cos2 = cos(teta2)
+          sin2 = sin(teta2)
+       endif
+
+c
+       sin1 = sin2 * sqrt(  (e2**2-masele**2)/(e1**2-masele**2) )
+       if(sin1 .lt. 0.03d0) then
+          cos1 = 1.- sin1**2/2
+       else
+          cos1 = sqrt(1.d0 - sin1**2)
+       endif
+c
+c          the next simplified treatment is also no problem.
+c       teta1=teta2 * e2/e1
+c       if(teta1 .lt. 0.03d0) then
+c          cos1 = 1. - teta1**2/2
+c          sin1 = teta1
+c       else
+c          cos1 = cos(teta1)
+c          sin1 = sin(teta1)
+c       endif
+
+       elec1 = cTrack           ! copy everything first
+c               sample direction cos. of 1st
+
+       call kcossn(cs,sn)
+       elec1.w.x = cs*sin1
+       elec1.w.y = sn*sin1
+       elec1.w.z = cos1
+c           
+       call eptransVect(cTrack.w, elec1.w, elec1.w)
+
+       call cmkptc(kelec, regptcl, ic, elec1.p)
+       elec1.p.fm.p(4) = e1
+       call epe2p(elec1)
+c              push higher energy none
+       call eppush(elec1)
+c               lower energy electron
+
+       elec2 = elec1
+       elec2.p.fm.p(4) = e2
+       call cmkptc(kelec, antip, -ic, elec2.p)
+
+c           treat the other one as counter part    (negative d.c)
+       elec2.w.x = -cs*sin2
+       elec2.w.y = -sn*sin2
+       elec2.w.z = cos2
+       call eptransVect(cTrack.w, elec2.w, elec2.w)
+       call epe2p(elec2)
+       call eppush(elec2)
+       end
+c      ************
+       subroutine epphot
+c      ************
+       implicit none
+#include  "ZepTrackv.h"
+#include  "ZepTrackp.h"
+#include  "Zcode.h"
+#include  "Zcnfig.h"
+#include  "Zmass.h"           
+
+       real*8 eout, cost, cs, sn, sint, Exray
+       logical kbtest
+       record /epTrack/ elec1, xray
+c
+c           get Photo-electron energy
+c       call epphotoEe(Media(MediaNo).pe,   < v8.0
+       call epphotoEe(Media(MediaNo),
+     *      cTrack.p.fm.p(4), eout, cost)
+       if(kbtest(Eabsorb, BitPhotoElec)) then
+c            energy absorbed by atom is Eabs = Eshell= Eg-(Ee-Me)
+          Move.dE = cTrack.p.fm.p(4) - (eout - masele)
+          Move.dEeff= Move.dE
+          Move.dEioni = Move.dE
+          SumDe = SumDe + Move.dE
+c                  regard it as deposited in the media
+c          if(Det.cmp(Cn).CountDE .ge. 1) then >>>>>>>>>>>>>>light
+             call epLightPreUserde(1, cTrack)
+             if( Move.Abort /= 0 ) then
+                if( Move.Abort /=3 ) then
+                   call epempty ! empty the stack
+                   call epSkipUpdateNo
+                else
+                   Move.Abort=0
+                endif
+                  ! no flag is needed. since called from epint
+                return
+             endif
+c          endif                               <<<<<<<<<<<<<
+          Exray = 0.
+       else
+c             bit 1 is not on; characteristic x-ray emmission;
+c             This was neglected in v8.71 or earlier.
+c             we  assume 
+c                1)  p.e effect takes place for the largest possible
+c                    shell energy (Say, if Eg> K-shell energy, L-shell
+c                    p.e effect is neglected and all p.e effect  is assumed
+c                    to take for K-shell. 
+c                2)  For such p.e effect, vacancy of electron level is 
+c                    filled by X-ray emission ; No Auger electron emmission
+c                    is considered. 1)+2) are good approximation.
+         Exray = max( cTrack.p.fm.p(4) - (eout - masele), 0.d0)
+       endif
+c         emitted electron
+       elec1 = cTrack
+       call cmkptc(kelec, regptcl, -1, elec1.p)
+       call kcossn(cs,sn)
+       sint = sqrt(1.-cost**2)
+       elec1.w.x = cs*sint
+       elec1.w.y = sn*sint
+       elec1.w.z = cost
+       elec1.p.fm.p(4) = eout 
+       call eptransVect(cTrack.w, elec1.w, elec1.w)
+       call epe2p(elec1)
+       call eppush(elec1)
+c         emitted xray; assume isotropic
+       if( Exray  .gt.  0.) then
+          xray = cTrack
+          call cmkptc(kphoton, 0, 0, xray.p)
+          call episoAngle( xray.w )
+c          call rndc(cost)
+c          cost = 2.0*cost-1.0
+c          call kcossn(cs,sn)
+c          sint = sqrt(1.-cost**2)
+c          xray.w.x = cs*sint
+c          xray.w.y = sn*sint
+c          xray.w.z = cost
+          xray.p.fm.p(4) = Exray
+          call eptransVect(cTrack.w, xray.w, xray.w)
+          call epe2p(xray)
+          call eppush(xray)
+       endif
+       end
+c      ************
+       subroutine epbrem
+c      ************
+       implicit none
+#include  "ZepTrackv.h"
+#include  "ZepTrackp.h"
+#include  "Zcode.h"
+#include  "Zmass.h"
+
+c
+       record /epDirec/ w
+       real*8 e1, eg, theta, cs, sn, cost, sint
+
+       e1 = cTrack.p.fm.p(4)
+c             sample brems gamma energy
+       call epBrSampE(Media(MediaNo), e1, eg)
+
+c             electron energy
+       cTrack.p.fm.p(4) =  e1 - eg
+       call epe2p(cTrack)
+c          save electron. can assume electron dose not change angle
+       call eppush(cTrack)
+c         see if brem g angle needed
+       if(AngleB) then
+c          brems g angle relative to parent electron.
+          call epBremAng(e1, masele, eg, Media(MediaNo).Zeff, theta)
+          if(theta .lt. 0.03d0) then
+             sint = theta
+             cost = 1.- theta**2 / 2
+          else
+             sint = sin(theta)
+             cost = cos(theta)
+          endif
+          call kcossn(cs,sn)
+          w.x = cs*sint
+          w.y = sn*sint
+          w.z = cost
+          call eptransVect(cTrack.w,  w, cTrack.w)
+       endif
+       cTrack.p.fm.p(4) = eg
+       call cmkptc(kphoton, 0, 0, cTrack.p)
+       call epe2p(cTrack)       
+       call eppush(cTrack)
+
+       end
+
+c     ************
+      subroutine epanih
+c     ************
+      implicit none
+#include  "ZepTrackv.h"
+
+#include  "Zcode.h"
+#include  "Zmass.h"
+
+c
+      record /epTrack/  gamma
+      record /epDirec/  w
+      real*8 Ee, eg1, eg2, cos1, cosr, tmp, sine, sinr
+      real*8 cs, sn 
+c        cpy parent info.
+      gamma = cTrack
+      Ee = cTrack.p.fm.p(4)
+      call epanihiea(Ee, eg1, eg2, cos1, cosr)
+      tmp=1.d0-cos1*cos1
+      if(tmp .lt. 0.d0) then
+         tmp=0.d0
+         cos1=-1.d0
+      endif
+      sine=sqrt(tmp)
+      call kcossn(cs,sn)
+      w.x = cs*sine
+      w.y = sn*sine
+      w.z = cos1
+      call eptransVect(cTrack.w, w, w)
+c        save hi gamma
+      call cmkptc(kphoton, 0, 0, gamma.p)
+      gamma.p.fm.p(4) = eg1
+#ifdef SUBSTREC
+      gamma.w = w
+#else
+      call epsubvec( w, gamma.w)
+#endif
+      call epe2p(gamma)
+      call eppush(gamma)
+c       low gamma
+      tmp=1.d0-cosr*cosr
+      if(tmp .lt. 0.d0) then
+         tmp=0.d0
+         cosr=-1.d0
+      endif
+      sinr=sqrt(tmp)
+      gamma.w.x = -cs*sinr
+      gamma.w.y = -sn*sinr
+      gamma.w.z = cosr
+      call eptransVect(cTrack.w, gamma.w, gamma.w)
+      gamma.p.fm.p(4) = eg2
+      call epe2p(gamma)
+      call eppush(gamma)
+      end
+
+c     ************
+      subroutine  epknoc
+      implicit none
+#include  "ZepTrackp.h"
+#include  "ZepTrackv.h"
+#include  "Zcode.h"
+#include  "Zmass.h"
+           
+c
+      integer ic
+      record /epDirec/ w
+      record /epTrack/ survival
+      real*8 Ee, e1, er, cos1, cosr, sine, cs, sn, sinr, tmp
+      character*80 msg
+
+      ic = cTrack.p.charge
+      Ee = cTrack.p.fm.p(4)
+
+      if(ic .eq. -1) then
+         call epmollerea(Ee, RecoilKEmin, e1, er, cos1, cosr)
+c         call epmollerea(Ee,  e1, er, cos1, cosr)  ! old
+      elseif(ic .eq. 1) then
+         call epbhabhae(Ee, RecoilKEmin, e1, er, cos1, cosr)
+c         call epbhabhae(Ee, e1, er, cos1, cosr)  ! old
+      else
+         write(msg,*) ' charge =',ic,' for knocon'
+         call cerrorMsg(msg, 0)
+      endif
+      tmp=1.d0-cos1*cos1
+      if(tmp .lt. 0.d0) then
+         tmp=0.d0
+         cos1=1.d0
+      endif
+      sine=sqrt(tmp)
+      call kcossn(cs,sn)
+      w.x = cs*sine
+      w.y = sn*sine
+      w.z = cos1
+      call eptransVect(cTrack.w, w, w)
+      survival = cTrack
+      survival.p.fm.p(4) = e1
+#ifdef SUBSTREC
+      survival.w = w
+#else
+      call epsubvec(w, survival.w)
+#endif
+      call cmkptc(kelec, -ic, ic, survival.p)
+      call epe2p(survival)
+      call eppush(survival)
+c                knock on electron
+      tmp=1.d0-cosr*cosr
+      if(tmp .lt. 0.d0) then
+         tmp=0.d0
+         cosr=1.d0
+      endif
+      sinr = sqrt(tmp)
+      survival.w.x = -cs*sinr
+      survival.w.y = -sn*sinr
+      survival.w.z = cosr
+      survival.p.fm.p(4) = er
+      call cmkptc(kelec, regptcl, -1, survival.p)
+      call eptransVect(cTrack.w, survival.w, survival.w)
+      call epe2p(survival)
+      call eppush(survival)
+      end
+c     ********************************
+      subroutine epsync
+      implicit none
+#include  "ZepTrackv.h"
+#include  "Zcode.h"
+
+       real*8 e1, eg
+
+       e1 = cTrack.p.fm.p(4)
+c             sample sync photon  energy
+       call epsynce(e1, Upsilon, eg)
+c             electron energy
+       cTrack.p.fm.p(4) =  e1 - eg
+       call cadjm(cTrack.p, cTrack.p)  ! adjust momentum due to energy change
+c          save electron. can assume electron dose not change angle
+       call eppush(cTrack)
+       cTrack.p.fm.p(4) = eg  ! no direction change
+       call cmkptc(kphoton, 0, 0, cTrack.p)
+       call epe2p(cTrack)       
+       call eppush(cTrack)
+       end
+c     ********************************
+      subroutine epmpair
+c         magneic pair production
+      implicit none
+#include  "ZepTrackv.h"
+#include  "Zcode.h"
+
+       real*8 e1, eg, chg, u
+
+       eg = cTrack.p.fm.p(4)
+c             sample pair electron of higher energy
+       call epmpaire(eg, Xai, e1)
+c            higher energy electron
+       cTrack.p.fm.p(4) =  e1
+c          save  higher energy electron.
+c          can assume electron dose not change angle
+       call rndc(u)
+       if(u .lt. 0.5) then
+          chg = -1
+       else
+          chg = 1
+       endif
+       call cmkptc(kelec, -chg, chg, cTrack.p)
+       call cadjm(cTrack.p, cTrack.p)
+       call eppush(cTrack)
+       cTrack.p.fm.p(4) = eg - e1  
+       cTrack.p.charge = chg
+       cTrack.p.subcode = -chg
+       call cadjm(cTrack.p, cTrack.p) 
+       call epe2p(cTrack)       
+       call eppush(cTrack)
+       end
+c
+c     ************
+      subroutine epNEPknoc
+c     ************
+      implicit none
+#include  "ZepTrackv.h"
+#include  "Zcode.h"
+c     
+      record /epDirec/ w 
+      record /epTrack/ aTrack
+      real*8  e1,  er, cos1, cosr, tmp
+      real*8 cs, sn, sinr
+
+
+      call epKnockea(cTrack.p, e1, er, cos1, cosr)
+c
+c     We can neglect angle of survival particle completely
+c      tmp=1.d0-cos1*cos1
+c      if(tmp .lt. 0.d0) then
+c         tmp=0.d0
+c         cos1=1.d0
+c      endif
+c      sine=sqrt(tmp)
+
+       call kcossn(cs,sn)
+
+c      w.x = cs*sine
+c      w.y = sn*sine
+c      w.z = cos1
+c           
+      aTrack = cTrack
+      aTrack.p.fm.p(4) = e1
+      call epe2p(aTrack)
+      call eppush(aTrack)
+c                knock on electron
+      tmp=1.d0-cosr*cosr
+      if(tmp .lt. 0.d0) then
+         tmp=0.d0
+         cosr=1.d0
+      endif
+      sinr = sqrt(tmp)
+      w.x = -cs*sinr
+      w.y = -sn*sinr
+      w.z = cosr
+c           
+      call eptransVect(cTrack.w, w, cTrack.w)
+      call cmkptc(kelec, regptcl, -1, cTrack.p)
+      cTrack.p.fm.p(4) = er
+      call epe2p(cTrack)
+      call eppush(cTrack)
+      end
+c         returns dE/dx (GeV/cm2)  ; this should not be moved
+c       to epquery (due to use moddedx)
+      subroutine epqElossRate(dedxout)
+      use moddedx
+      implicit none
+      real(8),intent(out):: dedxout
+      dedxout = dedx
+      end
+
+      subroutine epe2p(aTrack)
+c         E & direc cos  -->  px,py,pz
+      implicit none
+#include "ZepTrack.h"
+      
+      record /epTrack/ aTrack
+
+      real*8 p
+
+      p = aTrack.p.fm.p(4)**2 - aTrack.p.mass**2
+      if(p .lt. 0.) then
+         p = 0.
+      else
+         p = sqrt(p)
+      endif
+
+      aTrack.p.fm.p(1) = p * aTrack.w.x
+      aTrack.p.fm.p(2) = p * aTrack.w.y
+      aTrack.p.fm.p(3) = p * aTrack.w.z
+      end
+c    *************************************
+      subroutine epmagDefR(aTrack, mag, r)
+      implicit none
+c       get magnetic deflecton radius.  This is
+c       approximate one.
+
+#include  "ZepTrack.h"
+
+      record /epTrack/aTrack  ! input. charged particle
+      record /epPos/ mag  !   innput. magnetic field vector in 
+                          !           the local coordinate
+                          ! field strength is in T.
+      real*8  r   ! output. Radius of magnetic defletion.  cm 
+                  !         rough value.
+
+      real*8 maxb, temp
+
+      maxb = max (abs(mag.x), abs(mag.y), abs(mag.z))
+      if(maxb .ne. 0) then
+         temp = aTrack.p.fm.p(4)**2-aTrack.p.mass**2
+         if(temp .le. 0.) then
+            r = 1.d-4
+         else
+            r = 333.d0* sqrt(temp)/maxb/
+     *       abs(aTrack.p.charge)
+            r= max(r, 1.d-4)
+         endif
+      else
+         r = 1.d10
+      endif
+      end
+      subroutine episoAngle( dir ) 
+      implicit none
+#include "ZepDirec.h"      
+      record /epDirec/ dir
+      real*8  cost, cs, sn, sint
+
+      call rndc(cost)
+      cost = 2.0*cost-1.0
+      call kcossn(cs,sn)
+      sint = sqrt(1.-cost**2)
+      dir.x = cs*sint
+      dir.y = sn*sint
+      dir.z = cost
+      end
+
+      subroutine epResetCountIO(cmpNo, countio) 
+      implicit none
+#include "ZepTrackv.h"
+#include "Zcnfig.h"
+      integer,intent(in):: cmpNo !  comp. #                                                                      
+      integer,intent(in):: countio  ! countio to be set                                                           
+      if(cmpNo >= 1 .and. cmpNo <= Det.nct) then
+         Det.cmp(cmpNo).CountIO = countio
+      else
+         write(0,*) 'Warning from epResetCountIO:'
+         write(0,*) ' specified comp.# ', cmpNo, ' non exsistent'
+      endif
+
+      end
+#if !defined (INTINFO)
+!          this is dummy routine to avoid link problem
+!      subroutine epUI(info, loc1, loc2)
+!      implicit none
+!      integer,intent(in):: info
+!      integer,intent(in):: loc1,loc2
+!      end
+#endif
+

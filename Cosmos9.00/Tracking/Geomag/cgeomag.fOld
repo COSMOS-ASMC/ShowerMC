@@ -1,0 +1,507 @@
+cc          test crdGeomag
+c      real*8 year
+c      read(*,*) year
+c      call crdGeomag('../../Data/Geomag/wmm', year)
+c      end
+c       **************************************************************
+c       *
+c       *  cgeomag: geomagnetic filed strength is obtained
+c       *
+c       **************************************************************
+c  /usage/ call cgeomag(year, llh,  h, icon)
+c   year: real*8. input.  such as 1990.5
+c   llh:  /coord/ input.  position around the earth. 
+c                         in 'llh' form is better. if not 'llh'
+c                         conversion is done here.
+c     h:  /magfield/. output.  magnetic field is set in
+c                         the form of 'ned' (north, 
+c                         east-down). The unit is T.
+c  icon:  output. integer*4  0---> o.k
+c                            1---> input parameter wrong.
+c
+
+c
+       subroutine cgeomag(yearin, llh, h,  icon)
+       implicit none
+#include  "Zglobalc.h"
+#include  "Zcoord.h"
+#include  "Zmagfield.h"
+#include  "Zearth.h"
+       real*8 yearin
+       record /coord/ llh
+       record /magfield/ h
+       integer icon
+
+c     ************************************
+      integer nmax
+      parameter (nmax = 13)
+      real*4 gnm(nmax, 0:nmax), hnm(nmax, nmax), year
+      real*4 gnmd(nmax, 0:nmax), hnmd(nmax, nmax)
+      integer nmx
+      logical newfmt
+      common /ZmagCoef/  gnm, gnmd, hnm, hnmd, year, nmx, newfmt
+c     ************************************      
+
+c
+c
+       real*4 r, sumn, sume, sumd, t, cost, sint, x, tlonr, gmnc, 
+     *       cosml, sinml, hmnc, temp
+       real*8 gn, ge, gd
+       real*4 ssumd, ssumn, ssume 
+       integer m, n
+       record /coord/ cdata
+       real*4 kdpmnxsinn, kpmnxn, kpmnxisinn
+
+c
+c         check data type
+       if(llh.sys .eq. 'llh') then
+          cdata = llh
+       else     ! convet to llh
+          call ctransCoord2('llh', llh, cdata)
+       endif   
+c
+       icon =  0
+       if( abs(yearin-year) .gt. 7.) then
+           icon=1
+           call cerrorMsg(
+     *     ' Year spec. for geomag data is invalid.', 1)
+c       elseif(abs(cdata.lat) .gt. 90.) then
+       elseif(abs(cdata.r(1)) .gt. 90.5d0) then
+           icon=2
+c       elseif(abs(cdata.long) .gt. 360.) then
+       elseif(abs(cdata.r(2)) .gt. 360.5d0) then
+           icon=2
+c       elseif(cdata.h .gt. 5000.d3) then
+       elseif(cdata.r(3) .gt. 100000.d3) then
+           icon=1
+c       elseif(cdata.h .lt. -3000.d3) then
+       elseif(cdata.r(3) .lt. -3000.d3) then
+           icon=1
+       endif
+       if(icon .ne. 2) then
+c           r=1./( 1.+cdata.h/Eradius )
+           r=1./( 1.+cdata.r(3)/Eradius )
+           sumn=0.
+           sume=0.
+           sumd=0.
+c           t=(90.-cdata.lat)*Torad
+           t=(90.-cdata.r(1))*Torad
+           cost=cos(t)
+           sint=sin(t)
+           x=cost
+c           tlonr=cdata.long*Torad
+           tlonr=cdata.r(2)*Torad
+           do   n=1, nmx
+              ssumn = 0.
+              ssume = 0.
+              ssumd = 0.
+              do   m=0, n
+                 gmnc= gnm(n, m)
+                 cosml=cos(m*tlonr)
+                 sinml=sin(m*tlonr)
+                 if(m .gt. 0) then
+                    hmnc=hnm(n,m) 
+                    ssumn = ssumn+  (gmnc*cosml+hmnc*sinml)*
+     *                kdpmnxsinn(m, n, sint, x)
+                    ssume = ssume+  m *(-gmnc*sinml + hmnc*cosml)
+     *                  *  kpmnxisinn(m, n, sint, x)
+                    ssumd = ssumd + (gmnc*cosml+ hmnc*sinml)
+     *                 * kpmnxn(m, n, sint, x) 
+                 else
+                    ssumn = ssumn + gmnc*kdpmnxsinn(m, n, sint, x)
+                    ssumd = ssumd + gmnc*kpmnxn(m, n, sint, x)
+                 endif
+              enddo
+              temp = r**(n+2)
+              sumn = sumn + ssumn*temp
+              sume = sume + ssume*temp
+              sumd = sumd + ssumd*temp *(n + 1)
+          enddo
+c              original formula gives  data in nT.
+c              north component
+          gn = -sumn /1.e9  ! to T.
+c              east  component
+          ge = -sume /1.e9
+c              down
+          gd = -sumd /1.e9
+          call csetMagField('ned', gn, ge, gd, h)
+       endif
+       if(icon .eq. 2) then
+          call cerrorMsg('Geometrical input data wrong', 0)
+       endif
+       end
+      subroutine crdGeomag(filepath, yearin)
+      implicit none
+c    #include "Zmanagerp.h"
+      character*(*) filepath
+      real*8 yearin
+      integer klena
+      character*65 msg
+
+
+c     ************************************
+      integer nmax
+      parameter (nmax = 13)
+      real*4 gnm(nmax, 0:nmax), hnm(nmax, nmax), year
+      real*4 gnmd(nmax, 0:nmax), hnmd(nmax, nmax)
+      integer nmx
+      logical newfmt
+      common /ZmagCoef/  gnm, gnmd, hnm, hnmd, year, nmx, newfmt
+c     ************************************      
+
+      character*128 path
+      character*1 NULL
+      integer devn, icon, leng, kgetenv
+      save devn
+      data devn /12/
+
+      NULL = char(0)
+
+      if(filepath .eq. ' ') then
+c        assume it is  Cosmos/Data/Geomag/igrf
+c          get $COSMOSTOP
+         leng = kgetenv("COSMOSTOP"//NULL, path)
+         if(leng .eq. 0) then
+            call cerrorMsg(
+     *      'Env. variable "COSMOSTOP" cannot be found', 0)
+         endif
+         path = path(1:leng)//"/Data/Geomag/igrf"
+      else
+         path = filepath
+      endif
+      call copenf(devn, path(1:klena(path)), icon)
+      if(icon .eq. 1) then
+         call cerrorMsg(path, 1)
+         call cerrorMsg(
+     *        'above file cannot be opened for geomagnetic data', 0)
+      endif
+c         first judge if it is IGRF data or WMM data
+c         and branch
+      read(devn, '(a)') msg
+      if( index(msg, 'DGRF') .gt. 0 
+     *              .or. index(msg, 'IGRF') .gt. 0 ) then
+c            IGRF data
+         call cgmgIgrf(devn, path, yearin)
+      elseif(index(msg, 'igrf') .gt. 0 ) then
+c            IGRF data; from 2005
+         call cgmgIgrf(devn, path, yearin)
+      elseif(index(msg, 'WMM') .gt. 0) then
+c             DoD data
+         call cgmgWmm(devn, path, yearin)
+      else
+         call cerrorMsg(msg, 1)
+         call cerrorMsg('above data for geomag is strange',0)
+      endif
+      end
+c     *************************
+      subroutine cgmgIgrf(devn, filepath, yearin)
+      implicit none
+      
+      integer devn              ! input file dev. no.
+      character*(*) filepath
+      real*8  yearin ! input. year of geomag.
+
+      integer i, j, store, m, n
+      character*65  msg
+      character*90  msg2
+      real*4 yearx,  dy, coef, g, h, dg, dh
+
+
+c     ************************************
+      integer nmax
+      parameter (nmax = 13)
+      real*4 gnm(nmax, 0:nmax), hnm(nmax, nmax), year
+      real*4 gnmd(nmax, 0:nmax), hnmd(nmax, nmax)
+      integer nmx
+      logical newfmt
+      common /ZmagCoef/  gnm, gnmd, hnm, hnmd, year, nmx, newfmt
+c     ************************************      
+
+
+      rewind  devn
+      store = 0
+      nmx = 0
+c       first find the appropriate year
+      
+      read(devn, '(a)', end=1000) msg
+
+      do i=1, 10000
+         do while( index(msg, 'DGRF') .eq. 0 .and.
+     *         index(msg, 'IGRF') .eq. 0  .and.
+     *         index(msg, 'igrf') .eq. 0  )
+            read(devn, '(a)', end=1000) msg
+
+         enddo
+         if( index(msg, 'igrf') .ne. 0  ) then
+c              >= 2005
+            newfmt = .true.
+            read(devn, '(a65)', end=1000) msg
+            read(msg, '(12x, f6.1)') yearx
+         else
+            newfmt = .false.
+            read(msg, '(12x, f8.2)') yearx
+
+         endif
+         if(store .eq. 0 .and.  yearin - yearx .lt. 5.0
+     *      .and. yearin .ge. yearx) then
+            store = store + 1
+            year = yearx
+         elseif(store .eq. 1 .and. yearin .lt. yearx) then
+            store = store + 1
+            dy = yearx - year
+            coef = ( yearin -  year)/dy
+         endif
+         if( store .gt. 0 ) then
+            do j = 1, 1000000
+               read(devn, '(a)', end=1000) msg
+
+               if( index(msg, 'DGRF') .gt. 0 .or.
+     *             index(msg, 'IGRF') .gt. 0 .or.
+     *             index(msg, 'igrf') .gt. 0 ) then
+c                       new year appeared
+                  goto 30  ! loop out
+               else
+                  if( newfmt ) then
+                     read(msg,  *) n, m, g, h  !  n, m are inverse of  old format
+                     dg = 0.
+                     dh = 0.
+                  else
+                     read(msg, '(2i2, 2f8.1,2f8.2)')
+     *                 m, n, g, h, dg, dh
+                  endif
+                  if( n .gt. nmax ) then
+                     call cerrorMsg(msg, 1)
+                     write(msg2,*)
+     *                    ' n=',n, ' for  geomag  data > ', nmx
+                     call cerrorMsg(msg2, 0)
+                  endif
+                  nmx = max(n, nmx)
+                  if(n .le. 0) then
+                     call cerrorMsg(msg2, 1)
+                     write(msg2,*)
+     *                    ' n=',n, ' for  geomag data <=0'
+                     call cerrorMsg(msg2, 0)
+                  endif
+                  if(m .lt. 0 .or. m .gt. n) then
+                     call cerrorMsg(msg2, 1)
+                     write(msg2,*)
+     *                    ' m=',m, ' for   geomag data < 0 or > n'
+                     call cerrorMsg(msg2, 0)
+                  endif
+                  if(store .eq. 1) then
+                     gnm(n, m) = g
+                     gnmd(n, m) = dg
+                     if(m .gt. 0) then
+                        hnm(n, m) = h
+                        hnmd(n, m) = dh
+                     endif
+                  elseif( store  .eq. 2) then
+                     gnm(n, m) =( g-gnm(n, m)) * coef + gnm(n,m)
+                     gnmd(n, m) = 0.
+                     if(m .gt. 0) then
+                        hnm(n, m) = ( h-hnm(n, m)) * coef + hnm(n,m)
+                        hnmd(n, m) = 0 .
+                     endif
+                  else
+                     call cerrorMsg(
+     *                    'store value error in cgeomag', 0) 
+                  endif
+               endif
+            enddo
+ 30         continue
+            if( store .eq. 2) goto 1000
+         else
+            msg = ' '
+         endif
+      enddo
+ 1000 continue
+      if(store .eq. 1) then
+c          last year. do extrapolation and clearn  gnmd, hnmd
+         dy = yearin - year
+         do n =1, nmx
+            do m=0, n
+               gnm(n, m) = gnm(n, m) + dy*gnmd(n, m)
+               if(m .gt. 0) then
+                  hnm(n, m) = hnm(n,m) + dy*hnmd(n, m)
+               endif
+            enddo
+         enddo
+      endif
+
+      call cerrorMsg('Geomagnetic data has been read from', 1)
+      call cerrorMsg(filepath,1)
+      write(msg2, *) ' year=',yearin, ' # of expansion terms=', nmx
+      call cerrorMsg(msg2, 1)
+      if(store .eq. 0) then
+         call cerrorMsg(
+     *   'Geomagnetic data has no appropriate data', 0)
+      endif
+      end
+
+c     *************************
+      subroutine cgmgWmm(devn, filepath, yearin)
+      implicit none
+      
+      integer devn  ! input file dev. no.
+      character*(*) filepath
+      real*8  yearin ! input. year of geomag.
+
+      integer i, j, store, m, n
+      character*100  msg
+      real*4 yearx,  dy, coef, g, h, dg, dh
+
+
+c     ************************************
+      integer nmax
+      parameter (nmax = 13)
+      real*4 gnm(nmax, 0:nmax), hnm(nmax, nmax), year
+      real*4 gnmd(nmax, 0:nmax), hnmd(nmax, nmax)
+      integer nmx
+      logical newfmt
+      common /ZmagCoef/  gnm, gnmd, hnm, hnmd, year, nmx, newfmt
+c     ************************************      
+
+
+      rewind  devn
+      store = 0
+      nmx = 0
+c       first find the appropriate year
+      
+      read(devn, '(a)', end=1000) msg
+      do i=1, 10000
+         do while(index(msg, 'WMM') .eq. 0)
+            read(devn, '(a)', end=1000) msg
+         enddo
+         read(msg, *) yearx
+         if(store .eq. 0 .and.  yearin - yearx .lt. 5.0
+     *      .and. yearin .ge. yearx) then
+            store = store + 1
+            year = yearx
+         elseif(store .eq. 1 .and. yearin .lt. yearx) then
+            store = store + 1
+            dy = yearx - year
+            coef = ( yearin -  year)/dy
+         endif
+         if( store .gt. 0 ) then
+            do j = 1, 1000000
+               read(devn, '(a)', end=1000) msg
+               if(index(msg, 'WMM') .gt. 0) then
+c                       new year appeared
+                  goto 30  ! loop out
+               else
+                  if(msg(1:3) .eq. '999') then
+                     n = 999
+                  else
+c                              not m, n(cf; IGRF)
+                     read(msg, *) n, m, g, h, dg, dh
+                  endif
+                  if(n .lt. 999) then
+                     if( n .gt. nmax ) then
+                        call cerrorMsg(msg, 1)
+                        write(msg,*)
+     *                  ' n=',n, ' for  geomag  data > ',
+     *                  nmax
+                        call cerrorMsg(msg, 0)
+                     endif
+                     nmx = max(n, nmx)
+                     if(n .le. 0) then
+                        call cerrorMsg(msg, 1)
+                        write(msg,*)
+     *                  ' n=',n, ' for  geomag data <=0'
+                        call cerrorMsg(msg, 0)
+                     endif
+                     if(m .lt. 0 .or. m .gt. n) then
+                        call cerrorMsg(msg, 1)
+                        write(msg,*)
+     *                    ' m=',m, ' for   geomag data < 0 or > n'
+                        call cerrorMsg(msg, 0)
+                     endif
+                     if(store .eq. 1) then
+                        gnm(n, m) = g
+                        gnmd(n, m) = dg
+                        if( m .gt. 0) then
+                           hnm(n, m) = h
+                           hnmd(n, m) = dh
+                        endif
+                     elseif( store  .eq. 2) then
+                        gnm(n, m) =
+     *                     ( g-gnm(n, m)) * coef + gnm(n,m)
+                        gnmd(n, m) = 0.
+                        if(m .gt. 0) then
+                           hnm(n, m) =
+     *                      ( h-hnm(n, m)) * coef + hnm(n,m)
+                           hnmd(n, m) = 0.
+                        endif
+                     else
+                        call cerrorMsg(
+     *                    'store value error in cgeomag', 0) 
+                     endif
+                  endif
+               endif
+            enddo
+ 30         continue
+            if(store .eq. 2) goto 1000
+         else
+            msg = ' '
+         endif
+      enddo
+ 1000 continue
+      if(store .eq. 1) then
+c          last year. do extrapolation and clearn  gnmd, hnmd
+         dy = yearin - year
+         do n =1, nmx
+            do m=0, n
+               gnm(n, m) = gnm(n, m) + dy*gnmd(n, m)
+               if(m .gt. 0) then
+                  hnm(n, m) = hnm(n,m) + dy*hnmd(n, m)
+               endif
+            enddo
+         enddo
+      endif
+
+      call cerrorMsg('Geomagnetic data has been read from', 1)
+      call cerrorMsg(filepath,1)
+      write(msg, *) ' year=',yearin, ' # of expansion terms=', nmx
+      call cerrorMsg(msg, 1)
+      if(store .eq. 0) then
+         call cerrorMsg(
+     *   'Geomagnetic data has no appropriate data', 0)
+      endif
+      end
+
+
+c     *************************
+      subroutine cprGeomag
+      implicit none
+c        print current geomag coeff.
+
+
+      integer m, n
+
+
+c     ************************************
+      integer nmax
+      parameter (nmax = 13)
+      real*4 gnm(nmax, 0:nmax), hnm(nmax, nmax), year
+      real*4 gnmd(nmax, 0:nmax), hnmd(nmax, nmax)
+      integer nmx
+      logical newfmt
+      common /ZmagCoef/  gnm, gnmd, hnm, hnmd, year, nmx, newfmt
+c     ************************************      
+
+      write(*,*) 'year=',year, ' nmax=', nmx
+      write(*,'("  m  n    gnm      hnm    dgnm    dhnm")')
+      do n = 1, nmx
+         do m =0, n
+            if(m .eq. 0) then
+               write(*,'(2i3,2f7.0,2f7.1)') m, n,
+     *          gnm(n, m), 0., gnmd(n, m), 0.
+            else
+               write(*,'(2i3,2f7.0,2f7.1)') m, n,
+     *                gnm(n, m), hnm(n,m), gnmd(n,m), hnmd(n,m)
+            endif
+         enddo
+      enddo
+      end
+
+

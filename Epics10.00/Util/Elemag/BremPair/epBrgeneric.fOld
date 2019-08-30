@@ -1,0 +1,180 @@
+      real*8 function epBrgenex(x)
+      implicit none
+c           NOTE:  this function gives brems function ds/dx
+c           x = Eg/Ee.  in mb.  Function to be used is controlled
+c           by BrEemaxS  BrScrE, CompScrE, BremEemaxL but not
+c           by LPMeffect.  So if you compare the function with
+c           sampling result by using
+c           LPMeffect=f at high energies where normally LPM works
+c           you must use function at Ee=BrScrE. (approx)
+c       
+#include "Zmedia.h"
+#include "Zmass.h"
+#include "ZBPgene.h"
+
+c
+c         epBrgenex. in mb
+c
+c        Generic brems function for the entire energy region.
+c  This must be called after epBPGeneini has been called
+c  and  /BPgene/ common variable has been set.
+
+c  The common variables to be set is Eeme or Egme.
+c
+c
+c  This may be used for integration of Brems function.
+c  The functions in various energy regions are smoothly connected
+c  as much as possilbe.  Especially the LPM function is
+c  normalized to the complete screening function at x=0.75 and
+c  Ee=EemaxL  when  it is used at high energies.
+c  At low energies where LPM works at very low Eg emmision,
+c  the LPM function is used at such low energies and x <Xc after normalizing
+c  the function to the partial screening one at Xc and Ee,
+c  where Xc = (Ee/0.01d0)*(media.rho/11.35d0)*1.d-5
+c     
+      real*8 x  !  input Eg/Ee. 
+      real*8 epBrgene
+      real*8 Ee
+
+      Ee= Eeme * masele
+      epBrgenex = epBrgene(Ee, x)
+
+      end
+
+c     **********************************
+      real*8 function epBrgene(Ee, x)
+      implicit none
+c
+c     Generic bremsstrahlung function for entire energy region.
+c     The same note as for epBrgenex
+c
+c     Ee < EemaxS    ==> Seltzer table (normally <100 MeV)
+c     Ee < BrScrE      ==> partial screening only 
+c     BrScrE< Ee <EemaxL ===> complete sc. only by rejection (may not exits)
+c     EemaxL< Ee < Ee2H      ===> complete sc.+ LPM  table
+c     Ee > Ee2H      ===> comp. + LPM  by rejection
+c
+c
+#include "Zglobalc.h"
+#include "ZbasicCnst.h"
+#include "Zmedia.h"
+#include "Zmass.h"
+#include "ZBPgene.h"
+#include "ZepTrackp.h"
+
+      real*8  Ee  ! input. electron energy in GeV.
+      real*8  x   ! input. x = Eg/Ee.
+
+
+
+      real*8  epBremS, epBremSH, epBrSfs
+      real*8  epCompScrBr
+      external epBremS, epBremSH, epBrSfs, epCompScrBr
+c
+      integer i
+      real*8 f, xn, normf
+
+
+c//////////////////
+c      write(0,*) ' at Brgene Ee=', Ee, ' x=',x
+c      write(0,*) 'BrEemaxS =',  media.cnst.BrEemaxS
+c      write(0,*) 'BrScrE =',  media.cnst.BrScrE
+c      write(0,*) 'BremEemaxL=',media.cnst.BremEemaxL 
+c      write(0,*) 'CompScrE=', media.cnst.CompScrE
+c/////////////
+      if( (force=="?" .and. Ee <= media.cnst.BrEemaxS) .or.
+     *  force == "seltzer" ) then
+c            Seltzer region without LPM correction
+c                   Seltzer region 
+         f = epBrSfs(x)
+      elseif( ( force == "?" .and. Ee <= media.cnst.BrScrE) .or.
+     *   force(1:2) == "ps" ) then
+c                    Z=1:  150 GeV ~ Z=90: 30 GeV
+c          Partial screening
+            f = epBremS(x)
+      elseif( (force=="?" .and. Ee .le.  media.cnst.BremEemaxL .and.
+     *     Ee .gt.  media.cnst.CompScrE)  .or.
+     *     force == "TsaiCS" ) then
+c          complete screening without LPM
+         f = 0
+         do i = 1, media.noOfElem
+            f = f +
+     *           epCompScrBr(media.elem(i).Z, x)*media.No(i)
+         enddo
+      elseif( force=="?" .or. force == "CS+LPM") then
+c          complete screening +  LPM
+         call  epNormLPMc(normf)   ! for W,normf= 1.00873
+         f = epBremSH(x)*normf
+      else
+         write(0,*) ' force=',force,' invalid'
+         stop
+      endif
+      epBrgene = f
+      end
+c     ************************************
+      subroutine epBrgeneTX(xmin, xmax, tx)
+      implicit none
+#include "Zglobalc.h"
+#include "ZbasicCnst.h"
+#include "Zmedia.h"
+#include "Zmass.h"
+#include "ZBPgene.h"
+
+
+      real*8  xmin  ! input.  Eg/Ee min.
+      real*8  xmax  ! input. Eg/Ee max.
+      real*8  tx    ! output.  Integral of Brems function from
+                    !         x= xmin to xmax
+      external epBrgenex
+      real*8   epBrgenex, v1, v2, ans1
+      real*8  Ee
+c////////////
+c      real*8 eps, error
+c      integer icon
+c      data eps/1.d-8/
+c//////////////
+      Ee = Eeme *masele
+c      tx = 0.
+      v2 = xmax
+      v1=max( v2*0.9d0,  xmin)
+      call k16pGaussLeg(epBrgenex, v1, v2, 16,  tx)
+      v2= v1
+      do while (v1 .ne. xmin)
+c//////////////
+c         v1=max( v2/10.d0,  xmin)
+         v1=max( v2/4.d0,  xmin)
+c         call kdexpIntF(epBrgenex, v1, v2, eps, ans1, error,icon)
+c     call kdexpIntF(epBrgenex, xmin, xmax, eps, ans1, error,icon)
+         call k16pGaussLeg(epBrgenex, v1, v2, 16,  ans1)
+c///////////////
+         tx = tx + ans1
+         v2=v1
+      enddo
+
+c         vc = media.cnst.BremEgmin/(Ee-masele)
+c         tx = 4. * ar02 * ( ( log(1.d0/vc) -
+c     *                 (1.d0-vc)) * media.cScrMain +
+c     +                 (1.d0-vc)* (1.d0+vc)/2 * media.cScrC1 )
+
+      end
+c     **************
+      real*8 function epBrgeneSolv(v)
+c     **************
+      implicit none
+c
+c          used to solve total-cross-section * u = integral of
+c          brem function from min to v.
+c
+c
+c
+      common/upsic/upsi,vmax
+      real*8 upsi, vmax
+
+      real*8 v
+
+      real*8 ans
+
+      call epBrgeneTX(v, vmax, ans)
+c      epBrgeneSolv = ans/upsi-1.d0
+      epBrgeneSolv = log(ans/upsi)
+      end

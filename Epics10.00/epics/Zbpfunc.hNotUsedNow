@@ -1,0 +1,5 @@
+      structure /bpfunc/
+         real*8  Z13, Z23, ame, apme, delta, cf,
+     *        lnZ43,  lnZ83, Z, BHnorm, NonScEme,
+     *        al183z, ccz, bcoef, fz, z333
+      end structure

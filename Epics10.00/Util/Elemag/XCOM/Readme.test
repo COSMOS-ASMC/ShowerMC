@@ -1,0 +1,15 @@
+To see the x-section values in /(g/cm2) for 
+a media in Data/Media/:
+1) make clean
+2) make -f testGetXXsec.mk
+3)    testGetXXsecMacIFC  > outputfile
+      (or MacIFC-->$ARCH)
+　　after this, enter Air, W, Pb etc.
+4) outputfile will contain a table of
+
+ Ex(GeV) coh incoh p.e pair(nuc) pair(atomic e) atten c. 1  atten c 2
+
+where atten c.1 is attenuation coef. with cohrent scattering
+      atten c.2 //                   w/o   
+ (unit 1/(g/cm2))
+

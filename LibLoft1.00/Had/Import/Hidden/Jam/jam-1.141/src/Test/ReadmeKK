@@ -1,0 +1,36 @@
+For static link, we must be carefule about how to
+enable the block data initialization.
+1) If a file contains only block data and dose
+   not include any executable, it must be
+   included in the file which includes the main
+   program.  
+   jamdat.f is a such one (and only one).
+  
+   In cosmos applications, it is included via 
+   Zcmain.h which includes ZcosmosBD.h which
+   includes jamdat.f in Cosmos/cosmos.
+
+2) Main program must list block data names as
+   external.
+   The list is made and  given in jambextrn.inc
+3) If a file contains block data as well as 
+   some executable programs, and 
+   3-a) if the executable  programs are called via
+   main or its slaves, 2) is enough for enableing
+    the block data  initialization.
+   3-b) if the executable programs are not called
+   via main or its laves, 2) cannot establish
+   the block data initialization. (But this is ok 
+   that the data is assumed  not used in the
+   entire  program.)
+4) mydummy.f,  if included and called from main,
+   is to see if the block data really works.
+5) vnibook.f  is a histogramming subroutine.
+   It is used by some programs over  jam layer
+   so we don't need it in the Cosmos library.
+6) If it is  to be included, the block common should be
+   enabled. --> change jambextrn.inc
+   Even with that change, it will not be enabled
+   until some call to vnibook routines are used.
+   (see 3)
+

@@ -1,0 +1,88 @@
+Model A in LHC proposal   f)
+      B                   j) 
+
+a)
+chncol
+       real*8 BigXRejCnst/0.0003/, BigXRejPw/3.5/
+cs2lp
+	u=u**2.5
+cgnlp
+        avn =  1.25 * roots**0.55
+
+b)
+chncol
+	same as a).
+cs2lp
+	u =u
+cgnlp
+        avn =  1.25 * roots**0.55
+
+c)
+chncol
+         enhance
+        real*8 BigXRejCnst/.8/, BigXRejPw/2.2/
+cs2lp
+	u= u**2.5
+cgnlp
+        avn =  1.25 * roots**0.55
+
+d)
+chnocl
+	same as c
+cs2lp
+	u = u
+cgnlp
+        avn =  1.25 * roots**0.55
+	
+e)
+       real*8 BigXRejCnst/.4/, BigXRejPw/2.2/
+       u = u*0.25
+cgnlp
+        avn =  1.25 * roots**0.55
+
+f)
+chncol    default
+       real*8 BigXRejCnst/.4/, BigXRejPw/2.2/
+cs2lp
+       u = u*0.25
+cgnlp
+	default
+       avn = no* exp(sqrt(23./18. * log( (roots/lambda))*2))
+     *          -2.5
+
+g)
+chncol    
+       real*8 BigXRejCnst/0.0003/, BigXRejPw/3.5/
+cs2lp
+	u=u
+cgnlp
+       avn = no* exp(sqrt(23./18. * log( (roots/lambda))*2))
+     *          -2.5
+
+h)
+chncol    denhance
+      real*8 BigXRejCnst/.01/, BigXRejPw/1./
+cs2lp
+	u=u
+cgnlp
+       avn = no* exp(sqrt(23./18. * log( (roots/lambda))*2))
+     *          -2.5
+
+i)
+
+chncol    denhance
+      real*8 BigXRejCnst/.01/, BigXRejPw/1./
+cs2lp
+	u=u
+cgnlp
+        avn =  1.25 * roots**0.55
+
+j)
+chncol
+  default
+       real*8 BigXRejCnst/.4/, BigXRejPw/2.2/
+cs2lp
+	detault
+	u=u
+cgnlp
+        avn =  1.25 * roots**0.55

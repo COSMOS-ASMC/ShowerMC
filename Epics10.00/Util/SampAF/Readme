@@ -1,0 +1,20 @@
+To test sampling of aribitrary density function given in the form of
+table of (x,dn/dx) in each line.
+The table must contain #------------------- line. (separator)
+Any comment lines  may be placed before the separator.
+
+1) make   
+2) ./sampAFxxx  n filename > funcxy	
+   where n is 0 or < 0.  
+   if 0, a number of (x,dn/dx, dn/dx/Area) are put into "funcxy".
+	the nubmer of lines is 5*(input data points).
+   if<0, # of points will be |n|
+   You will see the xmin, xmax, and max pos max func value and <x>
+   on stderr.
+3) ./sampAFxxx  n filename | histograming 
+   n > 0.  gives n sampled variables. You may get histogram
+   from this.  If it is normalized by the n, you can directly
+   compare the histogram and funcxy (use dn/dx/Area as y)
+   You will see the xmin, xmax, and max pos , max func value and 
+   <x>   on stderr, too.
+

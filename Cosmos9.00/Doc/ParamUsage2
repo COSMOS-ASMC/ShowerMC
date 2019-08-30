@@ -1,0 +1,464 @@
+The description of parameters rarely used:  &HParam data
+----------------------------------------------------------
+
+<<AnihiE>>   real*8 
+ If E(positron) $<$ AnihiE, annihilation is considered. 
+
+<<AtEnv>>   character*32 
+ If this is non blank, an environmental variable with that name is 
+ assumed to exist and Cosmos tries to get the value of that env variable. 
+ If the value is obtained, the \verb/@/ in \verb/@_/ or \verb/@./ 
+ expressing a part of a file name is replaced by that value. 
+ (default is blank and in that case the \verb/@/ is replaced by 
+ the host name where the job runs.) 
+
+<<AtmosFile>>   character*100 
+ path to the atmospheric data as in 'Cosmos/Data/Atmos/stdatmos2.d' 
+
+<<BackAngLimit>>   real*8 
+ If the cosine of the angle between a particle and the primary becomes smaller than 
+ this value, the particle is discarded. See also BorderHeighH. If you give a value 
+ less than -1.0, such rejection will never happen. Default is -1.0 
+
+<<BaseErg>>   real*8 
+ See BaseTime. The default is 1000 (GeV). 
+
+<<BasePower>>   real*8 
+ See BaseTime. Default is 1.0 
+
+<<BorderHeightH>>   real*8 
+ If a particle goes higher than this, discard it. This should be larger than 
+ HeightOfInj or 0. 
+ If 0, it is adjusted to be the same as HeightOfInj. NOTE: For upgoin primary cases, you have 
+ to set this one explicitly. 
+
+<<BorderHeightL>>   real*8 
+ If a particle reaches this hight, call observation routine. No further tracking is done. 
+ This is for neutrino observation. See ObsPlane. 
+
+<<Cekaon>>   real*8 
+ Obsolute 
+
+<<Ceneuc>>   real*8 
+ \verb| p -> n ; n-> p; p~->n~; n~->p~| prob. 
+
+<<Cepic0>>   real*8 
+ Obsolute 
+
+<<Charge2heavyG>>   integer 
+ charge of heavy $\rightarrow$ heavy group index conversion array. 
+
+<<Code2heavyG>>   integer 
+ particle code $\rightarrow$ heavy group index conversion array. 
+
+<<Code2massN>>   integer 
+ particle code $\rightarrow$ mass number conversion array. 
+
+<<Deltkp>>   real*8 
+ k-p xsection increases as $E^{Deltkp}$ (E$>$ 100GeV) 
+
+<<Deltpip>>   real*8 
+ pi-p xsection increases as $E^{Deltpip}$ (E$>$ 100GeV) 
+
+<<Deltpp>>   real*8 
+ p-p xsection increases as $E^{Deltpp}$(E$>$ 100GeV) 
+
+<<DpmFile>>   character*70 
+ control card to specify the dpmjet execution conditions. If ' ', 
+ Cosmos/Data/DPM/atmos.inp is assumed. 
+
+<<Ecrit>>   real*8 
+ Critical energy in GeV. \newline 
+ Employed only when calculating air shower size in the hybrid 
+ air shower generation. The value would be dependent on the 
+ experimental purpose. The default value, 81 MeV, is bit too 
+ small in many applications (The air shower size is overestimated). 
+ Comparisons of sizes by the hybrid method and by the full Monte 
+ Carlo tell that \newline 
+ $N_e$ (full 3-D M.C) $ < N_e$ (hybrid AS with $E_c=81$ MeV ) $ < N_e$ (full 1-D M.C) 
+ $ {\ \lower-1.2pt\vbox{\hbox{\rlap{$<$}\lower5pt\vbox{\hbox{$\sim$}}}}\ } 
+ N_e$(hybrid AS with $E_c={76}$ MeV) at around shower maximum. 
+ Hybrid AS is always essentially 1-D. 
+
+<<Efermi>>   real*8 
+ If Kinetic E $<$ Efermi, Fermi Momentum is considered for Nucleus target.\\ 
+
+<<Elund2>>   real*8 
+ obsolete (from v6.0) 
+
+<<Elund3>>   real*8 
+ obsolete (from v6.0). 
+
+<<Elund>>   real*8 
+ obsolete (from v6.0) 
+
+<<EndLevel2>>   integer 
+ Don't worry. This is system use. 
+
+<<EndLevel>>   integer 
+ Used for skeleton/flesh-out job. In a normal job, system default value 0 is reset by 
+ the system to be the max number of observation levels. (=NoOfSites). Its real use is in such a 
+ skeleton/flesh-out job that one first follows the particles up to some high depth and later chooses 
+ events and flesh them out to deeper depths. In such a skeleton-making job, the user must give the 
+ depth list which is used flesh-out job, too. In the skeleton job, particle tracking is terminated 
+ at the level specified by EndLevel. In such a flesh-out job, the user must give a larger value 
+ or 0 to EndLevel 
+
+<<ErrorOut>>   integer 
+ Error output logical dev number. 
+
+<<Es>>   real*8 
+ Modified scattering constant. 19.3d-3 GeV 
+
+<<Eta2Pi0>>   real*8 
+ eta/pi0 ratio. this is used to see the effect due to non-decay of pi0 
+ at very high energies. Only source of h.e gamma can be eta and LPM may work 
+ for them. default is 0.2 
+
+<<EthinRatio>>   real*8 dimension 2.
+ if ThinSamplig = T, thin sampling is performed with the following conditions:
+
+ EthinRatio(1) $>$ 0, then Ethin(1)=EthinRatio(1) * PrimaryEnergy(/nucleon) \\
+ EthinRatio(1) $<$ 0, then Ethin(1)=abs(EthinRatio(1))
+
+ Ethin(2)=thinRatio(2)($>$) is taken to be the maximum permitted weight
+  of a particle.  
+
+ Thinsampling is performed when energy of a particle is $<$ Ethin(1) and
+ its weight is $<$ Ethin(2).   (Note, even though resultant weight of a
+ particle may  have a larger weight value than Ethin(2)).
+ To see longitudinal development,
+ EthinRatio(1) could be as large as 5$\times 10^{-5}$.
+ (To see lateral distribution  etc, problematic). 
+ For Fe of $10^{20} eV, with this EthinRatio(1), the maximum weight
+ becomes as large as $3\times 10^{8}$.  In this case, we may
+ put EthinRatio(2)=$10^6$.
+
+
+<<EventNo>>   integer 
+ cumulative event number counter.(excluding discarded ones due to cutoff). 
+
+<<EventsInTheRun>>   integer 
+ Counter for event number in the run. Internal use. 
+ (excluding discarded ones due to cutoff). 
+
+<<ExactThick>>   logical 
+ If T, a given length is converted into thickness with best accuracy even for very 
+ inclined trajectory by using numerical integration. 
+
+<<FragmentTbl>>   real*8 
+ tbl(i,j)=$<$Number$>$ of frag. j when a heavy of heavy group index i 
+ breaks up at air. 
+
+<<Generate2>>   character*16 
+ don't touch this. for skeleton/flesh use. 
+
+<<GeomagFile>>   character*70 
+ IGRF or WMM file path which contains geomagnetic field expansion 
+ coefficients. Their format is the same one as given in their web 
+ page. If ' ' (default), Cosmos/Data/Geomag/igrf is used. 
+
+<<HeavyG2charge>>   integer 
+ heavy group index $\rightarrow$ charge of heavy conversion array. 
+
+<<HeavyG2code>>   integer 
+ heavy group index $\rightarrow$ particle code conversion array. 
+
+<<HeavyG2massN>>   integer 
+ heavy group index $\rightarrow$ mass number conversion array. 
+
+<<HeavyG2symbol>>   character*4 
+ heavy group index $\rightarrow$ 'Fe' etc conversion array. 
+
+<<HowGeomag>>   integer 
+If the last digit is
+ 1, no magnetic field until first coll. \newline 
+ 2, mag.f always exists. If Reverse not=0, use this. \newline 
+
+ 11, same as 1 but mag.f is const. \newline 
+ 12, same as 2 but mag.f is const. \newline 
+ 21, same as 1 but mag.f is const. \newline 
+ 22, same as 2 but mag.f is const. \newline 
+ 31, same as 1 but mag.f is dependent on the position. \newline 
+ const value is determined as follows: 
+ For 11 and 12: one at deepest observation plane. 
+ For 21 and 22: MagN, MagE, MagD are used.  For normal applications, 12 is good. 
+
+<<HowIntNuc>>   integer 
+ If 0, the number of interacting nucleons among a projectile heavy nucleus is 
+ determined as the number of first collision of each interacting nucleon inside 
+ the nucleus. If 1, the number is determined as the total number of collisions 
+ including successive interactions. Default is 1. (There is uncertaninity in 
+ interpretation of the formula; value 1 gives larger number of interacting 
+ nucleons.) 
+<<HowPhotoProd>>   integer
+  if 1, sofia is used. 0-> no photo-hadron proc.
+-
+<<InclusiveFile>>   character*100 
+ The path to the inclusive data file, xdist.d. Default is 
+ "../Contrib/Inclusive/xdist.d" 
+
+<<IncreaseXsec>>   real*8 
+ how the xsection increases. 1.0$\rightarrow$ power of E 
+
+<<KEminObs2>>   real*8 
+ Don't touch this. skeleton/flesh use. 
+
+<<KnockOnRatio>>   real*8 
+ KnockOnRatio* KEminoObs is used instead of RecoilKineMinE if KnockOnRatio $<$1. 
+
+<<Knockon>>   logical 
+ Obsolete. Don't use this. See RecoilKineMinE 
+ and KnockonRatio. 
+
+<<Kpicns>>   real*8 
+ See Kpilog. 0.077 
+
+<<Kpilog>>   real*8 
+ K$_{ch}/\pi_{ch}$=(Kpilog*log(ss+.069)+Kpicns)*exp(-8/s') where ss(GeV**2)= 
+ effective s. s'(GeV**2)=s - 4.63. See also Kpicns. 
+
+<<LamorDiv>>   real*8 
+ In the geomagnetic field, a charged particle can travel almost streight 
+ in (Lamor Radius)/LamorDiv. Default is 5. For AMS like tracking 20 may be needed. 
+
+<<LpmBremEmin>>   real*8 
+ The LPM effect is taken into account for bremsstrahlung when LpmEffect is .true. 
+ and the electron energy is higher than this. 
+
+<<LpmPairEmin>>   real*8 
+ The LPM effect is taken into account for pair creation when LpmEffect is .true. 
+ and the gamma energy is higher than this. 
+
+<<LundPara>>   integer 
+ To control Lund program. LundPara(1) is set to kfr(7); kfr(7)=1 is for Frititof 
+ hard scattering. 2 is for Pythia H.S. 2 gives higher multiplicity but shape is 
+ strange. Default is 1. LundPara(2) is set to kfr(12): 1 by for OPAL hard scattering 
+ parameterization. 2 by DELPHI. Default is 2. (2 gives bit higher PT). LundPara(3) 
+ $>$ 0 $\Rightarrow$ Pythia message will appear. LundPara(4) $>$ 0 Fritiof 
+ message; both on ErrorOut. LundPara(5) =0 $\Rightarrow$ All kaons collisions 
+ are treated as pi- in Fritiof, else they are treated by adhoc model as they are. 
+
+<<MagBrem>>   integer 
+ If 0, no magnetic bremsstrahlung is considered. \newline 
+ if 1 and Ee $>$ MagBremEmin, energy loss due to magnetic brems is considered \newline 
+ if 2 and Ee $>$ MagBremEmin, real sampling of gamma is performed. \newline 
+ (note, actually upsilon is referred further). 
+ if generate='as' with really high energy primaries, WaitRatio 
+ must be made small so that WaitRatio*E0 $\sim$ MagBremEmin 
+
+<<MagBremEmin>>   real*8 
+ E $>$ this, magnetic bremsstrahlung by electrons may be considered. However, if 
+ MagBrem = 0, not considered at all \newline 
+ MagBrem = 1, total energy loss due to brems is considered. \newline 
+ MagBrem = 2, gamma energy is sampled actually. \newline 
+ If upsilon (Ee/m * B/Bcr) is small, the effective treatment will be 
+ the same as MagBrem = 0 case. 
+
+<<MagChgDist>>   real*8 
+ Distance where mag. can be seen as const.(m) at sea level 
+
+<<MagD>>   real*8 
+ See HowGeomag (in Tesla) 
+
+<<MagE>>   real*8 
+ See HowGeomag (in Tesla) 
+
+<<MagN>>   real*8 
+ See HowGeomag (in Tesla) 
+
+<<MagPair>>   integer 
+ If 0, no magnetic pair creation is considered. \newline 
+ if 1 and Eg > MagPairEmin, real sampling is tried. 
+ (note, actually upsilon is referred further). To see these magnetic effects, 
+ HowGeoMag=2 and HightOfInj $\sim$ 5000 km are desirable. 
+
+<<MagPairEmin>>   real*8 
+ E $>$ this, magnetic pair creation by gamma may be considered. However, if 
+ MagPair = 0, not considered at all. \newline 
+ MagPair = 1, pair creation is sampled. \newline 
+ However, again, actual occurrence will be dependent on the angle between 
+ B and photon direction. 
+
+<<MaxComptonE>>   real*8 
+ Above this energy, Compton scattering is neglected. 
+
+<<MaxPhotoE>>   real*8 
+ Above this energy, photoelectric effect is neglected. 
+
+<<Moliere>>   integer 
+ 0$\rightarrow$ use Gaussian approx always \newline 
+ 1$\rightarrow$ use Moli\`ere scattering for non-electrons (default)\newline 
+ 2$\rightarrow$ use Moli\`ere scattering for all charged particles.\newline 
+ If negative, anglular-correlated displacement is made to be 0 since Moli\`ere 
+ theory cannot give it. (if $\ge 0$, we use Gaussian approximation for correlation). 
+
+Moliere=-1 is recommended for normal jobs.  At very shallow depths
+(say < 1 r.l)  Moliere=1 is better.
+ 
+
+<<MuBr>>   integer 
+ parameter similar to MuNI but for bremsstrahlung by muons. 
+
+<<MuNI>>   integer 
+ 0$\rightarrow$ nuclear interaction of muon is completely neglected \newline 
+ 1$\rightarrow$ energy loss by n.i is subsumed in dE/dx of muons as a continuous energy loss. Let v= 
+ Etransfer/Emu, the loss here is Int(vc:vmax) of (Emu vdsigma/dv). (vc $\sim$0, vmax$\sim$1). \newline 
+ 2$\rightarrow$ (Default value). similar to 1 but as the continuous loss only v $<$ vmin=10$^{-3}$ of 
+ fractional muon energy is subsumed (Int(vc: vmin) of (Emu vdsigma/dv)). The portion 
+ of loss by v$>$vmin is treated as a stocastic process. However, the product from the 
+ n.i itself is neglected \newline 
+ 3$\rightarrow$ the same as 2, but the n.i is explicitly included to produce a number of particles. 
+ The n.i is treated as a photo-nucleus interaction. 
+
+<<MuPr>>   integer 
+ parameter similar to MuNI but for pair creation by muons. 
+
+<<Mudirp>>   real*8 
+ \verb| DD~| \# enhancement factor. D is only for prompt muon. 
+
+<<MulLow>>   integer 
+ if 1, QCD predicted multiplicity law is used in the adhoc model else UA5 
+ parametalization is used. Default is 1. (from v5), 
+ 0.6135exp(23/18sqrt(2log(roots/0.3))) is QCD jet prediction. 
+ 7.2roots**0.254 -7 is UA5 data. The branch point is set at roots = 900 GeV. 
+ (I have adjusted 0.6135 so that 900 GeV is the b.p) 
+
+<<NoOfSites2>>   integer 
+ No of Sites for particle observation; not to be touched; for skeleton/flesh use. 
+
+<<OffsetHeight>>   real*8 
+ The vertical offset height from the deepest detector. 
+ The primary is directed to this height above the detector. 
+ If ObsPlane is 3 (spherical), not used. 
+
+<<PathLimit>>   real*8 
+ If the sum of (path/beta) of a particle exceeds this, it is judged as dead. 
+ (to avoid infinite cyclotron loop). However, for normal applications, 
+ this will not be effective because of BackAnglLimit. See Reverse. 
+ TimeStructure should be T if Reverse 
+= 0 and PathLimit is to be effective. 
+
+<<PercentEnv>>   character*32 
+ If this is non blank, an environmental variable with that name is 
+ assumed to exist and Cosmos tries to get the value of that env variable. 
+ If the value is obtained, the \verb/%/ in \verb/%_/ or \verb/%./ 
+ expressing a part of a file name is replaced by that value. 
+ (default is blank and in that case the \verb/%/ is replaced by 
+ the USER name). 
+
+<<PrevEventNo>>   integer 
+ The event number already finished. System use for Cont job. 
+ (excluding discarded ones due to cutoff). 
+
+<<PtAvFrag>>   real*8 
+ $<$Pt$>$ of heavy fragments. 
+
+<<PtAvNonInteNuc>>   real*8 
+ $<$Pt$>$ of non interacting nucleons. 
+
+<<RatioToE0>>   real*8 
+ In the A.S generation, hadronic interactions are followed down to at 
+ least RatioToE0 * E0/nucleon energy. 
+
+<<RecoilKineMinE>>   real*8 
+ Recoil Kinetic Min Energy above which the recoil (=knock-on process) 
+ is treated. Below this energy, the effect is included as continuous 
+ energy loss. Used only if KnockOnRatio $>$ 1. 
+ See also KnockOnRatio. 
+
+<<Reverse>>   integer 
+ 0$\rightarrow$ Normal tracking. \newline 
+ 1$\rightarrow$ incident is tracked to a direction opposite to the given one. 
+ the incident is charge-conjugated. 
+ All interactions are ignored. (Use when to make cut-off table or to see 
+ a given particle (say, observed anti proton) can go out of Earth. \newline 
+ 2$\rightarrow$ same as 1 but energy gain (not loss) is taken into account 
+ TimeStructure should be T if Reverse 
+= 0. See BackAnglLimit. 
+
+<<SeedFileDev>>   integer 
+ logical device number of SeedFile. 
+
+<<SharpEnv>>   character*32 
+ If this is non blank, an environmental variable with that name is 
+ assumed to exist and Cosmos tries to get the value of that env variable. 
+ If the value is obtained, the \verb/#/ in \verb/#_/ or \verb/#./ 
+ expressing a part of a file name is replaced by that value. 
+ (default is blank and in that case the \verb/#/ is replaced by 
+ the process number of the run). 
+
+<<SucInt>>   integer 
+ The number of successive interactions inside A is affected by this parameter.\newline 
+ If $0\rightarrow$ old formula (before uv3.500) is used, which give rather 
+ smaller number ($<Nsuc>$ in Air = 1.7 for 30 mb pp), \newline 
+ if $1\rightarrow$ new one $<Nsuc>=2.2$ for 30 mb pp). \newline 
+ Default is 0 (from V5.00 again). 
+
+<<SucPw>>   real*8 
+ In the 2nd, 3rd,.. collision of a nucleon inside a nucleus, the collision is 
+ made to be more elastic than normal one. The leading particle spectrum is 
+ sampled from x**SucPw dx. SucPw should be in 1 to 2. 
+
+<<TempDev>>   integer 
+ Logical Dev. number for temporary disk use. 
+
+<<TraceDev>>   integer 
+ Logical dev \# for TraceDir/trace1,2,.... 
+
+<<Truncc>>   real*8  obsolete
+ coeff. for truncating path. 
+
+<<Truncn>>   real*8  obsolete
+ coeff. for truncating path. 
+
+<<Truncx>>   real*8  obsolete
+ coeff. for truncating path. 
+
+<<UpsilonMin>>   real*8 
+ Magnetic bremsstralhung is considered only if upsilon $>$ UpsilonMin. 
+
+<<UseRungeKutta>>   integer 
+ How to calculate deflection by the geomagnetic field. Let L be the distance 
+ the particle travels. \newline 
+ 0$\rightarrow$Don't use RungeKutta method. Use the solution assuming the constant B, which 
+ is exact if B is const. Since the particle path is made short, this is 
+ enough for normal cases where particles are inside the atmosphere.(default) \newline 
+ In every case below, if the particle height is $<$ 30km 
+ (= cheight in ccomPathEnd.f), the same method as 0 is used. \newline 
+ 1$\rightarrow$ Use the Euler method. Time needed is 20\% more than the 0 case. 
+ As B, use the value at L/2 point obtained by using the current direction. \newline 
+ 2$\rightarrow$ mixture of 1 and Runge-Kutta-Gill method. If gradient of B is large, RKG is 
+ employed. This needs $\sim$4 times more cpu time than case of 1 when making a 
+ cutoff table. The step size of RKG is $\sim$1/10 of the Lamore radius. \newline 
+ 3$\rightarrow$ The same as 2 but use the Runge-Kutta-Fehlberg method instead of RKG. 
+ Step size is automattically adjusted ($\sim$1/20 $\sim$1/30 of Lamor radius) \newline 
+ 4$\rightarrow$ As a middle point, use the point obtained by assuming the constant B at 
+ initial point. If grad B is still large, use RKG. \newline 
+ 5$\rightarrow$ The same as 4 but us RKF instead of RKG. \newline 
+ 6$\rightarrow$ Use always RKG \newline 
+ 7$\rightarrow$ Use always RKF. This takes very long time.(50 times of 0). \newline 
+
+<<UserHookc>>   character*100 
+ array size is MAX\_USERHOOKC(=5). Usage is left for the user. To get the i-th 
+ component, the use may 'call cqUHookc(i, cv)' in the userHook routine, 
+ where cv is a character variable to receive the data. 
+
+<<UserHooki>>   integer 
+ array size is MAX\_USERHOOKI(=10). Usage is left for the user. To get the i-th 
+ component, the use may 'call ccqUHooki(i, iv)' in the userHook rouitne, 
+ where iv is an integer varialbe to receive the data. 
+
+<<UserHookr>>   real*8 
+ array size is MAX\_USERHOOKR(=10). Usage is left for the user. To get the i-th 
+ component, the use may 'call cqUHookr(i, rv)' in the userHook routine, 
+ where rv is a real*8 variable to receive the data. 
+
+<<X0>>   real*8 
+ Radiation length in kg/m$^2$ for air. Normally the user should not touch this. 
+
+<<XaxisFromSouth>>   real*8 
+ Angle between the horizontal detector X-axis and the south(deg). + is counter 
+ clockwise. If $|$XaxisFromSouth$| > 360$, it is computed so that the direction is 
+ to the magnetic east at the deepest observation point. Default is 361. 
+

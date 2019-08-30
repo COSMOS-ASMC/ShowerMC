@@ -1,0 +1,7 @@
+NF > 1  && $1 != "#" {++nc; wsize += $1*$2; sumn+=$2; size[nc]=$2; dep[nc] = $1; ncsave=nc}
+nc==nl {cog=wsize/sumn;for(i=1; i<=ncsave; ++i) print dep[i]-cog, size[i]; sumn=0; wsize=0; ++nev; nc=0}
+END {print "# events ", nev}
+
+
+
+

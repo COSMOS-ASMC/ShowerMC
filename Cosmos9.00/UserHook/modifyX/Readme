@@ -1,0 +1,43 @@
+
+This is a variant of UserHook/mkLDD used for the TA M.C simulation
+but includes one special feature which is intended to see the effect
+of a softer x-distribution than the original one. 
+Various features used in the normal execution of mkLDD are disabled
+by the specification in the "param" file and the default output is
+only .hyb files from which you can see the transition of Ne, Ng etc.
+
+ 	
+1) Compilation.
+  Be sure that you have done 'make' in UserHook/Hist (once for all)
+  This is needed to make library for histograming althoug in default
+  we don't take histograms.
+
+  Then, if needed, edit csoftenPiK.f and adjust  parameters there. 
+  They are   hard-wirted and cannot be controled by input data.
+  Then, 
+   make clean; make
+2) Set parameters in "param", and fix the primary by "primary" file
+   Essential ones: 
+      Thinning parameter.
+  EthinRatio.  At the top part of param, the standard values
+          are shown. 
+       EthinRatio = 1.0e-7*A, 1.e5*(E0/1.e20eV),
+       However, to see only the transition curve and to get Xmax,
+       the standard one is too small so you can use (1.e-5*A, 1.e7(E0/1e20eV)
+       Don't use more rough values. 
+       (2.e-6A, 1.e6(E0/1.e20eV))  would be much better but need much cpu 
+       time.
+  UserHookc = '0 /',
+     'f, f,  f /',
+    '~/CosmosData/Xmax/p/E1.0e18/#2'       
+        The 3rd line specifies the output file location. #2 means
+        the file name which is formed by using process #. .hyb
+        is added.  e.g.  3492103.hyb will be created.
+
+3)  After .hyb's are generated, you may goto Cosmos/Util/Minuit
+	Then, "make clean; make' there (once for all).
+	Then, go further  Util/tranfit-xexp, "make clean; make" there
+	See Readme there.
+
+	
+

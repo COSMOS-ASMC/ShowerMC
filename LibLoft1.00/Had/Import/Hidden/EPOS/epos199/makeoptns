@@ -1,0 +1,1 @@
+for n in `seq 1 8`;do  sleep 1;      r=`awk 'END {srand(); print rand()*1.e6}' /dev/null`; echo $r;     sed s/ZZZ/$r/ epos7TeV.optns > temp; sleep 1;   r=`awk 'END {srand(); print rand()*1.e6}' /dev/null`; echo $r;    sed s/xxx/$r/ temp > epos7TeV-$n.optns ; done

@@ -1,0 +1,7 @@
+set nohidden
+
+splot "<awk -f e-mode zrev=`cat .Reverse` zoff=`cat .Revmax` `cat .trace`" w l; 
+rep  "<awk -f e+mode zrev=`cat .Reverse` zoff=`cat .Revmax` `cat .trace`" w l;
+
+rep  "<awk -f picmode zrev=`cat .Reverse` zoff=`cat .Revmax` `cat .trace`" w l;
+

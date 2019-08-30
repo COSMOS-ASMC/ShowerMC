@@ -1,0 +1,9 @@
+-----------------------------------------
+#news new-1 sqtccl
+#eq	CHDa	  1.6
+#eq	CHDb	  0.5
+#eq	CHDc	  7.00
+#eq	CHDr	  0.39
+
+1 sqtccl Acrylic 0 0 0 / 1.6065  0  0.5065 CHDa CHDb CHDc CHDr  1 0 0 0 0 1
+-------------------------------------------

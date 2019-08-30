@@ -1,0 +1,52 @@
+#!/bin/csh -f
+#  Namelist name definitions are given in case sensitive way for
+#  human eyes. We use the fortran system output of namelist
+#  to get their default values.  However, the sytem output 
+#  produces capital letter output.  This script changes the
+#  namelist in original name style. (Say, DEPTHLIST is
+#  replaced by DepthList)
+#  
+#  
+#  Usage: 1)  pretty
+#   or    2)  pretty  file
+#     1) prints default namelist
+#     2) assumes file contains the name list data as output from the system.
+#
+set id=$$
+if($#argv == 0) then
+	echo " &Param &end" | $COSMOSTOP/Util/showParam >>& /tmp/Default$id
+else
+	cat $argv[1] >! /tmp/Default$id
+	echo /tmp/Default$id
+endif 
+
+getName 1 | /usr/local/bin/sort >! /tmp/orig$id
+getName 2 | /usr/local/bin/sort >> /tmp/orig$id
+
+tr "[a-z]" "[A-Z]" < /tmp/orig$id >> /tmp/Cap$id
+
+
+#      BEGIN cannot be used for getting parameters so we use NR == 1
+#      dc =2 means that we don't need the first line in the output.
+gawk 'NR == 1 { while(getline orig[++i] < original > 0)  \
+             while(getline cap[++j] < capital  > 0)  \
+	    dw = "Don`t worry about the following for normal applications"}  \
+    NR > 1 {de[NR] = $0}  \
+    END { dc = 2   \
+          for(k =1; k<= i; k++) {   \
+	        $0 = de[dc]       \
+		while( $1 != cap[k] ) {print $0; dc++ \
+			if($1=="$END") { \
+			  print ""; print ""; print "------------------", dw} \
+  			  $0 =de[dc] \
+		 }\
+		$1 = orig[k] \
+		print $0   \
+		dc++   \
+	        if(dc > NR) break \
+	}    \
+        print " $END" \
+    }' original=/tmp/orig$id capital=/tmp/Cap$id /tmp/Default$id
+
+ rm -f /tmp/orig$id /tmp/Cap$id /tmp/Default$id
+

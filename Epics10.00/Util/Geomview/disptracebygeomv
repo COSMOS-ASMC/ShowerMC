@@ -1,0 +1,142 @@
+#!/bin/tcsh -f
+set work = /tmp/$USER/Work
+mkdir -p $work
+#  convert trace data and display it by  Geomview.
+
+#****************** fix below for your pupose
+set vdir = $work
+# ptcl code to be displayed. (charged/neutral/both can be
+#                             specfied from command line)
+set ptcls = "-1 1 2 3 4 5 6 9 "
+#***********************************
+
+
+# --------------------
+# Display type.
+# 1)  only trace data. 
+#
+#     Usage:  ./disptracebygeomv [-{c|z|b}]  tracedata 
+#
+# 2)  Trace data + detector
+#
+#     Usage: ./disptracebygeomv  [-{c|z|b}] tracedata  det [-e|-a][-s][-i] [outdir]
+#
+# where
+#   [-{c|z|b}] specifies display of charged particles only
+#           or neutral particles only, or both. partilce codes
+#           to be displayed are given in $ptcls. You must be carful
+#           to use -z or -b; huge number of gamma rays must be
+#           displayed.  The default is -c.
+#   det:    should be given literally.  detector is also displayed
+#   -e:     detector display is by each component base
+#   -a:     //                  all-in-one 
+#   -s:     skip drawing a kind of planer surfaces. (typically 
+#           in the case of fpolygon; if it is concave, 
+#           geomview may fail to draw it correctly. 
+#           In Geomview, making transparecy <1 will save the problem
+#           but anther problem may arise as to which of the object
+#           is far.
+#   -i:     detector color and material correspondence is displayed
+#  outdir;  working directory to contain files for Geomview.
+#           default is /tmp/$USER/Work.
+#
+#  To fix the color for each particle code, colortab is used.
+#  ===============
+#
+
+
+if( $#argv < 1 || $#argv >7 ) then
+        echo "You gave "  $#argv " arguments"
+  error:
+        echo " Usage: "
+	echo "./disptracebygeomv [-{c|z|b}] tracedata  [det] ..."
+	echo " "
+        gawk ' $2 ~ /---------/, $2 ~ /===========/' $0 | less
+	exit 1
+endif
+
+set chg = "-c"
+if (  "$1" == "-c"  || "$1" == "-z"  ||  "$1" == "-b"  ) then
+	set chg = $1
+	shift
+else if ( "$1" =~ "-"* )  then
+	echo $1 " is not supported "
+	goto error
+endif
+
+
+if($#argv >= 2) then
+        if( $2 == "det" ) then
+            set case = "2"
+        else
+ 	    goto error
+        endif
+else if( $#argv == 1 ) then
+    set case = "1"
+else
+    goto error
+endif
+
+
+#  rm -f  $vdir/ptcl*.vect
+
+find $vdir -name 'ptcl*.vect' -print | xargs rm -f
+
+
+foreach code( $ptcls )
+
+    foreach charge(`echo "n z p"` )
+       if( "$code" == 1 && "$charge" != "z")  goto next
+       if( "$code" == 2 && "$charge" == "z")  goto next
+       if( "$code" == 3 && "$charge" == "z")  goto next
+#            neglect pi0 tracks
+       if( "$code" == 4 && "$charge" == "z")  goto next  
+       if( ("$chg" == "-c" && "$charge" != "z" ) || \
+       	   ("$chg" == "-z" && "$charge" == "z")  ||  ("$chg" == "-b")) then
+
+    	  gawk -f ./first.awk chg=$charge \
+          code=$code  $1 > $vdir/vertexdata
+          set x = `ls -l $vdir/vertexdata` 
+	  if( $x[5] > 2 ) then
+            echo "VECT" > $vdir/ptcl${code}${charge}.vect
+
+	    gawk -f ./second.awk $vdir/vertexdata >> $vdir/ptcl${code}${charge}.vect
+      	    cat $vdir/vertexdata >> $vdir/ptcl${code}${charge}.vect
+	    if ( $code <= 6 ) then
+	   	    gawk '$2 == code && $3 == chg {print $4, $5, $6, $7}' \
+		    code=$code chg=$charge colortab >> $vdir/ptcl${code}${charge}.vect
+            else if ( $code == 9 )  then
+	   	    gawk '$2 == code  {print $4, $5, $6, $7}' \
+		    code=$code chg=$charge colortab >> $vdir/ptcl${code}${charge}.vect
+            else
+	   	    gawk '$2 == "any" {print $4, $5, $6, $7}' \
+		    colortab >> $vdir/ptcl${code}${charge}.vect
+            endif	 
+
+      	   ./splitiftoolarge $vdir/ptcl${code}${charge}.vect
+          endif
+       endif
+       next:
+     end
+end
+
+echo $case
+
+switch ( $case )
+    case "1":
+	   $GEOMVIEW  $vdir/ptcl???*.vect &
+	   breaksw
+    case "2":
+            shift; shift 
+            source ./convconfig $argv
+
+            if( $dispcolormap == "yes" ) then
+        	$GEOMVIEW  $vdir/mediatext   &
+		sleep 1
+            endif
+
+            $GEOMVIEW  `find $outdir -name '*.list' -print `  $vdir/ptcl???*.vect  &
+
+            breaksw
+endsw     
+

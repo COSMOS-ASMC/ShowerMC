@@ -1,0 +1,60 @@
+#!/bin/csh 
+#    sort and awk must be gnusort and gnuawk
+# 
+if( $#argv != 2) then
+	cat <<EOF 
+        Usage:fordpmjetCosINP  atmosfile  inpnum
+            atmosfile: 
+            inpunum:  1 or 2. 1 is for GLB upto Fe.  2 is for upto Pb 
+                used to select $LIBLOFT/Data/DPM-epi/Template${inpnum}.inp 
+EOF
+
+	exit
+endif
+
+
+rm -f  temp_target
+touch temp_target
+
+
+foreach f(`awk '$1~/^#----------+/,$1~/^xyzabcrandomslslkdkwo/' $1  \
+         |  awk '$NF ~ /^[0-9]/ && $NF !~/^.[0-9]/  \
+         {l=index($NF,"*"); if(l>0) print substr($NF,1,l-1); else print $NF}'  | sort |uniq`)
+#	echo $f
+#           j: pb
+	set j =  `echo $f | awk '{print tolower($1)}' `
+	foreach g($LIBLOFT/Data/BaseM/*)
+#                 x : Pb.GLB
+		set x = $g:t
+#                 y : Pb 
+		set y = $x:r 
+#                 z:  pb
+		set z = `echo $y | awk '{print tolower($1)}' `
+	 	if ( $z == $j ) then
+#                      extract header
+		    awk 'BEGIN {j=0}; $1=="#" && j==1 {exit}; \
+                      $1=="#" && $2=="Z" && $3=="A" && $4=="N" {j=1; next} ;\
+                      $1 != "#" && j> 0 && NF>0 {print int($2+0.5),  $1}' $g >> temp_target
+	            goto ok
+                endif
+	end	
+	echo "no BaseM data found for component media: " $f
+	exit 1
+ok:
+end
+
+sort temp_target | uniq > temp_target2
+mv temp_target2 temp_target
+
+set nelm = `wc -l temp_target`
+
+awk '$1 == "EMULSION" { for(i=1;i<=nelm;++i) {if(z[i]>0) printf("EMULSION  %10d%10d%10d\n", a[i], z[i], 1)};next};NR<= nelm {a[NR]=$1; z[NR]=$2; next}; {print}' nelm=$nelm[1] temp_target $LIBLOFT/Data/DPM-epi/Template$2.inp 
+#  rm temp_target
+   
+
+
+
+
+
+
+

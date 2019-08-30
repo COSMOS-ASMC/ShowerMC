@@ -1,0 +1,45 @@
+
+## SIA ##
+#subd SIA
+1 box Al 0 0 0 / 0     0        0        siaLa    siaLb    siaThick
+2 box Al 0 0 0 / 0     0        siaZ0    siaLa    siaLb    siaThick / 15 16 17 18
+3 box Al 0 0 0 / 0     0        siaThick siaLa    siaThick siaLc1
+4 box Al 0 0 0 / 0     siaY0    siaThick siaLa    siaThick siaLc1
+5 box Al 0 0 0 / 0     siaThick siaThick siaThick siaLb1   siaLc1
+6 box Al 0 0 0 / siaX0 siaThick siaThick siaThick siaLb1   siaLc1
+7 box Al 0 0 0 / siaThick siaThick siaThick siabLa siabTa siabTb
+8 box Al 0 0 0 / siaThick 34.38    siaThick siabLa siabTa siabTb
+9  box Al 0 0 0 / siaThick 1.02 siaThick siabTa siabLb siabTb
+10 box Al 0 0 0 / 34.38    1.02 siaThick siabTa siabLb siabTb
+11 box Al 0 0 0 / siaThick siaThick siabZ0 siabLa siabTa siabTb
+12 box Al 0 0 0 / siaThick 34.38    siabZ0 siabLa siabTa siabTb
+13 box Al 0 0 0 / siaThick 1.02 siabZ0 siabTa siabLb siabTb
+14 box Al 0 0 0 / 34.38    1.02 siabZ0 siabTa siabLb siabTb
+
+
+15 box Al 0 0 0 / 0 siaprizm siaZ0 7.8 7.8 siaThick cos45 cos45 0 ncos45 cos45 0
+16 box Al 0 0 0 / siaLa siaprizm siaZ0 7.8 7.8 siaThick cos45 cos45 0 ncos45 cos45 0
+17 box Al 0 0 0 / 0 siaprizm1 siaZ0 7.8 7.8 siaThick cos45 cos45 0 ncos45 cos45 0
+18 box Al 0 0 0 / siaLa siaprizm1 siaZ0 7.8 7.8 siaThick cos45 cos45 0 ncos45 cos45 0
+
+## prism error ??? ###
+#15 prism_yz Al 0 0 0 / 0 0 siaZ0 siapriz siaThick 0 siaprizm
+#16 prism_yz Al 0 0 0 / 0 0 siaZ0 siaprizm siaThick 0 siaprizm
+#17 prism_yz Al 0 0 0 / 0 0 siaZ0 siaprizm siaThick 0 siapriz
+#
+#18 prism_yz Al 0 0 0 / 0 siaLb siaZ0 siapriz siaThick 0 siaprizm
+#19 prism_yz Al 0 0 0 / 0 siaLb siaZ0 siaprizm siaThick 0 siaprizm
+#20 prism_yz Al 0 0 0 / 0 siaLb siaZ0 siapriz siaThick 0 siapriz
+#
+#21 prism_yz Al 0 0 0 / siaLa 0 siaZ0 siapriz siaThick 0 siapriz
+#22 prism_yz Al 0 0 0 / siaLa 0 siaZ0 siaprizm siaThick 0 siaprizm
+#23 prism_yz Al 0 0 0 / siaLa 0 siaZ0 siaprizm siaThick 0 siapriz
+#
+#24 prism_yz Al 0 0 0 / siaLa siaLb siaZ0 siapriz siaThick 0 siapriz
+#25 prism_yz Al 0 0 0 / siaLa siaLb siaZ0 siapriz siaThick 0 siaprizm
+#26 prism_yz Al 0 0 0 / siaLa siaLb siaZ0 siaprizm siaThick 0 siapriz
+
+19 box_w sp 0 0 0 / 0 0 0
+
+#end SIA
+

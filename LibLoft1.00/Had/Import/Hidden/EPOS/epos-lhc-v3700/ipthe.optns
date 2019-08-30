@@ -1,0 +1,192 @@
+write "!###############################################################"
+write "! mean pt at central rap vs energy  "
+write "!###############################################################"
+
+write "!-------------------------"
+write "! mean pt Chrg Ine   "
+write "!-------------------------"
+beginhisto 
+histogram egy pt 4  egy egy 1
+idcode      9970
+binning log
+endhisto
+write "openhisto name ptall-ine xrange 5 15000 yrange .2 auto htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title   Chrg Ine "" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis p?t!$    "" }"
+write "{column c3 = c2 / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+beginhisto histogram egy pt 4  egy egy 1
+idcode 9970 binning log trigger eta -1 1
+endhisto
+write "oh htyp pbt name ptall-ine-eta1 column c3 = c2 / sqrt( c3 ) " 
+histoweight nozero writearray 3  write "ch plot 0-"  
+beginhisto histogram egy pt 4  egy egy 1
+idcode 9970 binning log trigger eta -2.5 2.5
+endhisto
+write "oh htyp pgt name ptall-ine-eta25 column c3 = c2 / sqrt( c3 ) " 
+histoweight nozero writearray 3  write "ch plot 0-"  
+beginhisto histogram egy pt 4  egy egy 1
+idcode 9970 binning log trigger eta -3 3
+endhisto
+write "oh htyp pyt name ptall-ine-eta3 column c3 = c2 / sqrt( c3 ) " 
+histoweight nozero writearray 3  write "ch plot 0-"  
+beginhisto histogram egy pt 4  egy egy 1
+idcode 9970 binning log trigger eta -5 5
+endhisto
+write "oh htyp pxt name ptall-ine-eta5 column c3 = c2 / sqrt( c3 ) " 
+histoweight nozero writearray 3  write "ch plot 0-"  
+write "openhisto getarray ppexci-pt closehisto plot 0"
+
+write "!-------------------------"
+write "! mean pt Chrg NSD UA1  "
+write "!-------------------------"
+beginhisto 
+histogram egy pt 4  egy egy 1
+idcode      9970
+trigger nd0evt 1 1
+binning log
+endhisto
+write "openhisto name ptall-ua1 xrange 5 15000 yrange .2 auto htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title   Chrg NSD UA1"" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis p?t!$    "" }"
+write "{column c3 = c2 / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+beginhisto histogram egy pt 4  egy egy 1
+idcode 9970 trigger nd0evt 1 1 binning log trigger eta -1 1
+endhisto
+write "oh htyp pbt name ptall-ua1-eta1 column c3 = c2 / sqrt( c3 ) " 
+histoweight nozero writearray 3 write "ch plot 0-"  
+beginhisto histogram egy pt 4  egy egy 1
+idcode 9970 trigger nd0evt 1 1 binning log trigger eta -2.5 2.5
+endhisto
+write "oh htyp pgt name ptall-ua1-eta25 column c3 = c2 / sqrt( c3 )" 
+histoweight nozero writearray 3  write "ch plot 0-"  
+beginhisto histogram egy pt 4  egy egy 1
+idcode 9970 trigger nd0evt 1 1 binning log trigger eta -3 3
+endhisto
+write "oh htyp pyt name ptall-ua1-eta3 column c3 = c2 / sqrt( c3 )" 
+histoweight nozero writearray 3  write "ch plot 0-"  
+beginhisto histogram egy pt 4  egy egy 1
+idcode 9970 trigger nd0evt 1 1 binning log trigger eta -5 5
+endhisto
+write "oh htyp pxt name ptall-ua1-eta5 column c3 = c2 / sqrt( c3 )" 
+histoweight nozero writearray 3  write "ch plot 0-"  
+write "openhisto getarray ppexci-pt-nsd closehisto plot 0"
+
+write "!-------------------------"
+write "! mean pt Chrg NSD CMS  "
+write "!-------------------------"
+beginhisto 
+histogram egy pt 4  egy egy 1
+trigger eta -2.4 2.4
+idcode      9970
+trigger nd7evt 1 1
+binning log
+endhisto
+write "openhisto name ptall-cms xrange 5 15000 yrange .2 auto htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title   Chrg NSD CMS"" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis p?t!$    "" }"
+write "{column c3 = c2 / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "openhisto getarray ppexci-pt-nsd closehisto plot 0"
+
+write "!-------------------------"
+write "! mean pt Chrg NSD Theoretic "
+write "!-------------------------"
+beginhisto 
+histogram egy pt 4  egy egy 1
+idcode      9970
+trigger typevt 1 2
+binning log
+endhisto
+write "openhisto name ptall-nsd xrange 5 15000 yrange .2 auto htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title   Chrg NSD Theo"" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis p?t!$    "" }"
+write "{column c3 = c2 / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+beginhisto histogram egy pt 4  egy egy 1
+idcode 9970 trigger typevt 1 2 binning log trigger eta -1 1
+endhisto
+write "oh htyp pbt name ptall-nsd-eta1 column c3 = c2 / sqrt( c3 ) " 
+histoweight nozero writearray 3  write "ch plot 0-"  
+beginhisto histogram egy pt 4  egy egy 1
+idcode 9970 trigger typevt 1 2 binning log trigger eta -2.5 2.5
+endhisto
+write "oh htyp pgt name ptall-nsd-eta25 column c3 = c2 / sqrt( c3 )" 
+histoweight nozero writearray 3  write "ch plot 0-"  
+beginhisto histogram egy pt 4  egy egy 1
+idcode 9970 trigger typevt 1 2 binning log trigger eta -3 3
+endhisto
+write "oh htyp pyt name ptall-nsd-eta3 column c3 = c2 / sqrt( c3 )" 
+histoweight nozero writearray 3  write "ch plot 0-"  
+beginhisto histogram egy pt 4  egy egy 1
+idcode 9970 trigger typevt 1 2 binning log trigger eta -5 5
+endhisto
+write "oh htyp pxt name ptall-nsd-eta5 column c3 = c2 / sqrt( c3 )" 
+histoweight nozero writearray 3  write "ch plot 0-"  
+write "openhisto getarray ppexci-pt-nsd closehisto plot 0"
+
+write "!-------------------------"
+write "! mean pt 120    "
+write "!-------------------------"
+beginhisto 
+histogram egy pt 4  egy egy 1
+trigger rap -2 2
+!trigger egy 100 20000
+idcode      120
+binning log
+endhisto
+write "openhisto name pt120a xrange 5 15000 yrange .2 auto htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title   [p]^+!  "" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis p?t!$    "" }"
+write "{column c3 = c2 / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "openhisto getarray ppexci-pt-pip closehisto plot 0-"
+write "openhisto getarray ppexci-pt2pion closehisto plot 0-"
+write "input newdata/ua5c exci-pt-pi plot 0"
+
+write "!-------------------------"
+write "! mean pt 130    "
+write "!-------------------------"
+beginhisto 
+histogram egy pt 4  egy egy 1
+trigger rap -2 2
+!trigger egy 100 20000
+idcode      130
+binning log
+endhisto
+write "openhisto name pt130a xrange 5 15000 yrange .3 auto htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title   K^+!  "" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis p?t!$    "" }"
+write "{column c3 = c2 / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "openhisto getarray ppexci-pt-kap closehisto plot 0-"
+write "openhisto getarray ppexci-pt2kaon closehisto plot 0-"
+write "input newdata/ua5c exci-pt-k plot 0"
+
+write "!-------------------------"
+write "!mean pt -1120    "
+write "!-------------------------"
+beginhisto 
+histogram egy pt 4  egy egy 1
+trigger rap -2 2
+!trigger egy 100 20000
+idcode      -1120
+binning log
+endhisto
+write "openhisto name pt-1120a xrange 5 15000 yrange .3 auto htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title   apr  "" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis p?t!$    "" }"
+write "{column c3 = c2 / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "openhisto getarray ppexci-pt-apr closehisto plot 0-"
+write "openhisto getarray ppexci-pt2apr closehisto plot 0-"
+write "input newdata/ua5c exci-pt-p plot 0-"
+write "oh calc pt-1120a ; htyp prs ch plot 0 dh"

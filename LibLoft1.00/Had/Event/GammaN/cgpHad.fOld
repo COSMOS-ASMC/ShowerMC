@@ -1,0 +1,634 @@
+c  uncomment until   cgpHad and use make -f test.mk
+c
+c #include "BlockData/cblkGene.h"
+c      program main
+c#include "ZcosmosExt.h"
+c      call testprog
+c      end
+      
+
+c            test cgpHad
+c      subroutine testprog
+c        implicit none
+c#include  "Zptcl.h"
+c#include  "Zmass.h"
+c#include  "Zcode.h"
+
+c     integer  massN
+c      integer atomicN
+c      integer icin
+c      integer ntp
+c      record /ptcl/ pj
+c      integer  nmax
+c      parameter (nmax=5000)
+c      record /ptcl/a(nmax)
+c      real*8  sumP(4), Eg
+c      integer i, j, k
+
+c      massN=14
+c      atomicN=7
+c      icin = 2
+c      call cmkptc(kphoton, 0, 0, pj)
+c      write(0,*) 'Enter Eg'
+c      read(*,*) Eg
+c      pj.fm.p(4)=Eg
+c
+c      pj.fm.p(1)= 0.
+c      pj.fm.p(2)= 0.
+c      pj.fm.p(3)=Eg
+c      do i = 1, 10000
+c         call cgpHad(massN, atomicN, pj, icin, a, ntp)
+c         do j= 1, 4
+c            sumP(j) = 0.
+c         enddo
+c         do j = 1, ntp
+c            do k = 1, 4
+c               sumP(k)  = sumP(k) + a(j).fm.p(k) 
+c            enddo
+c            write(*,'(2i3, 4g12.3)') a(j).code, a(j).charge,
+c     *                      (a(j).fm.p(k),k=1,4)
+c         enddo
+c         write(*,'(4g12.3)') (sumP(k), k=1,4)
+c         write(*,*)
+c         write(*,*) 'n= ', ntp-1
+c      enddo
+      
+c      end
+c         gamma-n(p or A)-->hadrons
+
+c       icin:  integer  0--> gn
+c                       1--> gp
+c                       2--> g A
+c          a: /ptcl/ output. container of produced ptcls
+c        ntp: integer. output. # of produced ptcls.
+        subroutine cgpHad(massN, atomicN, pj, icin, a, ntp)
+        implicit none
+#include  "Zptcl.h"
+#include  "Zevhnp.h"
+#include  "Zevhnv.h"
+#include  "Zmass.h"
+#include  "Zcode.h"
+
+        integer ntp, icin
+        record /ptcl/ pj,  a(*), pjx
+        integer  massN, atomicN
+        record /ptcl/ tgt
+c
+        integer jtype, ic, k, icon
+        logical fermim
+c        record /ptcl/pi0
+        real*8  xs
+        record /ptcl/pic
+        character*70 msg 
+        integer i
+        real*8 sum
+c///////////////////////
+        pic = pj
+        call cmkptc(kpion, regptcl, 1, pic)
+        call ce2p(pic)
+        if(ActiveMdl .eq. "qgsjet2")  then
+           call cxsecQGS( pic, massN,   xs )
+        endif
+c        call chAcol(pic, massN, atomicN, a, ntp)
+c        return
+c
+        if(icin .ge. 2) then
+c           fix target charge (n or p)
+           call cfxTgtChg(massN, atomicN, ic)
+        else
+           ic=icin
+        endif
+c          make target
+        call cmkptc(knuc, regptcl, ic, tgt)
+c
+
+        fermim=(pj.fm.p(4) -pj.mass) .lt. Efermi
+     *          .and. icin .ge. 2
+
+        if(fermim) then
+c             never come here now
+           call csampFermiM(tgt.fm)
+c              boost the projectile into target
+c              rest system (trs).
+           call cbst1(1, tgt, pj,  pjx)
+        else
+           pjx = pj
+c            rest target
+           tgt.fm.p(1) = 0.
+           tgt.fm.p(2) = 0.
+           tgt.fm.p(3) = 0.
+           tgt.fm.p(4) = tgt.mass
+        endif
+c             make cm ptcl
+        call  cgeqm(pj, tgt, Cmsp, icon)
+
+c            fix collision type
+        call cghCollType(pjx, jtype)
+        if(jtype .eq. 0) then
+           ntp=1   !   older version  0 and no product
+           a(1)=pj   ! gamma 
+        elseif(jtype .eq. 1) then
+c           gp-->p+pi0 or gn-->n+pi0
+c           'a' gets particles at target rest system
+c           call cg1pi0(pjx, ic, a, ntp)
+           call chAcol(pic, massN, atomicN, a, ntp)
+        elseif(jtype. eq. 2) then
+c                   gp-->n+pi+ or gn-->p+pi-;  at target rest system
+c           call cg1pic(pjx, ic,  a, ntp)
+           call chAcol(pic, massN, atomicN, a, ntp)
+        elseif(jtype .eq. 3) then
+c                   gp-->p pi+ pi- or gn --> n pi+ pi- at cms
+           call cg2pi(ic,  a, ntp) 
+c           call chAcol(pic, massN, atomicN, a, ntp)
+        elseif(jtype .eq. 4) then
+c                    'a' gets cms ptcls
+           call cg3pi(ic, a, ntp)
+c           call chAcol(pic, massN, atomicN, a, ntp)
+        elseif(jtype .eq. 5)then
+c               vector meson type.  ptcls produced  in lab.
+
+cccc           if(ActiveMdl .eq. "qgsjet2") then
+ccc              pi0 = pj
+cccc              call cmkptc(kpion, 0, 0, pi0)
+ccc              call ce2p(pi0)
+ccc              call cxsecQGS(pi0, massN,   xs )
+ccc              call cQGSjet(pi0, massN, atomicN,  a, ntp)
+ccc           elseif(ActiveMdl .eq. 'dpmjet3' ) then
+ccc              pi0 = pj  ! but put charge
+ccc              call cmkptc(kpion, 0, 1, pi0)
+ccc              call ce2p(pi0)
+ccc              call cdpmjet(pi0, massN, atomicN,  a, ntp)
+ccc              if( a(1).code .eq. kpion  .and. a(1).charge .ne. 0)  then
+ccc                 a(1).charge = 0
+ccc                 call cmkptc(kpion, 0, 0, a(1))
+ccc              endif
+ccc           else
+c//////////////
+c        pic = pj
+c        call cmkptc(kpion, regptcl, 1, pic)
+c        call ce2p(pic)
+c        if(ActiveMdl .eq. "qgsjet2")  then
+c           call cxsecQGS( pic, massN,   xs )
+c        endif
+c        call chAcol(pic, massN, atomicN, a, ntp)
+c//////////
+           call cgVectorMeson(pj, tgt, a, ntp)
+ccc           endif
+        else
+           write(msg,*) ' strage jtype=',jtype, ' from cghCollType'
+           call cerrorMsg(msg, 0)
+        endif
+        if(fermim .and. jtype .le. 2) then
+c            boost ptcls back to lab. 
+           do   k=1, ntp
+c              call cibst1(k, tgt, a(k), a(k))
+           enddo
+        elseif(jtype .eq.  3 .or. jtype .eq. 4) then
+c              now in cms. boost to lab
+           do k =1, ntp
+              call cibst1(k, Cmsp, a(k), a(k))
+           enddo
+c       else
+c          jtype =1 or 2 and fermin=F; then a is already in lab.
+        endif
+       end
+c      ****************************************************************
+c         fix g--->hadrons interaction type
+c                   gp-->p+pi0 or gn-->n+pi0
+c              jtype=1
+c                   gp-->n+pi+ or gn-->p+pi-
+c              jtype=2
+c                   gp-->p pi+ pi- or gn --> n pi+ pi-
+c              jtype=3
+c                   gp --> p pi+ pi- pi0 or  gn n pi+pi- pi0
+c              jtype=4
+c                  vector meson collision
+c              jtype=5
+c              jtype=0  no-production
+c      ****************************************************************
+       subroutine cghCollType(pj, jtype)
+       implicit none
+#include  "Zptcl.h"
+       record /ptcl/ pj
+       integer jtype
+
+       real*8 egl, xs1, xs2, xs3, xs4, xso, xst, u
+       real*8 xs
+       if(pj.fm.p(4) .lt. 5.) then
+c             log10(Eg/MeV); xs in micro barn
+           egl=log10(pj.fm.p(4)) + 3
+           call cgppi0(egl, xs1)
+           call cgppip(egl, xs2)
+           call cgppi2(egl, xs3)
+           call cgppi3(egl, xs4)
+        else
+           xs1=0.
+           xs2=0.
+           xs3=0.
+           xs4=0.
+        endif
+c            gp total x-section  xs in mb
+        call cgpxs1(pj.fm.p(4),   xs)
+        xs=xs*1000.   ! in micro barn
+        xso=max(0.d0, xs-(xs1+xs2+xs3+xs4) )  ! other channel
+        if(pj.fm.p(4) .lt. 2.5) xso=0.
+        xst=xs1+xs2+xs3+xs4+xso
+        if(xst .gt. 0.) then
+            call rndc(u)
+            if(u .lt. xs1/xst) then
+c                   gp-->p+pi0 or gn-->n+pi0
+               jtype=1
+            elseif(u .lt. (xs1+xs2)/xst) then
+c                   gp-->n+pi+ or gn-->p+pi-
+               jtype=2
+            elseif(u .lt. (xs1+xs2+xs3)/xst) then
+c                   gp-->p pi+ pi- or gn --> n pi+ pi-
+               jtype=3
+            elseif( u .lt.  (xs1+xs2+xs3+xs4)/xst) then
+               jtype=4
+            else
+c                  vector meson collision
+               jtype=5
+            endif
+         else
+            jtype=0
+         endif
+       end
+c          gn --> resonance production
+       subroutine cg1pi0(pj, ic, a, ntp)
+       implicit none
+#include  "Zptcl.h"
+#include  "Zmass.h"
+#include  "Zcode.h"
+#include  "Zevhnv.h"
+
+       record /ptcl/ pj, a(*)
+       integer ic, ntp
+c
+
+
+        real*8 cs, tmass
+        record /ptcl/ eres
+        save
+c
+        tmass=masp
+c                   gp-->p+pi0 or gn-->n+pi0; sample cos of pi0 in cms
+        call csPiAngOfPiN(Cmsp.mass, 1, 0, cs)
+c          resonance energy in trs
+cc        eres.fm.p(1) = 0.
+cc        eres.fm.p(2) = 0.
+cc        eres.fm.p(4) = pj.fm.p(4) + tmass
+cc        eres.mass = Cmsp.mass
+cc        eres.fm.p(3) = sqrt(eres.fm.p(4)**2 - eres.mass**2)
+        call cmkptc(kpion, 0, 0, a(1))        
+        call cmkptc(knuc, regptcl, ic, a(2))
+cc        call c2bdcp(eres, a(1), cs, a(2))
+        call c2bdcp(Cmsp,  a(1), cs, a(2))
+        ntp=2
+        end
+c       **************
+        subroutine cg1pic(pj, ic, a, ntp)
+       implicit none
+#include  "Zptcl.h"
+#include  "Zmass.h"
+#include  "Zcode.h"
+#include  "Zevhnv.h"
+
+       record /ptcl/ pj, a(*)
+       integer ic, ntp
+c
+
+
+        real*8 cs, tmass
+        record /ptcl/ eres
+        save
+
+c       **************
+c                   gp-->n+pi+ or gn-->p+pi-; sample cos of pi in cms
+        tmass = masp
+        call csPiAngOfPiN(Cmsp.mass, 0, 1, cs)
+c        eres.fm.p(4)=pj.fm.p(4) + tmass
+c        eres.mass = Cmsp.mass
+c        eres.fm.p(3) = sqrt(eres.fm.p(4)**2 - eres.mass**2)
+        call cmkptc(kpion, 0, ic, a(1))
+        call cmkptc(knuc, regptcl, ic*2-1, a(2))
+c        call c2bdcp(eres, a(1), cs, a(2))
+        call c2bdcp(Cmsp, a(1), cs, a(2))
+        ntp=2
+        end
+c       **************
+        subroutine cg2pi(ic, a, ntp)
+c       **************
+c          particles are produced in cms.
+       implicit none
+#include  "Zptcl.h"
+#include  "Zcode.h"
+#include  "Zevhnv.h"
+
+       record /ptcl/ a(*)
+
+       integer ic, ntp
+
+        real*8 w
+        integer icon
+c                   gp-->p pi+ pi- or gn --> n pi+ pi-
+        character*70 msg
+       
+       call cmkptc(knuc, regptcl, ic, a(1))
+       call cmkptc(kpion, 0, 1, a(2))
+       call cmkptc(kpion, 0, -1, a(3))
+
+       call cnbdcy(3, Cmsp.mass, a,  0, w, icon)
+       if(icon .eq. 1) then
+          write(0, *)
+     *    ' cnbdcy fails in gp-->p pi+ pi- ', 
+     *    ' roots=',Cmsp.mass, ' icon=',icon
+          ntp=0
+       else
+          ntp=3
+       endif
+       end
+c       **************
+       subroutine cg3pi(ic, a, ntp)
+       implicit none
+#include  "Zptcl.h"
+#include  "Zmass.h"
+#include  "Zcode.h"
+#include  "Zevhnv.h"
+
+       record /ptcl/ a(*)
+       integer ic, ntp, icon
+       real*8 w
+c
+c       **************
+c                   gp-->p pi+ pi- pi0 or gn-> 3pi
+c            in cms.
+       call cmkptc(knuc, regptcl, ic, a(1))
+       call cmkptc(kpion, 0, -1, a(2))
+       call cmkptc(kpion, 0, 0, a(3))
+       call cmkptc(kpion, 0, 1, a(4))
+       call cnbdcy(4, Cmsp.mass, a,  0, w, icon)
+       if(icon .eq. 1) then
+           write(0,*) ' cnbdcy fails in gp--> p + 3pi ',
+     *     ' roots=',  Cmsp.mass, ' icon=',icon
+           ntp=0
+       else
+c          icon =2 comes here. no problem statistically.
+c            few percent cases for mass=1.6 to 3 GeV happens to be icon=2
+c            (icon = 2 means rejection after 20 trials due to wight problem)
+          ntp=4
+       endif
+       end
+c      ************************************************************
+c         neutral vector meson collision.
+       subroutine cgVectorMeson(pj, tg, a, ntp)
+       implicit none
+#include  "Zptcl.h"
+
+       record /ptcl/ pj, a(*), tg
+       integer  ntp
+c
+       record /ptcl/ vm, pw
+       integer jcon, nx, icon
+       real*8 p, alfa
+c            fix vector meson (rho, omega, or phai)
+c                              46  46         8 %
+        call cfixVectorMeson(pj.fm.p(4), vm, jcon)
+        if(jcon .eq. 0) then
+c              make vector meson proj.
+            p=sqrt(pj.fm.p(4)**2 - vm.mass**2)
+            alfa=p/pj.fm.p(4)
+            vm.fm.p(1) = pj.fm.p(1)*alfa
+            vm.fm.p(2) = pj.fm.p(2)*alfa
+            vm.fm.p(3) = pj.fm.p(3)*alfa
+            vm.fm.p(4) = pj.fm.p(4)
+            call chncol(vm, tg, a, ntp, icon)
+c              leading v.m is in a(ntp)
+c              need to make decay of leading ptcl
+            if(icon .eq. 0) then
+               pw = a(ntp)
+               call cvmdcy(pw, a(ntp), nx)
+               ntp=ntp -1 + nx
+            else
+               ntp = 1
+               a(1) = pj
+            endif
+        else
+c//////////////
+c           write(*,*) 'no vector meson '
+c///////////////
+           ntp=1
+           a(1) = pj
+        endif
+       end
+c      *****************************************
+       subroutine cfixVectorMeson(e, vm, icon)
+c      *****************************************
+       implicit none
+
+#include  "Zptcl.h"
+#include  "Zcode.h"
+#include  "Zmass.h"
+       real*8 e
+       record /ptcl/ vm
+       integer icon
+c       
+       integer nc
+       real*8 u, amass, w
+c
+       nc=0
+c         *** until loop*** 
+       do while (.true.)
+          nc=nc+1
+          call rndc(u)
+          if(u .lt. .46) then
+             call cmkptc(krho, 0, 0, vm)
+             w=wrho
+c///////////
+c             write(*,*) ' rho'
+c//////////////
+          elseif(u .lt. .92) then
+             call cmkptc(komega, 0, 0, vm)
+             w=womega
+c///////////
+c             write(*,*) ' omega'
+c//////////////
+
+          else
+             call cmkptc(kphi, 0, 0, vm)
+             w=wphai
+c///////////
+c             write(*,*) ' phi'
+c//////////////
+
+          endif
+c              *** until loop*** 
+          do while (.true.)
+             call ksbwig(vm.mass, w, amass)
+             if (amass .gt. vm.mass-w .and. amass .lt. vm.mass+w)
+     *                           goto 10
+          enddo
+ 10       continue
+          if(e .le. amass) then
+             icon=1
+          else
+             icon=0
+          endif
+          if  (icon .eq. 0 .or. nc .gt. 10)
+     *                      goto 100
+       enddo
+       vm.mass = amass
+ 100   continue
+       
+       end
+c      *****************************************************************
+c          make decay of a vector meson
+c      *****************************************************************
+       subroutine cvmdcy(vm, a, np)
+       implicit none
+#include  "Zptcl.h"
+#include  "Zcode.h"
+       record /ptcl/ vm, a(*)
+       integer np
+c
+       if(vm.code .eq. krho) then
+          call crhodc(vm, a, np)
+       elseif(vm.code .eq. komega) then
+          call comgdc(vm, a, np)
+       elseif(vm.code .eq. kphi) then
+          call cphadc(vm, a, np)
+       endif
+       end
+c      ******************************
+c        rho 0, +, - decay
+       subroutine crhodc(vm, a, np)
+c      ******************************
+       implicit none
+#include  "Zptcl.h"
+#include  "Zcode.h"
+       record /ptcl/ vm, a(*)
+       integer np,  icharge
+
+       if(vm.charge .eq. 0) then
+c               pi+ pi-
+          call cmkptc(kpion, 0, 1, a(1))
+          call cmkptc(kpion, 0, -1, a(2))
+          call c2bdcy(vm, a(1), a(2))
+          np = 2
+       else
+          call cmkptc(kpion, 0, 0, a(1))
+	  icharge = vm.charge
+          call cmkptc(kpion, 0, icharge, a(2))
+          call c2bdcy(vm, a(1), a(2))
+          np = 2
+       endif
+       end
+c      ******************************
+       subroutine comgdc(vm, a, np)
+c      ******************************
+       implicit none
+#include  "Zptcl.h"
+#include  "Zcode.h"
+       record /ptcl/ vm, a(*)
+       integer np
+
+       real*8 u
+c         omega--->pi+ pi- pi0   : 88.8 %
+c                  pi0 gamma:       8.5
+c                  pi+ pi- :        2.7
+          call rndc(u)
+          if(u .lt. .888) then
+              call c3pidc(vm, a, np)
+          elseif(u .lt. .973) then
+             call cmkptc(kpion, 0, 0, a(1))
+             call cmkptc(kphoton, 0, 0, a(2))
+             call c2bdcy(vm, a(1), a(2))
+             np = 2
+          else
+c               pi+ pi-
+             call cmkptc(kpion, 0, 1, a(1))
+             call cmkptc(kpion, 0,-1, a(2))
+             call c2bdcy(vm, a(1), a(2))
+             np = 2 
+          endif
+        end
+
+c    * ****************************      
+        subroutine c3pidc(vm, a, np)
+c    * ****************************      
+        implicit none
+#include  "Zptcl.h"
+#include  "Zcode.h"
+        integer np
+        integer icon, ntry
+        record /ptcl/ vm, a(*)
+        integer i
+        real*8 w
+        character*70  msg
+
+        call cmkptc(kpion, 0, 1, a(1))
+        call cmkptc(kpion, 0, 0, a(2))
+        call cmkptc(kpion, 0, -1, a(3))
+c             pi+ pi- pi0
+        ntry = 0
+        icon = 1
+        do while( icon .ne. 0 .and. ntry < 200)
+           call cnbdcy(3, vm.mass, a,  0, w, icon)
+           ntry = ntry + 1
+        enddo
+        if(icon .ne. 0) then
+           write(0, *) ' cnbdcy fails for omega 3 pi',
+     *          'cms=',vm.mass, 'icon=',icon
+           np=0
+        else
+           np=3
+           do i = 1, np
+              call cibst1(1, vm, a(i), a(i))
+           enddo
+c////////////
+c           write(*,*) ' omega 3body '
+c//////////////////
+        endif
+       end
+       subroutine cphadc(vm, a, np)
+        implicit none
+#include  "Zptcl.h"
+#include  "Zcode.h"
+        integer np
+
+        record /ptcl/ vm, a(*)
+
+        real*8  u
+        integer ic, nx
+        record /ptcl/pw 
+        nx = 0
+c            phai-->k+ k-      49.5 %
+c                   k0l k0s 34.4
+c                   rho pi      12.9 (rho+ pi-, rho- pi+, rho0 pi0)
+c                   pi+ pi- pi0      1.9
+
+          call rndc(u)
+          if(u .lt. .495) then
+             call cmkptc(kkaon, 0, 1, a(1))
+             call cmkptc(kkaon, 0, -1, a(2))
+             call c2bdcy(vm, a(1), a(2))
+             np = 2
+          elseif(u .lt. .839) then
+             call cmkptc(kkaon, k0l, 0, a(1))
+             call cmkptc(kkaon, k0s, 0, a(2))
+             call c2bdcy(vm, a(1), a(2))
+             np = 2
+          elseif(u .lt. .968) then
+             call rndc(u)
+             ic=int(3.*u)-1
+             call cmkptc(kpion, 0, ic, a(1))
+             call cmkptc(krho, 0, -ic, a(2))
+             call c2bdcy(vm, a(1), a(2))
+c                  rho decay
+             pw = a(2)
+             call crhodc(pw, a(2), nx)
+             np=nx+1
+          else
+             call c3pidc(vm, a, np)
+          endif
+        end

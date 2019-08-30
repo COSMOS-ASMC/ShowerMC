@@ -1,0 +1,84 @@
+To compile and get an executable, simple type
+	make
+which will cteate  cosmos$ARCH, where $ARCH is the one
+specified in site.config.  You will need to do
+	mkdir /tmp/YOURID
+before running the jot as
+	cosmos$ARCH < param
+
+
+If compilation fails, read the following.
+
+c++ code may run or may not run depending on the environment.
+It depends on the version of gcc, OS.
+ Intel Fortran. with Red Hat Linux 7.3, 9.0  the
+ C++ User Interface went well. 
+
+Stuff in Test/ include varous tests I tried during making up 
+the interface.
+**********
+You have to change the IFC compiler part in Makefile.
+Also you have to make the appropiate  ifclib file.
+(For intel fortran, you would have to change the -L part,
+say -L/usr/intel/...)
+
+To see what specification is needed,
+ you may make a simple fortran program, and
+compile it with -v option. Then, you will see what
+libraries are needed to link Fortran programs and
+you may put them in ifclib.
+*********
+
+
+If you change Z.....h in cosmos, you must also change the
+corresponding Z...h in include.
+
+ -------------
+
+The commands used in Makefile are
+
+c++ -c ../cmain.cc -I../../include
+c++ -c  chookHybAS.cc -I../../include
+c++ -c ../ctemplCeren.cc -I../../include
+c++ -c chook.cc -I../../include
+
+ /lib/cpp -C -P -traditional -I$COSMOSINC ../cmymain.f > /tmp/cmymain.f
+ifc -c  /tmp/cmymain.f
+
+
+c++ cmain.o cmymain.o chook.o chookHybAS.o ctemplCeren.o -L$COSMOSTOP/lib/PCLinuxIFC -lcosmos `cat ifclib `
+
+will create a.out. So you may run the program as
+ ./a.out < param  
+(you will need to mkdir /tmp/YOURID with standard param).
+
+
+-------------------------------
+IFC:
+ append _.
+ for lib, cc ...  ` cat ifclib `
+
+ cat ifclib must come last
+
+
+-----------
+	
+icrsrv: 
+In C code,
+ use  the same capital/small letter as in fortran.
+	but apend _ in each external name.
+
+use library 
+-L/usr/lib32/mips4/r10000 -L/usr/lib32/mips4 -L/usr/lib32 -dont_warn_unused -lfortran -lffio -lftn -lm
+
+
+--------------
+OS X absoft fortran
+In C code;
+use capital letter for external name without appending _
+
+use library;
+  -L/usr/local/Absoft/lib/ -lfio -lf77math
+
+-----------------
+

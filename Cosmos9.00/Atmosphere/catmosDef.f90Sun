@@ -1,0 +1,125 @@
+#include "ZepMaxdef.h"
+  ! if you change the Earth to another world, cputCerenkov.f in
+  ! Tracking might be updated (if you use it for Cerenkov light
+  ! generation)
+module modAtmosDef
+  !     this should be linked to Cosmos/Moddule/catmosDef.f90
+  !     as ln -s ../Atmoshere/catmosDef.f90 catmosDef.f90
+  !     in Cosmos/Module/
+  !  This module defines basic variables to describe atmosphere
+  !  and can be used for non-Earth atmosphere too with some changes.
+  !  Old many variables in Zearth.h and Zatmos.h in Cosmos/cosmos
+  !  were  moved here and updated.
+  !
+  !    radius of the Earth or other object like the sun
+!  real(8),save:: Eradius = 6378136.0d0  !  radius in m
+  real(8),save::  Eradius = 690000e3  !  radius in m
+!  real(8),save:: Maxheight=220.d3 !  max height with some air (m)
+  real(8),save:: Maxheight=3000.d3 !  max height with some air (m)
+!  real(8),save:: Minheight = -500.d0 !min height below the surface
+  real(8),save:: Minheight = -100.d3 !min height below the surface  
+  ! where we may assume  atmosphere (m)
+    
+
+  ! At > Maxheight,  air density is calculated using
+  ! this value as the scale height.  rho= rho_m exp( -(z-Zm)/Hinf)
+  !     'm' means the value at Maxheight.
+
+!  real(8),save:: Hinf = 1000.d3 ! m  At very high altitude
+  real(8),save:: Hinf = 10000.d3 ! m  At very high altitude  
+!    real(8),parameter:: LenStep=1000.d0   ! in m
+  real(8),parameter:: LenStep=100.d3   ! in m
+!  integer,save:: maxl2t=1200.0d3/LenStep
+  integer,save:: maxl2t=120000.0d3/LenStep
+  
+  !       for length to thickness conversion and  v.v 
+  !
+  
+  
+  !     next two are not used 
+  real(8),parameter:: Eecen2= 0.006694470d0  !  square of the ecentricity
+  ! not used at present
+  real(8),save:: Eone_ecen2 = 1.d0 - Eecen2 !   1 - ecen2
+
+
+  !
+  integer,parameter:: maxnodes = 40
+  ! maximum no. of nodes to express the atmosphere.
+     ! slant length 1200km ~ vertical length 100km for
+     !  cos~0.083.  The length is divided by LenSetp.
+     
+!      When using the table,
+!      Non-integral point (i.e., values not in the table) is
+!      obtained by using interpolation using 3 integral points.
+!      (see cl2tTblA.f)
+!     maxnodes: 
+
+  integer,save:: NumStep ! table size made by sub.  cl2tTbl
+  real(8),save:: Htop, Hbase
+  real(8),save:: Zsave, ThickSave
+  real(8),allocatable,save::ThickTbl(:), LenTbl(:), CosTbl(:), &
+         HeightTbl(:)  ! size should be maxl2t
+  
+  type atmosph 
+     sequence
+     real*8  z(maxnodes)
+     real*8  zi(maxnodes)
+     real*8  T(maxnodes)
+     real*8  P(maxnodes)
+     real*8  logP(maxnodes)
+     real*8  rho(maxnodes)
+     real*8  logrho(maxnodes)
+     real*8  logrhoi(maxnodes) 
+     real*8  H(maxnodes)
+     real*8  a(maxnodes)
+     real*8  b(maxnodes)
+     real*8  cumd(maxnodes)
+     real*8  logcumd(maxnodes)
+     real*8  logcumdi(maxnodes)
+     real*8  d0(maxnodes)
+     real*8  coefh2r(maxnodes,3)
+     real*8  coefh2T(maxnodes,3)
+     real*8  coefh2d(maxnodes,3)
+     !        real*8  coefh2P(maxnodes,3)      
+     real*8  coefh2H(maxnodes,3)      
+     !        real*8  coefr2h(maxnodes,3)      
+     real*8  coefd2r(maxnodes,3)  
+     real*8  coefd2h(maxnodes,3)      
+        !        real*8  coefP2h(maxnodes,3)
+     integer:: node2mediaNo(maxnodes) !  for a given node number, n,
+        !  j= node2mediaNo(n) gives index for media (for usual atmphere
+        !  1)  and media(j) gives the media name (normally "air")
+        !  max of j can be nodes<=maxnodes.
+        !  If, for a give n, "air" is specified, it means meidia
+        !  between node n and n+1 is "air".  n=1 is the bottom of
+     !  the atmosphere.
+     ! Note:  media name of the node is obtained by
+     !            Media(MediaNo) where MediaNo is fixed by
+     !              MediaNo= atmos%node2mediaNo(node) just after
+     !            the present active track is extracted by calling
+     !     cpop.
+     !            NoOfMedia (# of diff. emdia types in the current
+     !            atmospher.  Medai, MediaNo, NoOfMedia are in
+     !            ZmediaLoft.h
+     real(8):: rhoc(maxnodes) ! rho correction factor give like H2O*0.01
+     character(len=MAX_MEDIANAMELENG)::matter(maxnodes)
+     
+     integer:: nodes  ! actual # of total nodes.
+
+  end type atmosph
+
+  type(atmosph):: atmos
+
+end module modAtmosDef
+subroutine callocAtmosTbl
+  use modAtmosDef
+  implicit none
+
+  allocate( ThickTbl(maxl2t))
+  allocate( LenTbl(maxl2t))
+  allocate( CosTbl(maxl2t))
+  allocate( HeightTbl(maxl2t) )
+end subroutine callocAtmosTbl
+
+  
+  

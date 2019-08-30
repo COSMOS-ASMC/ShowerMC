@@ -1,0 +1,374 @@
+#news new-1 angle
+
+#subd   anchorA1 
+1 box  Al     0  0  0 / 0.253  0.147  0   0.672 0.15 anglelA1  cos45 cos45  0  ncos45 cos45 0 
+2 angle Al    0  0  0 / 0.0  0.0  0  0.7 0.7 0.2 0.2 anglelA1 
+3 box_w  sp  0 0 0 / 0 0 0 
+#end  anchorA1 
+ 
+#subd  AlbarA1 
+1 box  Al     0 0 0 / 0.6 0.6  0  0.8  0.8 anglelA1  / 2 
+2 cyl  hollow 0 0 0 / 1 1  0   0.21 anglelA1 
+3 anchorA1  sp 0 0 0 /   0  0 0 
+4 anchorA1  sp 0 0 0 /   2  0 0   0  1 0  -1  0 0 
+5 anchorA1  sp 0 0 0 /   2  2 0  -1  0 0   0 -1 0   
+6 anchorA1  sp 0 0 0 /   0  2 0   0 -1 0   1  0 0 
+7 box_w   sp  0 0 0 / 0 0 0 
+#end  AlbarA1 
+
+#subd   anchorA1_2 
+1 box  Al     0  0  0 / 0.253  0.147  0   0.672 0.15 anglelA1_2  cos45 cos45  0  ncos45 cos45 0 
+2 angle Al    0  0  0 / 0.0  0.0  0  0.7 0.7 0.2 0.2 anglelA1_2 
+3 box_w  sp  0 0 0 / 0 0 0 
+#end  anchorA1_2 
+ 
+#subd  AlbarA1_2 
+1 box  Al     0 0 0 / 0.6 0.6  0  0.8  0.8 anglelA1_2  / 2 
+2 cyl  hollow 0 0 0 / 1 1  0   0.21 anglelA1_2 
+3 anchorA1_2  sp 0 0 0 /   0  0 0 
+4 anchorA1_2  sp 0 0 0 /   2  0 0   0  1 0  -1  0 0 
+5 anchorA1_2  sp 0 0 0 /   2  2 0  -1  0 0   0 -1 0   
+6 anchorA1_2  sp 0 0 0 /   0  2 0   0 -1 0   1  0 0 
+7 box_w   sp  0 0 0 / 0 0 0 
+#end  AlbarA1_2 
+
+
+#subd   anchorA2 
+1 box  Al     0  0  0 / 0.253  0.147  0   0.672 0.15 anglelA2  cos45 cos45  0  ncos45 cos45 0 
+2 angle Al    0  0  0 / 0.0  0.0  0  0.7 0.7 0.2 0.2 anglelA2 
+3 box_w  sp  0 0 0 / 0 0 0 
+#end  anchorA2 
+ 
+#subd  AlbarA2 
+1 box  Al     0 0 0 / 0.6 0.6  0  0.8  0.8 anglelA2  / 2 
+2 cyl  hollow 0 0 0 / 1 1  0   0.21 anglelA2 
+3 anchorA2  sp 0 0 0 /   0  0 0 
+4 anchorA2  sp 0 0 0 /   2  0 0   0  1 0  -1  0 0 
+5 anchorA2  sp 0 0 0 /   2  2 0  -1  0 0   0 -1 0   
+6 anchorA2  sp 0 0 0 /   0  2 0   0 -1 0   1  0 0 
+7 box_w   sp  0 0 0 / 0 0 0 
+#end  AlbarA2 
+
+
+#subd   anchorA3 
+1 box  Al     0  0  0 / 0.253  0.147  0   0.672 0.15 anglelA3  cos45 cos45  0  ncos45 cos45 0 
+2 angle Al    0  0  0 / 0.0  0.0  0  0.7 0.7 0.2 0.2 anglelA3 
+3 box_w  sp  0 0 0 / 0 0 0 
+#end  anchorA3 
+ 
+#subd  AlbarA3 
+1 box  Al     0 0 0 / 0.6 0.6  0  0.8  0.8 anglelA3  / 2 
+2 cyl  hollow 0 0 0 / 1 1  0   0.21 anglelA3 
+3 anchorA3  sp 0 0 0 /   0  0 0 
+4 anchorA3  sp 0 0 0 /   2  0 0   0  1 0  -1  0 0 
+5 anchorA3  sp 0 0 0 /   2  2 0  -1  0 0   0 -1 0   
+6 anchorA3  sp 0 0 0 /   0  2 0   0 -1 0   1  0 0 
+7 box_w   sp  0 0 0 / 0 0 0 
+#end  AlbarA3 
+
+
+#subd   anchorA4 
+1 box  Al     0  0  0 / 0.253  0.147  0   0.672 0.15 anglelA4  cos45 cos45  0  ncos45 cos45 0 
+2 angle Al    0  0  0 / 0.0  0.0  0  0.7 0.7 0.2 0.2 anglelA4 
+3 box_w  sp  0 0 0 / 0 0 0 
+#end  anchorA4 
+ 
+#subd  AlbarA4 
+1 box  Al     0 0 0 / 0.6 0.6  0  0.8  0.8 anglelA4  / 2 
+2 cyl  hollow 0 0 0 / 1 1  0   0.21 anglelA4 
+3 anchorA4  sp 0 0 0 /   0  0 0 
+4 anchorA4  sp 0 0 0 /   2  0 0   0  1 0  -1  0 0 
+5 anchorA4  sp 0 0 0 /   2  2 0  -1  0 0   0 -1 0   
+6 anchorA4  sp 0 0 0 /   0  2 0   0 -1 0   1  0 0 
+7 box_w   sp  0 0 0 / 0 0 0 
+#end  AlbarA4 
+
+
+#subd   anchorA5 
+1 box  Al     0  0  0 / 0.253  0.147  0   0.672 0.15 anglelA5  cos45 cos45  0  ncos45 cos45 0 
+2 angle Al    0  0  0 / 0.0  0.0  0  0.7 0.7 0.2 0.2 anglelA5 
+3 box_w  sp  0 0 0 / 0 0 0 
+#end  anchorA5 
+ 
+#subd  AlbarA5 
+1 box  Al     0 0 0 / 0.6 0.6  0  0.8  0.8 anglelA5  / 2 
+2 cyl  hollow 0 0 0 / 1 1  0   0.21 anglelA5 
+3 anchorA5  sp 0 0 0 /   0  0 0 
+4 anchorA5  sp 0 0 0 /   2  0 0   0  1 0  -1  0 0 
+5 anchorA5  sp 0 0 0 /   2  2 0  -1  0 0   0 -1 0   
+6 anchorA5  sp 0 0 0 /   0  2 0   0 -1 0   1  0 0 
+7 box_w   sp  0 0 0 / 0 0 0 
+#end  AlbarA5 
+
+
+#subd   anchorA6 
+1 box  Al     0  0  0 / 0.253  0.147  0   0.672 0.15 anglelA6  cos45 cos45  0  ncos45 cos45 0 
+2 angle Al    0  0  0 / 0.0  0.0  0  0.7 0.7 0.2 0.2 anglelA6 
+3 box_w  sp  0 0 0 / 0 0 0 
+#end  anchorA6 
+ 
+#subd  AlbarA6 
+1 box  Al     0 0 0 / 0.6 0.6  0  0.8  0.8 anglelA6  / 2 
+2 cyl  hollow 0 0 0 / 1 1  0   0.21 anglelA6 
+3 anchorA6  sp 0 0 0 /   0  0 0 
+4 anchorA6  sp 0 0 0 /   2  0 0   0  1 0  -1  0 0 
+5 anchorA6  sp 0 0 0 /   2  2 0  -1  0 0   0 -1 0   
+6 anchorA6  sp 0 0 0 /   0  2 0   0 -1 0   1  0 0 
+7 box_w   sp  0 0 0 / 0 0 0 
+#end  AlbarA6 
+
+
+#subd   anchorA7 
+1 box  Al     0  0  0 / 0.253  0.147  0   0.672 0.15 anglelA7  cos45 cos45  0  ncos45 cos45 0 
+2 angle Al    0  0  0 / 0.0  0.0  0  0.7 0.7 0.2 0.2 anglelA7 
+3 box_w  sp  0 0 0 / 0 0 0 
+#end  anchorA7 
+ 
+#subd  AlbarA7 
+1 box  Al     0 0 0 / 0.6 0.6  0  0.8  0.8 anglelA7  / 2 
+2 cyl  hollow 0 0 0 / 1 1  0   0.21 anglelA7 
+3 anchorA7  sp 0 0 0 /   0  0 0 
+4 anchorA7  sp 0 0 0 /   2  0 0   0  1 0  -1  0 0 
+5 anchorA7  sp 0 0 0 /   2  2 0  -1  0 0   0 -1 0   
+6 anchorA7  sp 0 0 0 /   0  2 0   0 -1 0   1  0 0 
+7 box_w   sp  0 0 0 / 0 0 0 
+#end  AlbarA7 
+
+
+#subd   anchorA8 
+1 box  Al     0  0  0 / 0.253  0.147  0   0.672 0.15 anglelA8  cos45 cos45  0  ncos45 cos45 0 
+2 angle Al    0  0  0 / 0.0  0.0  0  0.7 0.7 0.2 0.2 anglelA8 
+3 box_w  sp  0 0 0 / 0 0 0 
+#end  anchorA8 
+ 
+#subd  AlbarA8 
+1 box  Al     0 0 0 / 0.6 0.6  0  0.8  0.8 anglelA8  / 2 
+2 cyl  hollow 0 0 0 / 1 1  0   0.21 anglelA8 
+3 anchorA8  sp 0 0 0 /   0  0 0 
+4 anchorA8  sp 0 0 0 /   2  0 0   0  1 0  -1  0 0 
+5 anchorA8  sp 0 0 0 /   2  2 0  -1  0 0   0 -1 0   
+6 anchorA8  sp 0 0 0 /   0  2 0   0 -1 0   1  0 0 
+7 box_w   sp  0 0 0 / 0 0 0 
+#end  AlbarA8 
+
+
+#subd   anchorA9 
+1 box  Al     0  0  0 / 0.253  0.147  0   0.672 0.15 anglelA9  cos45 cos45  0  ncos45 cos45 0 
+2 angle Al    0  0  0 / 0.0  0.0  0  0.7 0.7 0.2 0.2 anglelA9 
+3 box_w  sp  0 0 0 / 0 0 0 
+#end  anchorA9 
+ 
+#subd  AlbarA9 
+1 box  Al     0 0 0 / 0.6 0.6  0  0.8  0.8 anglelA9  / 2 
+2 cyl  hollow 0 0 0 / 1 1  0   0.21 anglelA9 
+3 anchorA9  sp 0 0 0 /   0  0 0 
+4 anchorA9  sp 0 0 0 /   2  0 0   0  1 0  -1  0 0 
+5 anchorA9  sp 0 0 0 /   2  2 0  -1  0 0   0 -1 0   
+6 anchorA9  sp 0 0 0 /   0  2 0   0 -1 0   1  0 0 
+7 box_w   sp  0 0 0 / 0 0 0 
+#end  AlbarA9 
+
+
+#subd   anchorBy 
+1 box  Al     0  0  0 / 0.253  0.147  0   0.672 0.15 anglelBy  cos45 cos45  0  ncos45 cos45 0 
+2 angle Al    0  0  0 / 0.0  0.0  0  0.7 0.7 0.2 0.2 anglelBy 
+3 box_w  sp  0 0 0 / 0 0 0 
+#end  anchorBy 
+ 
+#subd  AlbarBy 
+1 box  Al     0 0 0 / 0.6 0.6  0  0.8  0.8 anglelBy  / 2 
+2 cyl  hollow 0 0 0 / 1 1  0   0.21 anglelBy 
+3 box  Al     0 0 0 / 2.6 0.6  0  0.8  0.8 anglelBy  / 4
+4 cyl  hollow 0 0 0 / 3 1  0   0.21 anglelBy 
+5 anchorBy  sp 0 0 0 /   0  0 0 
+6 anchorBy  sp 0 0 0 /   4  0 0   0  1 0  -1  0 0 
+7 anchorBy  sp 0 0 0 /   4  2 0  -1  0 0   0 -1 0   
+8 anchorBy  sp 0 0 0 /   0  2 0   0 -1 0   1  0 0 
+9 box  Al     0  0  0 / 2.253  0.147  0   0.672 0.15 anglelBy  cos45 cos45  0  ncos45 cos45 0 
+10 box  Al     0  0  0 / 2.147  1.747  0   0.672 0.15 anglelBy  cos45 ncos45  0  cos45 cos45 0 
+11 box  Al     0  0  0 / 1.853  1.747  0   0.672 -0.15 anglelBy  ncos45 ncos45  0  cos45 ncos45 0 
+12 box  Al     0  0  0 / 1.747  0.147  0   0.672 -0.15 anglelBy  ncos45 cos45  0  ncos45 ncos45 0 
+13 box Al    0 0 0 / 1.3 0 0 1.4 0.2 anglelBy
+14 box Al    0 0 0 / 1.3 1.8 0 1.4 0.2 anglelBy
+15 box_w   sp  0 0 0 / 0 0 0 
+#end  AlbarBy
+
+
+#subd   anchorBy2 
+1 box  Al     0  0  0 / 0.253  0.147  0   0.672 0.15 anglelBy2  cos45 cos45  0  ncos45 cos45 0 
+2 angle Al    0  0  0 / 0.0  0.0  0  0.7 0.7 0.2 0.2 anglelBy2 
+3 box_w  sp  0 0 0 / 0 0 0 
+#end  anchorBy2 
+ 
+#subd  AlbarBy2 
+1 box  Al     0 0 0 / 0.6 0.6  0  0.8  0.8 anglelBy2  / 2 
+2 cyl  hollow 0 0 0 / 1 1  0   0.21 anglelBy2 
+3 box  Al     0 0 0 / 2.6 0.6  0  0.8  0.8 anglelBy2  / 4
+4 cyl  hollow 0 0 0 / 3 1  0   0.21 anglelBy2 
+5 anchorBy2  sp 0 0 0 /   0  0 0 
+6 anchorBy2  sp 0 0 0 /   4  0 0   0  1 0  -1  0 0 
+7 anchorBy2  sp 0 0 0 /   4  2 0  -1  0 0   0 -1 0   
+8 anchorBy2  sp 0 0 0 /   0  2 0   0 -1 0   1  0 0 
+9 box  Al     0  0  0 / 2.253  0.147  0   0.672 0.15 anglelBy2  cos45 cos45  0  ncos45 cos45 0 
+10 box  Al     0  0  0 / 2.147  1.747  0   0.672 0.15 anglelBy2  cos45 ncos45  0  cos45 cos45 0 
+11 box  Al     0  0  0 / 1.853  1.747  0   0.672 -0.15 anglelBy2  ncos45 ncos45  0  cos45 ncos45 0 
+12 box  Al     0  0  0 / 1.747  0.147  0   0.672 -0.15 anglelBy2  ncos45 cos45  0  ncos45 ncos45 0 
+13 box Al    0 0 0 / 1.3 0 0 1.4 0.2 anglelBy2
+14 box Al    0 0 0 / 1.3 1.8 0 1.4 0.2 anglelBy2
+15 box_w   sp  0 0 0 / 0 0 0 
+#end  AlbarBy2
+
+
+#subd   anchorBx 
+1 box  Al     0  0  0 / 0.253  0.147  0   0.672 0.15 anglelBx  cos45 cos45  0  ncos45 cos45 0 
+2 angle Al    0  0  0 / 0.0  0.0  0  0.7 0.7 0.2 0.2 anglelBx 
+3 box_w  sp  0 0 0 / 0 0 0 
+#end  anchorBx 
+
+#subd  AlbarBx 
+1 box  Al     0 0 0 / 0.6 0.6  0  0.8  0.8 anglelBx  / 2 
+2 cyl  hollow 0 0 0 / 1 1  0   0.21 anglelBx 
+3 box  Al     0 0 0 / 0.6 2.6  0  0.8  0.8 anglelBx  / 4
+4 cyl  hollow 0 0 0 / 1 3  0   0.21 anglelBx 
+5 anchorBx  sp 0 0 0 /   0  0 0 
+6 anchorBx  sp 0 0 0 /   2  0 0   0  1 0  -1  0 0 
+7 anchorBx  sp 0 0 0 /   2  4 0  -1  0 0   0 -1 0   
+8 anchorBx  sp 0 0 0 /   0  4 0   0 -1 0   1  0 0 
+9 box  Al     0  0  0 / 0.147 2.253  0   0.672 -0.15 anglelBx  cos45 cos45  0  ncos45 cos45 0 
+10 box  Al     0  0  0 / 1.747 2.147  0   -0.672 0.15 anglelBx  cos45 ncos45  0  cos45 cos45 0 
+11 box  Al     0  0  0 / 1.747 1.853  0   0.672 0.15 anglelBx  ncos45 ncos45  0  cos45 ncos45 0 
+12 box  Al     0  0  0 / 0.147 1.747  0   -0.672 -0.15 anglelBx  ncos45 cos45  0  ncos45 ncos45 0 
+13 box Al    0 0 0 / 0 1.3 0 0.2 1.4 anglelBx
+14 box Al    0 0 0 / 1.8 1.3 0 0.2 1.4 anglelBx
+15 box_w   sp  0 0 0 / 0 0 0 
+#end  AlbarBx
+
+
+#subd   anchorBx2 
+1 box  Al     0  0  0 / 0.253  0.147  0   0.672 0.15 anglelBx2  cos45 cos45  0  ncos45 cos45 0 
+2 angle Al    0  0  0 / 0.0  0.0  0  0.7 0.7 0.2 0.2 anglelBx2 
+3 box_w  sp  0 0 0 / 0 0 0 
+#end  anchorBx2 
+ 
+#subd  AlbarBx2 
+1 box  Al     0 0 0 / 0.6 0.6  0  0.8  0.8 anglelBx2  / 2 
+2 cyl  hollow 0 0 0 / 1 1  0   0.21 anglelBx2 
+3 box  Al     0 0 0 / 0.6 2.6  0  0.8  0.8 anglelBx2  / 4
+4 cyl  hollow 0 0 0 / 1 3  0   0.21 anglelBx2 
+5 anchorBx2  sp 0 0 0 /   0  0 0 
+6 anchorBx2  sp 0 0 0 /   2  0 0   0  1 0  -1  0 0 
+7 anchorBx2  sp 0 0 0 /   2  4 0  -1  0 0   0 -1 0   
+8 anchorBx2  sp 0 0 0 /   0  4 0   0 -1 0   1  0 0 
+9 box  Al     0  0  0 / 0.147 2.253  0   0.672 -0.15 anglelBx2  cos45 cos45  0  ncos45 cos45 0 
+10 box  Al     0  0  0 / 1.747 2.147  0   -0.672 0.15 anglelBx2  cos45 ncos45  0  cos45 cos45 0 
+11 box  Al     0  0  0 / 1.747 1.853  0   0.672 0.15 anglelBx2  ncos45 ncos45  0  cos45 ncos45 0 
+12 box  Al     0  0  0 / 0.147 1.747  0   -0.672 -0.15 anglelBx2  ncos45 cos45  0  ncos45 ncos45 0 
+13 box Al    0 0 0 / 0 1.3 0 0.2 1.4 anglelBx2
+14 box Al    0 0 0 / 1.8 1.3 0 0.2 1.4 anglelBx2
+15 box_w   sp  0 0 0 / 0 0 0 
+#end  AlbarBx2
+
+
+
+#subd   anchorC1 
+1 box  Al     0  0  0 / 0.253  0.147  0   0.672 0.15 anglelC1  cos45 cos45  0  ncos45 cos45 0 
+2 angle Al    0  0  0 / 0.0  0.0  0  0.7 0.7 0.2 0.2 anglelC1 
+3 box_w  sp  0 0 0 / 0 0 0 
+#end  anchorC1 
+ 
+#subd  AlbarC1_half
+1 box  Al     0 0 0 / 0.6 0.6  0  0.8  0.8 anglelC1  / 2 14
+2 cyl  hollow 0 0 0 / 1 1  0   0.21 anglelC1 
+3 box  Al     0 0 0 / 2.6 0.6  0  0.8  0.8 anglelC1  / 4 15
+4 cyl  hollow 0 0 0 / 3 1  0   0.21 anglelC1 
+5 anchorC1  sp 0 0 0 /   0  0 0 
+6 anchorC1  sp 0 0 0 /   4  0 0   0  1 0  -1  0 0 
+7 box  Al  0 0 0 / 0 1.3 0 0.2 0.7 anglelC1
+8 box  Al  0 0 0 / 0.147 1.747 0 0.672 0.15 anglelC1  cos45 ncos45  0  cos45 cos45 0 
+9 box  Al  0 0 0 / 3.8 1.3 0 0.2 0.7 anglelC1
+10 box  Al  0 0 0 / 3.853 1.747 0 0.672 -0.15 anglelC1  ncos45 ncos45  0  cos45 ncos45 0 
+11 box  Al     0  0  0 / 2.253  0.147  0   0.672 0.15 anglelC1  cos45 cos45  0  ncos45 cos45 0 
+12 box  Al     0  0  0 / 1.747  0.147  0   0.672 -0.15 anglelC1  ncos45 cos45  0  ncos45 ncos45 0 
+13 box Al    0 0 0 / 1.3 0 0 1.4 0.2 anglelC1
+14 box hollow 0 0 0 / 1 1 0 0.4 0.4 anglelC1
+15 box hollow 0 0 0 / 2.6 1 0 0.4 0.4 anglelC1
+16 box_w   sp  0 0 0 / 0 0 0 
+#end  AlbarC1_half
+
+#subd  AlbarC1 
+1 AlbarC1_half sp 0 0 0 / 0 0 0
+2 AlbarC1_half sp 0 0 0 / 4 4 0  -1  0 0   0 -1 0   
+3 box_w sp 0 0 0 / 0 0 0
+#end  AlbarC1 
+
+
+#subd   anchorC2 
+1 box  Al     0  0  0 / 0.253  0.147  0   0.672 0.15 anglelC2  cos45 cos45  0  ncos45 cos45 0 
+2 angle Al    0  0  0 / 0.0  0.0  0  0.7 0.7 0.2 0.2 anglelC2 
+3 box_w  sp  0 0 0 / 0 0 0 
+#end  anchorC2 
+ 
+#subd  AlbarC2_half
+1 box  Al     0 0 0 / 0.6 0.6  0  0.8  0.8 anglelC2  / 2 14 
+2 cyl  hollow 0 0 0 / 1 1  0   0.21 anglelC2 
+3 box  Al     0 0 0 / 2.6 0.6  0  0.8  0.8 anglelC2  / 4 15
+4 cyl  hollow 0 0 0 / 3 1  0   0.21 anglelC2 
+5 anchorC2  sp 0 0 0 /   0  0 0 
+6 anchorC2  sp 0 0 0 /   4  0 0   0  1 0  -1  0 0 
+7 box  Al  0 0 0 / 0 1.3 0 0.2 0.7 anglelC2
+8 box  Al  0 0 0 / 0.147 1.747 0 0.672 0.15 anglelC2  cos45 ncos45  0  cos45 cos45 0 
+9 box  Al  0 0 0 / 3.8 1.3 0 0.2 0.7 anglelC2
+10 box  Al  0 0 0 / 3.853 1.747 0 0.672 -0.15 anglelC2  ncos45 ncos45  0  cos45 ncos45 0 
+11 box  Al     0  0  0 / 2.253  0.147  0   0.672 0.15 anglelC2  cos45 cos45  0  ncos45 cos45 0 
+12 box  Al     0  0  0 / 1.747  0.147  0   0.672 -0.15 anglelC2  ncos45 cos45  0  ncos45 ncos45 0 
+13 box Al    0 0 0 / 1.3 0 0 1.4 0.2 anglelC2
+14 box hollow 0 0 0 / 1 1 0 0.4 0.4 anglelC2
+15 box hollow 0 0 0 / 2.6 1 0 0.4 0.4 anglelC2
+16 box_w   sp  0 0 0 / 0 0 0 
+#end  AlbarC2_half
+
+#subd  AlbarC2 
+1 AlbarC2_half sp 0 0 0 / 0 0 0
+2 AlbarC2_half sp 0 0 0 / 4 4 0  -1  0 0   0 -1 0   
+3 box_w sp 0 0 0 / 0 0 0
+#end  AlbarC2 
+
+
+
+#subd   anchorDy 
+1 box  Al     0  0  0 / 0.253  0.147  0   0.672 0.15 anglelDy  cos45 cos45  0  ncos45 cos45 0 
+2 angle Al    0  0  0 / 0.0  0.0  0  0.7 0.7 0.2 0.2 anglelDy 
+3 box_w  sp  0 0 0 / 0 0 0 
+#end  anchorDy 
+ 
+#subd  AlbarDy 
+1 box  Al     0 0 0 / 0.6 0.6  0  0.8  0.8 anglelDy  / 2 
+2 cyl  hollow 0 0 0 / 1 1  0   0.21 anglelDy 
+3 box  Al     0 0 0 / 2.6 0.6  0  0.8  0.8 anglelDy  / 4
+4 cyl  hollow 0 0 0 / 3 1  0   0.21 anglelDy 
+5 box  Al     0 0 0 / 4.6 0.6  0  0.8  0.8 anglelDy  / 6
+6 cyl  hollow 0 0 0 / 5 1  0   0.21 anglelDy 
+
+7 anchorDy  sp 0 0 0 /   0  0 0 
+8 anchorDy  sp 0 0 0 /   6  0 0   0  1 0  -1  0 0 
+9 anchorDy  sp 0 0 0 /   6  2 0  -1  0 0   0 -1 0   
+10 anchorDy  sp 0 0 0 /   0  2 0   0 -1 0   1  0 0 
+
+11 box  Al     0  0  0 / 2.253  0.147  0   0.672 0.15 anglelDy  cos45 cos45  0  ncos45 cos45 0 
+12 box  Al     0  0  0 / 2.147  1.747  0   0.672 0.15 anglelDy  cos45 ncos45  0  cos45 cos45 0 
+13 box  Al     0  0  0 / 1.853  1.747  0   0.672 -0.15 anglelDy  ncos45 ncos45  0  cos45 ncos45 0 
+14 box  Al     0  0  0 / 1.747  0.147  0   0.672 -0.15 anglelDy  ncos45 cos45  0  ncos45 ncos45 0 
+
+15 box  Al     0  0  0 / 4.253  0.147  0   0.672 0.15 anglelDy  cos45 cos45  0  ncos45 cos45 0 
+16 box  Al     0  0  0 / 4.147  1.747  0   0.672 0.15 anglelDy  cos45 ncos45  0  cos45 cos45 0 
+17 box  Al     0  0  0 / 3.853  1.747  0   0.672 -0.15 anglelDy  ncos45 ncos45  0  cos45 ncos45 0 
+18 box  Al     0  0  0 / 3.747  0.147  0   0.672 -0.15 anglelDy  ncos45 cos45  0  ncos45 ncos45 0 
+
+19 box Al    0 0 0 / 1.3 0 0 1.4 0.2 anglelDy
+20 box Al    0 0 0 / 1.3 1.8 0 1.4 0.2 anglelDy
+21 box Al    0 0 0 / 3.3 0 0 1.4 0.2 anglelDy
+22 box Al    0 0 0 / 3.3 1.8 0 1.4 0.2 anglelDy
+23 box_w   sp  0 0 0 / 0 0 0 
+#end  AlbarDy
+
+

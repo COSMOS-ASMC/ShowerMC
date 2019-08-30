@@ -1,0 +1,1 @@
+      parameter (nmom=102,nkind=6,maz=6,mcz=10,mlvl=15,mpr=4)

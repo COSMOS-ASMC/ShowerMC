@@ -1,0 +1,130 @@
+CompScrE:  150.0/media%Z**0.333  GeV  Above this complete screening holds
+	     (LPM may exist).    Z=1  150GeV. 
+	                           6  83
+				  20  55
+				  74  36
+	     			  80  34 
+				  
+BremEgmin =  1.d-5     Eg/Ee < this is neglected.  (Ee> ...)
+
+BrEemaxS  = 100.d-3  ! max of the  lower Seltzer data
+                                !     region  (100MeV)
+
+BrEgminS = 1.0d-6    ! Eg  min for lower Seltzer region
+                               ! 1 keV ***NOT RATIO****
+BrEeminS = masele+ 5.0d-6  ! below this, brems is
+	      	neglected  (Ek=5keV)
+
+BrLEeminS = log10(cnst%BrEeminS-masele)  ! this is in K.E
+
+
+BrTXTS = mxBrTXS (=85) ! table size for Energy;lower Seltzer region
+	              (defined in ZbpTbl.h)
+
+BrES = BrTXTS  
+BrUminSA = 0.1d0  
+BrUmaxSA = 1.0
+BrUszSA = 51
+BrdUSA = (BrUmaxSA-BrUminSA)/(BrUszSA-1)  =>  1.8e-2
+ 
+mxBrTXS2=41
+
+BrdETXS =  log10((BrEemaxS-masele)/(BrEeminS-masele))/
+                          (BrTXTS-1)
+	    =log10( (100e-3 - 511e-6)/(5e-6))/84 =
+	    =5.117625e-2
+BrdES =*   log10( (BrEemaxS-masele)/(BrEeminS-masele))/
+              ( BrES-1)
+          = log10( 100e-3 - 511e-6 )/5e-6/84 = 5.11762e-2
+
+BrUszSB = 51
+BrUminSB = 0.
+BrUmaxSB = BrUminSA**0.25d0 = 0.1^0.25=0.56234
+BrdUSB =  (BrUmaxSB-BrUminSB)/(BrUszSB-1) =
+         (0.56234 - 0 ) /(51-1)= 1.12468e-2
+
+----------------- 100MeV to 10 GeV Seltzer upper region
+BrEemaxS2  = 10.  ! max of the upper Seltzer data region  (10GeV)
+BrEgminS2 = 1.0d-5  ! Eg/Ee min for upper Seltzer region
+                                ! *** ratio ***.
+				! Eg=100keV to 1keV
+
+BrEeminS2 =  BrEemaxS ! 100. MeV
+
+BrLEeminS2 = log10(BrEeminS2-masele) = log10(100e-3-511e-6) =
+	   = 1.0022
+
+!         table size for Energy;upper Seltzer region
+BrTXTS2 = mxBrTXS2 =41
+BrES2 = BrTXTS2 = 41
+
+BrUminSA2 = 0.1d0
+BrUmaxSA2 = 1.0
+
+BrUszSA2 = 51
+BrdUSA2 =  (BrUmaxSA2-BrUminSA2)/(BrUszSA2-1)
+        =(1-0.1)/50 = 0.018
+	
+BrdETXS2 = log10((BrEemaxS2-masele)/(BrEeminS2-masele))/
+                           (BrTXTS2-1)
+         =log10((10-511e-6)/(100e-3-511e-3))/40 = 0.00500
+	 
+BrdES2 =  log10( (BrEemaxS2-masele)/(BrEeminS2-masele))/
+	         ( BrES2-1)
+       =  log10(1(0-511e-6)/(100e-3-511e-6) )/40 = 0.00500
+
+BrUszSB2 = 51
+BrUminSB2 = 0.
+BrUmaxSB2 = BrUminSA2**0.25d0 =0.56234
+BrdUSB2 =  (0.56234-0.)/50 = 0.0112468
+
+           ordinary brems region
+BremEemin = 100.d-3  ! v9.14.
+BremLEemin = log10(BremEemin) = -1
+
+    above this, LPM is taken into account if LPM on
+BremEeminLPM =  max(0.1d0,  0.3d0 * media%X0/0.561)
+	     Pb  0.3 GeV
+	     W   0.19GeV
+	     Air 16TeV
+
+we use partial screened brems cross-section below BrScrE
+BrScrE = CompScrE    34 ~150 GeV
+BremTXTL = mxBrTXL  = 60
+BremEsize = BremTXTL = 60
+BremUminLA = 0.1d0
+
+BremUmaxLA = 1.0
+BremUszLA = 51
+BremdULA =(BremUmaxLA-BremUminLA)/(BremUszLA-1)
+         = (1-0.1)/50 = 0.018
+	 
+BremdETXL =log10(BrScrE/BremEemin)/(BremTXTL-1)
+          =  log10( (34~150)/100e-3)/59 =
+	  = 0.043 ~ 0.0538
+BremdEL =  log10(BrScrE/BremEemin)/ (BremEsize-1)
+        = log10((34~150)/0.1) /59 = 0.043~ 0.0538
+BremUszLB = 51
+BremUminLB = 0.
+
+BremUmaxLB =BremUminLA**0.25d0 = 0.1^0.25 =0.5623
+	   
+BremdULB =(BremUmaxLB-BremUminLB)/(BremUszLB-1)
+	 =(0.5623- 0) / 50 = 0.00124
+	 
+=================================
+main: (in     epCreBrTab.f)
+     epBPgeneini   
+     epExpot
+     epStern
+     epSetPhotoE
+     epwtmedia
+     epDisableLPM
+     epCreBrSTblS ( < 10 GeV)         
+     		    epwtBrCnstS
+		    epCreBrSeltz1   BrEeminS (Ek=5keV ~ 99.489 keV)
+		    epCreBrSeltz2   BrEeminS2 (Ek=99.489keV ~9.9995 GeV)
+     epCreBrSTbl1 (  0.1 ~ 35.779 GeV)
+
+     epAbleLPM
+     epCreBrSTbH  

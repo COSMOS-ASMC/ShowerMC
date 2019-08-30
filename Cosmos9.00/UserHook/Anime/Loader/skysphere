@@ -1,0 +1,10 @@
+INST
+geom{ < "./starsky.mesh" }
+
+#   convert to to E-xyz system conversion
+transforms { 
+ TLIST
+< "./earth2skymatrix"}
+ }
+
+

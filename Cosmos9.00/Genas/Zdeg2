@@ -1,0 +1,24 @@
+c(((((((((((((((((((((((((((((((( Zdeg2 ((((((((((((((((((((((((((((((((
+       parameter(nr1=7, nr2=7)
+       common /Zdeg2/ e1(101,nr1), e2(101, nr2)
+       dimension
+     * ed1(101), ed2(101), ed3(101),ed4(101), ed5(101),
+     * ed6(101), ed7(101), ed8(101), ed9(101),
+     * ed10(101), ed11(101), ed12(101), ed13(101), ed14(101)
+c
+      equivalence (ed1(1), e1(1,1))
+      equivalence (ed2(1), e1(1,2))
+      equivalence (ed3(1), e1(1,3))
+      equivalence (ed4(1), e1(1,4))
+      equivalence (ed5(1), e1(1,5))
+      equivalence (ed6(1), e1(1,6))
+      equivalence (ed7(1), e1(1,7))
+c
+      equivalence (ed8(1), e2(1,1))
+      equivalence (ed9(1), e2(1,2))
+      equivalence (ed10(1), e2(1,3))
+      equivalence (ed11(1), e2(1,4))
+      equivalence (ed12(1), e2(1,5))
+      equivalence (ed13(1), e2(1,6))
+      equivalence (ed14(1), e2(1,7))
+c)))))))))))))))))))))))))))))))) Zdeg2 ))))))))))))))))))))))))))))))))

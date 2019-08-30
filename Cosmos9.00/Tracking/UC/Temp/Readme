@@ -1,0 +1,43 @@
+To test new Cosmos9.00 with old deflection routines.
+  cputDeflection is separated from the old ccompPathEnd.f
+  and placed here. Also old scattering routines for Air
+  is added at the last part of the file.
+To use this cputDeflection.f 
+1) Makefile is modified so that this cputDeflected be used.
+2) cSampMolReducedA.f90  is also needed  and it is module, so it is
+   added at the top of Makefile.
+
+3) 
+In Cosmos9.00/Tracking,
+     ln -s ../UC/Temp/cputDeflection.f cputDeflection.f 
+     ln -s ../UC/Temp/cSampMolReducedA.f90 cSampMolReducedA.f90 
+     Replace Makefile there by the one here (keep old one)
+
+4) Activate  #ifdef xxxxxx inside ccompPathEnd.f in Tracking/
+  (this is to ignore cputDeflection in ccompPathEnd.f. The
+   place is just at the top of cputDeflecction subroutine.)
+   Don't forget also you need activate #endif later)
+
+   ccompPathEnd.f here is  disabled one.
+   
+   
+5) The "make" will work; then  you can make userhook.
+
+    But current situaiton is strange, # of particles appear is so small.
+    Should be some bug.
+
+
+6) To restore,  deactivate #ifdef xxxxxx ~ #endif  in ccompPathEnd.f
+    restore Makefile so that cputDeflction.f and cSampMolReducedA.f90
+    are  not to be compilled.
+   (To avoid confusion, better to remove the link;
+   rm  cpuDeflaction and cSampMolReduced.f90)
+
+
+   
+
+
+
+     
+   
+   

@@ -1,0 +1,23 @@
+-----------------------------------------------------
+#news  new-2  ciecone
+#eq  or2  11.0
+#          pipe outer radius of after recombination chamber is 3.2cm
+#          pants are surrounded by marble of 40 cm length
+#          our detector is sorounded by Iron
+#
+#	   ----- Change log -----
+#	   1. "=" is replaced with "0", by Mitsuka 23 Jul. 2013.
+
+#subd   pants
+1   ciecone  Cu     0 0 0 / 0 0 0  or2   or2   90.8   8.0  3.2 270  90 / 2 3
+2   ciecone  hollow 0 0 0 / = = =  =-0.35 =-0.2 90.2  = =-0.2  =   =
+3   cyl      hollow 0 0 0 / 8 0 +  3.0d0  0.6d0
+4   ciecone  Cu     0 0 0 / 0 0 0  or2   or2   90.8  -8.0  3.2  90 270 / 5 6
+5   ciecone  hollow 0 0 0 / = = =  =-0.35 =-0.2 90.2  = =-0.2  =   =
+6   cyl      hollow 0 0 0 / -8 0 + 3.0d0  0.6d0
+7   cyl_w    sp     0 0 0  / 0 0 0
+#end  pants
+
+1  pants  sp 0 0 0 / 0 0 0
+2  box_w  sp 0 0 0 / 0 0 0 
+--------------------------------- 

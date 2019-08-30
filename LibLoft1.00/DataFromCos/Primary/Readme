@@ -1,0 +1,15 @@
+...........................................
+sample.d is to explain how to give the primary spectrum data.
+delta.d  is an example of delta-function like primary spectrum data.
+---------------------------------------
+Note that in the Util diectory of the top cosmos directory, 
+the following utility routines are available to check the primary 
+spectrum data.
+
+sss:     check basic raw data (such as sample.d) by showing the
+	 spectrum shape (show spectrum shape).
+testPrim:  check basic raw data by writing summary table.
+	   (the same as written by sampPrim) 
+sampPrim:  do sampling of primaries using given spectrum data
+           also print the same summary data as testPrim does.
+

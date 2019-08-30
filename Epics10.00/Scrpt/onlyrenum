@@ -1,0 +1,14 @@
+$1 == "#do" {print "Error: #do remains"; exit}
+$1 == "#subd" {num = 0; print; next}
+$1 == "#end" {num = 0; print; next}
+substr($1, 1,1) == "1" {++num; $1=num; print; next} 
+substr($1, 1,1) == "2" {++num; $1=num; print; next} 
+substr($1, 1,1) == "3" {++num; $1=num; print; next} 
+substr($1, 1,1) == "4" {++num; $1=num; print; next} 
+substr($1, 1,1) == "5" {++num; $1=num; print; next} 
+substr($1, 1,1) == "6" {++num; $1=num; print; next} 
+substr($1, 1,1) == "7" {++num; $1=num; print; next} 
+substr($1, 1,1) == "8" {++num; $1=num; print; next} 
+substr($1, 1,1) == "9" {++num; $1=num; print; next} 
+{print}
+

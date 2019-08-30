@@ -1,0 +1,13 @@
+#name   Format    Gd2Si1O5(Ce)
+GSO 	2
+# wrong:  0.42266 493.3  0.2216  2.6300 -0.1774  3.4045  5.5347 0.00
+#  Elem	 rho(g/cm^3)	Gas/Solid(1/0)   refl.index Birks C
+
+3         6.71		0          1.85     0 0 0
+# 	Z	A 	N
+	64	156	2
+	14	28.9	1
+	8	16	5
+
+#  ⟨Z/A⟩   I[eV]   a       k      x0    x1     Cbar  delta0
+ 0.43069   405.4  0.1961  3.0000  0.2039  3.0000  5.2267 0.00

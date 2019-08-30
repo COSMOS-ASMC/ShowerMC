@@ -1,0 +1,34 @@
+2019/06/14
+
+mkdir ShowerMC/Doc/JPN
+ShowerMC/Doc/JPNにGitのマニュアルを追加
+ShowerMC/Doc/JPNに本テキストファイルを追加
+mkdir ShowerMC/Scrpt
+
+ShowerMC/Scrpt/にCleanUpTemporaryFiles.shを追加
+これはオブジェクトファイル、モジュールファイル、プリプロセッサ出力、cmakeファイルの一部を消去するためのものである
+
+ここで一旦コミット
+
+モジュールファイル、オブジェクトファイルなどを消去
+
+ShowerMC/Scrpt/にSetEnvironment.shを追加
+このスクリプトは環境変数をセットするためのものである。
+
+ShowerMC/Scrpt/にCompileByLegacyMake.shを追加
+このスクリプトはLibLoftとCosmosをコンパイルするためのものである。
+
+ここで一旦コミット
+
+mkdir ShowerMC/tmp
+
+2019/06/14
+.gitignoreにsite.config, cosmosMac*,core.*を追加
+
+add ShowerMC/Scrpt/ConvertMakeLogToSourceList.sh
+
+2019/06/15
+ShowerMC/CMakeLists.txt, ShowerMC/Application/Example/FirstKiss/CMakeLists.txt を整備
+
+2019/06/17
+ShowerMC/Scrpt/にCompileLibraryByCMake.shを追加

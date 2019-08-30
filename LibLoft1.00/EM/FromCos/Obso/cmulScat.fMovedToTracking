@@ -1,0 +1,219 @@
+c  *****************************************
+c  This should be moved to Tracking section
+c  *****************************************
+c        multiple scattering in the Atmosphere 
+c        with cosideration of gradual change of energy and density of air.
+c        path top track is in BeforeMove
+c        path end track is in MovedTrack
+c
+      subroutine cmulScat(dx, dy, tetax, tetay)
+ 
+      implicit none
+
+#include  "Ztrack.h"
+#include  "Ztrackv.h"
+#include  "Zelemagp.h"
+
+c
+      real*8 dx, dy, tetax, tetay
+      real*8  ai0, aiti, aiti2, c, b, a, disp, st, tmp
+      real*8  avx, avy
+c
+      real*8 t
+c      t     r.l travelled
+c         get Fourie transform coeff. (a,b,c) in
+c                      exp(-a*ita**2 -b*ita*zeta-c*zeta**2)
+        t = IntInfArray(ProcessNo).thickness/ X0
+        call cFourieCoeff(t, ai0, aiti, aiti2)
+c
+c        the inverse coeff. in
+c           exp(-aa*t**2 + bb*t*r - cc*r**2)
+c        is expressed as:
+c             d= (4*a*c - b**2)
+c             aa=a/d   ;  bb=b/d   ;   cc=c/d
+c
+        c=ai0
+c
+c
+        if(c .gt. 0.) then
+           b=aiti
+           a=aiti2
+           disp=(a*4.- b**2/c)/2
+           if(disp .lt. 0.) disp=1.e-20  ! rarely  we have -epsilon
+c             variance
+c             st=sqrt(0.5/(aa-bb**2/(4.*cc) ) )
+           st=sqrt(c*2)
+c
+c            sample tetax tetay
+c
+           call kgauss2(0.d0, st, tetax, tetay)
+c                    sample displacement correlated to theta
+c            tmp=bb/cc/2
+           tmp=b/c/2
+           avx=tmp*tetax
+           avy=tmp*tetay
+c            disp=sqrt(0.5/cc)
+c            sample 2 independent gauss var with mean avx,avy and var disp
+           disp=sqrt(disp)
+           call kgauss(avx, disp, dx)
+           call kgauss(avy, disp, dy)
+        else
+           dx = 0.
+           dy = 0.
+           tetax =0.
+           tetay = 0.
+        endif
+      end
+      subroutine cFourieCoeff(t, ai0, aiti, aiti2)
+c          compute const for scattering in the atmosphere
+c
+c           ai0:  t*alam/(1-k)
+c
+c          aiti:  2*t*alam (rl/(1-k) - sh * i1)
+c                where i1= int(0 to 1: ln(1+mu*x)/(1-k*x)**2)
+c
+c         aiti2:  t*alam* ( rl**2/(1-k) - 2*sh*rl*i1 + sh**2 * i2)
+c                where i2= int(0 to 1: ( ln(1+mu*x)/(1-k*x) )**2)
+c
+      implicit none
+
+#include  "Ztrack.h"
+#include  "Ztrackv.h"
+#include  "Zelemagp.h"
+#include  "Zstdatmos.h"
+c
+      real*8  t,  ai0, aiti, aiti2
+c
+      real*8 amu, akap
+      common/cvscat/ amu, akap
+      external  cfvscat
+c
+      real*8  cvh2scaleh, sh, alam, si1, almu, reall, akc, akapi, 
+     * am1,  alk, ams, w0, w1, w2, ami, si2, ep, si41, tmp, si42
+      real*8  si4, si3, kzeta2a, akmu
+c         mean scale height
+      if(MovedTrack.pos.height .gt. AlmostVacH) then
+          ai0 = 0.
+          aiti = 0.
+          aiti2 = 0.
+       else
+         sh=cvh2scaleh(
+     *        ( MovedTrack.pos.height + TrackBefMove.pos.height)/2
+     *        )
+c
+c            mu factor
+         amu= abs(MovedTrack.pos.depth/TrackBefMove.pos.depth -1.)
+         akap= EnergyLoss/TrackBefMove.p.fm.p(4)
+         alam=(Es/TrackBefMove.p.fm.p(4))**2 * 0.25
+         reall = IntInfArray(ProcessNo).length ! length travelled
+c
+c        akap is usually very small
+c
+         if(akap .lt. 1.e-2)  then
+c               regard it 0
+             ai0=t * alam
+c                   si1
+c              amu is small?
+             if(amu .lt. .3) then
+                 si1= ( (8.33333e-2*amu -.166666)*amu +.5)*amu
+             else
+                 si1= (1.+amu) * log(1.+amu) /amu - 1.
+             endif
+c                aiti
+             aiti= 2*ai0*(reall - sh * si1)
+c                  aiti2; si2
+             if(amu .lt. .2) then
+                si2= ((.18333*amu -.25)*amu + .333333) * amu* amu
+             else
+                almu = log(1.+amu)
+c                            wm(0)/amu
+                si2=( (1.+amu) * ( (almu - 2.)*almu + 2.) - 2.  )
+     *          / amu
+             endif
+             aiti2=ai0* ( (reall - 2*sh * si1)*reall + sh**2 * si2)
+         else
+c             finite energy loss
+c              ai0
+             akc=1.-akap
+             akapi=1./akc
+             ai0=t * alam * akapi
+             am1=amu+1.
+             almu = log(am1)
+             akmu = akap + amu
+             alk = log(akc)
+c
+c                aiti
+c
+c                   si1
+             if(akap .lt. .2) then
+                 si1=( am1 * almu*akapi
+     *                - amu*( (.33333*akap+.5)*akap +1.) ) /akmu
+             else
+                 si1=( almu*akapi + (alk -almu)*amu
+     *              /akmu ) /akap
+             endif
+             aiti=2*t*alam*( reall*akapi - sh *si1)
+c
+c                 aiti2
+c                    si2
+             if(akap .lt. .1 .and. amu .lt. .1) then
+                 ams=amu**2
+                 si2=((( -.6*akap - .4*amu)*akap + .183333*ams)
+     *            + (.5*akap -.25*amu) + .3333333 ) *ams
+             elseif(akap .lt. .1) then
+c
+c                     akap is small but amu not
+c
+c                      wm(m)= (1.+amu)**(m+1)/(m+1) *
+c       *                      ( (almu - 2./(m+1) )*almu
+c       *                        + 2./(m+1)**2)   -  2./(m+1)**3
+c
+                    w0= am1 * ( (almu - 2.)*almu + 2.) -2.
+                    w1= am1**2 /2 * ( (almu - 1.) * almu + .5) - .25
+                    w2= am1**3/3 * ( (almu -.6666) * almu+ .22222)
+     *              -.07407
+c
+                    ami=1./amu
+                    si2= ( ( -3.*akap*(w2 - 2*w1 + w0)*ami +
+     *                    2*(w1-w0) ) *ami * akap + w0) * ami
+             elseif( akap .lt. .3 .and. amu .lt. 100.) then
+                    call k16pGaussLeg(cfvscat, 0.d0, 1.d0, 6, si2)
+c                        akap not small and amu arbitray
+             else
+                    ep=amu/akap
+                    if(ep .lt. .1) then
+                        si41=alk * (
+     *                   (.333333*amu -.5) * amu + 1.
+     *                 -((.333333*ep - .5) * ep + 1.)/akap  )
+c
+                        tmp=1./(1.+ep)
+                        si42=( ( tmp *ep *( (-akap +3.)*akap -3.)/9.
+     *                        + (akap-2.)/4) * tmp *ep -1.)*tmp
+                    else
+                        si41=alk * log(akap *am1/akmu) /amu
+                        si42=
+     *                  ( kzeta2a(akc*amu/akmu) - 
+     *                    kzeta2a(amu/akmu) )
+     *                       / amu
+                    endif
+                        si4=si41 + si42
+                        si3=( (almu/2-alk) * almu + amu*si4) / akmu
+                        si2=(almu**2 * akapi - 2.*amu *si3)/akap
+             endif
+c
+             aiti2=t*alam *
+     *       (  ( reall*akapi - 2* sh *si1) * reall + sh**2 *si2)
+          endif
+       endif
+      end
+c     ***************
+      real*8 function cfvscat(x)
+c     ***************
+      implicit none
+      real*8 x
+c
+      real*8 amu, akap
+      common/cvscat/ amu, akap
+
+      cfvscat=( log(1.+amu * x) /(1.-akap*x) )**2
+      end

@@ -1,0 +1,55 @@
+#!/bin/csh 
+#   NLM:  NameList Management.  Everything about namelist is managed here.
+#
+	echo '  this is NLM'
+
+
+# 1)     first put namelist data Znamelist1.h and Znamelist2.h
+#
+	makeNL 1 >! $COSMOSINC/Znamelist1.h
+	makeNL 2 >! $COSMOSINC/Znamelist2.h
+#
+	echo " Znamelist1.h  and Znamelist2.h  have been updated."
+#
+# 2)     make  Namelist description table.
+#
+	set  doc1=$COSMOSTOP/Doc/ParamUsage1
+        echo "The description of parameters frequently used:  &Param data"  >! $doc1
+        echo "----------------------------------------------------------"  >>! $doc1
+        mkNLD 1 >>! $doc1
+#        
+	echo $doc1/ParamUsage1 has been updated
+#
+	set  doc2=$COSMOSTOP/Doc/ParamUsage2
+        echo "The description of parameters rarely used:  &HParam data"  >! $doc2
+        echo "----------------------------------------------------------"  >>! $doc2
+        mkNLD 2 >>! $doc2
+#
+	echo $doc2/ParamUsage2 has been updated
+
+#           make all; should have been done before hand
+###       (cd  $COSMOSTOP/ ; make)
+###	echo "make all has been done"
+#
+#        update showParam utility routine.
+#
+	(cd $COSMOSTOP/Util;rm showParam; make showParam; make clean)
+#       
+#   3)     update ParamDefault
+#
+	rm -f $COSMOSTOP/Doc/ParamDefault
+	pretty | gawk '{if(substr($0,1,1)  != " ") $0=" "$0;print}' - \
+        | gawk ' ! index($0,"ErrorOut") {print}' - | \
+          gawk '{gsub(/000000000,/,"0,");print}' | gawk '{gsub(/000000000)/,"0)");print}' |\
+          gawk '{gsub(/00000,/,"0,");print}' | gawk '{gsub(/00000)/,"0)");print}'  | \
+          gawk '{gsub(/000,/,"0,");print}' | gawk '{gsub(/000)/,"0)");print}' \
+            >  $COSMOSTOP/Doc/ParamDefault
+  cp   $COSMOSTOP/Doc/ParamDefault   $COSMOSTOP/Data/Namelist/ParamDefault
+#       in 0, 0, etc. , may not appear in some system. (say HP ) then
+#       IBM machine need , so put ,.
+  if( `arch` != "i386") then
+    gawk -f toIBM  $COSMOSTOP/Data/Namelist/ParamDefault >  $COSMOSTOP/Data/Namelist/ParamDefault.IBM
+  else
+      cp   $COSMOSTOP/Data/Namelist/ParamDefault   $COSMOSTOP/Data/Namelist/ParamDefault.IBM
+  endif
+	echo "ParamDefault in Doc and Data/Namelist updated"

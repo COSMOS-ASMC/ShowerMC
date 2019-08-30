@@ -1,0 +1,31 @@
+******	subroutine eppos2cn(ncx, aTrack, nc)
+
+        ncx = 0: aTrack.pos is wolrd.
+        ncx !=0: aTrack.pos is local for ncx
+
+
+******	subroutine epsInside(pos, nci, nco)
+
+	pos:   world
+        nci:   comp which includes pos.  must be Matreska
+        nco:   Matreska comp. number includes pos. or 0 no child Mat
+               which includes pos.
+
+
+******	subroutine epsOne(ncx, pos, icon)
+
+	pos:  local to ncx
+
+******	subroutine  epsPCont(ncx, pos, icon)
+
+	pos:  local to ncx
+
+******  subroutine epsMatreska(ncx, pos,  nc)
+
+	pos: local to ncx
+
+******  subroutine epsall(ncx, pos, nc)
+
+        ncx = 0:  pos world
+           != 0:  pos is local to  ncx
+

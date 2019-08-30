@@ -1,0 +1,7 @@
+{appearance {+edge }  LIST  { < "./Globe/globe.mesh" } 
+	LIST  { < "./Globe/meridian.vect"}
+	LIST { < "./Globe/equator.vect"}}
+
+
+
+

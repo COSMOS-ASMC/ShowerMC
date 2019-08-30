@@ -1,0 +1,42 @@
+#
+# CALET CAD model
+#
+#  v5.2 (2014.06.23)
+#    
+#    in chd.cnfg
+# #subd imc-in
+#-1 chd sp  0 0 0 / -20.6 -20.6 0.725
+#+1 chd sp  0 0 0 / -20.6 -20.6 0.694
+#
+#    in imc.cnfg
+# #subd chd
+# 1 chdx sp  0 0 0 / 0.009  0 0
+#-2 chdy sp  0 0 0 / 0  0.009 1.135
+#+2 chdy sp  0 0 0 / 0  0.009 1.153
+#
+#    in imc-scifi2.cnfg
+# #subd opt1x14u, opt2x14u, opt1y14u, opt2y14u
+#   pos_z 0 -> 0.01
+#
+#
+#  v5.1 (2013.11.15)
+#
+-----------------------------------
+
+#news new-1 octagon
+#news new-2 honeycomb
+#news new-3 horse
+#news new-4 oecyl
+#news new-5 ocyl
+#news new-6 sqpipe
+#news new-7 fpolygon
+#news new-8 sqtccl
+
+#inc CnfgDir/imcbox.cnfg
+#inc CnfgDir/tasc.cnfg
+
+1 imcbox sp 0 0 0 / -1.925 -1.925  0
+2 tasc sp 0 0 0 / 0.0 0.0 23.03
+3 sphere_w sp 0 0 0 / 0 0 24.53 78
+--------------------------------------------------
+4 box_w sp 0 0 0 / 0 0 0

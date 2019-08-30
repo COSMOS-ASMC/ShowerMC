@@ -1,0 +1,6 @@
+
+awk '{sum+=$1; n++};END {print sum/n}' /tmp/kasahara/xmax19
+
+cumulative <>
+
+awk '{sum+=$1; n++; print n, sum/n}' /tmp/kasahara/xmax19 > /tmp/kasahara/cumave19

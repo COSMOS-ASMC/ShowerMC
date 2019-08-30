@@ -1,0 +1,42 @@
+Some documentation:  indexing.pdf
+
+Before make:
+1) Fix a program for treating index management from
+   prog/ex1.f to ex8.f; edit it, if needed. 
+ or
+   create some file:  ex10.f  etc
+Then,
+    rm example.f
+    ln -s prog/ex?.f example.f
+  where ? is selected number.
+    make clean     
+    make 
+Before run, we must fix the "config" depending on exxxx.f
+
+ exxx.f and  config file correspondecne is
+   ex1.f   config
+   ex2.f   config
+   ex3.f   config
+   ex4.f   configB
+   ex5.f   configB3
+   ex6.f   configB3
+   ex7.f   config
+   ex8.f   config
+
+configB and configB3 are included here.
+
+**But** 
+  config is a link to somewhere/config
+  so you must have such config file somewhere
+  If config uses CnfgDir, it  must be
+  also a link to somewhere/CnfgDir
+  To fix the link, 
+  rm config
+  rm CnfgDir
+  ln -s somewhere/config config
+  ln -s somewhere/CnfgDir CnfgDir
+
+When config is fixed, enter it to FirstInput.
+
+Then, run the program as usual, say, by 
+ sepicPCLinuxIFC64 < FirstInput  2> tempout

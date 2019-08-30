@@ -1,0 +1,12 @@
+To get a 6-column  table of
+# h(m) rho(kg/m3) rho' rho'' thickness(kg/m2) T(K)
+    1       2       3    4       5              6
+0) if necessary, change atmospheric model (use atmosModel.sh)
+1) make -f cstdatmos.mk
+2) For NRL model, fix NRL_period in param
+3) ./a.out < param > table
+
+If you need hieght > 100km, change the code.
+
+
+

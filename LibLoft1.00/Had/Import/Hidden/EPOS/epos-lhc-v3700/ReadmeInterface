@@ -1,0 +1,41 @@
+correction: epos-xan-lhc-v3700.f
+!!!       if(iprx.eq.1)write(ifmt,'(i7,a,$)'),jarray1(i)-iconp,'   '  
+!!                                   ),jarray --> ) jarray ! KK    
+       if(iprx.eq.1)write(ifmt,'(i7,a,$)')jarray1(i)-iconp,'   '  
+--------------------------
+
+!  default parameters are set by 
+call aaset(0)
+   Between aaset and ainit we should do following
+
+  by call IniEpos  ! not epos subroutine.
+       set initial random numbers
+       control decay/non-decay of short life partilces
+       ifmt<---6 so change it to 0    
+       set LHC tunded parameters by calling  LHCparameters
+       fix cross-section treatment
+       fix frame of collisions
+       fix file path business
+
+       fix projectile and target.o  
+  Normally above is ok; next may be used to read
+       data from file to change the parameters so far
+       fixed by next call: 
+        call EposInput ! not epos subroutine. 
+        
+
+
+! after fixing energy  call next
+call ainit  
+
+!   generate inelastic event 
+call aepos(-1)
+
+!   fix final ptcls 
+call afinal
+
+!   fill the ptlc info. in hep array.
+call hepmcstore  
+
+! see ReadMeJAXA  in Cosmos/
+

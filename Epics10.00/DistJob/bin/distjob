@@ -1,0 +1,235 @@
+#!/usr/local/bin/tcsh -f
+#  distjob: distribut jobs over many hosts
+#   /bin/csh  does not work at line ##%%##
+#   This is for Epics
+#
+
+if ($#argv == 0) then
+    echo " Usage: distjob configFile [host host ...]"
+    exit 1
+endif
+if (! -f $1)  then
+    echo $1 not exists
+    exit 1
+else
+    echo config file is: $1 
+endif
+
+
+
+#  get base directory to store data
+set datadir=`awk '$1=="datadir" {print $2}' $1`
+if ( "x$datadir" == "x") then
+  echo  no datadir in config file 
+  exit 1
+endif
+echo $datadir is the base directory to store data
+echo "If this dose not exist, it will be created automatically."
+#     get execution prog path name
+set progpath=`awk '$1=="prog" {print $2}' $1`
+if ( "x$progpath" == "x") then
+    echo prog in config file not exists
+        exit 1
+    else if(! -f $progpath) then
+        echo prog path $progpath not exists
+        exit 1
+    endif
+endif
+
+#    get last name of the path
+    set prog=$progpath:t
+echo  $prog
+
+#  get file for data
+set datafile=`awk  '$1=="datafile" {print $2}' $1`
+if ( "x$datafile" == "x") then
+  echo  no datafile in config file 
+  exit 1
+endif
+echo $datafile will be the name of each data file as 
+echo $datadir/machineName/$datafile
+
+
+#       get append or new flag
+set add=`awk '$1=="append" {print $2}' $1`
+if ( "x$add" == "x" ) then
+  echo "append in config file not exists"
+  exit 1
+endif
+if ( $add == "yes" ) then
+else if ( $add == "no" ) then
+else
+  echo "$add for append is no good in $1"
+  exit 1
+endif
+
+#  get input parameter specification file
+    set input=`awk '$1=="input" {print $2}' $1`
+    if ( "x$input" == "x") then
+	echo input in $1 not exists
+	exit 1
+    else if(! -f $input) then
+       echo $input not exists
+       exit 1
+    endif
+    echo $input is the file where input parameter file names are given
+
+#  get parameter output base dir
+    set paramOut=`awk '$1=="paramOut" {print $2}' $1` 
+    if ( "x$paramOut" == "x") then
+	echo paramOut not exists in $1
+	exit 1
+    else if (! -d $paramOut ) then
+	echo directory $paramOut not exists
+	exit 1
+    endif
+    echo $paramOut is the base directory to save parameters
+#    get alive 
+    set alive=`awk '$1=="alive" {print $2}' $1` 
+    if ( "x$alive" == "x") then
+	echo alive not exists in $1
+	exit 1
+    else if (! -f $alive ) then
+	echo alive file  $alive not exists
+	exit 1
+    endif
+    echo $alive contains the host list as follows:
+    cat $alive
+
+#
+#      get filename in which initial random numbers
+#      are to be given
+    set x=`awk '{print $3}' $input`
+#      x is now like:  'sepics',
+#      delete ' and ,
+
+####%%####
+    set xx=$x:s/,//
+
+    set qm="'"
+    set sepicsFile=`echo $xx | tr -d $qm `
+
+    echo $sepicsFile is the file for the sepics parameter
+
+#     get primary file name which is specified in $sepicsFile
+    set x=`awk '$1=="PrimaryFile" {print $2}' $sepicsFile`
+    if( "x$x" == "x" ) then
+       ehco  no PrimaryFile in $sepicsFile
+       exit 1
+    endif
+#       x is now like: 'config', remove ' and ,
+    set xx=$x:s/,//
+    set primFile=`echo $xx | tr -d $qm`
+    echo Primary is given in $primFile. Its copy will be used.
+
+#     get epics parameter file name
+    set x=`awk '{print $1}' $input`
+#       x is now like: 'epics', remove ' and ,
+    set xx=$x:s/,//
+    set epicsFile=`echo $xx | tr -d $qm`
+    echo $epicsFile is the file for the epics parameter
+#     get config parameter
+    set x=`awk '{print $2}' $input`
+#       x is now like: 'config', remove ' and ,
+    set xx=$x:s/,//
+    set configFile=`echo $xx | tr -d $qm`
+    echo $configFile is the file for the detector configuration
+#    get last term in "input" (normally  f/)
+    set lastp=`awk '{print $4}' $input`
+#
+#          start job at each host
+#
+foreach machine (`cat $alive`)
+onintr -
+   if(  $#argv >= 2) then
+     if(`echo "$argv[2*]" | gawk '{if(index($0, h) >0 ) print "x";else print "y"}' h=$machine -` == "y") continue
+     endif	
+
+#******************** this part must be dependent of the  
+#******************** parameter file format
+#    make initial random numbers
+#    randomly choose an integer 
+set u=`echo "x" | gawk  '{srand(); print int(rand()*1010105+1); exit}'  `
+set v=`echo "x" | gawk  '{srand(); print int(rand()*7201003+1); exit}'  `
+echo $u, $v are the initial random numbers for host $machine
+# 
+set sepicsParam=$sepicsFile:t
+
+mkdir -p  $paramOut/$machine
+
+set primary=$primFile:t
+
+gawk   '$1=="PrimaryFile" {print " PrimaryFile ", file, " /"; next }  \
+        $1=="Ir1(1)" {print " Ir1(1) ", uu, " /"; next}  \
+        $1=="Ir1(2)" {print " Ir1(2) ", vv, " /"; next}  \
+        {print}' \
+        file=$qm$paramOut/$machine/primary$qm, uu=$u, vv=$v \
+        $sepicsFile  > $paramOut/$machine/sepics
+######
+####
+cp    $primFile   $paramOut/$machine/primary
+cp    $configFile $paramOut/$machine/detConfig
+cp    $epicsFile  $paramOut/$machine/epics
+#  make first "input" file and save it in $paramOut/$machine/input
+      echo $qm"$paramOut/$machine/epics"$qm, $qm"$paramOut/$machine/detConfig"$qm, $qm"$paramOut/$machine/sepics"$qm, $lastp   >  $paramOut/$machine/input
+#        copy config file 
+cp   $1  $paramOut/$machine/execConfig
+#  
+#  make a command  for a run and store it in $paramOut/$machine/run
+#    compress or not
+#        to inhibit removing {}
+#     ********
+    set noglob
+#     ********
+    set x=`awk '$1=="pipe1" {print}' $1` 
+    if ( "x$x" == "x" ) then
+	echo pipe1 not exists in $1
+	exit 1
+    endif
+    if ("$x" == "pipe1") then
+	set pipe1=
+        echo no pipe operation on output
+    else 
+        set pipe1="$x[2-]"
+	echo pipe operation specified is $pipe1
+    endif
+
+
+
+if ( $add == "yes") then
+  echo "mkdir -p  $datadir/$machine;( $progpath < $paramOut/$machine/input   $pipe1  >> $datadir/$machine/$datafile ) >& $paramOut/$machine/error   & " > $paramOut/$machine/run
+else
+  echo "mkdir -p $datadir/$machine; ( $progpath < $paramOut/$machine/input   $pipe1 >  $datadir/$machine/$datafile ) >& $paramOut/$machine/error   & " >   $paramOut/$machine/run
+endif
+#      ***********
+unset noglob
+#      ***********
+chmod +x  $paramOut/$machine/run
+
+ echo next is the command to be executed by rsh
+ cat $paramOut/$machine/run
+
+#   if interuptted goto file delete-section
+
+onintr delete
+
+echo "Now starting job at $machine"
+
+
+   rsh $machine  source $paramOut/$machine/run  &
+#     kill "source" process at each machine
+#       it is no more needed after job has started
+   rsh $machine `echo "(cd $COSMOSTOP/bin;  ./kesu $1 source)"`
+delete:
+
+#            disable double interupt   
+	onintr -
+	echo "$machine is now running"
+	sleep 1
+end
+
+
+
+
+
+

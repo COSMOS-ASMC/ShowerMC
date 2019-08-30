@@ -1,0 +1,157 @@
+#!/bin/csh -f
+#  if make says that it dosn't know how to make
+#     epwtSmpTbl.o
+#  then, you may use gmake ; for that next may work
+#
+##  alias make /usr/local/bin/gmake
+#
+#
+#      to creat sampling table for brems, pair, nuc. int. 
+#       for muons
+#
+if( $#argv != 2 ) then
+	echo "Usage: CreatemuTab basic_media_table output_table_dir"
+	exit 1
+endif
+if( ! -f $1 )  then
+	echo $1 not exists
+	exit 1
+endif
+if( ! -d $2 ) then
+	echo directory $2 not exists
+	exit 1
+endif
+set dir_of_media=$1:h
+if( x$dir_of_media == x$2 ) then
+	echo The sampling table must be saved in a different
+        echo directory than the one in which  basic media exists
+	exit 1
+endif
+set lastname=$1:t
+
+echo "*********************************************************"
+echo "*                                                       *"
+echo "*  Creating a table for random sampling proccess        *"
+echo "*  of pair creation, bremsstralhung, and nuclear        *"
+echo "*  interaction of muons.                                *"
+echo "*  Note, however, it is almost useless to create the    *"
+echo "*  table if the matter is such as thin wood; you need   *"
+echo "*  not make the tab in such a case                      *"
+echo "*                                                       *"
+echo "*  If the system complains that it dose not know how to *"
+echo "*  make      epwtSmpTbl.o                               *"
+echo "*  you may find a solution by looking at the top of     *"
+echo "*  CreateMuTab in Util/Mu/Tab/                          *"
+echo "*                                                       *"
+echo "*********************************************************"
+echo 
+echo "1)  make the tab for muon     "
+echo "2)  skip making tab"
+echo "Select the number "
+     set maketab=$<
+if ( $maketab != 1 ) then
+  echo "you can make the tab later, if you feel it necessary."
+  echo "Use CreatemuTab command (in Util/Mu) in that case; the tab will be"
+  echo "appendid to the existing elemag tab"
+  exit
+endif
+#   make the file writable
+make clean
+if( -f $2/$lastname ) then
+	chmod +w $2/$lastname
+else	
+        echo 
+  	echo "Warning: $2/$lastname not exit"
+        echo " assumed you are doing some test"
+        echo 
+endif
+echo
+echo "*********************************************************"
+echo "*  You have the following choice                        *"
+echo "*  For nuclear interaction                              *"
+echo "*     1) Bezurukov & Bugaev formula                     *"
+echo "*     2) Kobayakawa  formula  (NOT USABLE)              *"
+echo "*     -------------------------------------------       *"
+echo "Select the number "
+     set nucint=$<
+echo "Your choice is" $nucint
+     if( x$nucint == x1 ||  x$nucint == x2) then
+	echo " "
+     else
+	echo "It's invalid"
+	exit 1
+     endif		
+if( ! -f CreMuNtbl$nucint.mk ) then
+	echo "formula $nucint is not yet ready; sorry"
+	exit
+endif
+echo  "Fix minimum fractional energy: vmin=E_pair/Emu"
+echo  "above which stocastic sampling is performed;"
+echo  " (i.e., v<vmin is treated as continuous process of energy loss)"
+echo  " "
+echo  "If path length is long (say, rock for underground obs.)"
+echo  "1.e-3 ~ 1.e-2 is enough."
+echo  "If path length is short (~ 10000 g/cm^2 or less), 1.e-4 is needed"
+echo  "Enter vmin for pair creation"
+     set pairvmin=$<
+     echo $pairvmin > ./muVmin
+echo  "Enter the same one for bremsstrahlung"
+      set bremvmin=$<
+echo  "Enter the same one for nuclear interaction"
+      set nucintvmin=$<
+
+#     put remark at the top; which cross-sections, date, by whom
+    set  version=`epicsvn`
+    echo "# ************muon tab*********************** " >> $2/$lastname
+    echo "#     This table  has been made by using $1 " >> $2/$lastname
+    echo "#     with nuclear interaction formula: $nucint"  >>$2/$lastname
+    echo "#     `date` by $USER using "                   >>$2/$lastname
+    echo "#      version $version  "                   >>$2/$lastname
+    echo "# "                                   >>$2/$lastname
+#    next -------- is mandatory
+    echo "-------------------------------------------"  >>$2/$lastname
+/bin/rm -f a.out
+make  -f CreMuPrtbl.mk
+if(-f a.out) then
+	 ./a.out < $1 >> $2/$lastname
+else	
+    echo "executable a.out not yet made"
+    exit 1
+endif
+echo "pair creation tab has been made"
+
+     echo $bremvmin > ./muVmin
+
+/bin/rm -f a.out
+make -f CreMuBrtbl.mk
+if(-f a.out) then
+	./a.out < $1 >> $2/$lastname
+else
+    echo "executable a.out not yet made"
+    exit 1
+endif
+echo "brems tab has been made"
+
+
+     echo $nucintvmin > ./muVmin
+
+
+/bin/rm -f a.out
+make -f CreMuNtbl$nucint.mk
+if(-f a.out) then
+	echo " ***** next will take some time *****"
+	./a.out < $1 >> $2/$lastname
+else
+    echo "executable a.out not yet made"
+    exit 1
+endif
+rm ./muVmin
+echo  "nuclear interaction tab has been made"
+echo  "end of all processes"
+#  echo  "Note: $2/$lastname is made unwritable"
+#       protect
+#  chmod a-w $2/$lastname
+
+
+
+

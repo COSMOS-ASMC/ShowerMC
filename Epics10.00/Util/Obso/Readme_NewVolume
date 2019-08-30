@@ -1,0 +1,27 @@
+To make the interface routine 'epNewVolume.f' in the prog/ directory,
+
+1) Make a config file which containes lines like,
+
+       #news  new-1 xxxx
+       #news  new-3 yyyy
+
+as many as you need, where xxxx, yyyy, etc is a name to
+represent new volume shape. (< 9 characters).
+
+2) Issue,
+
+   ./mkNewVolume  configfile
+
+where 'configfile' is the path to the config file mentioned above.
+
+You must make routines
+
+	epbxxxx, epsxxxx, epenvlpxxxx, eprxxxx epthickxxxx
+
+etc as described in the manual and place them in UserHook 
+and modify your Makefile so that they can be compliled by make.
+
+(For the ep_cone.f, ep_ecyl.f, ep_cap.f, they are placed in
+the prog directory and you may use it without making Makefile
+for them.)
+  

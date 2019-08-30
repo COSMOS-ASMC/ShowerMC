@@ -1,0 +1,21 @@
+1)cixsec or cixsec2
+  This is needed in each test prog.
+2) cmkDCSconst
+     allocate  DCSnega
+     call cDCSconstForMedia(DCSnega)
+     same for TPXSposi
+           3)cDCSconstForMedia
+	      call cPreReadDCS
+                4) cPreReadDCS
+                   call cReadTPXS
+                     this is to get KEele
+		     S0,S1,S2 are also read (only for e-)
+                   call cReadDCS  for each elemnt
+                   add dcs and make dcs for the media
+              call  cPrepIntpDCS
+                  make  logdcs
+                        logmuval
+	     
+                  make logKEele  
+   
+

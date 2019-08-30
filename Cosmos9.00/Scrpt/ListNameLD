@@ -1,0 +1,13 @@
+#!/bin/csh -f
+#    List NameList Data
+#	
+	foreach f ($COSMOSINC/Z?*p.h)
+		if ($argv[1] == 1) then
+			awk -f ListNameLDawk1 $f
+	        else if ($argv[1] == 2) then
+			awk -f ListNameLDawk2 $f
+	        else
+		   echo "Usage: ListNameLD 1  (or 2)"
+	           exit 1
+		endif
+	end

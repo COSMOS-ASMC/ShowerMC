@@ -1,0 +1,65 @@
+test_decpr.f
+   ifort test_decpr.f  -L$COSMOSTOP/lib/MacIFC -l cosmos
+   a.out > pidAndDecyTable.dat
+
+test_no_charm.f   (must omit call rnd_ini)
+   ifort test_no_charm.f   -L$COSMOSTOP/lib/MacIFC -l cosmos
+
+
+
+test_partpr.f 
+    ifort test_partpr.f   -L$COSMOSTOP/lib/MacIFC -l cosmos
+    ./a.out > ParticleTable.dat
+
+test_rand_gen.f
+     ifort test_rand_gen.f  ../utils/rndm_dbl.f  -L$COSMOSTOP/lib/MacIFC -l cosmos
+
+ ./a.out
+   testing random number generator
+   nevt:   100000000
+   ii,s_rndm:     4639169  0.000000000000000E+000
+   ii,s_rndm:     4836546  0.000000000000000E+000
+   ii,s_rndm:    33631177  0.000000000000000E+000
+   ii,s_rndm:    57874608  0.000000000000000E+000
+   ii,s_rndm:    77083063  0.000000000000000E+000
+   ii,s_rndm:    88273076  0.000000000000000E+000
+   ii,s_rndm:    93508420  0.000000000000000E+000
+   No good generator in Siyll !!   0 must be cut.
+
+   After commet out the line
+    !      call rnd_ini
+  in  test_rand_gen.f  and complie by
+  ifort test_rand_gen.f   -L$COSMOSTOP/lib/MacIFC -l cosmos
+  ./a.out
+  testing random number generator
+  nevt:   100000000
+  Generator rndc in Cosmos is used. no 0. random number.
+  
+test_rndm_sibyll.f
+    ifort test_rndm_sibyll.f  ../utils/rndm_dbl.f  -L$COSMOSTOP/lib/MacIFC -l cosmos
+    ./a.out
+
+    If call rnd_ini is comment out, it can be compiled without rndm_dbl.f
+    but   call pho_RNDST(2,FILENA) will show always the smame  numbers.
+    (since its content is not changed).
+
+test_sibyll.f
+    ifort test_sibyll.f  ../utils/rndm_dbl.f  -L$COSMOSTOP/lib/MacIFC -l cosmos
+    ./a.out > test_sibyll.dat
+
+    comment out  rnd_ini and complile by
+    ifort test_sibyll.f    -L$COSMOSTOP/lib/MacIFC -l cosmos
+    ./a.out > test_sibyll.dat
+    ./a.out > test_sibyll-2.dat
+
+    statistically seems ok
+
+test_stblty_sibyll.f
+   ifort test_stblty_sibyll.f  ../utils/rndm_dbl.f  -L$COSMOSTOP/lib/MacIFC -l cosmos    ./a.out >
+   
+   ./a.out > test_stblty_sibyll-1.dat
+
+  After  comment out "call PHO_RNDINI"
+  ifort test_stblty_sibyll.f   -L$COSMOSTOP/lib/MacIFC -l cosmos  
+  ./a.out >  test_stblty_sibyllB-1.dat
+  

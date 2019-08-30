@@ -1,0 +1,19 @@
+set nohidden
+if($0+1==1) rep "<awk -f emode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace1" w l  3
+if($0+1 > 1) rep "<awk -f emode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace$0" w l 3
+
+
+if($0+1==1) rep "<awk -f mumode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace1" w l   4
+if($0+1 > 1) rep "<awk -f mumode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace$0" w l 4
+
+if($0+1==1) rep "<awk -f pimode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace1" w l   1
+if($0+1 > 1) rep "<awk -f pimode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace$0" w l 1
+
+if($0+1==1) rep "<awk -f kmode zoff=`cat .Revmax` zrev=`cat .Reverse`/tmp/$$USER/trace1" w l  2
+if($0+1 > 1) rep "<awk -f kmode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace$0" w l  2
+
+if($0+1==1) rep "<awk -f pmode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace1" w l  5
+if($0+1 > 1) rep "<awk -f pmode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace$0" w l 5
+
+
+

@@ -1,0 +1,27 @@
+OBSO:
+----------
+DPM is the link to one of DPM-{a,b,c}.
+
+a:  dpmjet3.04b  (some update from  v3.04 by adapting v3.05)
+    compatible with Jam which is an updated version of
+    the original Jam from Nara san but not with the one
+    from PHITS. (due to external name collision).
+
+b:  dpmjet3.04b   (some update from  v3.04 by adapting v3.05)
+    Same as 'a' but pythia is modulized so that
+    it can be used with Jam from pythia, too.
+
+c:  dpmjet is v3.05.  too much specialized to Fluka
+    and cannot generate heavy fragment. So we should not use it.
+    Pythia is modulized and common to 'b'.  As to Jam
+    same as 'b'
+---------
+now DPM is linked to Hidden/DPM/DPM-0
+
+random number generator is replaced by rndc.
+
+aadn.f  
+    Many changes were  made:  real*8 --> character*8.
+                              statement ordering. etc.
+aado.f
+    statement ordering.

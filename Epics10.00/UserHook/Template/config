@@ -1,0 +1,25 @@
+#  type  matter  c    de maxpath  / x y z  a  b c 
+-------------------------------------------------------------------
+#eq   ab   30
+#eq   cos15 9.659258263E-01
+#eq   cos75 2.588190451E-01	   
+#eq   cos30 8.660254038E-01
+#eq   cos60   0.5d0
+#eq   de  2
+#eq   scth  5
+#eq   pbth  0.2
+#eq   addz1 0.2070552361        pbth/cos15
+#eq   addz2 0.2309401077        pbth/cos30
+#eq   addz3 0.4                 pbth/cos60 
+
+1   box  pb   0  0      / 0  0  0  ab  ab  1.0  
+2   box  scin 0  de     / 0  0  +  =    =  scth
+3   box  Pb   0  0     / 0  0   7  =   35.  pbth 1 0 0 0   cos15  cos75
+4   box  scin 0  de     / 0  0  =addz1  =  =   scth  1 0 0 0   cos15  cos75
+5   box  Pb   0  0     /  0  0  14  =  40   pbth  1 0 0 0   cos30  cos60
+6   box  scin 0  de    /  0  0  =addz2  =  =   scth  1 0 0 0   cos30  cos60
+7   box  Pb   0  0    /  0  0  21  =  60   pbth  1 0 0 0   cos60      cos30
+8   box  scin 0  de    /  0  0  =addz3  =  =   scth  1 0 0 0   cos60      cos30
+9   box_w  sp 0  0   / 0 0 0
+-------------------------------------------------
+

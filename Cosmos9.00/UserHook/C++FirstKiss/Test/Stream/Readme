@@ -1,0 +1,12 @@
+character*70  a(3)
+
+should be expressed 	as
+
+	char a[3][70];
+and if the size is to be informed to Fortran
+it must be 70 but not 210, say
+
+	xxx(a, ..  70);
+
+
+

@@ -1,0 +1,12 @@
+  The format is the same as Lightxx
+  This gives the properties of light sensor (PD etc)
+------------------------------------------------------------
+ Qeff 0.85  / 0.8
+     Quantum efficiency of the sensor. Used when QeffFile is dummy
+ QeffFile  dummy / dummy.
+     Quantum efficienty of the sensor as a function of wavelength.
+     Pairs of (wavelength,  efficiency) in unit of (nm, %) must be
+     given  in each line. If dummy, Qeff is used for all wavelength. 
+     Note that efficiency is expressed by percentage.
+ mnOfScinti  10 /
+ cf          1. /

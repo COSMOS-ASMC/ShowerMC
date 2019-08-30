@@ -1,0 +1,50 @@
+#!/bin/tcsh -f
+#  Caution:  print " " > file  print " " >> file
+#           or print xxxx > file etc with xxx containing spaces
+#           are not correctly treated by gawk. Instead we have to
+#           use system function.
+# 
+#
+
+if( $#argv != 1 ) then
+	echo "Usage: splitiftoolarge convertedtracedata"
+	exit
+endif
+
+
+####### max data lines that can be accepted by Geomview (32767 ?)
+
+set  maxsize = 32000
+
+
+find . -name 'tempvect*' -print | xargs rm -f
+
+
+
+set file = $1:r
+
+set line2 = `gawk 'NR==2 {print; exit}' $1`
+
+#    number of polylines
+@ nl = $line2[1]
+
+
+#  get max number of vertices in a file
+ 
+@ maxv = `gawk 'BEGIN{maxv=0}; NR>2 && NR<= nl+2 {if(maxv < $1) maxv=$1}; NR > nl+2 {print maxv;exit}' nl=$nl $1`
+
+
+if( $maxv < $maxsize ) then
+#             size is not large; simply rename the file
+	mv $1	${file}1.vect
+else
+#            qm is needed in split.awk
+        set qm = '"'
+	set color = $qm` tail -1 $1 `$qm 
+
+	gawk  -f split.awk  maxsize=$maxsize file=$file color="$color" $1
+#          remove original file
+
+	rm -f $1
+endif
+

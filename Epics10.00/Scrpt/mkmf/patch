@@ -1,0 +1,69 @@
+From dcon@ihlpe.ATT.COM Thu Dec 31 22:49:22 1987
+Path: creamy!icsts1!icssm!ouicsu!nttlab!icot32!kddlab!uunet!lll-winken!lll-lcc!lll-tis!ames!hao!oddjob!gargoyle!ihnp4!ihlpe!dcon
+From: dcon@ihlpe.ATT.COM (452is-Connet)
+Newsgroups: comp.sources.bugs
+Subject: mkmf bugs
+Keywords: makefile mkmf
+Message-ID: <2418@ihlpe.ATT.COM>
+Date: 31 Dec 87 13:49:22 GMT
+Organization: AT&T Bell Laboratories - Naperville, Illinois
+Lines: 55
+
+
+Here are a set of diffs to fix some bugs in mkmf.  The majority were
+to get it running on SYSV.  The others are:
+	1. mkmf would read ALL entries in a directory, including deleted files.
+		- Checks d_ino (== 0 -> file deleted).
+	2. syntax as #include<file.h> would fail.  (The 1st '<' was eaten.)
+		- Does an ungetc() to put character back.
+
+David Connet
+AT&T Naperville IL
+ihnp4!ihlpe!dcon
+
+#### diff OMkmf.h Mkmf.h
+58a59,65
+> 
+> #ifdef SYSV
+> #define index	strchr
+> #define rindex	strrchr
+> #define closedir	close
+> #define opendir(x)	open(x,0)
+> #endif
+
+#### diff Obuildlist.c buildlist.c
+215a216,218
+> #ifdef SYSV
+> 	int *dirp;			/* directory stream */
+> #else
+217a221
+> #endif
+229c233
+< 		if ((suffix = rindex(dp->d_name, '.')) != NULL)
+---
+> 		if (dp->d_ino != 0 && (suffix = rindex(dp->d_name, '.')) != NULL)
+254a259,272
+> 
+> #ifdef SYSV
+> struct direct sysvdir
+> 
+> struct direct *
+> readdir(fd)
+> int fd;
+> {
+> 	if (read(fd,(char *)&sysvdir,sizeof(sysvdir)) != sizeof(sysvdir))
+> 		return (NULL);
+> 	else
+> 		return (&sysvdir);
+> }
+> #endif
+
+#### Odepend.c depend.c
+547a548
+> 		ungetc(c,ifp);
+653a655
+> 		ungetc(c,ifp);
+757a760
+> 		ungetc(c,ifp);
+
+

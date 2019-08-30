@@ -1,0 +1,86 @@
+cc      cphotoEEPath, Energy
+c      real*8 eg, egom, em/0.511e-3/,  path
+c      integer i
+c      egom=.01
+c      do  i=1,150
+c          eg=egom*em
+c          call cphotoEEPath(eg,  path)
+c          write(*, *) eg
+c          egom=egom*10.**(.03333)
+c      enddo
+c      end
+c     ****************************************************************
+c     *
+c     * cphotoEEPath: samples photo electric effect path in r.l
+c     * cphotoEEEnergy: gives energy of photo-electron in GeV
+c     *
+c     ****************************************************************
+c
+c   /usage/  call cphotEEPath(eg,  path)
+c            call cphotoEEEnergy(eg, e)
+c
+c   --input--
+c    eg: photon energy in GeV
+c     z: charge of media
+c     a: mass no. of ..
+c
+c   -- output --
+c path: sampled path in r.l
+c    e: photo electron energy in GeV
+c
+c
+c
+c
+       subroutine cphotoEEPath(eg,  path)
+c
+c
+
+c
+       real*8  path
+c            e mass in gev
+       real*8 emass/.511e-3/
+c
+       real*8 egin, eout, eg
+       real*8 tp
+
+       
+       real*8 b0/.8406032822525545/,
+     *        b1/1.76788459694177/,
+     *        b2/1.82193436175065/,
+     *        fa/1.08224940926528/,
+     *      cnsta/ -1.985937500000000E-04/,
+     *      cnstp/8.587838661937385E-05/,
+     *      ek/7.148500000000000E-04/,
+     *      cnstl/.7734375/
+c
+       real*8  ep, epi, u
+
+c
+       ep=eg/emass
+c      if(eg .lt. the ) then
+         call rndc(u)
+         epi=1./ep
+         tp= ( (b2*epi + b1)*epi + b0 ) *
+     *       fa* cnstp * epi
+         if(eg .lt. ek) then
+             tp=tp/cnstl
+         endif
+         path=-log(u) / tp
+c      else
+c        call photha(ep, xs)
+c        tp=xs*cnstp/2
+c      endif
+       tp=tp*1.2
+ccc    write(*,*) ' eg=',eg,' tp=',tp
+       return
+c
+c      ************
+       entry cphotoEEEnergy(egin, eout)
+c      ************
+c
+       eout=egin + cnsta
+       if(eout .le. emass) then
+          eout=emass*1.0000000001d0
+       endif
+       end
+

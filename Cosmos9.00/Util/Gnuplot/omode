@@ -1,0 +1,2 @@
+ NF>0 && $4 > 6 && $6 != 0 {print $1, $2, zoff+zrev*$3}
+ NF==0 { print }

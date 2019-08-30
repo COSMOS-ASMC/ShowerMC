@@ -1,0 +1,52 @@
+c         test kgauss  on sun fortran (new version)
+c       real*8 g1
+c       do 100 i=1, 25000 
+c          call kgauss(0.d0, 1.d0, g1)
+c         write(*, *) sngl( g1 )
+c  100  continue
+c      end
+      subroutine kgauss(m, v, g1)
+c           Generate a Gaussian random variable with a given mean
+c           and variance.
+c        m:   real*8 input.   mean of the distribution.
+c        v:   real*8 input.   variance of the distribution.
+c       g1:   real*8 output.  a gaussian random variable.
+c        
+c        subroutine needed:  rndc.
+c
+c          To generate 25000 variables, 0.85 sec is needed on Sparc 2.
+c           
+        implicit none
+        real*8 m, v, g1
+c
+        logical sw/.true./, more
+        real*8  temp, u1, u2, r
+        save sw, temp
+        save u2
+c
+c       integer nt
+c             -----------------
+        if(sw) then
+c               counter for the loop at the test time.
+c           nt=0
+c               nt is distributed like
+c               exp(-1.57nt) ( nt=1, 2, ...).  The average is 1.75.
+            more=.true.
+            do while (more)
+c              nt=nt+1
+               call rndc(u1)
+               call rndc(u2)
+               u1=u1*2 - 1.0d0
+               u2=u2*2 - 1.0d0
+               r=u1**2 + u2**2
+               more= r .gt. 1.0d0
+            enddo
+c           write(*,*) nt
+            temp=sqrt(-2*log(r)/r)
+            g1=u1*temp*v + m
+            sw=.false.
+        else    
+            g1=u2*temp*v + m
+            sw=.true.
+        endif    
+      end    

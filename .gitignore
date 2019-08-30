@@ -1,32 +1,66 @@
-# Prerequisites
-*.d
+temp*.f
+temp*.f90
+lib/*
+*~
+*.o
+*.mod
+
+# CMake 
+CMakeCache.txt
+CMakeFiles
 
 # Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# *.slo
+# *.lo
+
+# *.obj
+core.*
 
 # Precompiled Headers
-*.gch
-*.pch
+# *.gch
+# *.pch
 
 # Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+# *.so
+# *.dylib
+# *.dll
 
 # Fortran module files
 *.mod
-*.smod
 
 # Compiled Static libraries
-*.lai
-*.la
+# *.lai
+# *.la
+
 *.a
-*.lib
+
+# *.lib
 
 # Executables
-*.exe
+# *.exe
+
 *.out
-*.app
+
+# *.app
+
+# mac
+.DS_Store
+
+tmp/*
+
+#cmake build directory
+build/*
+
+#cosmos trace file
+trace*
+
+#cosmos binary file
+cosmosLinux*
+cosmosMac*
+
+#cosmos random seed
+Seed
+
+#QGSJET2 data file
+qgsdat*
+!qgsdat*bz2

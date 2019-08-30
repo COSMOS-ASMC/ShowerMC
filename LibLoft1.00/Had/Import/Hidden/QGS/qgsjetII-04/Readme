@@ -1,0 +1,8 @@
+qgsjetII-04:  LHC tunned.  Although the version dosn't change,
+there were changes  3 times.
+1st gives wrong  diffraction flag.
+2nd one gives correct flag. but for A>1 target the program
+    dies easily.  (with a message:  W^-<0!! )
+3rd one.  from crmc.
+    this seems ok now.
+    

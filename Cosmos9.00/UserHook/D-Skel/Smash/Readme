@@ -1,0 +1,11 @@
+1)  edit setupenve.sh
+2) cd ../
+  ./mkHosts.csh  > Hosts 
+  ./mkThinHosts.sh
+3) come back here;   make clean;make
+4)  bash
+5)  source ./setupenv.sh
+6)  ./smashSkelPCLinuxIFC
+
+
+

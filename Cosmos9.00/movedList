@@ -1,0 +1,25 @@
+Data/Atmos
+Data/Cutoff
+Data/DPM
+Data/EPOS
+Data/Elsepa
+Data/Fragment
+Data/Geomag
+Data/MCS
+Data/Namelist
+Data/Primary
+Data/QGS
+Data/Rock
+Particle/Event
+  Elemag --> EM/
+  Xsection-->Had/
+  MuInt -->  Mu/
+  othe Event--> Had/
+Import --> Had
+
+KKlib--> General/FromCos
+Clib--> General/
+
+
+
+

@@ -1,0 +1,10 @@
+#!/bin/csh -f
+#    extract variable names to be put into namelist definition
+	cd $COSMOSINC
+	foreach f (Z?*p.h)
+		if($argv[1] == 1) then
+			awk '/\(->/,/<-\)/ {if ($3 == "\!1") print $2}' $f
+	        else
+			awk '/\(->/,/<-\)/ {if ($3 == "\!2") print $2}' $f
+		endif
+	end

@@ -1,0 +1,42 @@
+1) make -f Compton.mk  will create a.out
+
+  ./a.out > outfile
+  contents:
+   "prob/r.l"    "Eg_out"  "Ee"   "cosg"  "cose"  "path"'
+  
+2) make -f ComptonSamp.mk
+ 
+ ./a.out > outfile
+  contents:
+     "Egp/Eg"   "Ee"  "cosg"   "cose"  "path"  "Eg"'
+
+3) make -f DrawComptonXS.mk
+  ./XS.out > outfile
+  contents:
+      "Eg(MeV),    /rl    /(g/cm2)    /cm     mb "
+
+    If XCOM is used(XCOM=1), binding energy effect is taken into 
+    account. So there should appear difference from
+    XCOM=0 case where Klein-Nishina formula is used. 
+    It starts around  1MeV for W.  0.1MeV for Air.
+
+***  ./testXS.sh  will do the business for 3) with gnuplot
+
+4) make -f drawCompFunc.mk 
+    This is for Klein-Nishina formula.
+      drawCompFunc.out > outfile
+  contents
+     v, dsdv, cosg, dsdcos, Eg, Egp, Nc, tprob
+  where 
+      v:  Eg'/Eg
+    dsdv:  xs ds/dv
+    cosg: cos of Eg'
+    dsdcos:  ds/dcosg
+    Eg:   incident Eg
+    Egp:  Eg'
+    Nc:   normalization value
+    tprob:  xs   /r.l
+
+5)  ./testComptonSamp.sh
+    do the business of sampling-->histograming 
+    and compare with funtion.  (with gnuplot)

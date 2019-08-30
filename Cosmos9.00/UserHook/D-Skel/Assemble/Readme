@@ -1,0 +1,32 @@
+1) assemble hist data, 
+	prepare setupenvHist.sh
+	./assemHist.sh
+2) assemble hybrid data,
+	prepare setupenvHyb.sh
+	./assembHyb.csh
+3) assemble nrfai data,
+	./assembNrfai.csh
+
+4) Reduce file size in each /tmp/$USER
+        ./reduceEach.bin.atsite.sh
+
+5) Gather data somedir
+	./assemDat.sh  somedir  (create files accorging to layer nubmers;
+	               to be put by $TAMCDB/sbin/mdCreatFDDBnew.csh)
+or	
+	./assemDatNew.sh somedir.  Basically the same as the next one
+	  but don't gather the files in the remote host to the temporary
+	  directory and concatinate directory.
+ 
+	./assemDat2onefile.sh  somedir (create one .dat file to be
+	          put by  $TAMCDB/sbin/mdCreatFDDB.csh)
+	This one will need longer time.
+-----------
+a) To convert binary hist file to ascii with
+	consistent id key (i.e, with correct age and cog_norm_depth)
+
+
+b) To convert binary hist file to ascii (without
+	id correction)
+
+

@@ -1,0 +1,4 @@
+set nohidden
+if($0+1==1) rep "<awk -f cmode zrev=`cat .Reverse` zoff=`cat .Revmax` /tmp/$$USER/trace1" w l
+if($0+1 > 1) rep "<awk -f cmode zrev=`cat .Reverse` zoff=`cat .Revmax` /tmp/$$USER/trace$0" w l
+

@@ -1,0 +1,84 @@
+write "!###############################################################"
+write "! mean pt vs energy"
+write "!###############################################################"
+
+write "!-------------------------"
+write "! 120    "
+write "!-------------------------"
+beginhisto 
+histogram egy pt 4  2 100 100
+idcode      120
+binning log
+endhisto
+write "openhisto name pt120a xrange 2 100 yrange .2 .4 htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title   [p]^+!  "" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis p?t!$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "openhisto getarray ppexci-pt-pip closehisto plot 0"
+
+write "!-------------------------"
+write "!-120    "
+write "!-------------------------"
+beginhisto 
+histogram egy pt 4  2 100 100
+idcode      -120
+binning log
+endhisto
+write "openhisto name pt-120b xrange 2 100 yrange .2 .4 htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title   [p]^-!  "" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis p?t!$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "openhisto getarray ppexci-pt-pim closehisto plot 0"
+
+write "!-------------------------"
+write "! mean pt 130    "
+write "!-------------------------"
+beginhisto 
+histogram egy pt 4  2 100 100
+idcode      130
+binning log
+endhisto
+write "openhisto name pt130a xrange 2 100 yrange .3 .5 htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title   K^+!  "" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis p?t!$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "openhisto getarray ppexci-pt-kap closehisto plot 0"
+
+write "!-------------------------"
+write "!-130    "
+write "!-------------------------"
+beginhisto 
+histogram egy pt 4  2 100 100
+idcode      -130
+binning log
+endhisto
+write "openhisto name pt-130b xrange 2 100 yrange .3 .5 htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title   K^-!  "" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis p?t!$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "openhisto getarray ppexci-pt-kam closehisto plot 0"
+
+write "!-------------------------"
+write "!mean pt -1120    "
+write "!-------------------------"
+beginhisto 
+histogram egy pt 4  2 100 100
+idcode      -1120
+binning log
+endhisto
+write "openhisto name pt-1120a xrange 2 100 yrange .35 .55 htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title   apr  "" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis p?t!$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "openhisto getarray ppexci-pt-apr closehisto plot 0-"
+write "oh calc pt-1120a ; htyp prs ch plot 0 dh"

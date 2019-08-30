@@ -1,0 +1,12 @@
+Rigidity cut-off tables here were made by M.Honda 
+(Baksan    Frejus    Gransaso  IMB       KGF       Kamioka   Sudbury)
+The tables were made using his program.  The table format;
+
+Column-wise : azimutal angles from 0 to 360 deg step 10 deg
+Row-wise:     zenith angles from 0 to 180 deg step 10 deg
+
+
+W-E was originally wrong because of p/p_Bar mistake.
+
+awkfile is to revert W-E
+

@@ -1,0 +1,414 @@
+write "!###############################################################"
+write "! mean multiplicities vs energy"
+write "!###############################################################"
+
+write "!-----------------------------"
+write "! (dn/deta)eta=0  (inel)   "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      9970
+trigger eta -0.5 0.5
+binning log
+endhisto
+write "openhisto name dndeta-ine xrange 5 15000  "
+write "htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title  "B# [c]"B# "L# 0.5 Inelastic"" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis dn/d[c]_[c]=0!$    "" }"
+write "{column c3 = c2 / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "openhisto getarray ppexci-plateau-ine closehisto plot 0"
+write "!-----------------------------"
+write "! (dn/deta)eta=0  (UA1 NSD)   "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      9970
+trigger eta -0.5 0.5
+trigger nd0evt 1 1
+binning log
+endhisto
+write "openhisto name dndeta-ua1 xrange 5 15000  "
+write "htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title  "B# [c]"B# "L# 0.5 UA1 NSD trigger"" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis dn/d[c]_[c]=0!$    "" }"
+write "{column c3 = c2 / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "openhisto getarray ppexci-plateau-cms closehisto plot 0-"
+write "openhisto getarray ppexci-plateau-alice closehisto plot 0-"
+write "openhisto getarray ppexci-plateau closehisto plot 0"
+write "!-----------------------------"
+write "! (dn/deta)eta=0  (UA5 NSD)   "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      9970
+trigger eta -0.5 0.5
+trigger nd1evt 1 1
+binning log
+endhisto
+write "openhisto name dndeta-ua5 xrange 5 15000  "
+write "htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title  "B# [c]"B# "L# 0.5 UA5 NSD trigger"" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis dn/d[c]_[c]=0!$    "" }"
+write "{column c3 = c2 / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "openhisto getarray ppexci-plateau-cms closehisto plot 0-"
+write "openhisto getarray ppexci-plateau-alice closehisto plot 0-"
+write "openhisto getarray ppexci-plateau closehisto plot 0"
+write "!-----------------------------"
+write "! (dn/deta)eta=0  (CMS NSD)   "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      9970
+trigger eta -0.5 0.5
+trigger nd7evt 1 1 
+binning log
+endhisto
+write "openhisto name dndeta-cms xrange 5 15000  "
+write "htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title  "B# [c]"B# "L# 0.5 CMS NSD trigger"" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis dn/d[c]_[c]=0!$    "" }"
+write "{column c3 = c2 / sqrt( c3 ) }"
+write "!set factor 1.08"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "openhisto getarray ppexci-plateau-cms-nocorr closehisto plot 0"
+write "!-----------------------------"
+write "! (dn/deta)eta=0  (ALICE NSD)   "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      9980
+trigger eta -0.5 0.5
+trigger nd9evt 1 1 
+binning log
+endhisto
+write "openhisto name dndeta-alice xrange 5 15000  "
+write "htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title  "B# [c]"B# "L# 0.5 ALICE NSD 0.9 TeV trigger"" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis dn/d[c]_[c]=0!$    "" }"
+write "{column c3 = c2 / sqrt( c3 ) }"
+write "!set factor 1.02"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      9980
+trigger eta -0.5 0.5
+trigger ndaevt 1 1 
+binning log
+endhisto
+write "openhisto name dndeta-alice2 xrange 5 15000  "
+write "htyp pbs xmod log ymod lin"
+write "{text 0.05 0.85 ""title  "B# [c]"B# "L# 0.5 ALICE NSD 2.36 TeV trigger"" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis dn/d[c]_[c]=0!$    "" }"
+write "{column c3 = c2 / sqrt( c3 ) }"
+write "!set factor 1.02"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "openhisto getarray ppexci-plateau-alice-nocorr closehisto plot 0"
+write "!-----------------------------"
+write "! (dn/deta)eta=0  (ALICE Ine>0)   "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      9980
+trigger eta -1. 1.
+trigger ndbevt 1 1 
+set hisfac 0.5          !eta range
+binning log
+endhisto
+write "openhisto name dndeta-alice-ine1 xrange 5 15000  "
+write "htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title  "B# [c]"B# "L# 1 ALICE Ine "G# 0"" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis dn/d[c]_[c]=0!$    "" }"
+write "{column c3 = c2 / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "openhisto getarray ppexci-plateau-alice-ine1 closehisto plot 0"
+write "!-----------------------------"
+write "! (dn/deta)eta=0  (Theo NSD)   "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      9970
+trigger eta -0.5 0.5
+trigger typevt 1 2 
+binning log
+endhisto
+write "openhisto name dndeta-nsd xrange 5 15000  "
+write "htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title  "B# [c]"B# "L# 0.5 NSD "" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis dn/d[c]_[c]=0!$    "" }"
+write "{column c3 = c2 / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "!-----------------------------"
+write "! (dn/deta)eta=0  (Theo ND)   "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      9970
+trigger eta -0.5 0.5
+trigger typevt 1 1 
+binning log
+endhisto
+write "openhisto name dndeta-nd xrange 5 15000  "
+write "htyp pbs xmod log ymod lin"
+write "{text 0.05 0.90 ""title  "B# [c]"B# "L# 0.5 ND"" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis dn/d[c]_[c]=0!$    "" }"
+write "{column c3 = c2 / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "openhisto getarray ppexci-plateau-cms closehisto plot 0-"
+write "openhisto getarray ppexci-plateau-alice closehisto plot 0-"
+write "openhisto getarray ppexci-plateau-cms-nocorr closehisto plot 0-"
+write "openhisto getarray ppexci-plateau-alice-nocorr closehisto plot 0-"
+write "openhisto getarray ppexci-plateau closehisto plot 0"
+
+
+write "!-----------------------------"
+write "! mult |eta|<2.5     "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      9970
+trigger eta -2.5 2.5
+trigger nd1evt 1 1
+binning log
+endhisto
+write "openhisto name mul25 xrange 5 15000  "
+write "htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title  "B# [c]"B# "L# 2.5 "" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis average multiplicity (n)$    "" }"
+write "{column c3 = c2 / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "openhisto getarray ppexci-mult25 closehisto plot 0"
+write "!-----------------------------"
+write "! dndeta     "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      9970
+trigger eta -1 1
+trigger nd1evt 1 1
+set hisfac 0.5          !eta range
+binning log
+endhisto
+write "openhisto name dndeta xrange 5 15000  "
+write "htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title " "" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis plateau height "" }"
+write "{column c3 = c2 / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "openhisto getarray ppexci-plateau closehisto plot 0- plot dndeta"
+write "!-----------------------------"
+write "! C     "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      9970
+binning log
+endhisto
+write "openhisto name mult-chrg xrange 5 15000  "
+write "htyp prs xmod log ymod log"
+write "{text 0.05 0.90 ""title " "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = c2 / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "openhisto column c1 = sqrt ( c1 ) getarray ppexci-mult-chrg closehisto plot 0-"
+write "openhisto getarray ppexci-mult-ch3 closehisto plot 0-"
+write "oh calc mult-chrg ; htyp prs ch plot 0 dh"
+
+write "!-----------------------------"
+write "! 120      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      120
+idcode      -120
+trigger eta -3.25 3.25
+set hisfac 0.5
+binning log
+endhisto
+write "openhisto name 120 xrange 5 15000  "
+write "htyp prs xmod log ymod log"
+write "{text 0 0 ""title [p]  "B# [c]"B# "L# 3.25  "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = c2 / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "openhisto column c1 = sqrt ( c1 ) getarray ppexci-mult-pip closehisto plot 0"
+write "!-----------------------------"
+write "! 130      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      130
+idcode      -130
+trigger eta -3.25 3.25
+set hisfac 0.5
+binning log
+endhisto
+write "openhisto name 130 xrange 5 15000 "
+write "htyp prs xmod log ymod log"
+write "{text 0 0 ""title K  "B# [c]"B# "L# 3.25   "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = c2 / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "openhisto column c1 = sqrt ( c1 ) getarray ppexci-mult-kap closehisto plot 0"
+
+write "!-----------------------------"
+write "! -1120      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      -1120
+trigger eta -3.25 3.25
+binning log
+endhisto
+write "openhisto name -1120 xrange 5 15000  "
+write "htyp prs xmod log ymod log"
+write "{text 0 0 ""title ap   "B# [c]"B# "L# 3.25   "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = c2 / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "openhisto column c1 = sqrt ( c1 ) getarray ppexci-mult-ap closehisto plot 0"
+
+write "!-----------------------------"
+write "! -1120  y=0    "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      -1120
+trigger rap -0.5 0.5
+binning log
+endhisto
+write "openhisto name -1120y0  "
+write "{column c3 = c2 / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "ch"
+write "!-----------------------------"
+write "! 1120  y=0    "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      1120
+trigger rap -0.5 0.5
+binning log
+endhisto
+write "openhisto name 1120y0  "
+write "{column c3 = c2 / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "ch"
+write "!-----------------------------"
+write "! -120  y=0    "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      -120
+trigger rap -0.5 0.5
+binning log
+endhisto
+write "openhisto name -120y0  "
+write "{column c3 = c2 / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "ch"
+write "!-----------------------------"
+write "! 120  y=0    "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      120
+trigger rap -0.5 0.5
+binning log
+endhisto
+write "openhisto name 120y0  "
+write "{column c3 = c2 / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "ch"
+write "!-----------------------------"
+write "! -130  y=0    "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      -130
+trigger rap -0.5 0.5
+binning log
+endhisto
+write "openhisto name -130y0  "
+write "{column c3 = c2 / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "ch"
+write "!-----------------------------"
+write "! 130  y=0    "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      130
+trigger rap -0.5 0.5
+binning log
+endhisto
+write "openhisto name 130y0  "
+write "{column c3 = c2 / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "ch"
+write "!-----------------------------"
+write "! k/pi ratio of multiplicity versus energy |eta|<3.25       "
+write "!-----------------------------"
+write "openhisto name exci-k-pi xrange 5 15000 htyp prs xmod log ymod lin"
+write "calc 130 / 120 ;"
+write "{txt ""xaxis energy (GeV) "" }"
+write "{txt ""yaxis ratio"" }"
+write "{txt ""title K/[p]"" }"
+write "closehisto plot 0-"
+write "openhisto getarray ppexci-kpi closehisto plot 0-"
+write "input newdata/e735 exci-k-pi plot 0"
+write "!-----------------------------"
+write "! ap/pi ratio of multiplicity versus energy  |eta|<3.25       "
+write "!-----------------------------"
+write "openhisto name exci-ap-pi xrange 5 15000 htyp prs xmod log ymod lin"
+write "calc -1120 / 120 ;"
+write "{txt ""xaxis energy (GeV) "" }"
+write "{txt ""yaxis ratio"" }"
+write "{txt ""title ap/[p]"" }"
+write "closehisto plot 0-"
+write "openhisto getarray ppexci-aprpi closehisto plot 0-"
+write "input newdata/e735 exci-ap-pi plot 0"
+write "!-----------------------------"
+write "! k/pi ratio of multiplicity versus energy y=0       "
+write "!-----------------------------"
+write "openhisto name exci-k-pi-y0 xrange 5 15000 htyp prs xmod log ymod lin"
+write "calc 130y0 + -130y0 ; -> 1"
+write "calc 120y0 + -120y0 ; -> 2"
+write "calc $1 / $2 ;"
+write "{txt ""xaxis energy (GeV) "" }"
+write "{txt ""yaxis ratio"" }"
+write "{txt ""title K/[p]"" }"
+write "closehisto plot 0-"
+write "openhisto getarray ppexci-krpi closehisto plot 0"
+write "!-----------------------------"
+write "! ap/pim ratio of multiplicity versus energy       "
+write "!-----------------------------"
+write "openhisto name exci-ap-pim xrange 5 15000 htyp prs xmod log ymod lin"
+write "calc -1120y0 / -120y0 ;"
+write "{txt ""xaxis energy (GeV) "" }"
+write "{txt ""yaxis ratio"" }"
+write "{text 0.1 0.9 ""ap/[p]^-!"" }"
+write "closehisto plot 0-"
+write "openhisto getarray ppexci-aprpim closehisto plot 0-"
+write "!-----------------------------"
+write "! p/pip ratio of multiplicity versus energy       "
+write "!-----------------------------"
+write "openhisto name exci-ap-pim xrange 5 15000 htyp pbs xmod log ymod lin"
+write "calc 1120y0 / 120y0 ;"
+write "{txt ""xaxis energy (GeV) "" }"
+write "{txt ""yaxis ratio"" }"
+write "{text 0.7 0.9 ""p/[p]^+!"" }"
+write "closehisto plot 0-"
+write "openhisto getarray ppexci-prpip closehisto plot 0"
+

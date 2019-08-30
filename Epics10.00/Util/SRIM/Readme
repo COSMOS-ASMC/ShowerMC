@@ -1,0 +1,20 @@
+How to utilize SRIM data for heavy ion dE/dx
+1) Use "SRIM"  to get Ekt vs dE/dx  for heavy ion and given target.
+   (Ekt is the total kinetic energy, i.e not K.E/E). 
+   The energy region may be 0.001 GeV/n to 0.7 GeV/n
+   (there may be a way to use the batch mode; I don't know how to do)
+   The output name must be Zx-Media.srim  x=1~9 or 10~90 for heavy ion 
+   charge, Media is SCIN etc expressing Epics media name.
+   To use the data in Epics,  Z=2 (He) must be included, even if He is not
+   used  in actual simlation.
+2) Use convSrim.sh  
+    Usage: ./convSrim.sh Name forWhat ouputdir
+       Name: media name such as SCIN
+       forWhat:  1 --> for betagamma vs  dE/dx/Z**2
+                 2 --> for Epics use  Ek vs dE/dx 
+       outputDir;  output file is put there; name will be srim.01
+                  srim.02    where 01 02 is the Z.
+                  For Epics, you must have created 
+	            $EPICSTOP/Data/Media/SCIN_srim 
+                  directory (in the case of SCIN)
+                  (Note:  SciFi_srim is the link to SCIN_srim)

@@ -1,0 +1,8 @@
+#name   Format    very thin H atom for 'hollow' (same as sp)
+hollow 	1
+#
+#  Elem	 rho(g/cm^3)	Gas/Solid(1/0)  refl.index   Birks c
+
+1         1.d-10        1                   1.       0 0 0
+# 	Z	A  	N
+	1	1.008	1

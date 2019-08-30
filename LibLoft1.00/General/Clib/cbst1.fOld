@@ -1,0 +1,76 @@
+#include "ZsaveStruc.h"
+c          testing cbst0, 1
+c     include 'cbst0.f'
+c     include 'clorep.f'
+c     include 'clorez.f'
+c     include 'cgetRotMat4.f'
+c     include 'cgetlf.f'
+c     include 'cpm2e.f'
+c     include 'cibst1.f'
+cc-----------------------
+c      implicit none
+c      include '../Zptcl.h'
+c 
+c       record /ptcl/p1, p2, po, pox
+c       real*8 m
+c
+c       m=.938
+c
+c           p1.fm.p(1)=1.5
+c           p1.fm.p(2)=-8.5e1
+c           p1.fm.p(3)=5.e4
+c           p2.fm.p(1)=-1.0
+c           p2.fm.p(2)=10.
+c           p2.fm.p(3)=3000.
+c           p1.mass=m
+c           p2.mass=m
+c           call cpm2e(p2, p2)
+c           call cpm2e(p1, p1)
+c           call cbst1(1,  p1, p1, po)
+c           call cibst1(1, p1, po, pox)
+c           write(*,*) po.fm.p, pox.fm.p
+c       end
+c       **************************************************************
+c       *
+c       * cbst1:  boost a partilce into the rest system of another
+c       *         particle
+c       *
+c       **************************************************************
+c
+c /usage/  call cbst1(init, p1, p2,  po)
+c
+c        Suppose two particles p1, p2, given in the system K. 
+c        This boosts particle 2 into  the rest frame of particle 1.
+c  init: integer.  Input.  If p1 is the same as the previous call to this
+c        subroutine, give a value other than 1.  If p1 is different
+c        from the previous call, use 1. 
+c    p1: structure /ptcl/. Input. particle 1
+c    p2:  structure /ptcl/. Input. particle 2
+c   po:  structure /ptcl/. Output. particle seen at the rest system
+c        of particle 1.
+c
+       subroutine cbst1(init, p1, p2, po)
+         implicit none
+c----         include '../Zptcl.h'
+#include  "Zptcl.h"
+         record /ptcl/ p1, p2, po
+         integer init
+c
+         record /fmom/ g
+#ifdef USESAVE
+         save g
+#endif
+c
+         if(init .eq. 1) then
+c                 get Lorent factor of p1
+            call cgetlf(p1, g)
+         endif   
+c              boost
+         call cbst0(init, g, p2,  po)
+       end
+
+
+
+
+
+

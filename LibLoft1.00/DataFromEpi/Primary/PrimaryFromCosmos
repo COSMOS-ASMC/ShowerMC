@@ -1,0 +1,75 @@
+Suppose you use Cosmos (or some other code) and observe 
+particles in the atmospere.  The  particles at some observation
+level may be needed to be input to a detector to simulate
+observation.  In such case, you may organize particle list
+in a cerain format, and use as an incident particle(s) to
+the detector.  In that case, the PrimaryFile specified
+in sepicsfile must have + at the top of its file name.
+E.g
+	+incident
+
+The first line of the file may contain some of the following strings:
+
+   xyz  dir  sub KE ke  TE te time
+
+(order of appearance is not impotant;  TE and te ( KE and ke )
+have the same effect)
+
+Subsequnt lines with # at the line  head are ignored until
+#--------------- appears.
+
+If all of the above are given, each of the lines to come must have
+
+ code, subcode, chg, erg, xin, yin, zin,  wx, wy, wz, time
+
+where code is the particle code
+      subcode  the  particle subcode
+      chg   the particle charge
+      erg   the particle energy (in Kinetic energy or Total energy in GeV)
+xin, yin, zin the incident particle posision in the world coordinate
+wx, wy, wx,   the direction cosines in the world coordinate
+time          time in nsec.
+
+If some of "xyz  dir  sub KE ke  TE te" are missing in the first line,
+the corresponding data values must not exist in the incident 
+list.   The values for those variables are determined by usual
+way as specified in sepicfile.
+
+Example
+
+#   TEdir
+#----------------------- 
+3 1 0.4888421 0.493346 0 0.8698332
+3 1 2.513295 0.351829 0 0.9360642
+6 0 0.9397199 0.227679 0 0.9737363
+6 0 0.9405982 0.551315 0 0.8342969
+1 0 6.990098E-03 0.389743 0 0.9209238
+1 0 2.976213E-02 0.319498 0 0.9475870
+...
+
+This file contains 
+  code charge  Total_energy  3_direction_cosines
+
+y_direction cosine is always made to be 0.
+
+
+Anothe example:
+# subTEdir
+#---------------------------
+3 -1 -1 0.9386770 0 0.189997 0.9817846
+1 3 0 3.236826E-03 0 0.136755 0.9906049
+1 3 0 2.587103E-02 0 0.184878 0.9827615
+2 -1 -1 1.116556E-02 0 0.225584 0.9742237
+1 3 0 1.016765E-03 0 0.801877 0.5974895
+1 3 0 1.922196E-03 0 0.749173 0.6623741
+1 3 0 8.296736E-02 0 0.145697 0.9893293
+6 -1 0 0.9399502 0 0.312321 0.9499767
+
+
+
+In this case, sub code is also included
+x-dir is 0.
+
+
+
+

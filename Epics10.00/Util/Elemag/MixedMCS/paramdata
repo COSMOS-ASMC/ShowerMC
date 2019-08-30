@@ -1,0 +1,67 @@
+0.6  0.05   f/
+2.0  0.05    f/
+1.0  0.05    f /
+1.0  0.5    f /
+1.9  0.5    f /
+
+1.9  0.05   f /
+1.75  0.05   f /
+1.5  0.05   f /
+1.2  0.05   f /
+1.0  0.05   f /
+0.9  0.05    f /
+0.8  0.05    f /
+0.7  0.05    f /
+0.5  0.05    f /
+0.4  0.05    f /
+0.3  0.05    f /
+0.2  0.05    f /
+0.1  100     f /
+0.5  100     f /    high speed for thick det and H.E
+   0.1  0.05  f /  orginal
+
+Data above is for 
+c1forHardScat, maxHCSmfprl, print_redpdfc1
+
+c1forHardScat: (D=0.1)  hard Coulomb scattering mfp (lHard) should
+                be Lambmda(1)*c1forHardScat 
+		If it is < Lambda(el), Lambda(el) is employed
+
+         Lambda(1) is the 1st tranport mfp  
+	 Lambda(el) is the elastic Coulomb scattering mfp.
+         (typically < * 10 micro g/cm2)
+
+	 Default value is 0.1.   0.05~ 0.5 may be tried
+	 depending on the purpose. Smaller one takes longer
+	 computation time. If typcal thickness ~ r.l, 0.1
+	 OK.
+
+        typical values:
+	     KE         L(el)          L(1)
+	     1MeV    50 microg/cm2   0.1g/cm2 
+             10keV   3   //          10^-4 //
+
+maxHCSmfprl: D=0.05.  If lHard (in rl) is > maxHCSmpfrl
+              (> Lambda(el) in r.l),
+              it is forced to  be this value (in r.l).
+	      This will happen above ~10 MeV.
+	      This must be order of magnitude smaller
+              than the typical layer thicness of the
+              target material in 
+	      which multiple scattering effect is important
+	      and if you need precise information at very small
+	      lateral distance; e.g, in nuclear emulsion inserted
+	      between Pb, and look at showers inside handred micron
+	      meters. Otherwise, could be much larger.
+
+print_redpdfc1: D=f.  This is not for making sampling table.
+		but if you want to have a look at the
+		reduced mu(=(1-cos)/2) distribution of
+		Coulomb scattering, this may be set to t.
+ 		  Reduced distribtuion is 
+
+		(true Coulomb distribution)/(MW distribution),
+
+		where, MW distribution is the Modified
+		Wentzel distritution. MW has a simple analytic
+		form approximating true Coulomb distribtion).

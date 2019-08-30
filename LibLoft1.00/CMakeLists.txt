@@ -1,0 +1,33 @@
+cmake_minimum_required(VERSION 2.8.7)
+
+get_filename_component(dirName ${CMAKE_CURRENT_LIST_DIR} NAME)
+if(thisTarget)
+  set (thisTarget "${thisTarget}.${dirName}")
+else(thisTarget)
+  set (thisTarget "${dirName}")
+endif(thisTarget)
+
+file(GLOB sources
+  "*.f" "*.F" "*.f90" "*.F90" "*.f95" "*.F95" "*.f03" "*.F03" "*.for")
+if (sources)
+  message(STATUS "Source : glob       /  Target : ${thisTarget}")
+  add_library(${thisTarget} OBJECT ${sources})
+#else (sources)
+#  message(STATUS "Target ${thisTarget} is skipped")
+endif (sources)
+
+file(GLOB DIR_LIST "*")
+SET_INCLUDE_DIR_LIST("${DIR_LIST}")
+if (DIR_LIST)
+  foreach(DIR ${DIR_LIST})
+    if(IS_DIRECTORY "${DIR}")
+      if(${SEE_SUBDIR} AND EXISTS ${DIR}/CMakeLists.txt)
+	string(REPLACE "${SHOWERMCTOP}/${dirName}/" "" DIR "${DIR}/")
+	add_subdirectory(${DIR})
+      else(${SEE_SUBDIR})
+#	message(${DIR})
+      endif(${SEE_SUBDIR} AND EXISTS ${DIR}/CMakeLists.txt)
+    endif(IS_DIRECTORY "${DIR}")
+  endforeach(DIR ${DIR_LIST})
+endif (DIR_LIST)
+    

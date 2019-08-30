@@ -1,0 +1,58 @@
+read from /home/Users/kasahara/Develop/Cosmos7.622/Import/EPOS/epos.iniev ...
+read from /home/Users/kasahara/Develop/Cosmos7.622/Import/EPOS/epos.initl ...
+read from /home/Users/kasahara/Develop/Cosmos7.622/Import/EPOS/epos.inirj.lhc ...
+read from /home/Users/kasahara/Develop/Cosmos7.622/Import/EPOS/epos.inics.lhc ...
+seedj:         1     0.0000000000000000D+00
+  xs =   31.5641155242920     
+ EPOS used with FUSION option
+  istmax=           0  maproj=           1  matarg=           1
+  nptl =          19
+  istptl=           1
+   1 id= 1120 pdg= 2212 iorptl=   -1 jorptl=    0
+  istptl=           1
+   2 id= 1120 pdg= 2212 iorptl=   -1 jorptl=    0
+  istptl=          41
+  istptl=          41
+  istptl=           1
+  istptl=          21
+  istptl=          21
+  istptl=          29
+  istptl=           1
+  istptl=           1
+  istptl=           1
+  istptl=           0
+  12 id=  120 pdg=  211 iorptl=    5 jorptl=    0
+  istptl=           0
+  13 id= 1120 pdg= 2212 iorptl=    9 jorptl=    0
+  istptl=           0
+  14 id=  120 pdg=  211 iorptl=    9 jorptl=    0
+  istptl=           0
+  15 id= -120 pdg= -211 iorptl=   10 jorptl=    0
+  istptl=           0
+  16 id=  110 pdg=  111 iorptl=   10 jorptl=    0
+  istptl=           0
+  17 id= 1120 pdg= 2212 iorptl=   11 jorptl=    0
+  istptl=           0
+  18 id=   12 pdg=   11 iorptl=   11 jorptl=    0
+  istptl=           0
+  19 id=  -11 pdg=  -12 iorptl=   11 jorptl=    0
+  nhep=          10  type=   2.000000    
+  1 idhep=  2212 code=  6 status=  4 moth=  -1 daug=   0
+  2 idhep=  2212 code=  6 status=  4 moth=  -1 daug=   0
+  3 idhep=   211 code=  4 status=  1 moth=  -1 daug=   0
+  4 idhep=  2212 code=  6 status=  1 moth=  -1 daug=   0
+  5 idhep=   211 code=  4 status=  1 moth=  -1 daug=   0
+  6 idhep=  -211 code=  4 status=  1 moth=  -1 daug=   0
+  7 idhep=   111 code=  4 status=  1 moth=  -1 daug=   0
+  8 idhep=  2212 code=  6 status=  1 moth=  -1 daug=   0
+  9 idhep=    11 code=  2 status=  1 moth=  -1 daug=   0
+ 10 idhep=   -12 code=  7 status=  1 moth=  -1 daug=   0
+      4      1   25.1069507598877     
+      6      1   1.14142453670502     
+      4      1  0.443285554647446     
+      4     -1  0.976581990718842     
+      4      0  0.436769396066666     
+      6      1   72.7772674560547     
+      2     -1  2.091055922210217E-002
+      7      0  3.509560972452164E-002
+

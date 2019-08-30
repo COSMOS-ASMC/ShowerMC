@@ -1,0 +1,54 @@
+c     ****************************************************************
+c        compute density correction for Air with given density
+c
+      subroutine cdedxdlt(rhoin, gin, dlt)
+      implicit none
+      real*8  rhoin  ! input. air density in kg/m^3
+      real*8  gin  ! input. gamma factor
+      real*8  dlt  ! output.  density correction factor
+                   !   dlt + 4.605x will give deltx to be added
+                   !   old fourmula
+      real*8 rho0,  g
+      data  rho0/1.205/      ! standard density in kg/m3
+      save rho0
+c      dlt at (rho, p) is  dlt at (rho0, p*sqrt(rho/rho0))
+c     where p is the momentum.
+c       p = mgb; for the same m, p*sqrt(rho/rho0) is 
+c       gb=sqrt(g**2-1)-->sqrt( (g**2-1)rho/rho0)
+c      so that we  may compute dlt at g'**2-1 =  (g**2-1)rho/rho0
+c      i.e, g' =sqrt( (g**2-1)rho/rho0+1 )
+      
+      g = sqrt( (gin**2-1.0) * rhoin/rho0 + 1.d0 )
+
+      call cdedxdlt1(g, dlt)
+      end
+      subroutine cdedxdlt1(g, dlt)
+      implicit none
+      real*8 g     ! input . gamma factor
+      real*8  dlt  ! output.  density correction
+
+      real*8   shc, shx0, shx1, shsa, shm, cb, x
+      data   shc/-10.595/
+      data shx0/1.742/, shx1/4.0/, shm/2.879/
+      data shsa/0.2466/
+      save   shc, shx0, shx1, shsa,  shm
+
+
+
+      x=log10( (g- 1.)*(g+1.) ) / 2  ! = log10(gbeta) = 0.4343log(gbeta)
+      cb = -shc
+c
+c        we define deltx = -delta + 4.605x = -delta + log(g+1)(g-1)
+c                          -delta + log(g^2beta^2)
+c        and dlt = deltx - 4.605x
+c
+      if(x .lt. shx0) then
+c        4.605x - dlt  
+c         dltx=4.605*x
+         dlt = 0.
+      elseif(x .lt. shx1) then
+         dlt=cb - (shx1-x)**shm * shsa - 4.605*x
+      else
+         dlt=cb - 4.605*x
+      endif
+      end

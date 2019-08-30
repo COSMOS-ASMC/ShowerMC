@@ -1,0 +1,23 @@
+#!/bin/tcsh -f
+if ( $#argv != 2 ) then
+   cat << EOF
+   Usage: showEmin  config   epicsfile
+    expand config and show Emin for each of the  components
+    at the entrance of the component. 
+    Emin for gamma,  electron, RecoilMin, Emin for charged, Emin of n
+EOF
+exit
+endif
+
+set pwd=`pwd`
+
+
+cd $EPICSTOP/Util; make clean;make -f testCnf2.mk
+
+cd $pwd
+
+echo $1 > temp$$
+echo $2 >> temp$$
+$EPICSTOP/Util/a.out < temp$$
+rm temp$$
+

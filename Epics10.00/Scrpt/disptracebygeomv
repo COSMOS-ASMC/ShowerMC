@@ -1,0 +1,38 @@
+#!/bin/csh -f
+set pwd = `pwd`
+if ( $# == 0 ) then
+   cd $EPICSTOP/Util/Geomview;   ./disptracebygeomv
+   cd $pwd
+   exit
+endif
+
+# [-{c|z|b}]
+    set opt=`echo $1 | awk '{print substr($0,1,1)}'`
+    if( "$opt" == "-" ) then 
+       set arg1=$1
+       shift
+    else 
+       set arg1=""
+    endif
+
+
+    set trace=$1
+    shift
+
+
+    set abs=`echo $trace | awk '{print substr($0,1,1)}'`
+
+
+    if( "$abs" != "/" ) then
+      set trace=$pwd/$trace
+    endif
+
+  cd $EPICSTOP/Util/Geomview;   ./disptracebygeomv $arg1 $trace   $*
+
+cd $pwd
+
+
+
+
+
+

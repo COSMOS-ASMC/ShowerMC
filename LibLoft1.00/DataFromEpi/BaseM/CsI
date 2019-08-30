@@ -1,0 +1,11 @@
+#name   Format    Cesium Iodide
+CsI 	2
+#
+#  Elem	 rho(g/cm^3)	Gas/Solid(1/0)  refl.index       Birks c.
+#   rho may be 4.51
+2         4.53		0                  1.80          0 0 0
+# 	Z	A  	N
+	55	132.9	1
+	53	126.9	1
+#  ⟨Z/A⟩   I[eV]   a       k      x0    x1     Cbar  delta0
+ 0.41569 553.1  0.2538  2.6657  0.0395  3.3353   6.2807 0.00

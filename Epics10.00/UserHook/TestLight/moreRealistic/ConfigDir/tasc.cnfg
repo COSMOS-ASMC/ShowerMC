@@ -1,0 +1,47 @@
+### TASC ###
+#subd bgolog
+1 box BGO  2 3102 0 /     0   0 0      bgoXsec bgoL bgoXsec
+2 box Si   0  502 0 /     0  bgoL 0     1.0    30.d-4 1.0
+3 box Si   0  512 0 /    1.0  bgoL 1.0  0.5d0    10.d-4  0.5d0
+4 box_w sp 0 0 0 / 0 0 0
+#end bgolog
+
+#subd xBGO
+1 bgolog sp 0 0 0   /    0   0 0 
+2 bgolog sp 0 0 0 / +spBGO = = 
+3 bgolog sp 0 0 0  / +spBGO = =  
+4 bgolog sp 0 0 0 / +spBGO = =  
+5 bgolog sp 0 0 0  / +spBGO = =  
+6 bgolog sp 0 0 0 / +spBGO = =  
+7 bgolog sp 0 0 0 / +spBGO = =  
+8 bgolog sp 0 0 0 / +spBGO = =  
+9 bgolog sp 0 0  0 / +spBGO = =  
+10 bgolog sp 0 0 0 / +spBGO = =  
+11 box_w sp  0 0 0 / 0 0 0
+#end xBGO
+
+#subd yBGO
+1 box  BGO  0 2 0 / 0   0    0   bgoL bgoXsec bgoXsec
+2 box  BGO  = = = / = +spBGO =   =    =     =
+3 box  BGO  = = = / = +spBGO =   =    =     =
+4 box  BGO  = = = / = +spBGO =   =    =     =
+5 box  BGO  = = = / = +spBGO =   =    =     =
+6 box  BGO  = = = / = +spBGO =   =    =     =
+7 box  BGO  = = = / = +spBGO =   =    =     =
+8 box  BGO  = = = / = +spBGO =   =    =     =
+9 box  BGO  = = = / = +spBGO =   =    =     =
+10 box  BGO  = = = / = +spBGO =   =    =     =
+11 box_w sp  0 0 0 / 0 0 0
+#end yBGO
+
+
+#subd tasc
+1 xBGO sp 0 0 0 / xBGOOX xBGOOY BGOOZ
+2 yBGO sp 0 0 0 / yBGOOX yBGOOY +spbgoz
+3 xBGO sp 0 0 0 / xBGOOX xBGOOY +spbgoz
+4 yBGO sp 0 0 0 / yBGOOX yBGOOY +spbgoz
+5 xBGO sp 0 0 0 / xBGOOX xBGOOY +spbgoz
+6 yBGO sp 0 0 0 / yBGOOX yBGOOY +spbgoz
+7 box_w sp 0 0 0 / 0 0 0
+#end tasc
+

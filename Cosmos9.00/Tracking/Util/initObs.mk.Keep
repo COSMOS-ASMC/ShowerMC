@@ -1,0 +1,61 @@
+include $(COSMOSTOP)/site.config
+#
+#
+#vpath %.h  $(COSMOSINC)
+
+#vpath c%.f  $(COSMOSTOP)/Tracking/Util:$(COSMOSTOP)/Tracking:$(COSMOSTOP)/Tracking/Geomag:$(COSMOSTOP)/Tracking/AS
+
+
+
+src = testInitObs.f cinitObs.f ctransMagTo.f  cprObsSite.f cgetMoliereU.f \
+	cprintObs.f ctransCoord2.f
+
+objs := $(src:.f=.o)
+
+
+initObs :  $(objs)  
+	$(LD) $(LDFLAGS) -o $@  $(objs) -L$(LIBLOC) -l$(LIBNAME)
+
+###
+
+
+cinitObs.o: $(COSMOSINC)/Zglobalc.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Zobs.h \
+	$(COSMOSINC)/Zobsp.h \
+	$(COSMOSINC)/Zobsv.h \
+	$(COSMOSINC)/Zearth.h \
+	$(COSMOSINC)/BlockData/cblkObs.h
+
+cprObsSite.o: $(COSMOSINC)/Zglobalc.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Zobs.h \
+	$(COSMOSINC)/Zobsp.h \
+	$(COSMOSINC)/Zobsv.h \
+	$(COSMOSINC)/Zearth.h \
+	$(COSMOSINC)/BlockData/cblkObs.h
+
+ctransMagTo.o:  $(COSMOSINC)/Zglobalc.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Zobs.h \
+	$(COSMOSINC)/Zobsp.h \
+	$(COSMOSINC)/Zobsv.h 
+
+cgetMoliereU.o: $(COSMOSINC)/Zelemagp.h
+
+cprintObs.o: $(COSMOSINC)/Zglobalc.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Zobs.h \
+	$(COSMOSINC)/Zobsp.h \
+	$(COSMOSINC)/Zobsv.h \
+	$(COSMOSINC)/BlockData/cblkElemag.h \
+	$(COSMOSINC)/Zelemagp.h
+

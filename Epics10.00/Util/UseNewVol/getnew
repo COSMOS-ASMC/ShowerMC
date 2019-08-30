@@ -1,0 +1,10 @@
+substr($1,1,2)=="/*" {++cdep}; index($0,"*/") !=0 {--cdep}
+cdep >0 {next}
+cdep <0 {print "unbalanced /*  */ pair ";  exit}
+substr($1,1,1)=="c" {next}
+substr($1,1,1)=="!" {next}
+$1=="#news" {print $2, $3; next} 
+substr($1,1,1)=="#" {next}
+index($2,"new-") != 0 || index($3,"new-") != 0  {print $2, $3; next} 
+
+

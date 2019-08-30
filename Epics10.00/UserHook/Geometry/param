@@ -1,0 +1,15 @@
+ IntModel = '"nucrin" 4 "ad-hoc" 9 "fritiof7.02"',
+ IntModel = '"nucrin" 4 "ad-hoc" 9 "fritiof7.02"',
+ IntModel = '"dpmjet3" 80 "qgsjet2" ',
+ IntModel = '"dpmjet3"'
+ $PARAM
+ IntModel = '"phits" 2 "jam"'
+ $END
+  
+ ------------------ Don`t worry about the following for normal applications
+ $HPARAM
+ Kpilog = 6.200000178068880E-003,
+ $END
+
+ IntModel = '"nucrin" 5 "ad-hoc" 10 "dpmjet3"',
+

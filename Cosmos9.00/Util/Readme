@@ -1,0 +1,22 @@
+1) Fix the "vdir" in 'trace' in this directory.
+  (say to  /tmp)
+2) If a trace data (say, /tmp/foo/trace1) by Cosmos is available, 
+   use
+   ./trace  6  /tmp/foo/trace1
+
+  This will create ptcl2, ptcl3,.. ptcl6 (some may be missing
+  if there is no such particle trakcs) in $vdir.  If 2 is given
+  instead of 6, only ptcl2 will be created.
+  (2 is for electrons, 3 muon,...).
+
+3) In Geomview, you may specify, ptcl2 etc to display them.
+
+
+4) The 'colormap' in this directory determines the default color of 
+  each particle code. Color can be changed within Geomview.
+
+5) Geomview is available free; For many unix (pc linux, digital unix,
+solaris, next) binary is available. The source code is also available.
+Visit:
+       http://www.geom.umn.edu/software/geomview/
+

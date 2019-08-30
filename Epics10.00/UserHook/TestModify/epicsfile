@@ -1,0 +1,313 @@
+Parameters of Epics.
+
+Any comment may be placed before ---- line.
+you must give a value for each row at column corresponding to
+ "specified".   If you give / only there, standard is taken. No items
+ should be deleted or added.  If standard column has only ",", no
+ standard value is defined.
+
+The name field must start from the 2nd column.  
+Blank lines, if any,  are ignored. If the first 2 columns are blank, 
+the line is regarded as a comment line and ignored.
+
+name   standard     specified    meaning              
+---------------------------------------------------------------------
+ AngleB    f     t       /   Deflection at bremsstrahlung is taken or
+                             not.   This can be neglected in most of 
+                             applications.
+ DtMax     100.          / very rough world size in r.l( obsolete )
+ Eabsorb   6          / See also Photo.  To control energy deposit
+	                   treatment  when a particle energy becomes 
+                           lower than the given  minimum energy. Each of
+               the bit of Eabsorb (LSB is the rightmost bit) specifies 
+
+           bit 1:  When the photoelectric effect occurs, some of the
+               photon energy becomes absorbed by the atom (K shell energy)
+               and  the energy conservation apparently breaks.  If this
+               bit is on, such an energy is regarded as the  energy loss 
+               in the media and included in Move.dEeff. 
+           bit 2:  When a photon energy becomes lower than EminGamma, the
+               photon tracking is ceased. If the bit is on, the photon
+               energy is regarded as absorbed at the point and included
+               in Move.dEeff.
+           bit 3: When an electron or positron energy becomes lower than
+               EminElec, the tracking is ceased. If this bit is on, the
+               remaining kinetic energy of the electron or the posititron
+               energy + electron mass is regarded as absorbed at the point
+               and included in Move.dEeff.
+           bit 4: When the kinetic energy of a proton becomes < KEmin,
+               its tracking is ceased. If the bit is on, the kinetic energy
+               is regarded as absorbed at the point and included in
+               Move.dEeff.
+           bit 5: When the kinetic energy of a neutron becomes < KEmin,
+               its tracking is ceased. If the bit is on, the kinetic energy
+               is regarded as absorbed at the point and included in
+               Move.dEeff.
+           bit 6: When the total energy of an anti-proton or anti-neutron
+                becomes < KEmin, its tracking is ceased. If the bit is on,
+               its( energy +  mass) is regarded as absorbed at the point
+               and included in Move.dEeff.
+           bit 7: When the total energy of  a particle which may decay
+                soon after stopping (pi, K, mu) becomes  < KEmin, its
+               tracking is ceased.  If the bit is on, its kinetic energy
+               is regarded as absorbed at the point and included in
+               Move.dEeff.
+           bit 8: For other particles not falling in the category shown
+               above, their tracking is ceased when their kinetic energy
+               becomes < KEmin.  If the bit is on, its energy is regarded
+               as absorbed at the point and included in Move.dEeff.
+
+           Old value was real*8 and used
+               for different purpose. Non 0 old default
+               is not compatible with this default.
+                   
+                           
+ Eanihi   30.e-3  30e-2    / At E>Eanihi (GeV), e+ annihilation is 
+                           neglected
+ Ecut     100.e-6         / cut off gamma energy for brems (obsolete)
+ EdepDedx   t             / dE/dx is energy dependent or not
+                          (don't change;this is used in test mode)
+ ElowerBndPair 1.2e-3 1.03e-3     / At E<ElowerBndPair(GeV), pair creation is
+                           neglected (may be as low as threshold )
+ AutoEmin    1    /
+ EminElec   611.e-6      / Min of electron total energy (GeV) treated.
+                            In some case you may put this as low as
+                         (511+few tens) keV. 
+ EminGamma  50.e-6    /  Min of  gamma  energy. 
+                              If environment is "sp" and you want to
+                              treat synchrotron radiation, you may 
+                              give very low energy such as 0.1 keV.
+                              
+                      For the minimum energy of mu, pi, ... see
+                      KEmin later.
+ 
+ Es       19.3d-3        / scattering const (GeV)(this is the one
+                              normally given as 21 MeV).
+ Excom1   1.e-3 100 /
+ Excom2   1.e-3    /
+                              (don't change except for  test purpose)
+ EupperBndCS   1.    10.    / At E>EupperBndCS, compton scattering is
+                                neglected
+ IncGp    0                   / Include g-p interaction ?
+                               0-> no
+                               1-> taken into account
+
+ IoTrace  21       -21        /  Fortran dev# for Trace output. Open/close
+	                         of the file is done by the system.
+                                 userhook routine. See Trace and TraceDir
+ Knckon   t            /  High energy knock-on process is explicitly
+                                 included or not
+                                 t--> knock-on of electron kinetic energy 
+                                 > RecoilKeMin  is treated as a discrete
+                                 process. 
+                                 f-->knock-on is included  as a continuous
+                                 ionization loss.
+ LPMeffect   t   /
+ Molier   t         /  Moliere or gaussian multiple scattering.
+                                 Cascade result dose not change even if you 
+                                 put  f except for very special cases.
+ Photo    t             /  Photo electric absorption is  taken
+                                 into account or not.  If this is t,
+	               and media has high Z (such as Pb),  the K-shell
+	               energy becomes  close to the default EminGamma.
+                       Then apparent non-energy conservation may be seen
+                       in the sum of the deposited energy ( in the form of 
+                       ionization loss) in the media,
+	               since the energy of emitted electron is
+                                   Ee = Eg - Eshell + Me.
+                       (If Eg ~ Eshell, there appear only a stopping electron
+                       and this means the energy of the photon disappears).
+	               The amount of energy lost in this process in Pb becomes
+                       as large as ~4% for electron incident case. That is,
+	               if the incident electron has 100 MeV, the total energy
+	               deposited in Pb is ~95 MeV. For Fe, it becomes as
+                       small as 0.1 %.  
+         Eabsorb detemines how to treat the energy absorbed in the atom.
+                       The default 1 (non 0) is to count the absorbed energy as
+                       a part of energies deposited in the media. 
+                       0 is to neglect such energy in the energy loss count.
+	              (Eabs = Eg - (Ee - Me) = Eshell)
+ RecoilKeMin  0    /  Knock-on electron  of kinetic energy >
+                                 RecoilKeMin is explicitly produced, 
+                                 if Knckon=t.	
+ ModifyFile  'modfile'    /
+ Tcoef    5.                  /  When a sampled path length for a charged 
+                                 particle is > max(Tcoef*E, Tmin), 
+                                 the path is truncated to a shorter length.
+
+	                         This coefficient will be halved depending
+                                 on the value of (Molier, ALateCor)
+ Tmin     1.e-3               /  See Tcoef. 
+
+	                         This coefficient will be halved depending
+                                 on the value of (Molier, ALateCor)
+
+            Trace    f            /  Write trace information or not.
+                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                Use t only when you want to make demo
+                                figures. 
+                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
+                                See also IoTrace and TraceDir
+ TimeStruc  f                /  put time (sum of (path length)/beta cm) 
+                                in the track information or not
+
+ MagField    0               / 0--> no magnetic field exists
+                               1--> constant magnetic field is assumed
+                                    everywhere.  The magnitude is give
+                                    by (Bxu,Byu,Bzu)
+                               2--> You have to give the field depending
+                                    on the particle position. You must
+                                    modify  eppos2B.f in the UserHook to
+                                    give  the field  in the local coordinate
+                                    of the component there.
+
+ Bxu      0.                /  The x-component of uniform mag. field (T)
+ Byu      0.                /      y
+ Bzu      0.                /      z
+
+ ElecField    0             /  0--> no electric field.f
+                               1--> constant electric field everywhere
+                                   (Exu,Eyu,Ezu) is used
+                               2--> you have to modify eppos2B.f in 
+                                    UserHook.
+ Exu      0.              /  x-component of uniform electric field (V/m)
+ Eyu      0.              /  y
+ Ezu      0.              /  z
+ FreeC    t               /  Make f, only if you want to make the 
+                             incident pos. to be the interaction point.
+                             (continuous processes such as ionization is
+                              not regarded as the interaction)
+ EpsLeng 1.d-8       / Adjusting length in cm at the boundary of 
+                            a component.  If a particle crosses a 
+                            boundary of a component, the problem will
+                            arise if it belongs to the same component
+                            or another component. To avoid such a problem,
+	                    the position of the particle is adjusted to
+                            be at  b - w*EpsLeng, if it is to be kept
+                            in the same component or b + w*EpsLeng, if
+                            it is to be moved to the other component.
+                            Here
+                            b is the vector representing the computed
+                               boundary of the component the particle
+                               crosses,
+                            w the direction cosine vector of the particle.
+			    Becareful not to give a  value as large
+			    as some of the components.
+                              
+ ALateCor 1              / When we move a charged particle, we have to
+                            include multiple Coulomb scattering as a
+                            continuous process. The scattering causes
+                            angular deflection and lateral displacement
+                            simultaneously.  Both are correlated each
+                            other.  The correlated distribution is 
+                            available only for the Gaussian approximation
+                            of scattering and no practical distribution
+                            exists for Moliere's theory.
+                      0--> No correlation is taken into account. Only
+                           angular deflection is computed for the
+                           scattering.  The maximum distance a charged 
+                           particle can  travel is halved (see Tcoef,
+                           Tmin) to compensate the neglect of 
+                           displacement.
+                      1--> If Moliere=f (i.e, Gaussian scattering),
+                           angular lateral correlated distribution is
+                           used.  Tcoef and Tmin are used as they are.
+	                   If Moliere=t, the treatment is the same
+                           as the case of 0.
+                      2--> Scattering angle is sampled by Moliere's
+                           theory (if Moliere=t), or by Gaussian approx.
+                          (Moliere=f).  Independently of the above,
+                           the lateral displacement is computed by using
+                           Gaussian correlation.  Tcoef and Tmin are
+                           used as they are.
+
+ Sync     0               / Take synchrotron energy loss or not.
+                           0--> no synchrotron radiation process is
+                                considered.
+                           1--> dE/dx by synchrotron radiation is
+                                taken into account for electrons.  This
+                                loss is normally completely negligible.
+                           2--> If the media is "sp", explicit generation
+                                of synchrotron photon is tried.
+                                You must give a very low value to  EminGamma.
+                                (See  also SyncLoop)                        
+
+ SyncLoop 10.             / If magnetic field exists, an electron may make a
+                            semi-infinite cyclotron loop in the vacuum ("sp")
+                           To avoid such a case, if the electron runs  
+                           cyclotron radius * SyncLoop in vacuum, it is
+                           discarded.
+ MagPair  0              /  0 -> magnetic pair production is not considered
+                            1 -> magnetic pair production is considered
+                                 if Xai=B/Bc Eg/me > 0.05. Bc~4.3x10^13 g.
+
+          Lines follow describe how to treat muon energy loss.  
+          The ionization loss is always considered (but see  Knckon).
+          The direct pair creation, bremsstrahlung and  nuclear interaction
+          of muons become important at high energies  (normally at few 10
+          GeV for high (Z,A) material, and few 100 GeV for low (Z,A)).
+          Independently of the parameter values below, if the loss due to
+          each of the 3 processes is < 1 % of dE/dx(ionization), the 
+	  process is neglected.  Also, if a given media  has no table
+          for the muon energy loss, the loss is neglected. Among the 3
+          processes, nuclear interaction has least significance, then
+          follows bremsstrahlung. The direct pair creation has the largest
+	  contribution which mainly comes from a number of low energy
+          pair emissions. However, the nuclear interaction and bremsstrahlung
+          may sometimes give a large loss and lead to  big fluctuations.
+          
+          
+                 
+ MuNI     3          /   0--> nuclear interaction of muon is completely
+                              neglected
+                         1--> energy loss by n.i is included in dE/dx
+                              of muons as a continuous energy loss.
+                              Let v= E_transfer/Emu,  the loss here is
+                              Int(vc:vmax) of (Emu vdsigma/dv).
+                              (vc ~0, vmax~1).
+                              
+                  
+                         2--> energy loss by n.i is included in dE/dx
+                              of muons as a continuous energy loss in
+                              which only the energy transfer smaller than 
+                              vmin=10^-3 of the muon energy is included.
+                              The  loss here is 
+                              Int(vc: vmin) of (Emu vdsigma/dv).
+	                      The portion of loss by v>vmin is treated as
+                              a stocastic  process. However, the product 
+                              from the n.i itself is neglected
+                         3--> the same as 2, but the n.i is explicitly
+                              included to produce a number of particles.
+                              The n.i is treated as a gamma-nucleus 
+                              interaction.
+ MuBr   3          /      The same as MuNI  but for bremsstrahlung.
+ MuPr   3          /      The same as MuNI  but for direct pair creation. 
+ 
+ KEmin  0        /      Minimum kinetic energy (GeV) of heavy particles
+                          (mu, pi, K, n, p, ... ) to be tracked. 
+                          (Some may be tracked even if 
+                          the energy becomes smaller than this when it can
+                          annihilate or decay to produce particles of kinetic
+                          energy > KEmin. If 0 is given, EminElec-Me is  
+                          taken.  If you are interested in only muons, 
+                          hadrons, and ignor the photo-hadron production,
+                          you may set EminElec, EminGamma very large while
+                          keeping this small. It is be very much effective
+                          to do a fast simulation. 
+ EminH   0  /
+ MsgLevel 1             / if 2, all (warning, error) messages are shown.
+                           if 1, some (important, fatal error) messages are
+                           shown.
+                           if 0 only fatal error is  shown.
+ 
+ MediaDir '../../Data/Media'   /directory path to the media data.
+                                You can put a max of 3 paths by giving
+                                additional  two in below. The media
+                                name is searched for from the first path.
+                              You can use ".." or "."  but not "~" nor
+                              $EPICSTOP.
+ MediaDir ' '              / another path
+ MediaDir ' '              / one more another path
+           TraceDir ' '          / if ' ',  /tmp/$USER/trace1 will be the
+                             file for trace, else  given dir/trace1 is used.
+---------------------------------------------------------------------

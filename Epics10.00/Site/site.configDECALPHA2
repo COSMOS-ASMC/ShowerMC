@@ -1,0 +1,87 @@
+#  This specifies the site specific information
+#  This file is used when making the Epics library  as well as
+#  when using the Epics library.
+#
+#  Before you issue 'make' to make the library,
+#  the following command should be issued to set two environmental 
+#  variables (EPICSTOP and EPICSINC).
+#
+#   source Scrpt/sevi
+#
+#
+#
+# give next sun4 HP9000 etc to ARCH; 
+#           libepics.a is made in $EPICSTOP/lib/$ARCH/
+
+
+ARCH          = DECALPHA
+
+#  for nomal archiver option
+ARCHVOPT       = rv
+#  for HP9000. ar option. f is needed due to 14 character truncation.
+#ARCHVOPT        = rfv
+AR = /bin/ar             #archiver:  for HP. f option works by native archiver
+#AR = /usr/local/bin/ar    # gnu ar is ok for if -f is not used. 
+
+#LDFLAGS       = +U77		# HP.  this is for getlog.  
+LDFLAGS       =			# non-HP
+
+LD            = f77          # sun4 etc
+
+
+DFLAGS        = -D$(ARCH)
+INCHEADER     = -I$(EPICSINC) -I$(COSMOSINC)
+
+
+FFLAGS       =   $(DFLAGS) $(INCHEADER)		#  non-HP
+
+FC            = $(EPICSTOP)/Scrpt/cppFCDECALPHA2
+
+################probably you need not change until next '##########' line
+#
+LIBLOC        = $(EPICSTOP)/lib/$(ARCH)
+LIBNAME       = epics
+CLIBNAME       = lib$(LIBNAME).a
+
+LIBRARY	      = $(LIBLOC)/$(CLIBNAME)
+
+INSTALL	      = /etc/install
+
+
+
+##########################################################
+#  Following is used only when 'make install' and when creating 
+#  a complete executable "epics"  (DEST is used in the latter case)
+#  After make install, you may need to execute ranlib
+#  chmod, chwon, in some system.
+#############################################make install spec.
+#    where to copy the library.  
+#    if DEST directory not exist, you must make it by hand
+#    before 'make install'
+
+#DEST          = /usr/local/lib/$(ARCH)
+DEST	= $(LIBLOC)
+#DEST          = /tmp/$(ARCH)
+
+
+#   where to copy  header files by 'make install'
+#   if the directory not exist, you must make by hand before 'make install'
+
+HEADER     = /usr/local/include
+#HEADER     = /tmp/include
+
+#    where you copy some template files by 'make install'
+#   if the directroy not exist, you must make by hand before 'make install'
+
+TEMPLATE  = /usr/local/lib/$(LIBNAME)/template
+#TEMPLATE  = /tmp/template
+
+##############################################make install spec end
+#   archiver suffix rule
+#
+.f.a:
+	$(FC) -c $(FFLAGS) $<
+	$(AR) $(ARCHVOPT) $@ $*.o
+	rm -f $*.o
+
+	

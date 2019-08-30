@@ -1,0 +1,13 @@
+FOBJECTS = int-distbndry.o int-multi.o int-sample-cospt.o \
+	int-v1.o int-v2.o int-v3.o int-v4.o int-v5.o int-v6.o \
+	int-v7.o int-v8.o int-v9.o int-vinterface2.o \
+	int-x1.o int-x2.o int-x3.o int-x4.o int-x5.o int-x6.o \
+	int-x7.o int-x8.o int-x9.o int-xinterface2.o \
+	int-variblock.o
+
+#libintdpmjet3.a : $(FOBJECTS)
+#	ar r libintdpmjet3.a $(FOBJECTS)
+$(LIBRAR) ;  $(FOBJECTS)
+
+clean :
+	rm -f *.a *.o *.il

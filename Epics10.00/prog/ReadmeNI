@@ -1,0 +1,83 @@
+treatment of the nuclear interaction  in Epics.
+General:
+  ep2cosPtcl: It is called when a new particle is popped up
+	in epLightStack.f   The argument  ptcl is copied to
+        'aPtcl' in  the common area in /epepi2cos/
+  epcosCond:  When called, the current 'aPtcl' in /epepi2cos/
+        is copied to TrackBefMove.p
+  epcosCond2: When called, the current 'aPtcl' in /epepi2cos/
+        is copied to Move.Track.p
+  epcosCondr:  this is obsolite.  No effect.
+  eppushPtcl:  When Cosmos made  ptcls, this must be called
+        to store them in the Epics stack.
+        The  argument must be the parent (projectile) track of
+        the generated particles.
+  epfixProc: If the paths for  various process are stored
+        in IntInfArray, this one select the shortest path
+	as the selected process.
+
+
+How each particle is treated.
+ electron:  no interaction for hadron generation 
+ photon:  In epprog in epgen, all photon interaction
+	  paths are sampled; for photo-hadron path sampling
+	       call ep2cosCond
+	       call cfixModel( cTrack.p )
+               call cgetPhotoPxs(ActiveMdl2,
+               cTrack.p, media(mediumNo),  xs, mfp)
+   	       ....
+	  For process selection, epfixProc is not used.
+	  When the photo-production is selected in epprog,
+          Move.proc='photop' is set. 
+	  
+	  In epint, 
+           call ep2cosPtcl( cTrack.p )  copy current track to 'aPtc'
+           call cfixTarget(xmedia(mediumNo))  
+                          xs has been fixed in cgetPhotoPxs
+			  TargetNucleonNo TargetProtonNo TargetXs
+	                  are fixed
+   	   call epcpTargetInfo	
+                          cp above 3 info into Media(MediaNo).colA
+                          etc.
+           call ep2cosCond2   copy aPtcl to Move.Track.p
+           call cphotop
+           call eppushPtcl(cTrack) 
+
+  muon, hadron:
+       epNonEleMag is called in epgen.
+       There, 
+         call ep2cosCond
+	 call cfixModel( cTrack.p )
+         call ciniSmpIntL
+         call epsmpNEPIntL(xmedia(mediumNo))
+                  this  is in epcosIntf.f and does:
+                    set   decay length 
+	          if not muon
+                    set   hadronic col. length by using
+                          cGeTXsec
+         call ep2cosCondr  ! no effect
+	 call epKnockp ! for charged ; set knock-on length
+              For the muon   
+         set pair/brem/nuci lengths are set.
+              Then
+         call epfixProc; fix Move.proc etc (coll or decay ..)
+  In epint
+         Branch by Move.proc and ptcl type
+         For muons
+	     call ep2cosPtcl( cTrack.p )
+	     call ep2coscond2
+             decay ==> cinteMuon    (cmuInte is not called there.
+                                But muon capture is also treated)
+             pair/brem/nuci ==>epmuInte in prog/Mu
+   	       If nuci is requested, the transfer energy is 
+               reagarded as photon, and employ photo-hadron
+               program. 
+         For hadrons
+	     call ep2cosPtcl( cTrack.p )
+             call cfixTarget(xmedia(mediumNo))
+     	     call epcpTargetInfo	
+                          cp above 3 target info into 
+                          Media(MediaNo).colA   etc.
+             call ep2cosCond2
+             call cinteNEP
+             call eppushPtcl( cTrack ) 

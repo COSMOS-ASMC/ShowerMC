@@ -1,0 +1,63 @@
+subroutine kxInPolyhedra0(p, q, n, x, inside)
+     integer,intent(out):: inside ! 0 inside                                   
+                                  ! 1 on the surface.
+				  ! 2 outside   
+
+=========================================
+
+subroutine  kinout3(p, n,  r, nv, sumteta, inside)
+    real(8),intent(out):: sumteta  ! if the point is inside, 
+             !  sumteta is 2pi if normal vector is proper direction, 
+             !  if opposite direction, -2pi. 
+             ! If the point is outside 0 (normally +/- 10^-15 ~10^-10) 
+             ! Proper direction means right-handed srew rule.
+    integer,intent(out) :: inside
+              !  insdie:  1 if the point is in outer region
+              !          -1                 in inner region
+              !           0  on the edge of the polygon
+              !          -2 input is invalid (n<=2)
+==========================
+subroutine ep3p2plane0(x, p1, p2, n, k, alpha, icon)
+      real(8),intent(out):: alpha ! if icon =1 or 2, 
+                      !    alpha is such that
+                      !  (x-p1) = alpha*(p2-p1)
+                      ! alpha< 0: x is far from p2 than p1
+                      !      0  : x = p1
+                      !   0~ 1  : x is between p1 and p2
+                      !      1  : x is p2
+                      !     >1  : x is far from p1 than p2    
+      integer,intent(out):: icon  ! if 0, n, k obtained.
+                       ! if  1,  x, p1, p2 are colinear. but  p1 /= p2 
+                       !         and 0<= alpha <=1
+                       ! if  2,  x, p1, p2 are colinear. but  p1 /= p2 
+		       !         and alpha< 0 or alpha > 1.
+                       ! if -1,  p1 == p2 alpha has no meaning
+=============================
+ subroutine epProjAReaOfTriang(p1, p2, p3, x, nv, teta, area,icon)
+
+   real(8),intent(out):: area  ! signed  area                                
+   integer,intent(out):: icon  ! 0:   area obtained.                         
+  integer,intent(out):: icon  ! 0:   area obtained.                           
+                         !   -1  p1 p2 p3 do not form a triagle                
+                         !    1  x is on the triangle plane                    
+                         !       on one of the p1-p2, p2-p3 or p3-p1 segment   
+                         !    2  x is on the triagle plane and inside of       
+                         !       of the triangle area                          
+                         !    3  x is on the triagle plane but outside of      
+                         !       the triagle.     
+================================
+subroutine epgetAngleBtw2Planes(i, x, p1, p2, p3, nv, teta,icon)
+   real(8),intent(out):: teta   !   rad. angle obtained.(icon = 0)             
+                   !  for other case see icon                                  
+   integer,intent(out):: icon ! 0.  teta obtained,                             
+                       !  1. x is colinear with p1, p2 or p2 p3                
+                       !     x is on the p1-p2 or p2-p3 segment                
+                       !  2.  x is on the triangle plane inside                
+                       !  3.  x is on the plane  but outside of the            
+                       !      triangle.                                        
+                       !  -1. strange input.      
+========================
+subroutine  kgetNormalVec(p, n, req, nv, k, icon)
+!    icon
+!        0. nv, k obtained                    
+!       -1   p is colinear or n<3. 

@@ -1,0 +1,24 @@
+c          parameters that can be controlled by the user
+c
+         common/ Zepprm/ amass(20), emin(20), 
+     1   EupperBndCS, ElowerBndPair, DtMax,  RecoilKeMin, MagField, 
+     *   Bxu, Byu, Bzu,
+     2   Exu, Eyu, Ezu, EpsLeng,
+     3   Eanihi, Tcoef, Tmin,
+     4   Eabsorb, Ecut, EminElec, EminGamma,
+     5   ElecField,  EdepDedx, AngleB, TimeStruc,
+     6   Trace, IoTrace, Photo, Knckon, FreeC
+c
+	real*8 amass, emin, DtMax, ElowerBndPair
+        real*8 EupperBndCS,  RecoilKeMin, MagField, Bxu, Byu, Bzu
+	real*8 Exu, Eyu, Ezu, Eanihi, Tcoef, Tmin, Eabsorb, Ecut
+        real*8 EminElec, EminGamma, EpsLeng
+
+         logical Trace, Photo, Knckon, EdepDedx, AngleB, TimeStruc, 
+     *   FreeC
+         integer ElecField, IoTrace
+c
+c DtMax: max length in r.l that can be regarded enough larger than
+c        the detector size.
+c
+

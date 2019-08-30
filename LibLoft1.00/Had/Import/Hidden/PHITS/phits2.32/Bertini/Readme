@@ -1,0 +1,45 @@
+in  bertin.f
+	param00.inc--> include '../JQMD/param00.inc'
+  (don't use #include "param00.inc"; implicit none is 
+     incompatible with implicit real*8(...) )
+
+
+
+From isobert.f,  ptotal  gamma  cii cij are extracted and gathered
+     in ptotal.f
+     following variable names  in isobart.f are declared explicityl
+     to avoid conflict with sub name.
+     ptotal
+     bb 
+     alpha
+     gamma
+     cii
+     cij
+in bert.f 
+5046   kkrou = kkrou +1  is 
+      5046 continue
+          ! kkrou = kkrou +1  ! kkrou  nowhere used.
+
+
+ifort bert*.f isobert.f isodat.f testBert.f ../Com/ndata01.f  -I../Com/
+
+
+unirn:   in utlnmtc.f:      function unirn(dummy)
+	 uniform random number
+isbert;  in isobert.f: 
+	  subroutine isbert(finput,npart,nomp,ityp,eout,alph,beta,gam)
+parastop:  same as in JQMD
+bindeg:   //
+rn:       //
+
+
+------------------
+init:  bertin  --> bertcin (only once)　xsec calculation
+                   parameter icugn in common/cugnon/
+		   icugn=1 (old)  2(new) xsection  
+		   block data is in bert-bl0.f
+
+
+in bert, sometimes  nopart is -1 and return is made.
+   (no particle produced.  why)
+    reason is not known.      

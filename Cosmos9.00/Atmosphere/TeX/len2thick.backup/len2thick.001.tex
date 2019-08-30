@@ -1,0 +1,90 @@
+\documentstyle[epsf]{article}
+\begin{document}
+
+%%Begin InstantTeX Picture
+\let\picnaturalsize=N
+\def\picsize{8cm}
+\def\picfilename{earthGeom.eps}
+\begin{figure}[h]  % [t] or [b]
+%  ////// YOU NEED epsf.sty  AS   \documentstyle[epsf]  //////////
+ \hspace*{1cm}
+ \epsfysize=\picsize
+ \leavevmode\epsffile{\picfilename}
+ \caption{Geometrical relation}
+ \label{Label}
+\end{figure}
+
+%%End InstantTeX Picture
+
+\begin{eqnarray}
+r \cos\theta - r'\cos\theta' = s\\
+r\sin\theta = r'\sin\theta\\
+r^2 + s^2 - 2rs\cos\theta = r'^2
+\end{eqnarray}
+Then, we have
+
+\begin{eqnarray}
+z'& = & \sqrt{r^2 + s^2-2rs\cos\theta} - R \nonumber \\
+ & = & \sqrt{ (r- s\cos\theta) + s^2\sin^2\theta} - R \nonumber \\
+& = & z - s\cos\theta +{1 \over 2}{  s^2\sin^2\theta\over r-s\cos\theta} + O(s^4) \nonumber \\
+ & = & z - s\cos\theta + {s^2 \over 2r}\sin^2\theta + {s^3 \over 2r^2}\cos\theta\sin^2\theta + O(s^4)
+\end{eqnarray}
+The slant thickness in the length $s$ is
+
+\begin{eqnarray}
+t & = & \int_{0}^{s}{\rho(s)ds}\nonumber \\
+& = & \int_{0}^{s}{\rho(z + f(s,z))ds}
+\end{eqnarray}
+where
+\begin{eqnarray}
+f(s, z) \approx - s\cos\theta + {s^2 \over 2r}\sin^2\theta + {s^3 \over 2r^2}\cos\theta\sin^2\theta
+\end{eqnarray}
+
+\begin{eqnarray}
+\rho(z + f(s,z)) \approx \rho(z) + \rho'(z)f(s,z) + {\rho''(z)\over 2}f^2(s,z)
+\end{eqnarray}
+
+Taking upto $s^4$, the indefinit integral is
+
+\begin{eqnarray}
+f_1(s,z) & \equiv &\int{f(s,z)ds} =-{s^2 \over 2}\cos\theta + {s^3 \over 6r}\sin^2\theta + {s^4 \over 8r^2}\cos\theta\sin^2\theta\\
+f_2(s,z) &  \equiv &\int{f^2(s,z)ds} = {s^3 \over 3}\cos^2\theta-{s^4 \over 4r}\cos\theta\sin^2\theta
+\end{eqnarray}
+
+Error estimation:
+
+
+
+\begin{eqnarray}
+\rho = \rho_0 \exp(-z/z_0)
+\end{eqnarray}
+is an not so bad approximation for the atmosphere.  Then,
+
+\begin{eqnarray}
+\rho'(z) &=&- \rho(z)/z_0\nonumber \\
+\rho''(z) & = & \rho(z)/z_0^2
+\end{eqnarray}
+
+\begin{eqnarray}
+t&=&\rho(z)(s + {s^2 \over 2z_0}\cos\theta-{s^3 \over 6rz_0}\sin^2\theta +{s^3 \over 6z_0^2}\cos^2\theta -{s^4 \over 8r^2z_0}\cos\theta\sin^2\theta\nonumber \\
+& & - {s^4 \over 8rz_0^2}\cos\theta\sin^2\theta)\\
+&=&\rho(z)s(1 + {1 \over 2}{s\over z_0}\cos\theta-{1 \over 6}{s\over r}{ s\over z_0}\sin^2\theta
+ +{1 \over 6}({s\over z_0})^2\cos^2\theta \nonumber \\ 
+& &-{1 \over 8}({s \over r})^2{s \over z_0}\cos\theta\sin^2\theta
+-{ 1\over 8} {s \over r}({s \over z_0})^2\cos\theta\sin^2\theta)
+\end{eqnarray}
+
+For a near vertical case, we put $\cos\theta=1$ and  $\sin\theta=0$, then
+
+\begin{eqnarray}
+t&=&\rho(z)s(1 + {1 \over 2}{s\over z_0}\cos\theta-{1 \over 6}{s\over r}{ s\over z_0}\sin^2\theta
+ +{1 \over 6}({s\over z_0})^2\cos^2\theta \nonumber \\ 
+& &-{1 \over 8}({s \over r})^2{s \over z_0}\cos\theta\sin^2\theta
+-{ 1\over 8} {s \over r}({s \over z_0})^2\cos\theta\sin^2\theta)
+\end{eqnarray}
+
+
+
+
+
+\end{document}

@@ -1,0 +1,84 @@
+This directory contains histogram routines in C.
+They are almost the same as Fortran  version, although
+only 1 dimensional routines are provided in C.
+
+The interface is almost the same as Fortran routines.
+Some exceptions are seen in file specification and
+character variable and logical parameters.
+
+File specification in Fortran is by a number and
+in C by a FILE * consruct.  Some character parameters
+and logical parameters in Fortran is replaced by
+int in C.
+
+The binary output file is not compatible between C and
+Fortran. However, they can be converted into an ascii file
+by bin2ascii program or you can directory make an ascii
+output file.  The ascii output file are compatible between
+C and Fortran.  So they can be read C and Fortan. 
+An ascii file can be converted into a binary file.
+(Old ascii files created by Fortran are not compatilbe
+ with those created by C).
+
+Therefore, by applying splitHisto.sh in the Hist
+directory  to an ascii file, you can create files
+which are ready for plotting by gnuplot (the *.dat
+files contain tuple data so that it can be used for
+any plotting routines easily).
+
+---------------------------------------------------
+
+k90whist1.c:  corresponds to k90whist1.f
+  histogramming routines.
+
+bin2ascii.c:  //             bintoascii.f
+ Utiliy to convert a binary file into an ascii file
+
+k90whistReadAscii.c
+  A function to read an ascii histogram file.
+
+test1.c: To create a binary or ascii histogram file
+	in which several histograms are stored.
+	k90whist1.c is used.
+	Usage: 
+	1) Edit test1.c and  define/undefine USECOSMOS.
+
+	2) make -f test1.mk
+   	    (if USECOSMOS is undefined)
+	    or
+	   maek -f test1Cosmos.mk 
+	    (if USECOSMOS is defined)
+	3) ./test1 n  output_file_name 
+		n=1 ==> ascii 
+		n=2 ==> binary.
+
+bin2ascii.c: To convert a binary histogram file into an
+	ascii histogram file.
+	k90whist1.c is used.
+	Usage:
+	make -f bin2ascii.mk
+
+	setenv HISTFILE0 input_bin_file
+	 or
+	export HISTFILE0=input_bin_file
+
+	./bin2ascii > output_ascii_file
+
+
+testReadAscii.c: To read an ascii histogram file and
+	convert it to a binary histogram file.
+	k90whist1.c and k90whistReadAscii.c are used.
+
+	Usage:
+	make -f testReadAscii.mk
+	
+	./testReadAscii < input_ascii_file output_bin_file
+	
+	(***NOTE: output is not redirection***).
+
+	
+
+
+
+
+ 

@@ -1,0 +1,13 @@
+#name   Format    Tantalum
+Ta 	2
+#
+#  Elem	 rho(g/cm^3)	Gas/Solid(1/0)  refl.index Birks c
+
+1         16.6            0              0         0 0 0
+# 	Z	A  	N
+	73	180.9479 1
+#  ⟨Z/A⟩   I[eV]   a       k      x0    x1     Cbar  delta0
+0.40343	718.0 0.1780  2.7623  0.2117  3.4805   5.5262 0.14
+
+
+

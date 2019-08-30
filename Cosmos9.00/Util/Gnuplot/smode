@@ -1,0 +1,26 @@
+set nohidden
+splot "<awk -f e-mode zrev=`cat .Reverse` zoff=`cat .Revmax` `cat .trace`" w l;
+
+color=`awk 'NR==2 {print $8}' ./setcolor`
+print "showing e+ with  ", color
+rep  "<awk -f e+mode zrev=`cat .Reverse` zoff=`cat .Revmax` `cat .trace`" w l;
+
+color=`awk 'NR==3 {print $8}' ./setcolor`
+print "showing pic with ", color
+rep  "<awk -f picmode zrev=`cat .Reverse` zoff=`cat .Revmax` `cat .trace`" w l;
+
+color=`awk 'NR==4 {print $8}' ./setcolor`
+print "showing Kc with", color
+rep  "<awk -f kcmode zrev=`cat .Reverse` zoff=`cat .Revmax` `cat .trace`" w l;
+
+color=`awk 'NR==5 {print $8}' ./setcolor`
+print "showing p with ", color
+rep  "<awk -f pmode zrev=`cat .Reverse` zoff=`cat .Revmax` `cat .trace`" w l;
+
+color=`awk 'NR==6 {print $8}' ./setcolor`
+print "showing heavy with ", color
+rep  "<awk -f heavymode zrev=`cat .Reverse` zoff=`cat .Revmax` `cat .trace`" w l;
+
+pause -1
+
+

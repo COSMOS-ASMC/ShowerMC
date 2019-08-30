@@ -1,0 +1,470 @@
+       subroutine cifXObsSite(nextwhere)
+c         see if MovedTrack crosses an observation depth.
+c         or go out of boundry.
+c        if to be observed, reset MovedTrack information
+      implicit none
+#include  "Ztrack.h"
+#include  "Ztrackp.h"
+#include  "Ztrackv.h"
+#include  "Zincidentv.h"
+#include  "Zobs.h"
+#include  "Zobsp.h"
+#include  "Zobsv.h"
+#include  "Zearth.h"
+#include  "Zcode.h"
+c     
+      integer nextwhere  ! output next where. to be used after ptcl
+                         !  crosses an  observation  level. 
+c  for perpendicular case
+c        cross       border
+c   1      O       BorderL< Moved.Height <BorderH
+c   2      X            //
+c   3      O       M.H > B.H 
+c   4      O       M.H < B.L
+c   5      X       M.H > B.H
+c   6      X       M.H < B.L
+c
+      integer loc
+      real*8  leng, dedt, cosfromaxis
+      real*8  clen2thick
+
+      logical cross, seeupper
+
+      record /coord/ xyz1, xyz2, dircos, diffvec, unitv, unitp
+
+      record /coord/ temp
+
+      real*8 dummylen, r0, rp, obsrl,  cosp, dt2, m2
+      real*8 coscr2, r0r
+      real*8 dedtF
+c
+      cross = .false.
+
+      loc = TrackBefMove.where
+
+      if(IntInfArray(ProcessNo).length .gt. 0. ) then
+c           later use
+         call cdiffvec(TrackBefMove.pos.xyz, 
+     *              MovedTrack.pos.xyz, diffvec)
+c           make it  to the unit vector    vector:  Bef  1--->2  Moved
+         call c3DV2DDCos(diffvec, unitv, dummylen)
+         if( ObsPlane .ne. notUsed ) then
+            if( abs(ObsPlane) .eq. Perpendicular ) then
+               call cifXPerpen(unitv,  cross, leng, seeupper)
+            else
+               call cifXHorizon(diffvec, unitv, cross, leng, seeupper)
+            endif
+         endif
+      endif
+         
+      if(cross) then
+
+c////////////////////
+c          there is small diff. between unitv and TrackBefMove.vec
+c      so  it may be neglected. though we use unitv.
+c     
+c         if(MoveStat ==  ToBeObserved  .and. 
+c     *         MovedTrack.p.code   == 2 ) then
+c            write(*, *) ' unitv=',unitv.x, unitv.y, unitv.z
+c            write(*, *) ' dir  =',TrackBefMove.vec.w.x,
+c     *                         TrackBefMove.vec.w.y,
+c     *                         TrackBefMove.vec.w.z
+c         endif
+c//////////////////
+
+
+         IntInfArray(ProcessNo).length = leng
+         IntInfArray(ProcessNo).thickness = clen2thick(
+     *     TrackBefMove.pos.radiallen - Eradius,
+     *     TrackBefMove.vec.coszenith, leng)
+
+         call cmoveStreight(leng, unitv)
+         MovedTrack.vec.w = unitv 
+         call cresetMom(MovedTrack)
+c                      bef. replace, w for low energy electron
+c                      may be largely scattered and even
+c                      backward at the path end.
+c                      At Xing point with obs. depth, this
+c                      is not good.
+c         if(MovedTrack.pos.height .le. BorderHeightL) then
+c            write(0,*) MovedTrack.pos.height, BorderHeightL
+c         MoveStat = BorderL
+c            MovedTrack.where = NoOfSites+1
+
+
+         if( MoveStat .ne. BorderH .and. MoveStat .ne. BorderL) then
+            MoveStat = ToBeObserved
+            if(seeupper) then
+               nextwhere = loc - 1
+               MovedTrack.where = nextwhere
+            else
+               MovedTrack.where = loc
+               nextwhere = loc + 1
+            endif
+         endif
+
+         if(MovedTrack.p.charge .ne. 0) then
+            call cqElossRate(dedt, dedtF) ! get de/dx computed previously
+            EnergyLoss = dedt * IntInfArray(ProcessNo).thickness
+            MovedTrack.p.fm.p(4) = TrackBefMove.p.fm.p(4)-EnergyLoss
+            if(MovedTrack.p.fm.p(4) .lt.  MovedTrack.p.mass ) then
+               MovedTrack.p.fm.p(4) = MovedTrack.p.mass 
+               EnergyLoss =  TrackBefMove.p.fm.p(4)- MovedTrack.p.mass 
+            endif
+         endif
+      else
+         nextwhere = loc
+         MovedTrack.where = loc
+      endif
+      end
+
+      subroutine cifXHorizon(diffvec, unitv, cross, leng, seeupper)
+      implicit none
+#include  "Ztrack.h"
+#include  "Ztrackp.h"
+#include  "Ztrackv.h"
+#include  "Zincidentv.h"
+#include  "Zobs.h"
+#include  "Zobsp.h"
+#include  "Zobsv.h"
+#include  "Zearth.h"
+#include  "Zcode.h"
+c     
+
+      integer loc
+      real*8  leng
+      real*8  clen2thick
+
+      logical cross, seeupper
+
+      record /coord/  diffvec, unitv, unitp
+
+
+      real*8 dummylen, r0, rp, obsrl,  cosp, dt2, m2
+      real*8 coscr2, r0r
+c
+
+      loc =  TrackBefMove.where
+
+      r0 = ObsSites(loc).pos.radiallen
+      rp = TrackBefMove.pos.radiallen
+      dt2 =   rp**2 -  r0**2
+      if(dt2 .lt. 0.d0) then
+         if(dt2 .lt. -1.d0) then
+            write(0,*) ' loc =',loc, ' r0=',r0, ' rp=',rp,
+     *           ' dt2=',dt2, ' code=',TrackBefMove.p.code,
+     *           ' rp.h=', TrackBefMove.pos.height,
+     *           ObsSites(loc).pos.height
+            call cerrorMsg('position info invalid',0)
+         endif
+         dt2 = abs(dt2)
+      endif
+c         this is cos^2 of zenith for a ptcl which touches the inner sphere (loc-th sphere)
+      coscr2 = dt2 /rp**2
+
+      call c3DV2DDCos(TrackBefMove.pos.xyz, unitp, dummylen)
+      call cscalerProd(unitv, unitp, cosp)
+      cosp = -cosp
+      seeupper = cosp .le. 0
+      if(cosp .gt. 0) then
+c             down going but not cross the lower sphere
+         seeupper = cosp**2 .le. coscr2
+      endif
+
+
+      if(.not. seeupper ) then
+         if(MovedTrack.pos.radiallen .le. r0) then
+c                 cross ; goes down
+            cross = .true.
+         else
+c                get moved length  ^2           
+            call cscalerProd(diffvec, diffvec, m2)
+            if(m2 .gt. dt2) then
+c              double cross; first one is the nearest cross
+               cross =.true.
+            endif
+         endif
+      else
+c                may see upper
+         if(MovedTrack.pos.radiallen .ge.
+     *        ObsSites(loc-1).pos.radiallen) then
+c                 if loc=1, this means going outside of the borderH
+               cross =.true.
+         endif
+      endif
+
+      if(cross) then
+c             get length, leng, from the starting point to
+c             the observation depth
+         call cscalerProd(unitv, TrackBefMove.pos.xyz, r0r)
+         if(seeupper) then
+            obsrl = ObsSites(loc-1 ).pos.radiallen
+            if(loc .eq. 1)  MoveStat=BorderH
+         else
+            obsrl = ObsSites(loc).pos.radiallen
+            if(loc .eq. NoOfSites+1 )then
+c                this seems not needed.
+               MoveStat = BorderL
+            endif
+         endif
+c            get distance to the crossing point
+         if(rp .gt. obsrl ) then
+            leng = -r0r - sqrt(r0r**2 -
+     *           (rp**2-obsrl**2))
+         else
+            leng = -r0r + sqrt(r0r**2 -
+     *           (rp**2 - obsrl**2))
+         endif
+         leng = leng + 0.001d0
+      endif
+      end
+      subroutine cifXPerpen(unitv,  cross, leng, seeupper)
+      implicit none
+#include  "Ztrack.h"
+#include  "Ztrackp.h"
+#include  "Ztrackv.h"
+#include  "Zincidentv.h"
+#include  "Zobs.h"
+#include  "Zobsp.h"
+#include  "Zobsv.h"
+#include  "Zearth.h"
+#include  "Zcode.h"
+c     
+
+
+      real*8  leng
+      logical cross, seeupper
+
+      real*8  clen2thick,  cosfromaxis, leng2
+
+      integer loc, i, icon
+      record /coord/ xyz1, xyz2, dircos, unitv
+
+      loc = TrackBefMove.where
+c///////////
+c      write(0,*) ' loc =', loc
+c//////////
+c
+c           observation plane is perpendicular to primary
+c           convert coord into 1ry system
+      call cxyz2prim(ObsSites(NoOfSites).pos.xyz, 
+     *     MovedTrack.pos.xyz, xyz2)
+      call cxyz2prim(ObsSites(NoOfSites).pos.xyz, 
+     *     TrackBefMove.pos.xyz, xyz1)
+c      call cscalerProd(TrackBefMove.vec.w, DcAtObsXyz, 
+c     *     cosfromaxis)
+      call cscalerProd(unitv, DcAtObsXyz, 
+     *     cosfromaxis)
+
+      seeupper = cosfromaxis .le. 0.
+      if(.not. seeupper) then
+c              current ptcl is down going
+         if( loc .gt. NoOfSites ) then
+            if( MovedTrack.pos.height .le. BorderHeightL ) then
+c                6
+               MoveStat = BorderL
+               MovedTrack.where = NoOfSites+1
+               cross = .true.
+            elseif( MovedTrack.pos.height .ge. BorderHeightH ) then
+c                5
+               MoveStat = BorderH
+               MovedTrack.where = 0
+               cross = .true.
+            endif
+         else
+            if(xyz1.r(3) .gt. ObsSites(loc).zpl .and.
+     *           xyz2.r(3) .le. ObsSites(loc).zpl) then
+               cross = .true.
+            elseif( MovedTrack.pos.height  .le. BorderHeightL )  then
+c                escape from side  6
+               cross = .true.
+               MoveStat = BorderL
+               MovedTrack.where = NoOfSites + 1
+            elseif( MovedTrack.pos.height  .ge. BorderHeightH )  then
+c               escape from side 5
+               cross = .true.
+               MoveStat = BorderH
+               MovedTrack.where = 0
+            endif
+         endif
+      else
+c            upgooing
+         if(loc .eq. 1)  then
+            if( MovedTrack.pos.height  .ge. BorderHeightH )  then
+c                   5
+               MoveStat = BorderH
+               MovedTrack.where = 0
+               cross = .true.
+            elseif(MovedTrack.pos.height  .le. BorderHeightL )  then
+c                  6
+               MoveStat = BorderL
+               MovedTrack.where = NoOfSites+1
+               cross = .true.
+            endif
+         else
+            if(xyz1.r(3) .lt. ObsSites(loc-1).zpl .and.
+     *           xyz2.r(3) .ge. ObsSites(loc-1).zpl ) then
+               cross = .true.
+            elseif( MovedTrack.pos.height  .ge. BorderHeightH )  then
+c                 escaep from side  5
+               cross = .true.
+               MoveStat = BorderH
+               MovedTrack.where = 0
+            elseif( MovedTrack.pos.height  .le. BorderHeightL )  then
+c                 escape from side 6
+               cross = .true.
+               MoveStat = BorderL
+               MovedTrack.where = NoOfSites + 1
+            endif
+         endif
+      endif
+c/////////////
+c      write(0,*) ' see upper=',seeupper, ' cross=',cross
+c      write(0,*) ' where=', MovedTrack.where
+c      write(0,*) ' MoveStat=',MoveStat
+c      write(0,*) ' BorderL=',BorderL, 'BorderH=',BorderH
+c/////////////
+      if(.not. cross ) then
+c     *      .and. MovedTrack.pos.height .gt. BorderHeightL  
+c     *     .and.    MovedTrack.pos.height .lt. BorderHeightH ) then
+c         most common  case; remain in the same layer; nothing to do 
+      elseif( cross .and. MoveStat .eq. BorderL ) then
+c         get length to the  x-ing point
+         call cxplsph(TrackBefMove.pos.xyz.x, TrackBefMove.pos.xyz.y, 
+     *                TrackBefMove.pos.xyz.z,
+     *               unitv.r(1), unitv.r(2), unitv.r(3),
+     *               BorderHeightL+Eradius,  leng, icon)
+c/////////////
+c         write(0,*) ' 1 leng=',leng, ' icon=',icon
+c//////////////
+         leng = leng + 0.01d0
+c         MovedTrack.where  = NoOfSites + 1
+      elseif( cross .and. MoveStat .eq. BorderH ) then
+c         get length to the  x-ing point
+         call cxplsph(TrackBefMove.pos.xyz.x, TrackBefMove.pos.xyz.y, 
+     *                TrackBefMove.pos.xyz.z,
+     *               unitv.r(1), unitv.r(2), unitv.r(3),
+     *               BorderHeightH+Eradius,  leng, icon)
+c//////////
+c         write(0,*) ' borderH leng=',leng, 'icon=',icon
+c//////////////
+         leng = leng + 0.01d0
+      else
+c           
+c           get length to the x-ing point
+         call cxyz2primD(unitv, dircos)
+         if(seeupper) then
+            leng = (ObsSites(loc-1).zpl - xyz1.r(3))/dircos.r(3)
+         else
+            leng = (ObsSites(loc).zpl - xyz1.r(3))/dircos.r(3)
+         endif
+c/////////
+c         write(0,*) ' 3  leng=',leng
+c//////////
+         leng = abs(leng)
+c         leng = leng + abs(0.01d0/dircos.r(3))
+         leng = leng + 0.01d0
+
+         if( MovedTrack.pos.height .gt. BorderHeightL  .and.
+     *       MovedTrack.pos.height .lt. BorderHeightH ) then
+c             1
+c            most  common cross case; if the track length is too long
+c            this logic is not complete, but  we neglect such case
+         elseif(  MovedTrack.pos.height .ge. BorderHeightH ) then
+c            3
+c            must find shorter x-ing point
+            call cxplsph(TrackBefMove.pos.xyz.x, TrackBefMove.pos.xyz.y, 
+     *                TrackBefMove.pos.xyz.z,
+     *               unitv.r(1), unitv.r(2), unitv.r(3),
+     *               BorderHeightH+Eradius,  leng2, icon)
+c///////////
+c            write(0,*) ' 3 leng2=',leng2, ' icon=',icon
+c/////////////
+            if( leng2 .lt. leng ) then
+               leng = leng2
+               MoveStat = BorderH
+            endif
+         elseif(  MovedTrack.pos.height .le. BorderHeightL ) then
+c           4
+c            must find shorter x-ng point
+            call cxplsph(TrackBefMove.pos.xyz.x, TrackBefMove.pos.xyz.y, 
+     *                TrackBefMove.pos.xyz.z,
+     *               unitv.r(1), unitv.r(2), unitv.r(3),
+     *               BorderHeightL+Eradius,  leng2, icon)
+c///////////
+c            write(0,*) ' 4 leng2=',leng2, ' icon=',icon
+c/////////////
+            if( leng2 .lt. leng ) then
+               leng = leng2
+               MoveStat = BorderL
+            endif
+         else
+c            should not come
+            write(0, *)  'logic error'
+            stop
+         endif
+      endif
+      end
+      subroutine cdiffvec(r1, r2, diff)
+c        get diff= r2-r1 as 3 D vector
+#include      "Zcoord.h"
+      record /coord/ r1,  r2  ! input 
+      record /coord/ diff     ! output.  
+
+      integer i
+
+      do i = 1, 3
+         diff.r(i) = r2.r(i) - r1.r(i)
+      enddo
+      end
+      subroutine cxplsph(x0, y0, z0, l, m, n, r, el, icon)
+c          this is the same as kxplsph in Epics
+      implicit none
+      real*8  x0, y0, z0 ! input. the line passes this point
+      real*8  l, m, n  !  input.  direc cos.  of  the line
+      real*8  r        !  input.  radius of the sphere
+      real*8  el       !  output. el>=0 distance to the
+                       !          sphere  from  x0,y0,z0
+      integer icon    !  output. icon =0.  x-point exists 
+                      !                  x0,.. is inside
+                      !          icon = 1  x-point exists
+                      !                  x0.. is outside
+                      !                =-1.  no x-point
+
+      real*8  rsqr, r0l, d
+      integer icon1, icon2 
+      
+      rsqr = x0**2 + y0**2 + z0**2 -r**2
+      if(rsqr .le. 0.) then
+c          inside
+         icon2 = 0
+      else
+         icon2 = 1
+      endif
+      r0l = x0*l + y0*m + z0*n
+      d = r0l**2 - rsqr
+      if(d .ge. 0.) then
+         d = sqrt(d)
+         el = -r0l - d
+         if(el .ge. 0.) then
+            icon1 = 0
+         else
+            el = -r0l + d
+            if(el .ge. 0.) then
+               icon1 = 0
+            else
+               icon1 = 1
+            endif
+         endif
+      else
+         icon1 = 1
+      endif
+c
+      if(icon2 .eq. 0) then
+         icon = 0
+      elseif(icon1 .eq. 0) then
+         icon = 1
+      else
+         icon = -1
+      endif
+      end

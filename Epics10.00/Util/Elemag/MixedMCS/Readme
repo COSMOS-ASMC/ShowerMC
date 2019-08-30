@@ -1,0 +1,104 @@
+The programs here are to make sampling tables to be stored
+in Epics/Data/MCS/, Epics/Data/MCS2/ or Cosmos/Data/MCS/.
+The table is used to sample the Coulomb scattering angle
+in the 'large' angle region. How  'large' depends on the
+parameter "p" described below.
+
+To make a table,
+1) the 1st line of the file 'paramdata'
+  must be fixed, say.
+   0.25  0.05 f /
+Normally, only the first one may be given. (Let call it p;  0< p < 2)
+Smaller p gives more rigorous scattering treament but
+needs longer compuation time in cascade simulation runs (table
+making time is almost independent of p and < 2 min).
+The cascade simulation time relative to p=0.1 case is 
+  ~(0.0778/p+0.222).  (for p=1, this makes ~0.3)  
+
+2) Then,
+  ./ForManyMedia.sh dir list
+
+where  
+   dir: is the directory pass (e.g /tmp/param_0.25-0.05 )
+       where the sampling tables are to be stored.
+       If it is non existent, it is created.
+       To make the table usable for simulation,
+       the directory (param_0.25-0.05 in this example)
+       must be moved as, e.g,
+         $EPICSTOP/Data/MCS/param_0.25-0.05
+       Here, 0.25 means "p" described below. (You may specify
+       this directory from the first.)
+  *** The file name to be contained in "dir"  for the table
+      will be the same as the media name in list (say BGO),
+      so if the "dir" contains a file with the same name,
+      it will be replaced by the new one. ****
+
+  list: list of material names (one or more)
+      which must appear in $EPICSTOP/Data/BaseM
+       (e.g, BGO  Air Pb).
+    A) If the number of media is small and typing is not
+       a problem, 'list' may be, e.g, as 
+          BGO Air Pb
+       Then, files
+          "dir"/param_0.25-0.05/BGO
+          "dir"/param_0.25-0.05/Air
+          "dir"/param_0.25-0.05/Pb
+       will be created.
+       
+    B) If the number of media is rather large, they may be
+       listed in a file (say, 'list' which may contain
+       following lines)
+           BGO
+	   Air
+	   Pb
+	   W
+	   PWO
+       In this case, use (with backquot)
+         `cat list`
+       An Example of "list" file  is "medialist"
+   C)   If you want to specify all the media in
+        $EPICSTOP/Data/BaseM  use 
+          `(cd $EPICSTOP/Data/BaseM/; ls)`
+	or  you may make a list file (say listfile) by
+	  ls $EPICSTOP/Data/BaseM/  > listfile
+	and use B).
+
+p may be interpreted as expressing
+  p ~ 1 - <cos(theta)>  (theta: scattering agnle).
+So p->0 means theta-->0 (='large'), i.e all
+scattering is regarded as large angle scattering and simulation
+becomes the detailed mode.  If p->2, all angles are regarded as
+small, and the simulation approaches to the condensed mode.
+(In any case, when particle crosses a boundery, the hinge
+method is employed).
+
+The second term may not be touched; it is almost insenstive
+to the speed of simulation.
+
+For further detailes, see paramdata file and manual.
+
+"dir"  need not be .../param_0.25-0.05  type.  It is
+arbitrary, especially if it is to conatin diffenet
+"p" value media.
+
+****
+  Those in
+    Epics/Data/MCS
+  contains all media in Epics/Data/BaseM
+
+  Those in
+    Epics/Data/MCS2
+  contain only a part of  the media in Epics/Data/BaseM.
+
+ To use the one (say, param_0.5-0.05) in Epics/Data/MCS2,
+   MCSdir="$EPICSTOP/Data/MCS2"
+ must  be  given in epicsfile 
+ (i.e, default is    MCSdir="$EPICSTOP/Data/MCS")
+ or param_0.5-0.05  must be moved to Epics/Data/MCS/.
+ 
+ 
+ 
+ 
+
+
+

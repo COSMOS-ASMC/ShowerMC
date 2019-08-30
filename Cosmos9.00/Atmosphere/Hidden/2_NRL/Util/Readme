@@ -1,0 +1,47 @@
+Read the top part of NRLGenData.f
+   To use NRL data, in  Cosmos/cosmos/condc.h, 
+ATMOSPHERE 
+   must be set to 3  and the library must be updated.
+To do so,  if Zcondc.h is ready,
+1)  go to Cosmos/Tracking/Atmosphere
+2)  touch cstandatmos0.f
+3)  make clean; make
+This is ok for using NRLGenData.f; To compile it,
+come here and
+  make clean; make
+
+But for the entire cosmos, it is better to
+4)  remove all in Cosmos/cosmos/lib/$ARCH/*
+5)  and remake the entire library, i.e at
+    Comsmos/
+    make veryclean; make
+    
+
+-------------
+Execution:
+  For execution, you must make a input file like template.d
+  (the last two lines must be gvien as you like). Then
+  
+NRLGenData$(ARCH) < yourInputfile > yourOutputFile
+
+This will create two files: one is
+NRLAtmos.d
+which may be used as input file for Cosmos execution when
+ ATMOSPHERE in Zcondc.h is 3.
+ To do so, give the file name in AtmosFile in Namelist data.
+Longitude and latitude values are taken from the data so
+the they must be consistent with those in Namelist.
+
+To avoid confusion, usually better to keep AtmosFile blank
+and give NRL_peridon data (4 integer data) like
+  day1 day2  hour1 hour2
+which specify the period from hour1 to hour2 during
+day1 to day2.
+   dayi  in 1 to 365  (i=1,2)  (neglect leap year)
+   houri in 0 to 24 
+If day1 > day2, new year step-over is made.
+Also, if hour1 > hour2, midnight step-over is made.
+
+Atmosphere data is prepared as the average during this period.
+The longitude and latitude are taken from those in Namelist.
+

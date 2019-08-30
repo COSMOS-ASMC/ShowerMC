@@ -1,0 +1,11 @@
+      integer maxDatPoint
+      parameter (maxDatPoint=100)
+      structure /sampAF/ 
+         real*8 x(maxDatPoint)
+         real*8 y(maxDatPoint)
+         real*8 yi(maxDatPoint)
+         real*8 coef(maxDatPoint, 3)
+         real*8 coef2(maxDatPoint, 3)
+	 real*8 sum  
+         integer n
+      end structure

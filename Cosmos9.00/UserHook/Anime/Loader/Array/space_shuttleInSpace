@@ -1,0 +1,10 @@
+INST
+geom{ < "./Array/space_shuttle.off" }
+
+# 
+transforms { 
+ TLIST
+
+ }
+
+

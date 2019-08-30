@@ -1,0 +1,739 @@
+      subroutine ctrackingAll    
+c     **************************************************
+c       tracking particles given in the stack area.
+c       During tracking, new particles may be produced
+c       and pushed in the stack area.  They are all
+c       treated here, until all particles are processed.
+c     **************************************************
+      implicit none
+#include  "Zcode.h"
+#include  "Ztrack.h"
+#include  "Ztrackv.h"
+#include  "Ztrackp.h"
+#include "Zincidentv.h"
+
+      integer moreptcl, jold, icon
+      real*8 smallAS/1./   ! electrons < 1GeV cannot make AS at all.
+cc      real*8 u, iwgt	
+      real*8 cosfromaxis
+      external cblkTracking
+
+c
+c      ***  do until no more ptcl in stack
+      do while (.true.)
+c           get one particle from stack
+         call cpop(TrackBefMove, moreptcl)
+         if(moreptcl .eq. 0) goto 100   !  exit
+         call rndsw(jold, 1)            !  specify 1st generator.
+         call cifDead(TrackBefMove, icon)  ! generator may be switched to 2
+c//////////
+c         if( icon /= 0 .and.  
+c     *      TrackBefMove.p.fm.p(4)-TrackBefMove.p.mass > 0.05 ) then
+c            write(0,*) ' H.E dead icon=',icon
+c            stop
+c         endif
+c//////////////
+            
+c                     icon=0; alive, 1 E<Emin, 2 long flight 3 h>H 4 h<L
+c                             5 angle>limit
+c            AS generation. 
+
+         if(ObserveAS .and. icon .le. 1 ) then
+            if(TrackBefMove.p.code .eq. kelec) then
+               if(TrackBefMove.asflag .eq. 0) then
+                  if(TrackBefMove.p.fm.p(4) .le. EasWait) then
+                     if(TrackBefMove.p.fm.p(4) .gt. smallAS) then ! 95/08/17
+                        call cscalerProd(TrackBefMove.vec.w,
+     *                            DcAtObsXyz, cosfromaxis)
+                        if(cosfromaxis .gt. 0.5 ) then
+c                               as gneration for e with 60 deg or less from axis
+                           call cobAS(TrackBefMove)
+                        endif
+                     endif
+                     TrackBefMove.asflag =1
+                  endif
+               endif
+            elseif(TrackBefMove.p.code .eq. kphoton) then
+               if(icon .eq. 1) then
+                  if(TrackBefMove.asflag .eq. 0) then
+                     if(TrackBefMove.p.fm.p(4) .gt. smallAS) then
+                        icon = 0 ! follow until it becomes e-pair
+                     endif
+                  endif
+               endif
+            endif
+         endif
+c        ----------------------------
+         if(icon .eq. 0) then
+c              see if heavy and ssp is needed; icon =1 --> SSP so skip tracking here
+            call cforceSSP(TrackBefMove, icon)
+            if(icon .eq. 0) then
+               call cTracking
+            endif
+         else
+c             already dead ptcl has been considered in cifDead; nothing todo
+         endif
+      enddo
+ 100  continue
+      end
+c -------------------------------------tracking a ptcl
+      subroutine cTracking
+      use modXsecMedia, only: TargetNucleonNo, TargetProtonNo,
+     * TargetXs
+      implicit none
+
+#include  "Ztrack.h"
+#include  "Ztrackv.h"
+#include  "Ztrackp.h"
+#include  "Zobs.h"
+#include  "Zobsp.h"
+#include  "Zobsv.h"
+#include  "Zincidentv.h"
+#include  "Zcode.h"
+#include  "Zmanagerp.h"
+#include  "Zstackv.h"
+#include  "Zevhnv.h"
+c                next is for DEBUG
+c//////
+      logical show
+      common /showshow/ show
+c/////////
+#define DEBUG 0
+
+
+      logical reset
+      real*8 cosangle
+      character*70 msg
+      integer nextwhere, never, ptclidx
+cc      integer icon
+
+#if DEBUG == 1
+      deb=.true.
+      call checkstat('before fixModel')
+#endif
+
+      call cfixModel( TrackBefMove.p )      ! fix interaction model.
+      call cfixMag            !   Mag field
+c           sample interaction length.  The path may
+c           be truncated to a shorter one than really sampled.
+c           In that case, MoveStat == Truncated.
+#if DEBUG == 1
+      call checkstat('before csampIntl')
+#endif
+      call csampIntL
+#if DEBUG == 1
+      call checkstat('after csampIntl')
+#endif
+c           Truncate the path if it is too long. Note, the truncated
+c           path in the above process may be again truncated to
+c           a shorter one. This happens, for example, if ptcl energy
+c           is low.  Path inf is reset in IntInfArray.
+c///////////
+      if(show) then
+         write(0,*) ' bef truncpath'
+         write(0,*) ' MoveStat=',MoveStat
+      endif
+c//////////////
+      call ctruncPath
+
+c///////////
+      if(show) then
+         write(0,*) ' bef truncpath'
+         write(0,*) ' MoveStat=',MoveStat
+      endif
+c//////////////
+
+#if DEBUG == 1
+      call checkstat('after ctruncPath')
+#endif
+
+c           compute path end inf. including scattering and
+c           mag. deflection.  Path end inf is set in MovedTrack
+
+      call ccompPathEnd
+c///////////
+      if(show) then
+         write(0,*) ' afte ccompPathend'
+         write(0,*) ' MoveStat=',MoveStat
+      endif
+c//////////////
+
+#if DEBUG == 1
+      call checkstat('after ccompPathEnd')
+#endif
+c           see if MovedTrack crosses an observation site.
+c         (or reaches BorderHeightL)  If so, reset MovedTrack. 
+      call cifXObsSite(nextwhere)
+
+
+      if(TrackBefMove.p.charge .ne. 0 .and. Eabsorb(1) .ne. 0) then
+c               4th arg. not used now
+         call chookEabsorb(TrackBefMove, MovedTrack, EnergyLoss, 0)
+      endif
+#if DEBUG == 1
+      call checkstat('after cifXObsSite')
+#endif
+      if(Trace .ne. 0) then
+         if( mod(Trace, 10) .le. 2) then
+            call cputTrInfo     ! put trace info.
+         elseif(mod(Trace,10) .le. 4) then
+            if( TrackBefMove.pos.height .le. HeightList(1)) then
+               call cputTrInfo  ! put trace info.
+            endif
+         endif
+      endif
+#if DETAILED_TRACKING >= 3
+c            the user may kill the ptcl
+      call cobservation(8)
+#endif
+c//////////
+      if(show) then
+         write(0,*) ' MoveStat=',MoveStat, Truncated
+         write(0,*) ' ToInteract', ToInteract
+      endif
+c/////////////////
+
+c     
+      if(MoveStat .eq. Truncated) then
+c        &&&&&&&&&&&&&& some may lose energy by dE/dx etc. 
+c                       This should be recorded
+         if(Job .eq. 'newskel' .and. 
+     *        (MovedTrack.p.fm.p(4) - MovedTrack.p.mass) .lt. 
+     *        KEminObs(1))  then
+            never = -1
+            call chookEInt(never)
+         endif
+c        &&&&&&&&&&&&
+c              stack current ptcl
+         call cpush(MovedTrack)
+      elseif(MoveStat .eq. ToInteract ) then
+         if(Zfirst.pos.depth .eq. 0.) then
+c            if(  (MovedTrack.p.code .ge. kpion  .and. 
+c     *            MovedTrack.p.code .le. knuc ) .or.
+c     *         MovedTrack.p.code .eq. kgnuc ) then
+c            from  v.7.10
+            if(  (IncidentCopy.p.code .ge. kpion  .and. 
+     *            IncidentCopy.p.code .le. knuc ) .or.
+     *            IncidentCopy.p.code .eq. kgnuc ) then
+
+c
+c                   from  v6.31 1ry is judged by Stack_pos
+c                  (even if this is not used, almost no problem)
+c                     ! if no stack, the particle should be 1ry (since Zfirst=0)
+
+               if( Stack_pos .eq. 0 .and.
+     *             IntInfArray(ProcessNo).process .eq. 'coll') then
+                  reset = .true.
+               else
+                  reset = .false.
+               endif
+            else
+               reset = .true.
+            endif
+            if(reset) then
+c             reset minimum time to reach the obs level (time from this
+c             hight to the obs. level), if no mag. exists until
+c                  the first collision point. or ptcl goes streight
+c                  comment out from v6.31
+c               call cresetTimer(MovedTrack)
+
+               Zfirst = MovedTrack
+               FirstColA = TargetNucleonNo
+               FirstColZ = TargetProtonNo
+               FirstColXs = TargetXs
+            endif
+         endif
+#if DETAILED_TRACKING >= 1 
+         call cobservation(4)
+#endif
+
+#if DEBUG == 1
+         call checkstat('before cinteraction')
+#endif
+c//////////////
+         if(show) then
+            write(0,*) 'e ntering interaction'
+         endif
+c/////////////////
+         call cinteraction
+c////////
+         if(show) then
+            write(0,*) 'back from cinerac'
+         endif
+c//////////////
+
+
+      elseif(MoveStat .eq. ToBeObserved ) then
+         ptclidx = MovedTrack.p.code  ! make 4 byte integer
+         ptclidx = min(ptclidx, 8)   ! this is only for using KEminObs
+         if(MovedTrack.p.fm.p(4)-MovedTrack.p.mass 
+     *        .ge. KEminObs(ptclidx) ) then    ! .gt. for <= uv6.00
+c             call only for high energy particles
+c                  (at AS generation, some ptcl may have < KEminObs
+c                  or some may loose energy by dE/dx etc.
+            call cobservation(2)
+
+            if(Job .eq. 'newskel' .and.
+     *          EndLevel .lt. NoOfSites .and. 
+     *          MovedTrack.where .eq. EndLevel ) then
+c                in this case, even E> KEminObs must be recorded
+c                 for skeleton making for kahanshin
+c                  where should be +1 at flesh time
+
+               MovedTrack.where = MovedTrack.where + 1
+               never = -3
+               call chookEInt(never)
+               MovedTrack.where = MovedTrack.where - 1 ! for safty
+            endif
+         elseif(Job .eq. 'newskel'  .and. 
+     *          EndLevel .eq. NoOfSites .and.
+     *          MovedTrack.where .lt. EndLevel )  then
+c            &&&&&&  this is to be recorded
+c                where should be + 1 at flesh time
+            MovedTrack.where = MovedTrack.where + 1
+            never = -2
+            call chookEInt(never)
+            MovedTrack.where = MovedTrack.where - 1
+c            &&&&& 
+         endif
+c               update observation place
+c         if(abs(ObsPlane) .eq. perpendicular) then
+         MovedTrack.where = nextwhere
+c                  if more obs-site, stack current ptcl.
+         if(.not. Upgoing) then ! incident is downgoing
+            if(MovedTrack.where .gt. EndLevel) then
+                                ! no need to stack; discard ptcl.
+            else
+               MovedTrack.where =max( MovedTrack.where*1, 1)
+               call cpush(MovedTrack)
+            endif
+         else                   !incident is  Upgoing
+            if(MovedTrack.where .lt.1 ) then
+                                ! no need to stack
+            else
+               MovedTrack.where =
+     *              min(MovedTrack.where*1, EndLevel)
+               call cpush(MovedTrack)
+            endif
+         endif
+c        else
+c            MovedTrack.where = nextwhere
+c            call cpush(MovedTrack)
+c         endif
+      elseif(MoveStat .eq. BorderL) then
+         call cobservation(3)
+         call cpush(MovedTrack)
+      elseif(MoveStat .eq. BorderH) then
+         call cobservation(1)
+         call cpush(MovedTrack)
+      else
+         write(msg, *) ' movestat=',MoveStat,' invalid'
+         call cerrorMsg(msg, 0)
+      endif   
+      end
+      subroutine cresetTimer(aTrack)
+      implicit none
+#include  "Ztrack.h"
+#include  "Ztrackv.h"
+#include  "Ztrackp.h"
+#include  "Zobs.h"
+#include  "Zobsp.h"
+#include  "Zobsv.h"
+#include  "Zincidentv.h"
+#include  "Zcode.h"
+#include  "Zmanagerp.h"
+      record /track/ aTrack
+c             reset minimum time to reach the obs level (time from this
+c             hight to the obs. level), if no mag. exists until
+c                  the first collision point. or ptcl goes streight
+      if(mod(HowGeomag, 2) .eq. 1 .or. 
+     *     IncidentCopy.p.charge .eq. 0 .and.
+     *     ObsPlane .ne. 3) then
+         call csetMinTime(aTrack)
+      else
+c         MovedTrack.t = 0.     ! bug bef uv6.09 ;;; but why commentout ??? 
+      endif
+      end
+C           if you activate the next routine, Epics will have link problem!!!
+#if DEBUG > 0
+      subroutine checkstat(str)
+      implicit none
+#include  "Ztrack.h"
+#include  "Ztrackv.h"
+#include  "Ztrackp.h"
+#include  "Zobs.h"
+#include  "Zobsv.h"
+#include  "Zevhnv.h"
+
+      logical deb
+      common /cdebug/deb
+
+      character*(*) str
+      integer i
+      integer nc
+      data nc/0/
+
+      nc = nc + 1
+c      if(nc .gt. 750) then
+c      if( deb) then
+            write(0,*) ' ActiveModel=',ActiveMdl
+            write(0,*) str, ' code=',TrackBefMove.p.code,
+     *         ' sub',TrackBefMove.p.subcode,
+     *         ' chg',TrackBefMove.p.charge
+            write(0,*) 'Px,y,z e=', TrackBefMove.p.fm.p(1:4)
+            write(0,*)  'Move stat=',MoveStat
+            write(0, *) ' where', TrackBefMove.where
+            write(0,*)  ' h==', TrackBefMove.pos.height,
+     *       ' d=', TrackBefMove.pos.depth
+            write(0,*) ' cos=',TrackBefMove.vec.coszenith
+            do i = 1, NumberOfInte
+               write(0, *) ' process=',IntInfArray(i).process
+               write(0, *) ' thickness=',IntInfArray(i).thickness
+               write(0, *) ' length=',IntInfArray(i).length
+            enddo
+            write(0,*)'  ProcessNo=', ProcessNo
+            write(0,*)  '--------------'
+c         endif
+c         endif
+      end
+#endif
+c-------------------------------------------------------
+      subroutine cfixMag
+      implicit none
+#include "Ztrack.h"
+#include "Ztrackv.h"
+#include "Ztrackp.h"
+#include "Zobs.h"
+#include "Zobsp.h"
+#include "Zobsv.h"
+
+      real*8 x/0./, y/0./, z/0./
+      save x, y, z
+      real*8 distant
+      integer icon
+      real*8 u
+
+      if(HowGeomag .le. 2 .or. HowGeomag .eq. 31) then
+c             distant; change of B is < 1 % (for default
+c             MagChgDist =20 km; you can change it)
+         call clengSmallBC(TrackBefMove, distant)
+         if( (TrackBefMove.pos.xyz.r(1) - x)**2 + 
+     *        (TrackBefMove.pos.xyz.r(2) - y)**2 + 
+     *        (TrackBefMove.pos.xyz.r(3) - z)**2 
+     *        .gt. distant**2) then
+c              if more than MagChgDist m from previous mag set.,
+c               reset mag field.
+c
+            call cgeomag(YearOfGeomag,  TrackBefMove.pos.xyz, 
+     *                Mag, icon)
+
+            call ctransMagTo('xyz', TrackBefMove.pos.xyz, 
+     *        Mag, Mag)
+            x = TrackBefMove.pos.xyz.r(1)
+            y = TrackBefMove.pos.xyz.r(2)
+            z = TrackBefMove.pos.xyz.r(3)
+
+         endif
+      else
+         Mag = MagfieldXYZ
+      endif
+      end
+
+c     --------------------------------------------------
+      subroutine csampIntL
+      use modXsecMedia
+c     **************************************************
+c          
+c          sample interaction length 
+c          and interaction type.
+c       Method.  Sample interaction lengths for all possible 
+c                interactions (for collisions, in kg/m2, for decay
+c                in m).  They are stored in a record /intinf/ IntInfArray
+c                given in Ztrackv.h;  
+c            In the routine,  cfixProc, 
+c                we take the minimum of values given in kg/m2, and
+c                convert it in real length (m).  In this process,
+c                path truncation may occur (if the particle is
+c                going upward, and there is very thin air there,
+c                then the given thickness may not be realized.
+c                Or if the length is too large and accuracy 
+c                of convesion is not enough due to the earch
+c                curverture)
+c                If the decay process exists, we compare the length
+c                given by the above treatment, and take shorter one.
+c                If decay length is shorter,  we assume the decay
+c                takes place, else some collision takes place if
+c                the path is not truncated. In the latter case,
+c                if the path is truncated, MoveStat == Truncated
+c                is set.
+      implicit none
+
+#include  "Zcode.h"
+#include  "Ztrack.h"
+#include  "Ztrackv.h"
+#include  "Ztrackp.h"
+
+      real*8 leng/1.d50/   ! will  be truncated  by ctruncPath
+      integer:: jcon
+c/////////
+      logical::show
+      common /showshow/ show
+c//////////
+
+c     **************************************************
+      call ciniSmpIntL   ! init for interaction length sampling
+c
+      if(Reverse .ne. 0) then
+         call csetIntInf(leng, .true., 'none')
+         ProcessNo = 1
+      else
+         if(TrackBefMove.p.code .eq. kelec) then
+            call csampEIntL
+         elseif(TrackBefMove.p.code .eq. kphoton) then
+            call csampGIntL
+         else
+            call csampNEPIntL   ! non Electron Photon  Interaction.
+         endif
+         call cfixProc
+c///////////////
+         if( TrackBefMove.p.code == 6 .and.
+     *       TrackBefMove.p.charge == -1 .and.
+     *     (  TrackBefMove.p.fm.p(4)-TrackBefMove.p.mass < 
+     *         0.1 ) ) then
+            show = .true.
+            write(0,*) ' fix proc =',
+     *        IntInfArray(ProcessNo).process
+         else
+            show = .false.
+         endif
+c//////////////////
+         if( IntInfArray(ProcessNo).process == 'coll' ) then
+!               some of the code can not deal with coll.of sigma 
+!               etc.
+            call cseeColPossible( TrackBefMove.p, jcon)
+            if( jcon == -1) then
+!                  then force to decay
+               call cresetIntInf
+            else
+               call cfixTarget( media(1) )
+c///////////////
+               if(show) then
+                  write(0,*)' TargetNucleonNo=',TargetNucleonNo
+               endif
+c///////////////////
+            endif
+         elseif( IntInfArray(ProcessNo).process == 'photop') then
+            call  cfixTarget( media(1) )
+         elseif( IntInfArray(ProcessNo).process == 'munuci') then
+            call cfixTargetMuNI(media(1))
+         endif
+
+         if(.not. Freec .and. Zfirst.pos.depth .eq. 0.) then
+            IntInfArray(ProcessNo).length = 0.
+            IntInfArray(ProcessNo).thickness = 0.
+         endif
+      endif
+
+      end
+c     **************************** cfixProc **********
+      subroutine cfixProc
+      implicit none
+
+#include  "Zglobalc.h"
+#include  "Ztrack.h"
+#include  "Ztrackv.h"
+#include  "Zearth.h"
+
+
+      real*8 h, leng, t, minlen, clen2thick, pcut
+c     
+      integer i, jcut
+c     
+       minlen = Infty + Infty
+c              get vertical height
+       h = TrackBefMove.pos.height
+c/////////
+c       write(0,*) 'NumberOf Inte=', NumberOfInte,
+c     * ' height=',h
+c////////
+
+       do i = 1, NumberOfInte
+         if(.not. IntInfArray(i).decay) then
+c              convert kg/m2 into length
+            if(NumberOfInte .eq. 1 .or.
+     *        IntInfArray(i).thickness .ne. Infty) then
+               call cthick2len(TrackBefMove,
+     *         IntInfArray(i).thickness, leng, t, jcut) 
+
+               if( jcut .ne. 0) then
+                  IntInfArray(i).thickness = t
+               endif
+c                  some work around for insufficient accuracy 
+               if(leng .lt. 0.) then
+                  leng = 1.d-3
+                  IntInfArray(i).thickness = clen2thick(h, 
+     *              TrackBefMove.vec.coszenith, 
+     *              IntInfArray(i).length )
+               endif
+            else
+               leng = Infty
+               jcut = 0
+            endif
+         else
+            leng = IntInfArray(i).length
+            jcut = 0
+         endif
+         if(leng .lt. minlen) then
+            if(jcut .ne. 0) then
+               MoveStat = Truncated
+            else
+               MoveStat = ToInteract
+            endif
+            ProcessNo = i
+            IntInfArray(i).length = leng
+            minlen = leng
+         endif
+      enddo
+c//////////////////
+c      write(0,*) ' pcor=',ProcessNo, ' leng=',minlen, ' Moves',
+c     *   MoveStat
+c/////////////
+
+c      if(leng .ge. minlen) then  !   bug in 6.00
+c      if(leng .ge. Infty) then  
+c         ProcessNo = 1
+c         IntInfArray(1).length = 1.e5
+c      endif         
+      if(IntInfArray(ProcessNo).decay ) then
+c         In the case  of muon, if individual knockon process  
+c       is neglected (by parameter setting or with high Emin)
+c       the length could be quite large (say, 6000  km).
+c       and results in error in the next call.
+c       To avoid that, we cut the path here
+c
+         if( TrackBefMove.vec.coszenith .lt. 0.) then
+            pcut = 300.d3
+         else
+            pcut = 30.d3
+         endif
+         if(IntInfArray(ProcessNo).length .gt. pcut) then
+            MoveStat = Truncated
+            IntInfArray(ProcessNo).length  = pcut
+         endif
+         IntInfArray(ProcessNo).thickness = clen2thick(h, 
+     *      TrackBefMove.vec.coszenith, 
+     *      IntInfArray(ProcessNo).length )
+      endif
+      end
+c     ***********************
+c          truncate a path of the particle, if the path
+c        given in InfIntArray is too long, or the path traverses
+c        an observation depth.
+      subroutine ctruncPath
+      implicit none
+
+#include  "Ztrack.h"
+#include  "Ztrackv.h"
+
+      real*8 leng, thick
+c
+c//////////////////
+      logical show
+      common /showshow/ show
+c////////////
+      call cmaxMovLen(leng, thick)
+c//////////
+      if(show) then
+       write(0,*) ' after maxMovLen, leng=',leng, ' thick=',thick
+       write(0,*) '  IntInfArray.length=',IntInfArray(ProcessNo).length
+       write(0,*) ' procno=', ProcessNo, ' process=', 
+     *   IntInfArray(ProcessNo).process
+      endif
+cc//////////
+
+      if(leng .lt. IntInfArray(ProcessNo).length ) then
+         MoveStat = Truncated
+         IntInfArray(ProcessNo).length = leng
+         IntInfArray(ProcessNo).thickness  = thick
+c//////////
+c      else
+c         if(TrackBefMove.pos.height .eq. 100.d3 .and.
+c     *     IntInfArray(ProcessNo).thickness .lt. 10.0d0) then
+c            write(*,*) 100.d3- IntInfArray(ProcessNo).length, 
+c     *      IntInfArray(ProcessNo).thickness
+c         endif
+c         write(*,*) 'thru: maxlen=',leng, ' thick=',thick,
+c     *  ' proce no=',ProcessNo, ' proc=',
+c     *    IntInfArray(ProcessNo).process,
+c     *    ' Bef H=',TrackBefMove.pos.height,
+c     *    ' Bef D=',TrackBefMove.pos.depth,
+c     * ' int leng=',  IntInfArray(ProcessNo).length, 
+c    * ' int thick=',  IntInfArray(ProcessNo).thickness
+c////////////
+      endif
+      end
+c      *************** for same model, we must use simple super position for heavy
+c      If so, current particle is decomposed into nucelons and put into stack
+c      and icon =1  is made. else icon = 0
+      subroutine  cforceSSP(atrack, icon)
+#include "Ztrack.h"
+#include "Zevhnv.h"
+#include "Zevhnp.h"
+#include "Zcode.h"
+#include "Zmass.h"
+
+      integer icon
+      record /track/atrack  ! input current projectile.
+
+      record /track/pj
+      integer i, j
+      real*8  p, po, pr
+
+      icon = 0
+      if(atrack.p.code .eq. kgnuc) then
+         call cfixModel(atrack.p)
+         if(ActiveMdl .eq. 'dpmjet3' .and. 
+     *      atrack.p.subcode .gt. 18) then
+c/////            icon = 1 ///// 
+         elseif( ActiveMdl .eq. 'incdpm3') then
+            icon = 1
+         endif
+      endif
+      if( icon  .eq. 1 ) then
+         pj = atrack
+         pj.p.fm.p(4) = atrack.p.fm.p(4)/atrack.p.subcode
+         pj.p.mass = masp
+         pj.p.code = knuc
+         pj.p.subcode = -1
+         pj.p.charge = 1
+
+         p = sqrt(pj.p.fm.p(4)**2 - masp**2)      
+c          next one leads to seg. violation on opteron and ifc64
+c         po = atrack.p.fm.p(1)**2 + atrack.p.fm.p(2)**2 +
+c     *           atrack.p.fm.p(3)**2 
+c       (  still by version 9. )
+
+         po = atrack.p.fm.p(1)**2 + atrack.p.fm.p(2)**2
+         po = po +  atrack.p.fm.p(3)**2 
+
+         po = sqrt(po)
+         pr = p/po
+         do j = 1, 3
+            pj.p.fm.p(j) = atrack.p.fm.p(j)*pr
+         enddo
+         do i = 1, atrack.p.charge
+            call cpush(pj)
+         enddo
+
+         pj.p.mass = masn
+         p = sqrt(pj.p.fm.p(4)**2 - masn**2)      
+         pr = p/po
+         pj.p.charge = 0
+         do j = 1, 3
+            pj.p.fm.p(j) = atrack.p.fm.p(j)*pr
+         enddo
+         do i = 1, atrack.p.subcode - atrack.p.charge
+            call cpush(pj)
+         enddo
+      endif
+      end

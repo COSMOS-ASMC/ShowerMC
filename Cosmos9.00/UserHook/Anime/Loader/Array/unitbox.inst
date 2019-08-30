@@ -1,0 +1,30 @@
+appearance {
+	+edge
+        shading flat
+        material { ambient  0.75 1.0 0.75
+                   edgecolor 1 1 1}
+}
+
+INST
+geom{ =
+OFF
+8 6 12
+#    next defines the verteces of the box
+-0.5    -0.5    -0.5	# 0   
+ 0.5    -0.5    -0.5	# 1   
+ 0.5     0.5    -0.5	# 2   
+-0.5     0.5    -0.5	# 3   
+-0.5    -0.5     0.5	# 4   
+ 0.5    -0.5     0.5	# 5   
+ 0.5     0.5     0.5	# 6   
+-0.5     0.5     0.5	# 7   
+#  next defines the color of each face
+#       verteces  r    g     b  
+4	3 2 1 0	 0.00 0.0   0.0
+4	4 5 6 7	 1    1      1
+4	2 3 7 6	 0    1      0
+4	0 1 5 4	 0    1      0 
+4	0 4 7 3	 0    1      0
+4	1 2 6 5	 0    1      0
+}
+

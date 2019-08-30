@@ -1,0 +1,174 @@
+!       Units are in SI.
+
+!   below cthick2h1 and cthick2h2 are so made that they coincide at
+!   t=230
+!   if height is > 1000 km, data 1000 km data is used.
+!
+!      -------------------------------------
+       real*8 function cvh2den(zin)
+!      --------------------------vertical height to density
+!        at z > 50 km, very bad. but ok for our purpose
+       implicit none
+c----       include 'Zstdatmos.h'
+#include  "Zstdatmos.h"
+       real*8 zin
+       real*8 z
+
+       z = min(zvac, zin)
+       if(z .ge. hc) then
+          cvh2den = 10.d0*exp( (hb-z)/hn)/hn 
+       else
+          cvh2den = 10.d0*hlhmi*( (ha-z)/hl)**(hmi-1.d0)
+       endif
+       end
+!
+!     -------------------------------------------------------------
+      real*8 function cthick2h(t)
+      implicit none
+      real*8 t
+#include  "Zstdatmos.h"
+      external cblkStdAtmos
+
+
+      if(t .lt. t0) then
+         cthick2h =  hb - log(t/10.d0) * hn    !    for t<t0 = 2300
+         
+      else
+         cthick2h = ha - hl * (t/10.d0)**hm      !    for t > t0 
+      endif
+      end
+!      -------------------------------------
+       real*8 function cthick2den(t)
+!      -------------------------------------
+       implicit none
+c----       include 'Zstdatmos.h'
+#include  "Zstdatmos.h"
+       real*8 t
+
+       if(t .lt. t0) then
+          cthick2den = t/hn
+       else
+          cthick2den =10.d0*hlhmi*
+     *         (t/10.d0)**(1.d0 - hm)
+       endif
+       end
+!      -------------------------------------
+       real*8 function cvh2denp(zin)
+!      -------------------------------------
+!          d rho/dz
+       implicit none
+c----       include 'Zstdatmos.h'
+#include  "Zstdatmos.h"
+       real*8 zin
+       logical firsttime/.true./
+       save firsttime
+       real*8 cnst1, cnst2, cnst3, z
+       save  cnst1, cnst2, cnst3
+       
+       z = min(zin, zvac)
+       if(firsttime) then
+          cnst1 = -10.d0/hn/hn
+          cnst2 = - 10.d0*hlhmi*(hmi-1.d0)/hl
+          cnst3 =  hmi -2.d0
+          firsttime = .false.
+       endif
+
+       if(z .ge. hc) then
+!          cvh2denp = - 10.d0*exp( (hb-z)/hn)/hn/hn
+          cvh2denp = cnst1*exp( (hb-z)/hn) 
+       else
+!          cvh2denp =- 10.d0*hlhmi*(hmi-1.d0)/hl*
+!     *        ( (ha-z)/hl)**(hmi-2.d0)
+          cvh2denp =cnst2 *
+     *        ( (ha-z)/hl)**cnst3
+       endif
+       end
+!      ----------------------------------
+       real*8 function cvh2scaleh(zin)
+       implicit none
+#include  "Zstdatmos.h"
+!      ----------------------------------
+!          get scale height defined by 
+!         -   rho/ (d rho/d z).  This has discontinuity at
+!       z = 11.1 km
+
+       real*8 zin
+       real*8 z
+       real*8 cvh2den, cvh2denp
+!
+       z = min(zvac, zin)
+       cvh2scaleh = - cvh2den(z)/ cvh2denp(z)
+       end
+!      -------------------------------------
+       real*8 function cvh2den2p(zin)
+!      -------------------------------------
+!          d(d rho/dz)/dz
+       implicit none
+c----       include 'Zstdatmos.h'
+#include  "Zstdatmos.h"
+       real*8 zin
+       logical firsttime/.true./
+       save firsttime
+       real*8 cnst1, cnst2, cnst3, z
+       save cnst1, cnst2, cnst3
+!
+       z = min(zvac, zin)
+       if(firsttime) then
+          cnst1 = 10.d0/hn/hn/hn
+          cnst2 = 10.d0*hlhmi*(hmi-1.d0)*(hmi-2.d0)
+     *          /hl/hl 
+          cnst3 = hmi -3.d0
+          firsttime = .false.
+       endif
+       if(z .ge. hc) then
+!          cvh2den2p =  10.d0*exp( (hb-z)/hn)/hn/hn/hn
+          cvh2den2p =  cnst1*exp( (hb-z)/hn)
+       else
+!          cvh2den2p = 10.d0*hlhmi*(hmi-1.d0)*(hmi-2.d0)
+!     *          /hl/hl *
+!     *        ( (ha-z)/hl)**(hmi-3.d0)
+          cvh2den2p = cnst2 * ( (ha-z)/hl )** cnst3
+       endif
+       end
+!      ---------------------------------------
+       real*8 function cvh2thick(zin)
+!      ---------------------------------------
+       implicit none
+c----       include 'Zstdatmos.h'
+#include  "Zstdatmos.h"
+       real*8 zin
+       real*8 z
+       z = min(zvac, zin)
+       if(z .gt. hc) then
+          cvh2thick = 10.d0* exp( (hb-z)/hn) 
+       else
+          cvh2thick = 10.d0* ((ha-z)/hl)**hmi 
+!
+!            the next factor is -1.5d-11 and is neglected.
+!     *              -  10.d0* ((ha-hc)/hl)**hmi +
+!     *                10.d0*exp( (hb-hc)/hn)
+!
+       endif
+       end
+       block data cblkStdAtmos
+#include  "Zstdatmos.h"
+!            main frame cosmos data. 
+!            d rho/dz is discontinuous at hc, but others are
+!            continuous.  Thickness values are almost the same
+!            as the standard obained by cstdatmos0-multi-seg.f
+!
+      data ha/4512224.7572830657d-2/, hb/4541933.9782793734d-2/,
+     *     hl/1244541.6061892177d-2/, hm/.1854893358365053d0/,
+     *     hn/6.3300000000746224d3/, t0/230.000458235099d1/,
+     *     hc /10.996296495761545d3/
+      data hmi/5.3911455097420/, hlhmi/4.3318322850207d-04/
+
+!      coef. to have continuous density values for h=h(t) and its derivative
+!      about t=t0.  However, the absolute thickness is little bit larger
+!      than the standard, so that we don't use this one.
+!
+!      data ha/25289.093750000d0/, hb/48490.145953733/,
+!     *     hl/2712.61d0/, hm/0.32397778012688d0/,
+!     *     hn/6800 .0/, hmi/3.0866314338235/, hc/11.1d3/,
+!     *     hlhmi/1.1378815278872D-03/, t0/2443.3759999999/
+      end

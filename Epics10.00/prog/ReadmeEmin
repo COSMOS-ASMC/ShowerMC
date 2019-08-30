@@ -1,0 +1,37 @@
+Emin control:  all energy is in GeV. To avoid confusion, we keep
+               scheme used in epicsfile.
+Epicsfile:  EminGamma
+            EminElec (total Energy) 
+	    RecoilKeMin; 0-->(EminElec-mass)
+	    KEmin  ;     0-->max(EminElec-mass, 20MeV)
+	    EminH  :     0-->max(KEmin, 20 MeV)
+       These are fixed when epicsfile is read and then epcmp1 is called and
+       saved as public variables:
+            EminGsave
+            EminEsave
+            RecoilEsave
+            KEminsave
+            Enminsave
+       in module "epModify". ( ElecMass=masele is also save; epModify
+       cannot use Zmass.h due to .f90 ) 
+
+       When config data is read, modifier bit is examined for each component,
+       if modifier is not specified, then the following action is taken
+            AutoEmin =0 --> above is employed for each component
+            AutoEmin >=1 --> EminGamma, EminElec and RecoilKeMin are fixed
+                       by calling  prog/UserMayChange/epAutoEmin.f
+		       If AutoEmin is 1, default minimum values are 
+                       fixed by using "minimum" thikness of the component
+                       (=mt;in g/cm2).  as 200keV * sqrt(mt). However, if it 
+                       exceeds  200, 200 keV is used. If it is lower than 10,
+                       10 keV is used. 
+                       AutoEmin > 1 may be given if the user makes a needed
+                       coding in epAutoEmin.f.
+                       These 3 values are put in the min E for the 
+                       component.  Other two are not set but determined
+                       when a particle enters that component.
+                          i.e,  KEmin = KEminsave and  EminH=Enminsave
+        if modifier is given and correspondig data exists in ModifyFile
+                       All five minimum could be specified.  However,
+		       if only first few were given, reaining ones are
+                       fixed by as above.

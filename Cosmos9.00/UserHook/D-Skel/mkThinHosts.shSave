@@ -1,0 +1,64 @@
+#!/bin/bash
+#  0) allHosts must exist
+#  1)  from Hosts; make a table which contains random number in the last 
+#   item
+#  2)  sort it;   hostname as 1st key and random number as 2nd key
+#  3)  select needed number of hosts
+if [ -f temphost ]; then
+    rm -f temphost
+fi
+awk 'BEGIN{ srand()}; {$4=rand();print }' Hosts > temphost
+if [ -f ThinHosts ]; then
+    rm -f ThinHosts
+fi
+
+sort -k 2,4 -g temphost > ThinHosts
+rm -f temphost
+mv ThinHosts temphost
+
+
+
+touch ThinHosts
+source Smash/setupenvcls.sh  $0
+
+echo $NCPU, $MCPU, $MARGIN
+
+ncount=0
+number=$[ $MCPU + $MARGIN ]
+# echo "number = " $number
+#   change stdin to allHosts
+exec  3<&0 <allHosts
+  while read num name howmany cpupow
+  do
+    if [ $num == "#" ]; then
+	continue;
+    fi
+
+    need=$[ $number - $ncount ]
+    if [ $need -gt $howmany ]; then
+	need=$howmany
+    fi 
+#    echo "name and howmany=" $name  $howmany   
+    awk -f mkThinHosts.awk name=$name howmany=$need temphost >> ThinHosts
+    ncount=$[ $ncount + $need ]
+#    echo "Now ncount=" $ncount
+    if [ $ncount -ge $number ] ; then 
+#	echo ncount= $ncount
+#	echo number= $number
+	break
+    fi 
+  done
+#  restore stdin
+exec 0<&3 3<&-
+ncount=`wc -l ThinHosts | awk '{print $1}' `
+if [ $ncount -lt $number ]; then
+    echo "number of cpu's is =" $ncount " < " $number
+    echo "i.e, number of real cpu's is not enough"
+    exit
+else
+    # sort by the number in the first field
+    sort -n -k 1 ThinHosts > temphost
+    mv temphost ThinHosts
+    echo "ThinHosts has been created with " $ncount " cpu's"
+fi
+#  rm -f temphost

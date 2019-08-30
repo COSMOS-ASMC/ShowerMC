@@ -1,0 +1,10 @@
+#name   Format    Ni
+Ni 	2
+#
+#  Elem	 rho(g/cm^3)	Gas/Solid(1/0)  refl.index Birks c
+#      rho may be 8.902
+1         8.85            0              0        0 0 0
+# 	Z	A  	N
+	28	58.7	1
+#  ⟨Z/A⟩   I[eV]   a       k      x0    x1     Cbar  delta0
+ 0.4770	 311.0   0.1650  2.8430 -0.0566  3.1851   4.3115 0.10

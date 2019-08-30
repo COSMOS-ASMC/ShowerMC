@@ -1,0 +1,35 @@
+#!/bin/csh -f
+@ cn = 0
+#  if no new vol is used, use next one
+if ( $#argv != 1 ) then
+	echo "Usage: ToDrawNewVol configfile"
+	exit 1
+else if( ! -f $1 ) then
+	echo $1  not exist
+	echo "Usage: ToDrawNewVol configfile"
+	exit 1
+endif
+   	
+cp epDrawNewVTemplx.f /tmp/drawnewvol$$ 
+
+foreach new (`gawk -f ./getnew $1`)
+	echo $new
+	if($new =~ new-* ) then
+	  echo new volume $new defined
+        else	
+	  echo new volume paraphased as $new
+	  @ cn += 1
+	  if($cn == 1) then
+		  sed -e s/%1/$new/g epDrawNewVTempl.f > /tmp/drawnewvol$$
+          else
+	          gawk -f ./second /tmp/drawnewvol$$ > /tmp/drawnewvol2$$
+		  sed -e s/%1/$new/g /tmp/drawnewvol2$$ > /tmp/drawnewvol$$
+          endif	
+       endif	
+end
+mv /tmp/drawnewvol$$ $EPICSTOP/Util/epDrawNewVol.f
+
+
+
+
+

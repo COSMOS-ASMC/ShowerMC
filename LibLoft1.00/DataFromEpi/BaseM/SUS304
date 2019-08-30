@@ -1,0 +1,10 @@
+#name   Format    SUS304; 74 % Fe, 18 % Cr, 8 % Ni
+ SUS304 1
+#
+#  Elem	 rho(g/cm^3)	Gas/Solid(1/0)  refl.index Birks c
+
+3         7.8204                  0              0        0 0 0
+# 	Z	A  	N
+	24	52.0	0.18
+	26	55.8	0.74
+	28	58.7	0.08

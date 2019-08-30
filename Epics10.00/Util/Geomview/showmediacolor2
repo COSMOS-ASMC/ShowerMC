@@ -1,0 +1,45 @@
+#!/bin/tcsh -f
+#   geomview display of used media and corresponding color
+#  1:  outdir
+#  2:  config file 
+#  3:  colormap file
+#  4:  n;  n-th call (fix the string posiiton by this)
+
+if( ! $?GEOMVIEWTEXT )  then
+	echo "GEOVIEWTEXT is not fixed"
+	exit
+endif
+
+set  file = $2:t
+set  media = $file:e 
+set  color = `gawk '$1==media {print $3, $4, $5, $6;exit}' media=$media $3`
+if( $#color == 0 ) then
+	echo "media"  $media " not found in colormap=" $3
+	echo "echo use black for that"
+	set color = "0 0 0 1"
+endif
+if( $4 == "1" && -f $1/mediatext ) then
+	rm -f $1/mediatext
+endif
+
+set posy1 = ` gawk 'END {print 0.9 - 0.11*n}' n=$4 /dev/null`
+set posy2 = ` gawk 'END {print posy1+0.07}' posy1=$posy1 /dev/null`
+
+echo "LIST {" >> $1/mediatext
+echo "CQUAD" >> $1/mediatext
+echo "-0.9" $posy1 "0" $color >> $1/mediatext
+echo "-0.6" $posy1 "0" $color >> $1/mediatext
+echo "-0.6" $posy2 "0" $color >> $1/mediatext
+echo "-0.9" $posy2 "0" $color >> $1/mediatext
+echo "}"  >> $1/mediatext
+
+echo "LIST {"  >> $1/mediatext
+$GEOMVIEWTEXT -s 0.07  -plane xy -align sw -at -0.5  $posy1 0 $media >> $1/mediatext
+echo "}"   >> $1/mediatext
+
+
+
+
+
+
+

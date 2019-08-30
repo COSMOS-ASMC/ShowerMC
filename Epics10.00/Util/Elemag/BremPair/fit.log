@@ -1,0 +1,36 @@
+
+
+*******************************************************************************
+Sat Sep 17 21:54:55 2016
+
+
+FIT:    data read from "/tmp/H2" u 1:($2*2.39)
+        format = x:z
+        #datapoints = 26
+        residuals are weighted equally (unit weight)
+
+function used for fitting: g(x)
+	g(x)=a*log(2*x/511e-6) + b
+fitted parameters initialized with current variable values
+
+iter      chisq       delta/lim  lambda   a             b            
+   0 2.5305326144e+01   0.00e+00  2.48e+01    4.000000e+00  -8.000000e+00
+   4 6.3156612505e+00  -4.23e-06  2.48e-03    4.199725e+00  -1.006516e+01
+
+After 4 iterations the fit converged.
+final sum of squares of residuals : 6.31566
+rel. change during last iteration : -4.22731e-11
+
+degrees of freedom    (FIT_NDF)                        : 24
+rms of residuals      (FIT_STDFIT) = sqrt(WSSR/ndf)    : 0.512984
+variance of residuals (reduced chisquare) = WSSR/ndf   : 0.263153
+
+Final set of parameters            Asymptotic Standard Error
+=======================            ==========================
+a               = 4.19972          +/- 0.02913      (0.6936%)
+b               = -10.0652         +/- 0.2489       (2.472%)
+
+correlation matrix of the fit parameters:
+                a      b      
+a               1.000 
+b              -0.915  1.000 

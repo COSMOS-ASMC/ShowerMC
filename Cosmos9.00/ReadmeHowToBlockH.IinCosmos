@@ -1,0 +1,22 @@
+The task:
+	Even if a new hadronic interaction model is added or
+	removed or some change in hadronic model treatment,
+	Epics program need not be touched.
+How to do:
+    Without moving  media files Epics into Cosmos, we must be able 
+    to do so.
+    Some of the items in media are copied into new moudle:
+        modXsecMedia  in cXsecMedia.f90 in Cosmos/Module.
+    There is 'type xsmedia' and type(xsmedia)::media(:) 
+    (allocatable :--> number of different  media) 
+    Also # of elements in each medium is allocatable.
+    Allocation is done after eprcnf is called;  by
+    eppiniXsMedia in epSetsecMedia.f in Epics/prog. 
+    It replaces epixsec.f.
+    In case of Cosmos, it is thru cixsec.f which is
+    in Cosmos/Particle/Event/Xsec/.  Old cixsec.f
+    is modified.
+    cixsec.f was moved to Cosmos/Manager/
+    cfixTarget there is replaced by cGetXsec.f in Tracking/
+    
+    

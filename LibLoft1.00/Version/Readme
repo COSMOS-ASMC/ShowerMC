@@ -1,0 +1,48 @@
+Jun. 11
+By taketa-san info.
+  ZepTrackp.h is move to Epics10.00/epics/; it is not used in LibLoft.
+  In cepControl.f we find:
+    real(8):: AnihiE=1.0d-3
+    real(8):: Eanihi=10.d-3
+    equivalence ( AnihiE, Eanihi)
+  We changed the first line to
+    real(8):: AnihiE
+
+
+May.14
+Now a gneric prarticle code conversion routine, cCodeConv.f
+is added in LibLoft/Manager/.  It is linked to
+LibLoft/Module/cCodeConv.f so tha it must be compiled before other
+programs which may use it.
+
+It can be  used to convert the kf code (i.e, code defined in
+the particle data book by the particle data group) to cosmos code
+and vice versa.  A similar routine, ckf2cos.f is still usable
+and used by the new routine too.
+
+The new generic one must be used with
+           use modCodeConv
+to be put before implicit none in each subrboutine. E.g
+
+      subroutine xxxx
+      use modCodeConv
+      implicit none
+   #incldue "Zptcl.h"
+      integer:: code, subc, chg
+      integer(2):: hcode, hsubc, hchg
+      type(ptcl):: aPtcl
+      integer:: pdgc
+
+    ! if pdg code, pdgc, is given, it can be converted to
+    ! cosmos code by
+      call cpdg2cos( pdgc, aPtcl) ! aPtcl%code, aPtcl%subcode, aPtcl%charge
+                                ! get cosmos code
+      call cpdg2cos(pdgc, code, subc, chg) ! code, subc, chg get cosmos code
+      call cpgd2cos(pdgc, hcode, hsubc, hchg) ! hcode, hsubc, hchg ..
+
+         ! inversely
+    ! if aPtcl has code,
+      call ccos2pdg(aPtcl, pdgc) ! will get pdg code, pdgc.
+      call ccos2pdg(code, subc, chg, pdgc) !  code, subc, chg --> pdgc
+      call cpgd2cos(hcode, hsubc, hchg, pdgc) ! hcode, hsubc, hchg ->pdgc
+      

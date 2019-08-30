@@ -1,0 +1,22 @@
+Stuff here is to get geometical information inside a 
+gvien detector by using a neutrino as the incident 
+partcile.
+The program responsible for the work is epGeom.f;
+its ingredients are called from ephook.f
+Execpt for that the primary is neu_e and optional
+2 control parameters given inside "sepicsfile",
+there is no special points.
+  Suupose a newtrino passes thru  many componests
+  we see it runs in many different media. The path
+  is devided into many segments, each of which consists
+  of the same medium.  If medium changes or component
+  number changes during the path, segment becomes different.
+(see fig.pdf. The output format is also seen there)
+
+Out of two control parameters in sepicsfile, 2nd one
+neednot be touched. First one is to suppress blanks.
+The default is no suppression;
+
+ epHooks '0 2  0'       / Entry for giving user defined parametes.
+ epHooki  0  /  0-> no blank suppress. 1-> blank suppress
+ epHooki  1 /   1->make pos world coord.   0-> pos.  local coord. (for debug)

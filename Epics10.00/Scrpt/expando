@@ -1,0 +1,6 @@
+#!/bin/csh -f
+if( $#argv == 0 ) then
+	echo "Usage: expando  configfile"
+	exit
+endif
+awk -f $EPICSTOP/Scrpt/onlyexpando $1 | awk -f $EPICSTOP/Scrpt/onlyrenum - 

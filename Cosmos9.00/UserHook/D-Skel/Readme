@@ -1,0 +1,23 @@
+
+SkelFlesh:  make skeleton for distributed job; param  template is
+	paramSkelForDistJob. Fleshing is not done in this directory.
+
+Smash:     Skeleton made in SkeleFlesh is smashed into N files for N cpu
+
+FleshBase:  At N cpu, execute jobs for one event or pluaral events.
+	    This dose not assumed to take histogram
+FlesHist:   At N cpu, execute jobs for one event or pluaral events.
+	    This is intended to take histogram. 
+Assemble:
+	Assemble  N files  of hybrid data to get one unified file.
+	Assemble  N files  of hist data to get one unified file.
+	convert binary histogram  file into ascii file
+
+This directory contains stuff for distributed job to simulate a very high
+energy event with a number of PC's, thus enabling Full Monte Carlo simulation
+of very  high energy events for which one cpu would need a desperate long
+computation time.
+
+
+
+	

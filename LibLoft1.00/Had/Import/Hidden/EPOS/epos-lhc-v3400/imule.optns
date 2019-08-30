@@ -1,0 +1,561 @@
+write "!###############################################################"
+write "! mean multiplicities vs energy"
+write "!###############################################################"
+
+write "!-----------------------------"
+write "! mult |eta|<2.5     "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      9970
+trigger eta -2.5 2.5
+trigger nd1evt 1 1
+binning log
+endhisto
+write "openhisto name mul25 xrange 2 100  "
+write "htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title  "B# [c]"B# "L# 2.5 "" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis average multiplicity (n)$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "openhisto getarray ppexci-mult25 closehisto plot 0"
+
+write "!-----------------------------"
+write "! dndeta     "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      9970
+trigger eta -1 1
+trigger nd1evt 1 1
+binning log
+endhisto
+write "openhisto name dndeta xrange 2 100  "
+write "htyp prs xmod log ymod lin"
+write "{text 0.05 0.90 ""title " "" }"
+write "{text 0.35 0.00 ""xaxis energy (GeV)$            "" }"
+write "{text 0.00 0.45 ""yaxis plateau height "" }"
+write "set fac2 0.5"     
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "openhisto getarray ppexci-plateau closehisto plot 0- plot dndeta"
+
+write "!-----------------------------"
+write "! C     "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      9970
+binning log
+endhisto
+write "openhisto name multchrg xrange 2 100  "
+write "htyp prs xmod log ymod log"
+write "{text 0.05 0.90 ""title " "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh column c1 = sqrt ( c1 ) getarray ppexci-mult-chrg closehisto plot 0-"
+write "openhisto getarray ppexci-mult-ch3 closehisto plot 0-"
+write "oh htyp fun function 2.45+0.32*log(x-1.86)+0.53*(log(x-1.86))**2 from 3 to 25 ch plot 0-"
+write "oh htyp fun function -2.9+3.58*log(x) from 13 to 90 ch plot 0-"
+write "oh calc multchrg ; htyp prs ch plot 0 dh"
+
+write "!-----------------------------"
+write "! 120      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      120
+binning log
+endhisto
+write "openhisto name multpip xrange 2 100  "
+write "htyp prs xmod log ymod log yrange 0.1 auto"
+write "{text 0 0 ""title [p]^+!    "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+!write "oh htyp fbf function -1.55+0.82*2*log(x)+0.79/x from 3 to 90 ch plot 0-"
+write "oh htyp fbf function  tanh(0.35*(x-1.3))*0.82*(log(x))**1.26    from 3 to 90 ch plot 0-"
+write "oh column c1 = sqrt ( c1 ) getarray ppexci-mult-pip closehisto plot 0- plot multpip"
+
+write "!-----------------------------"
+write "! -120      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      -120
+binning log
+endhisto
+write "openhisto name multpim xrange 2 100  "
+write "htyp prs xmod log ymod log yrange 0.1 auto"
+write "{text 0.1 0.8  ""[p]^-!    "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh htyp fbf function -2.98+0.94*2*log(x)+3.31/x from 3 to 90 ch plot 0-"
+write "oh column c1 = sqrt ( c1 ) getarray ppexci-mult-pim closehisto plot 0-"
+write "oh getarray ppexci-mult2-pim closehisto plot 0- plot multpim"
+
+write "!-----------------------------"
+write "! 110      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      110
+binning log
+endhisto
+write "openhisto name 110 xrange 2 100  "
+write "htyp prs xmod log ymod log yrange 0.1 auto"
+write "{text 0.1 0.8  ""[p]^0!    "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh column c2 = ( c2 / 32. ) column c3 = ( c3 / 32. ) getarray ppexci-mult5-pi0 closehisto plot 0"
+
+write "!-----------------------------"
+write "! 130      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      130
+binning log
+endhisto
+write "openhisto name multkap xrange 2 100  yrange 0.01 auto"
+write "htyp prs xmod log ymod log"
+write "{text 0 0 ""title K^+!    "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh htyp fbf function -0.46+0.12*2*log(x)+0.59/x from 3 to 90 ch plot 0-"
+write "oh column c1 = sqrt ( c1 ) getarray ppexci-mult-kap closehisto plot 0- plot multkap"
+
+write "!-----------------------------"
+write "! -130      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      -130
+binning log
+endhisto
+write "openhisto name multkam xrange 2 100  "
+write "htyp prs xmod log ymod log yrange 0.01 auto"
+write "{text 0.1 0.8  ""K^-!    "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh htyp fbf function -0.45+0.10*2*log(x)+0.70/x from 3 to 90 ch plot 0-"
+write "oh column c1 = sqrt ( c1 ) getarray ppexci-mult-kam closehisto plot 0-"
+write "oh getarray ppexci-mult2-kam closehisto plot 0- plot multkam"
+
+write "!-----------------------------"
+write "! 20      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      20
+binning log
+endhisto
+write "openhisto name multkas xrange 2 100  "
+write "htyp prs xmod log ymod log yrange 0.01 auto"
+write "{text 0.1 0.8  ""K?s!    "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh column c1 = ( sqrt ( 1.7335 + 1.862 * c1 ) ) getarray ppexci-mult4-ks closehisto plot 0-"
+write "oh getarray ppexci-mult2-ks closehisto plot 0-"
+write "oh getarray ppexci-mult6-ks closehisto plot 0- plot multkas"
+
+write "!-----------------------------"
+write "! 220      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      220
+binning log
+endhisto
+write "openhisto name 220 xrange 2 100  "
+write "htyp prs xmod log ymod log"
+write "{text 0.1 0.8  ""[c]    "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh getarray ppexci-mult3+220 closehisto plot 0"
+
+write "!-----------------------------"
+write "! 121      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      121
+binning log
+endhisto
+write "openhisto name 121 xrange 2 100  "
+write "htyp prs xmod log ymod log"
+write "{text 0.1 0.8  ""[r]^+!    "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh getarray ppexci-mult15-rh+ ch plot 0"
+
+write "!-----------------------------"
+write "! -121      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      -121
+binning log
+endhisto
+write "openhisto name -121 xrange 2 100  "
+write "htyp prs xmod log ymod log"
+write "{text 0.1 0.8  ""[r]^-!    "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh getarray ppexci-mult15-rh- ch plot 0"
+
+write "!-----------------------------"
+write "! 131      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      131
+binning log
+endhisto
+write "openhisto name 131 xrange 2 100  "
+write "htyp prs xmod log ymod log"
+write "{text 0.1 0.8  ""K^*+!    "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh getarray ppexci-mult3+131 ch plot 0"
+
+write "!-----------------------------"
+write "! -131      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      -131
+binning log
+endhisto
+write "openhisto name -131 xrange 2 100  "
+write "htyp prs xmod log ymod log"
+write "{text 0.1 0.8  ""K^*-!    "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh getarray ppexci-mult3-131 ch plot 0"
+
+write "!-----------------------------"
+write "! 231      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      231
+binning log
+endhisto
+write "openhisto name 231 xrange 2 100  "
+write "htyp prs xmod log ymod log"
+write "{text 0.1 0.8  ""K^*0!    "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh getarray ppexci-mult3+231 ch plot 0"
+
+write "!-----------------------------"
+write "! -231      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      -231
+binning log
+endhisto
+write "openhisto name -231 xrange 2 100  "
+write "htyp prs xmod log ymod log"
+write "{text 0.1 0.8  ""aK^*0!    "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh getarray ppexci-mult3-231 ch plot 0"
+
+write "!-----------------------------"
+write "! 111      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      111
+binning log
+endhisto
+write "openhisto name 111 xrange 2 100  "
+write "htyp prs xmod log ymod log"
+write "{text 0.1 0.8  ""[r]^*0!    "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh column c2 = ( c2 / 32. ) column c3 = ( c3 / 32. ) getarray ppexci-mult5-rh0 ch plot 0"
+
+write "!-----------------------------"
+write "! 221      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      221
+binning log
+endhisto
+write "openhisto name 221 xrange 2 100  "
+write "htyp prs xmod log ymod log"
+write "{text 0.1 0.8  ""[w]     "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh getarray ppexci-mult3+221 ch plot 0"
+
+write "!-----------------------------"
+write "! 331      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      331
+binning log
+endhisto
+write "openhisto name 331 xrange 2 100  "
+write "htyp prs xmod log ymod log"
+write "{text 0.1 0.8  ""[f]     "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh column c2 = ( c2 / 32. ) column c3 = ( c3 / 32. ) getarray ppexci-mult5-phi ch plot 0-"
+write "oh getarray ppexci-mult2-phi ch plot 0"
+
+write "!-----------------------------"
+write "! 1120      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      1120
+binning log
+endhisto
+write "openhisto name 1120 xrange 2 100  "
+write "htyp prs xmod log ymod log yrange 0.1 auto"
+write "{text 0.1 0.8  ""p     "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh column c1 = sqrt ( c1 ) getarray ppexci-mult-p ch plot 0"
+
+write "!-----------------------------"
+write "! -1120      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      -1120
+binning log
+endhisto
+write "openhisto name multap xrange 2 100  "
+write "htyp prs xmod log ymod log yrange 0.005 auto"
+write "{text 0.1 0.8  ""ap     "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh htyp fbf function -0.33+0.059*2*log(x)+0.74/x from 5 to 90 ch plot 0-"
+write "oh column c1 = sqrt ( c1 ) getarray ppexci-mult-ap ch plot 0-"
+write "oh getarray ppexci-mult2-ap ch plot 0- plot multap"
+
+write "!-----------------------------"
+write "! 1220      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      1220
+binning log
+endhisto
+write "openhisto name 1220 xrange 2 100  "
+write "htyp prs xmod log ymod log yrange 0.1 auto"
+write "{text 0.1 0.8  ""n    "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh getarray ppexci-mult6-n ch plot 0"
+
+
+write "!-----------------------------"
+write "! 2130      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      2130
+binning log
+endhisto
+write "openhisto name 2130a xrange 2 100  "
+write "htyp prs xmod log ymod log"
+write "{text 0.1 0.8  ""[L]    "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh column c2 = ( c2 / 32. ) column c3 = ( c3 / 32. ) getarray ppexci-mult5-lam ch plot 0-"
+write "oh column c1 = ( sqrt ( 1.7335 + 1.862 * c1 ) ) getarray ppexci-mult4-lam ch plot 0-"
+write "oh getarray ppexci-mult6-lam ch plot 0"
+
+write "!-----------------------------"
+write "! 2330      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      2330
+binning log
+endhisto
+write "openhisto name 2330 xrange 2 100  "
+write "htyp prs xmod log ymod log"
+write "{text 0.1 0.8  ""[X]^-!   "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh getarray ppexci-mult6-xi ch plot 0"
+
+write "!-----------------------------"
+write "! 1111      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      1111
+binning log
+endhisto
+write "openhisto name 1111 xrange 2 100  "
+write "htyp prs xmod log ymod log"
+write "{text 0.1 0.8  ""[D]^++!   "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh getarray ppexci-mult3+1111 ch plot 0"
+
+write "!-----------------------------"
+write "! -1111      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      -1111
+binning log
+endhisto
+write "openhisto name -1111 xrange 2 100  "
+write "htyp prs xmod log ymod log"
+write "{text 0.1 0.8  ""a[D]^++!   "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh getarray ppexci-mult3-1111 ch plot 0"
+
+write "!-----------------------------"
+write "! 1221      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      1221
+binning log
+endhisto
+write "openhisto name 1221 xrange 2 100  "
+write "htyp prs xmod log ymod log"
+write "{text 0.1 0.8  ""[D]^0!   "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh getarray ppexci-mult3+1221 ch plot 0"
+
+write "!-----------------------------"
+write "! -1221      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      -1221
+binning log
+endhisto
+write "openhisto name -1221 xrange 2 100  "
+write "htyp prs xmod log ymod log"
+write "{text 0.1 0.8  ""a[D]^0!   "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh getarray ppexci-mult3-1221 ch plot 0"
+
+write "!-----------------------------"
+write "! 1131      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      1131
+binning log
+endhisto
+write "openhisto name 1131 xrange 2 100  "
+write "htyp prs xmod log ymod log"
+write "{text 0.1 0.8  ""[S]^*+!   "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh getarray ppexci-mult3+1131 ch plot 0"
+
+write "!-----------------------------"
+write "! -1131      "
+write "!-----------------------------"
+beginhisto 
+histogram egyevt mulevt 4  egy egy 1
+idcode      -1131
+binning log
+endhisto
+write "openhisto name -1131 xrange 2 100  "
+write "htyp prs xmod log ymod log"
+write "{text 0.1 0.8  ""a[S]^*+!   "" }"
+write "{text 0 0 ""xaxis energy (GeV)$            "" }"
+write "{text 0 0 ""yaxis multiplicity$    "" }"
+write "{column c3 = 1. / sqrt( c3 ) }"
+histoweight nozero writearray 3 write "closehisto plot 0-"
+write "oh getarray ppexci-mult3-1131 ch plot 0"
+
+
+write "!-----------------------------"
+write "! k/pi ratio of multiplicity versus energy       "
+write "!-----------------------------"
+write "openhisto name exci-k-pi xrange 2 100 htyp prs xmod log ymod lin"
+write "calc multkap / multpip ;"
+write "{txt ""xaxis energy (GeV) "" }"
+write "{txt ""yaxis ratio"" }"
+write "{txt ""title K/[p]"" }"
+write "closehisto plot 0-"
+write "openhisto getarray ppexci-kpi closehisto plot 0-"
+write "input newdata/e735 exci-k-pi plot 0"
+write "!-----------------------------"
+write "! ap/pi ratio of multiplicity versus energy       "
+write "!-----------------------------"
+write "openhisto name exci-ap-pi xrange 2 100 htyp prs xmod log ymod lin"
+write "calc multap / multpip ;"
+write "{txt ""xaxis energy (GeV) "" }"
+write "{txt ""yaxis ratio"" }"
+write "{txt ""title ap/[p]"" }"
+write "closehisto plot 0-"
+write "openhisto getarray ppexci-aprpi closehisto plot 0-"
+write "input newdata/e735 exci-ap-pi plot 0"

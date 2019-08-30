@@ -1,0 +1,40 @@
+#
+#  TASC
+#
+
+#inc CnfgDir/imc-panel.cnfg
+#inc CnfgDir/tasc-post.cnfg
+#inc CnfgDir/tasc-panel.cnfg
+#inc CnfgDir/tasc-pwo.cnfg
+
+
+
+#subd tasc
+1 imc-pnl-base sp 0 0 0 / 23.00 23.00 0.00  -1 0 0  0 -1 0
+2 imc-pnl-sxa sp 0 0 0 / 23.00 23.00 0.0   -1 0 0  0 -1 0
+3 imc-pnl-sxb sp 0 0 0 / 23.00 23.00 0.0   -1 0 0  0 -1 0
+4 imc-pnl-inx sp 0 0 0 / 23.00 23.00 0.0   -1 0 0  0 -1 0
+5 imc-pnl-sya sp 0 0 0 / 23.00 23.00 0.0   -1 0 0  0 -1 0
+6 imc-pnl-syb sp 0 0 0 / 23.00 23.00 0.0   -1 0 0  0 -1 0
+7 imc-pnl-iny sp 0 0 0 / 23.00 23.00 0.0   -1 0 0  0 -1 0
+#
+8 tasc-toppnl sp 0 0 0 / -21.30 -21.30 1.50
+9  tasc-post1 sp 0 0 0 /  -16.65 -16.65 1.70
+10 tasc-post2 sp 0 0 0 /   16.65 -16.65 1.70
+11 tasc-post3 sp 0 0 0 /   16.65  21.30 1.70
+12 tasc-post4 sp 0 0 0 /  -16.65  16.65 1.70
+###
+13 tasc-sd-pnl1 sp 0 0 0 / -16.65 -21.30 1.70
+14 tasc-sd-pnl1 sp 0 0 0 / -21.30  16.65 1.70    0 -1 0  1 0 0
+15 tasc-sd-pnl2 sp 0 0 0 /  16.65  20.65 1.70   -1 0 0  0 -1 0
+16 tasc-sd-pnl2 sp 0 0 0 /  20.65 -16.65 1.70    0 1 0  -1 0 0
+###
+17 tasc-inb  sp 0 0 0 / 0 0 1.70
+18 tasc-inxa sp 0 0 0 / 0 0 1.70
+19 tasc-inxc sp 0 0 0 / 0 0 1.70
+20 tasc-inya sp 0 0 0 / 0 0 1.70
+21 tasc-inyc sp 0 0 0 / 0 0 1.70
+22 box_w sp 0 0 0 / 0 0 0
+###
+#end tasc
+

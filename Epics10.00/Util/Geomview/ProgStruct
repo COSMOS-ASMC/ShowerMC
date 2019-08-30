@@ -1,0 +1,101 @@
+For  each config.XX
+	find the vertex of the same component
+		if it is full box, make OFF object
+	else
+		make CMESH object
+and accumulate them in allobj.list
+
+if component base display, 
+	decompose allobj.list into component .list  file
+	and remove  allojb.list
+else subdetector base
+	deomppose allobj.lsit into component .list and subdetector .list files
+	and remove  allojb.list
+else all in one base
+
+Then display all .list files.
+
+
+
+
+
+			
+
+	
+
+
+dispconfigbygeomv
+	fix colomap file
+  	call convconfig
+
+	colormap output requested ?
+	  yes--> display  Work/mediatext
+        
+	component base display ?
+	  yes-->  display Work/listofnonsubd Work/subd_*.list
+	  no -->  display Work/*.list
+--------------------------
+
+convconfig
+	fix colormap
+
+	judge compbase or not
+	judge colormap display is requested or not
+	fix output directory (Work)
+	
+	rm ^temp file if any
+	rm Work/*.mesh if any
+	rm Work/*.list if any
+	rm Work/*.off  if any
+
+	For given config.* or Work/config.*
+
+	  call dispconfigbygeomv2; with say, Work, config.BGO colormap
+	  call showmediacolor2
+
+	this creates  *.list files
+
+	examine *.list and find max and min  subdetector index.
+
+	subdetector index > 0  && compbase ?
+	   yes --> rm listofnonsubd
+		examine each of *.list and find non-subdetector
+		and put it in listofnonsubd 
+
+		do each of subdetector  index
+		 examine each of *.list and find subdetectors
+	         and make listfile to contain a name like,
+		 subd_bgosubd_6.list
+		 listifle != ' ' ?
+		   yes--> call geomviewconfig3.awk and
+			 make Work/$listfile to contain
+			 corresponding subdetector components
+-----------------	
+dispconfigbygeomv2
+	fix color by media and colormap
+	
+	call geomviewconfig1.awk with colorinfo, config.BGO
+	  and put output in temp$$ which consists of  CMESH 
+
+	call geomviewconfig2.awk and decompse temp$$ into mesh files.
+
+	examine each mesh file and make list file by gathering
+	the same component.
+
+	rm temp$$
+-------------------
+geomveiewconfig1.awk
+	recognize 2 line mesh structure and
+	write  as CMESH data
+
+
+---------------
+geomviewconfig2.awk
+	count CMESH and number them and make file name, like,
+	BGO_00101.mesh. then output the content into it.
+
+
+-------------
+geomviewconfig3.awk
+	print LIST 
+

@@ -1,0 +1,26 @@
+c(((((((((((((((((((((((((((((((( Zascns (((((((((((((((((((((((((((((((
+c             basic const for genas and anaas system
+c             light velocity in m/nsec
+         parameter (vlight=.29987)
+c             standard shower consts.
+c           age, e0, observation depth, moliere unit for vertical
+         parameter (ssage=1.075, sse0=100., ssdep=600., ssmu=134.143)
+c            id for type 1, 2 scintillator structure
+         character*16  idsc1, idsc2
+         parameter (idsc1='fe.1sc3.5', idsc2='pb.5fe.1sc3.5')
+c           one ptcl equivalent energy deposit in scinti for
+c           type 1,2,
+c            forllowing is to take into account that in exp.
+c            all angles are taken for single peak calibration.
+c            if we assume muon angle distribution be cos**3dcos
+c            and  e/g be cos**7dcos, and 70 % of mu and 30 % of
+c            e/g,  <1/cos>=1.27 is obtained (see hayakawa for mu
+c             angular dist.)  then vertical de*1.27=8.89 may be
+c            use for comparison with exp. (?).
+c        parameter (eqvo1=8.90, eqvo2=8.90)
+         parameter (eqvo1=7.00, eqvo2=7.)
+c         in some weakly s-dependent programs (dt sampling),  if age s
+c         is different not more than smarg*100% from the previous call,
+c         the same consts are used as the previous ones.
+         parameter (smarg=.2)
+c)))))))))))))))))))))))))))))))) Zascns )))))))))))))))))))))))))))))))

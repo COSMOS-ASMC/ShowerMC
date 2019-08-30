@@ -1,0 +1,63 @@
+#!/bin/csh 
+
+
+if ( $#argv == 0 ) then
+    if( -f ./Sparam )  then
+	set sparam = "./Sparam"
+    else
+        echo "There is no ./Sparam; you have to specify the path to"
+ 	echo "the file specifed by SkeletonFile at Skeleton making time."
+	echo "E.g  execflesh parambySkel"
+	exit
+    endif
+else if ( $#argv == 1 ) then
+    if ( -f $1 ) then
+       set sparam = $1
+    else
+        echo "There is no $1  you have to specify the path to"
+ 	echo "the file specifed by SkeletonFile at Skeleton making time"
+	echo "E.g  execflesh parambySkel"
+	exit
+    endif   
+else
+    echo "Usage:
+    echo "   1)  execflesh "
+    echo "or 2)  execflesh paramfile"
+    echo "First case:  ./Sparam is assumed as paramfile"
+    echo "where paramfile is the file specified by SkeletonFile in Skeleton"
+    echo "making time."
+    exit
+endif
+
+echo  "Assume the file specified by SkeletonFile at Skeleton making time is"
+echo  "$sparam"
+echo  "Enter y if it is so."
+set yesno = $<
+if( x$yesno != "xy" ) exit
+
+source ../Smash/setupenv
+source ./setupenv
+set   dir = `pwd`
+setenv FLESHDIR  $dir:t
+echo $FLESHDIR
+source ../modparam.csh  $sparam
+
+again:
+
+echo "1) Do you flesh skeletons at all hosts in $HOSTLIST"
+echo "2) Or specify some hosts among them  for flesh job ?"
+echo "3) stop at here"
+echo "Enter 1, 2 or 3"
+set job=$< 
+if ( $job == 1 ) then
+  echo "You selected 1;  Enter y, if it is correct"
+  set yesno=$< 
+  if( $yesno != "y" ) goto again
+  source  ../execflesh_all $HOSTLIST
+else if( $job == 2 ) then
+  source  ../execflesh_one $HOSTLIST
+else if(  $job == 3 ) then
+  exit 
+else
+ goto again
+endif

@@ -1,0 +1,6 @@
+r = 6378136
+set para
+set ur[0:pi]
+set vr[0:2*pi]
+replot r*sin(u)*cos(v), r*sin(u)*sin(v), r*cos(u)
+

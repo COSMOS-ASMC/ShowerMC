@@ -1,0 +1,100 @@
+This directory contains Atmnc3 related stuff.
+For Atmnc3, see  Honda's home page at
+http://www.icrr.u-tokyo.ac.jp/~mhonda/atmnc3/
+
+By using Atmnc3, we can generate low energy 
+cosmic rays entering into the atmosphere even
+below the geomagnetic cut-off; they are particles
+which go up from the earth atmosphere(so called
+albedo particles) and come back to the earth again.
+
+Such partilces are geomagneic dependent (i.e, dependent
+on the latitue and longitude of the earth) and the 
+spectrum shape is difficult to be expressed by a
+simple formula. 
+
+Cosmos can generate such particles but it needs
+much longer time than Atmnc3 since Atmnc3 uses
+tabulated energy spectrum data of particles 
+generated  at nuclear collsions
+(It's  inclusive sepctrum). 
+
+So we may generate such partilces by Atmnc3 and
+1)  make them as incident particles (for detector
+    simulation at space or cosmic rays entering
+    into the atmosphere)
+and/or 
+2)  make incident partilce spectum in a certain
+    latitude and longitude region and use it
+    for 1ry spectum to Cosmos 
+etc.
+
+The program, translate, here may be used to convert
+Atmnc3 output for such purpose.
+
+The output here means data at a some hight (say 100 km) 
+from Atmnc3 as stdout and looks like
+
+310   403138 -3471379  -973521  5739772 -9999999  655845731  445081501 -609728492
+110   403138 -3471378  -973521  5739771 -8410834  655844660  445081156 -609729897
+  8  -496352 -3015664 -1476292  5888083 -2024724  298017341 -752972708  586700747
+310   700031   782339   561949 -6709348 -9999999 -436592118  172924109  882884237
+...
+
+How to use translate:
+  0) In Cosmos/Util/Atmnc3 do next  only once:
+     ln -s somewhere/atmnc3/src3 src3
+    where  somewhere.. is the directory where your
+    atmnc3 is placed.
+  1) Go to Interface;  make clean
+  2) make
+  3) ./translate$ARCH  arg  <  atmnc3-output-file
+     or
+     cat atmnc3-output-file | ./translate$ARCH  arg  
+where
+  arg is one of 1,2,3.  If not given, short usage will be shown.
+   1==> only hadronic particles suited for Cosmos 1ry are 
+        selected; content is sufficent for Cosmos use.
+        Content summary is shown on stderr.
+   2==> same as 1 but gammas and electrons, if any, are also selected
+   3==> all atmnc3 output are selected  printed.  content are bit
+        more than above case.  Content summary is shown on stderr.
+
+  atmnc3-output-file is  the file-path to the Atmnc3's stdout.
+
+  If each particle information obtainted with arg=1 or 2 is put in
+a file, it may be used to make primaries in Cosmos execution.
+
+  For that, 
+1) in chookBgRun
+    open the file.
+2) in chookBgEvent
+   a) define
+     record /track/aTrack
+     integer:: code, subcode, charge
+     real(8):: dir(3),  Rxyz(3), llh(3), Et, cosz
+     integer:: num1, num2
+   b) read 1 line from the file as
+      read(xx, *, end=zzzz) code, subcode, charge, dir(:), Et, Rxyz(:), llh(:), cosz
+      where xx is the logical dev. # defined in 1).
+      and do 
+        call cmkptc(code, subcode, charge, aTrack.p)
+        aTrack.p.fm.p(4) = Et    ! total energy
+        aTrack.pos.xyz.r(:) = Rxyz(:)  ! (x,y,z) in the E-system (Earth-system)
+        aTrack.vec.w.r(:) =  dir(:)   !  direction cos of the patcl in E-system.
+        aTrack.where = 1  ! (ptcl is directed to first observation depth)
+        call  cresetPrim2(aTrack)
+	return
+  zzzz  continue    !  zzzz should be some number
+        call cinitStack   ! clean stack area
+	call cqEventNo(num1, num2)   ! get current event #
+	call cresetDestEvNo(num1-1)  ! reset destination event #
+                               ! so that the run should stop
+
+
+
+**Note:   momentum is set automatically inside cresetPrim2. 
+
+
+
+  

@@ -1,0 +1,65 @@
+This dirctory contains the Primary class.  For a normal use, you may
+
+1) Prepare energy spectrum data in a file.  
+   The data format example is in sample.d in the Data/Primary directory. We can
+   express a number of spectra of arbitrary shape in a simple form.
+2) Give the file name in a file for namelinst Param.
+
+3) call  ciniSPrim
+     to initialize the primary energy and species sampling.   The spectrum 
+     file name must be given to the subroutine.
+4) call csampPrimary
+      to sample a one primary.  One particle data is  returned.
+For details, see testSampPrim.f in Util 
+
+
+ Every detailes of primary spectra  are contained in the class,
+/primaries/.  So, for example, you can know the number of samlings
+by 
+ 
+ call cqNoOfPrim(number)
+
+------list of files which conain subroutines and their synopsis---
+ciniSPrim.f
+  ciniSPrim  Initiaize primary sampling routines by giving a
+                      a file name where spectrum data is given. 
+	              csetPrimTbl and csetEUnitTbl are called.
+	              Record is made in "Prim" in common section given
+	              in Zprimaryv.h
+  ciniSPrim0  read a given spectrum data and establish a primary
+	              record in a given record area.
+  csetPrimTbl       set the symbols table usable for primary components
+  csetEUnitTbl     set the energy unit table (keV, GeV etc) usable
+
+cmkPrimSTbl.f
+  cmkPrimSTbl  assumign raw primary information is givne in a given 
+                     record,  make primary sampling table  for that record
+cprintPrim.f
+  cprintPrim     print "Prim" primary record information breifly
+  cprintPrim0    print a given primary record info. breifly.
+  cprintEachCmp   slave of the aboe
+cprocPrimDt.f
+  cprocPrimDt    Process a given pimary record to be ready for cmk_..
+  cexmPrimSymb    examine primary symobls in a given primary record
+  cexmPrimEU   examine primary energy unit in a given priamry record
+crdPrimData.f
+  crdPrimData       read a primary record from a given file into a given
+                        primary rcord area.
+  crdCompPrim  slave of the above. segments data is read
+csampPrimary.f
+  csampPrimary      Samples a primary particle from "Prim" record
+                     and returns /ptcl/ data
+  csampPrimary0     Samples a primary particle from a given primary record
+  csampPrimary1     slave of the above
+  cconv_prim_e       convert primary energy in a given primary record into
+                     total energy in GeV unit to be used in Cosmos
+  cqPrimE   inquire sampled primary energy/momentum in the form
+                     specified in  "Prim"
+  cqPrimE0       inquire sampled primary energy/mometum in the form
+                          specified in a given primary record
+  cqPrimLabel    inquire the sequence number of the sampled component
+                          for "Prim" record.
+  cqPrimLabel0   inquire the sequence number of the sampled component
+	                   for a given record
+  cqPrimary     inquire primary spectrum record information of "Prim"
+  cqNoOfPrim    inquire the number of sampled primaries.

@@ -1,0 +1,12 @@
+#name   Format    Acetate
+Acetate	2
+#
+#  Elem	 rho(g/cm^3)	Gas/Solid(1/0) refl.index  Birks c
+	3         1.20		0         0        0 0 0
+
+# 	Z	A  	N
+        6      12       15
+	1    1.00	22
+	8      16       8
+#  ⟨Z/A⟩   I[eV]   a       k      x0    x1     Cbar  delta0
+0.53279  74.6   0.1144   3.3738  0.1794  2.6809    3.3497 0.00

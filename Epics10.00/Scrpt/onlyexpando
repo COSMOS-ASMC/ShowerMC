@@ -1,0 +1,5 @@
+$1 == "#do" {ndo=$2; domode=1; nrow=0; next}
+$1 == "#end" &&  $2 == "do" {for(j=1;j<=ndo; j++){ for(i=1;i<=nrow; i++) print cache[i]} domode=0; next }
+$1 == "#end" && NF ==1 {print; print "error; only #end given"; exit}
+domode ==1 { ++nrow;  cache[nrow]=$0;next }
+{print}

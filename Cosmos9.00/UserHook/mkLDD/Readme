@@ -1,0 +1,101 @@
+What can I do for you here.
+
+1) LDD making.  
+	Be sure that you have done 'make' in UserHook/Hist.
+	This is needed to make library for histograming.
+	'Hist' can be used only with Intel Fortran.
+	Then, make clean; make will create a binary.
+	Edit param, primary. 
+	In 'param' specify UserHookc vaule, among others.
+	(For sge job submission:
+	Edit submit32At32.sh so that your user ID appears.
+	qsub -t 1:xx submit32At32.sh
+	Here if  xx is 10, it  means 10 jobs. 
+	 submitxxx depends on your envronment.
+2) In a directory where the ouptut of the above process
+	is stored.
+a)  If you want to check wheather your environment is vaild
+	for Cosmos or not, use the inclined primary case.
+	
+	$COSMOSTOP/UserHook/mkLDD/check.csh
+	If you see a very short line for some of files
+	and/or non negtive bins, the environment is NG.
+
+    Also you may better check the result by
+	$COSMOSTOP/UserHook/mkLDD/checkNe.csh
+	If you see Nemax far from 6x10^10 (E0 eV/1e20),
+	the environment is NG.
+
+	Once the envrionement is found valid, you don't need
+	to this task again.
+
+b)  If you want to find max/min age  or max/min cog values
+	among the current .hyb files (at a given depth),
+	
+	$COSMOSTOP/UserHook/mkLDD/showMinMaxAge.csh depth
+
+c)  If you want to show a line of a given depth of each
+	.hyb file,  use
+
+	$COSMOSTOP/UserHook/mkLDD/showMinMaxAge.csh depth
+
+d)  If you want to analyse a given -t.hist file and get
+	a file like tf.data, use
+	
+	make -f procTime.mk
+	./procTimexxxx 1 2 0  some-t.hist > tfx.data
+
+	tf.data would contain data as shown below
+         (1st layer means the 1st layer
+            specified in UserHookc; normally only 1 layer is
+	    specified so this is normally 1).
+	  The 2nd column (-1.657E+00 etc), shows the time in ns,
+	where the integral  (from small) time distribution reachs
+	5% of the total at a given web bin (rindex i means r=0.01x10**((i-1)*0.1)
+	in m.u).  Fai index 1 is for (-15,15) deg, 2 for (15,45)....
+	The next column is for 10%...
+	First gamma data, next electron, muon, hadron data follow.
+
+
+	
+  1   1   1         <---- fai=(-15,15), gamma,  1 st layer
+  1 -1.667E+00 -1.631E+00 -1.569E+00 ...  <-- web rindex 1 
+  2 -2.104E+00 -2.049E+00 -1.965E+00 ...  <--            2
+....
+ 40 -3.838E+03 -3.402E+03 -2.487E+03 ...  <--           40
+      5 %         10 %       20% ..  .90%
+0 0 0 0 0 0 0 0 0 0 0 0                   <--        end
+  2   1   1        <--- fai=(15,45), gamma  1 st layer
+  1 -1.492E+00 -1.45... <-- web rindex 1 
+...
+
+  1  2    1        <--- fai(-15,15),  electron  1st layer
+
+
+-------------
+The time data obtained as above may be compared with
+FDD time  data as follows.
+
+A)  Goto /TAMCDB/C/src/Examples/RawTimeInWeb
+	and get histogram data. To do so
+	you may give a layer (or layer range),
+	or age or cog. (for age or cog, a layer
+	of which age or cog is closest  is chosen.
+	For further details, read Readme there.
+	The histogram data thus obtained can be
+	put to procTime as in 2 d).
+B)  tf.data can be processed by using 
+	awk -f getTimeAtFai.awk fai=n code=m |
+	awk -f getTimeAtFrac.awk nth=p > somefile
+
+	where  n specifies fai region. (1-->(-15,15).. 12-->(315,345))
+	m for ptcl code (1-->g, 2-->e, 3-->mu, 4-->hadron).
+	p for percentage. 2-->5%, 3-->10%, 4-->20% 5-->30%
+	                 6-->40%, 7-->50%, 8-->60% 9-->70%
+	                10-->80%, 11-->90%).
+
+	somefile is ready for plotting or fitting.
+	You may compare fomefile from LDD and from FDD.
+
+
+

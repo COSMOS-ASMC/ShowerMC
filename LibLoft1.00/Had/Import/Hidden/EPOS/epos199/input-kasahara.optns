@@ -1,0 +1,79 @@
+!input file for EPOS. 
+! a line starting with "!" is not read by the program
+
+application hadron
+model epos ! can be "epos", "qgsjet", "IIqgsjet" and "sibyll"
+set nevent 1000000   !number of events
+set modsho 1    !printout after modsho events
+set ecms  900  !energy per nucleon in cms system
+!set pnll 300    !beam momentum 
+set laproj 1    !proj Z
+set maproj 1    !proj A
+set latarg 1   !targ Z
+set matarg 1   !targ A
+frame nucleon-nucleon     !for LHC
+!frame target             !for SPS
+
+!seeds are set in script epos but can be fixed here :
+set seedi 9223623d0   !seed for random number generator: at start program
+set seedj 917321d0   !seed for random number generator: for first event
+
+
+switch fusion on      !nuclear effects due to high density
+                      !more realistic but slow (can be switched off)
+!print * 2		      
+
+decayall        !decay all unstable particles (if commented ("!" in front), only muons, charged pions and charged kaons are stable (+ e, p, n))
+nodecay  14    !uncomment not to decay mu- (PDF id =  13)
+nodecay -14    !uncomment not to decay mu+ (PDF id = -13)
+nodecay 110   ! pi0
+nodecay 120   ! pi+
+nodecay -120   ! pi-
+nodecay 130  ! k+
+nodecay -130  ! k-
+nodecay 230  ! k0
+nodecay -230  ! k0b
+nodecay  20  ! k0s
+nodecay -20  ! k0l
+nodecay 1130 ! sigma+ 0.8e-10
+nodecay 2230 ! sigma- 1.5e-10
+nodecay 2130 ! lambda  2.6e-10
+nodecay 1330 ! xi0  2.9e-10
+nodecay 2330 ! xi- 0 1.6e-10
+
+
+
+!... more possible (with EPOS id (not PDG)) 
+
+!for other particles, please ask me
+
+set istmax 0    !mother particle not in final list (with 1, mother particles are in)
+
+output pdg      !output with PDG id
+!for each event : - event number in the file
+!                 - number of particle listed
+!                 - cms energy of the event
+record event  nevt nptl egy typ endrecord
+! then list of nptl particles with : - PDG id (see below)
+!                                    - px (GeV)
+!                                    - py (GeV)
+!                                    - pz (GeV)
+!                                    - E  (GeV)
+record particle id p1 p2 p3 p4 endrecord   !add p5 to this line (after p4) if you want the mass of the particle
+
+!full list of possible options
+!record event nevt nptl b ncol npj ntg npn npp ntn ntp jpns  jpp jtn jtp endrecord
+!record particle i id p1 p2 p3 p4 p5 fa mo c1 c2 st s n idfa idmo endrecord
+
+! alternative output (instead of "output pdg ... endrecord")
+!output osc1999a      !standart OSCAR 1999 output
+                      !3 introductory lines starting with #
+                      !per event :
+                      !(nb of recorded part)   0   (event number) (impact parameter (fm)) phi(rad))
+                      !per particle :
+                      !ipart id(PDG) ist px py pz p0 mass x y z t
+                      !0 0 (to close the file)
+
+                      !ist=0 : final particle
+                      !ist=1 : mother particle (before decay)
+

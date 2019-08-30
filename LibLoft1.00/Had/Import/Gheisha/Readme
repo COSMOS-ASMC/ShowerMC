@@ -1,0 +1,59 @@
+change from original.
+0)  All characters are converted to small letters.
+    This is due to nucrin, hadrin etc (already existing ones )
+    which are called from Gheisha.
+1)  cghe2cos.f  cgheDecay.f and ccos2gheCode are added for
+    interface with Cosmos. These have been moved to
+    Particle/Event/Interface
+2)  gutil.f is modified to call rndc instead of rnndo for 
+    uniform random number generation.
+3)  In gpghei.f, RANDO declearation is removed; it is not used.
+     gpghei returns mfp in g/cm2. This is done by giving rho = 1.
+    to GSMATE.
+4)  Somefiles (see Obso/DupSymbols) are moved to Obso/ since they are
+    defined in Import/aadn.f and aado.f  (Nucrin members)
+5)  call hadrin, call nucrin are made to call hadrinC and call nucrinC
+    when hall old Lund related external names are changed to xxxC
+---------------
+To use gheisha, one must do;
+1)  call gpart
+2)  call gheini
+
+3) To establish, matter, 
+
+	call gsmate for simple a,z
+	call gsmixt for complex matt.
+
+
+
+
+4)      call gheish(....)
+----------------------------------------------
+How to use gsmate
+
+     SUBROUTINE GSMATE(IMAT,A,Z,DENS,RADL,ABSL)
+This is to store the given material inside the subrutine with
+index imat. This material is taken out by GFMATE with a given
+index.
+
+How to use gsmixt
+
+     Entry GSMIXT(IMAT,NLMAT,WMAT,WHAT,DENS)
+
+To give compound material.  Each element should have been
+defined by gsmate before hand with index  j= what(i), where 
+i is  the i-th element of the compound.  dnes is the density.
+
+imat: the same meaning as in gsmate.
+nlmat: |nlmat| is the number of elements.  
+   if >0, wmat contains is proportion by weights of each 
+          element in the compound
+     < 0, wmat contains the number of atoms in the compound molecule.
+          should not be used.
+       
+the same as gsmate, but wmat, what, dens
+
+Gheisha particle code.  see gpart.f
+
+
+

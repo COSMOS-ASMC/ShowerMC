@@ -1,0 +1,489 @@
+      implicit none
+c           We smash the skeleton into NCPU skeeltons; but flesh (MCPU+MARGIN) skeletons
+c           and modify the  fleshed one by multiplying a factor NCPU/MCPU
+c           to the total number of particles. 
+c           We select (MCPU+MARGIN) skeletons among NCPU skeletons randomly.
+c
+c
+c       read skelton data and store each children as a complete
+c       track so that each can be put to stack area as incidnet
+c       particle.
+c    smashed skeleton data format
+c  Assume ncpu cpu's; For each cpu,  smashed skeleton files will be
+c
+c      skeleton001
+c        cumnum, num, ir, Zfirst
+c        Np
+c        observed ptcles 1
+c        observed ptcles 2
+c
+c        observed ptcles Np
+c        nlowp  
+c        track-1
+c        track-2
+c        ... 
+c        track-nlowp
+c     other skeleton file( skeleton002,...)
+c        cumnum, num, ir, Zfirst
+c        0
+c        nlowp  
+c        track-1
+c        track-2
+c        ...
+c        track-nlowp
+c        ....
+c
+#include "Ztrack.h"
+#include "Zearth.h"
+      include "../../SkelFlesh/Zprivate.h"
+      include "Zprivate2.h"
+
+
+      record /child/ cc
+      integer icon
+      integer klena
+      integer i, nlow, cumnum, num, ir(2)
+      record /track/ Zfirst
+      character*120  outdir
+      character*120 skelfilebase
+      character*100  basename
+      character*100  filename
+      character*100  input
+      character*100  hostlist
+      character*15  field(3)
+      integer n, j, k, nr, ll, kgetenv2
+
+      hostlist = ' '
+      
+      ll = kgetenv2("NCPU", msg)
+      read( msg(1:ll), *) Ncpu
+      ll = kgetenv2("SKELETON", msg)
+      skelfilebase=msg(1:ll)
+      ll = kgetenv2("SKELDIR", msg)
+      outdir = msg(1:ll)
+      ll = kgetenv2("SKELNAME", msg)
+      basename= msg(1:ll)
+      ll = kgetenv2("HOSTLIST", msg)
+      if(ll .gt. 0) hostlist = msg(1:ll)
+c        binary open
+      call copenfw2(11, skelfilebase, 2, icon)
+      if(icon .ne. 1) then
+         write(msg,*) skelfilebase(1:klena(skelfilebase)),
+     *    ' could not be opened properly'
+         call cerrorMsg(msg, 0)
+      endif
+      write(msg,*) "# of cpu's=",Ncpu
+      call cerrorMsg(msg, 1)
+      if(Ncpu .lt. 1 .or. Ncpu .gt. MaxCPU) then
+         call cerrorMsg("# of cpu's > MaxCPU <1 ",0)
+      endif
+
+c        open  output smashed skeleton files
+      k = klena(outdir)
+      if(  outdir(k:k) .ne. '/') then
+         k = k + 1
+         outdir(k:k)= '/'
+      endif
+      write(msg, '(a,a)') 'output directory is ',
+     *   outdir(1:k)
+      call cerrorMsg(msg, 1)
+      write(msg,*) Ncpu,
+     *    ' files will be created there as '//
+     *    basename(1:klena(basename))//'0001 etc' 
+      call cerrorMsg(msg, 1)
+
+c
+      if(hostlist .ne. ' ') then
+         call copenf(12, hostlist, icon)
+         if(icon .ne. 0 ) then
+            call cerrorMsg(hostlist, 1)
+            call cerrorMsg(' could not be opened', 0)
+         endif
+         do i = 1, Ncpu
+            read(12, '(a)') input
+c            input may be like:      1  hosta   2.5
+            field(1) = ' '
+            field(2) = ' '
+            field(3) = ' '
+            call ksplit(input, 30, 3, field,  nr)
+            read(field(1), '(i5)' )  numba(i)
+            if(nr .le. 2) then
+               cpupw(i) = 1.0
+            else
+               read(field(3), * )  cpupw(i)
+            endif
+         enddo
+         close(12)
+      else
+         write(0,*) ' hostlist not given'
+         stop 1234
+      endif
+
+      do i = 1, Ncpu
+         write(filename,'(a,i4.4)') 
+     *       basename(1:klena(basename)), numba(i)
+
+         skelfile(i) = outdir(1:klena(outdir))//filename
+c            We don't open files here; too  many files
+c            might not  be opened simultaneously.
+c         call copenfw2(basefn+i, skelefile, 2, icon)
+c         if(icon .ne. 0) then
+c            call cerrorMsg(skelfile(i), 1)
+c            call cerrorMsg('could not be opened properly',1)
+c            call cerrorMsg('maybe they already exist', 0)  
+c         endif
+      enddo
+
+
+c      ------------
+
+
+      do while(.true.)
+         read(11, end=100) cumnum, num, ir, Zfirst
+
+         do i = 1, Ncpu
+c                 open one file at a time and close 
+c                 if possible.
+            open(basefn+i, file=skelfile(i), access="append" , 
+     *       form="unformatted",   iostat=icon)
+
+            if(icon .eq. 0) then
+               write(basefn+i)  cumnum, num, ir, Zfirst
+            else
+               write(0,*)  skelfile(i), " could not be openee"
+               stop 0000
+            endif
+            close(basefn+i)
+         enddo
+
+         read(11) Np
+         call cerrorMsg('------------', 1)
+         write(msg, *) Np, ' ptcls are observed ones in skeleton'
+         call cerrorMsg(msg, 1)
+         if(Np .gt. Maxob) then
+            call cerrorMsg(
+     *      'It is too large; enlarge Maxob', 0)
+         endif
+
+         do i = 1, Np
+            read(11) oo(i)
+         enddo
+         nlow = 1
+         ctc=0
+         do while (nlow .ge. 0)
+            read(11) nlow, pp
+c               nlow = 0, if pp.asflag=-1.
+            do i = 1, nlow
+               read(11) cc
+               if(ctc .lt. Maxp) then
+                  ctc = ctc + 1
+                  call movetrack(cc, ct(ctc) )
+               else
+                  call cerrorMsg(
+     *                 'too many particles in skeleton',1)
+                  call cerrorMsg(
+     *            'Enlarge Maxp in Zprivate2.h', 0)
+               endif
+            enddo
+         enddo
+
+         write(msg,*)
+     *   '# of total ptcls at flesh=',ctc
+         call cerrorMsg(msg, 1)
+
+c             1 event data is ready now in oo and ct.
+c             distribute particles to ncpu
+c                  first sort ct by energy
+c///////////
+         write(0,*) ' sort by energy starts'
+         call sortbyerg
+         write(0,*) ' sort by energy ended'
+c/////////////////
+c             deploy particles to Ncpu so that
+c             sum energy on each cpu is roughly  the same
+         if(ctc .lt. Ncpu) then
+            n = ctc
+            write(msg, *) '# of ptcls < Ncpu'
+            call cerrorMsg(msg, 1)
+         else
+            n = Ncpu
+         endif
+         write(0,*) ' distribute particles to', n, ' cpus'
+         call distribute( n )
+
+         write(0,*) ' starts to write sub skeletons'
+         call memoforcpu( n )
+
+         call issuemsg(  Ncpu )
+      enddo
+
+ 100  continue
+      call cerrorMsg('all events have been smashed',1)
+c      do i = 1, Ncpu
+c         close(basefn+i)
+c      enddo
+
+      end
+c     ----------------------------
+      subroutine distribute( n )
+      implicit none
+#include "Ztrack.h"
+      include "../../SkelFlesh/Zprivate.h"
+      include "Zprivate2.h"
+      integer i, k
+      integer n, j
+      
+      do i = 1, Ncpu
+         sumergi(i)= 0.
+         sumergw(i) = 0.
+         nOnCpu(i) = 0
+      enddo
+      do i = 1, n 
+c          max energy ptcl for i-th cpu
+         sumergi(i) = erg(idx(i))
+         sumergw(i) = erg(idx(i)) / cpupw(i)
+         nOnCpu(i) = 1
+         idxlist(1, i) = idx(i)
+         idxlocal(i) = i
+      enddo
+c          if all cpupw =1, next two not needed
+      call kqsortd(sumergw, idxlocal, n)
+      call ksortinv(idxlocal, n)
+
+c///////////
+c      write(0,*) ' top E=',(sumergi(i), i=1, n)
+c      write(0,*) ' idx=',(idx(i), i=1, n)
+c////////
+c          next explanation is for cpupw = 1
+c            erg      idx     sumergi   idxlocal  nOnCpu  idxlist
+c                                                          1,1
+c        1    9         5        30       1        1       5
+c        2    1         3        18       2        1       3
+c    n   3   18         7        15       3        1       7
+c        4    5         8
+c        5   30         1
+c        6    4         4
+c        7   15
+c        8   13      
+c        .   
+c        .   
+c        .              6
+c      ctc   .          2
+c
+c after j= 4
+c    sumergi idxlocal nOnCpu  idxlist
+c                              1   2
+c     30      1        1       5
+c     18      2        1       3   
+c     28      3        2       7   8
+c  after j=5
+c    sumergi idxlocal nOnCpu  idxlist
+c                              1   2
+c     30      1        1       5
+c     27      3        2       3   1
+c     28      2        2       7   8
+c  after j=6
+c    sumergi idxlocal nOnCpu  idxlist
+c                              1   2  3
+c     30      1        1       5
+c     32      3        3       3   1  4
+c     28      2        2       7   8
+c
+      do j = n+1, ctc
+         if(n .ge. 2) then
+            if( sumergw( idxlocal(n) ) .gt.
+     *          sumergw( idxlocal(n-1) ) ) then
+               call kqsortd(sumergw, idxlocal, n)
+               call ksortinv(idxlocal, n)
+            endif
+         endif
+         k  = idxlocal(n)   
+         nOnCpu( k )  =  nOnCpu( k )   + 1
+         if( nOnCpu( k ) .gt.  MaxPtclPerCpu ) then
+            write(msg, *)
+     *      '# of ptcls on a cpu', k, '  exceeded limit=',
+     *     MaxPtclPerCpu
+            call cerrorMsg(msg, 1)
+            call cerrorMsg('Enlarge MaxPtclPerCpu in Zprivate2.h',0)
+         endif
+         idxlist( nOnCpu(k), k ) = idx(j)
+         sumergw(k) = sumergw(k) + erg(idx(j))/cpupw(k)
+         sumergi(k) = sumergi(k) + erg(idx(j))
+      enddo
+
+      end
+c     *************************
+      subroutine memoforcpu( n ) 
+      implicit none
+#include "Ztrack.h"
+      include "../../SkelFlesh/Zprivate.h"
+      include "Zprivate2.h"
+      
+      integer n
+      integer  navob, navobc, navobx
+      integer i, j, icon
+      real  avob, resob
+      real*8  u
+
+
+                        
+c          we distribute Np observed ptcls (at skeleton making time)
+c          almost equally to Ncpu cpu;
+c        number of average ptcls 
+
+c      navob = max(Np/n, 1)
+      avob = Np
+      avob = avob/Ncpu
+c      navobx = max(Np/Ncpu, 1)
+      navobx = Np/Ncpu
+c      if( Np .eq. 0 ) navobx = 0
+
+      resob = avob-navobx   !  0<= resob< 1
+
+      navobc = 0
+c/////////////////
+      write(0,*) ' navobx=', navobx, ' resob=',resob
+c///////////
+      do i = 1, Ncpu
+         navob = navobx
+         call rndc(u)
+         if( u .lt.  resob) then
+            navob = navobx + 1
+         endif
+         if(navobc+navob .gt. Np .or. i .eq. n ) then
+            navob = Np -  navobc
+         endif
+
+         open(basefn+i, file=skelfile(i), access="append",
+     *    form="unformatted",      iostat=icon)
+         if(icon .eq. 0) then
+c/////////////
+            write(0,*) ' cpu ',i, ' obs=',navob
+c//////////////
+            write(basefn+i) navob
+c
+
+            do j = navobc +1, navobc+navob
+               write(basefn+i) oo(j)
+            enddo
+            navobc = navobc + navob
+         else
+            write(0,*) ' skelfile=', skelfile(i), " cannot be opened"
+            stop 11111
+         endif
+
+c   ***      enddo
+c   ***      do i = 1, Ncpu
+ccc         if(i .eq. 1) then
+c              for the first skeleton, put observed ptcls
+cc            write(basefn+i) Np
+cc            do j = 1, Np
+cc               write(basefn+1) oo(j)
+cc            enddo
+cc         else
+cc            write(basefn+i) 0
+cc         endif
+         write(basefn+i)  nOnCpu(i)
+         do j = 1, nOnCpu(i) 
+            write(basefn+i) ct( idxlist(j, i)  )
+         enddo
+
+         close(basefn+i)
+
+      enddo
+      end
+      subroutine issuemsg( n ) 
+      implicit none
+#include "Ztrack.h"
+      include "../../SkelFlesh/Zprivate.h"
+      include "Zprivate2.h"
+      
+      integer n
+      integer i
+
+      msg = ' cpu#   cpuPW    Sum E        # of ptcls'
+c      msg = 'cpu#     Sum E      # of ptcls'
+      call cerrorMsg(msg, 1)
+      do i = 1, n
+         write(msg,'(i4, f7.1, g16.7, i9)')
+c         write(msg,'(i3, g16.7, i9)')
+     *      i, cpupw(i), sumergi(i), nOnCpu(i)
+c     *      i,  sumergi(i), nOnCpu(i)
+         call cerrorMsg(msg, 1)
+      enddo
+      end
+
+      
+      subroutine sortbyerg
+      implicit none
+#include "Ztrack.h"
+      include "../../SkelFlesh/Zprivate.h"
+      include "Zprivate2.h"
+
+      integer i
+
+      averg = 0.
+      do i = 1, ctc
+         erg(i) = ct(i).p.fm.p(4)
+         averg = averg + erg(i) 
+      enddo
+      call kqsortd(erg, idx, ctc)
+c       high to low
+      call ksortinv(idx, ctc)
+      if(ctc .gt. 0.) then
+c            average total energy on 1 cpu
+         averg = averg/ctc  * ncpu
+      else
+         call cerrorMsg('no child',1)
+         return
+      endif
+      if( erg(idx(ctc) ) .gt. averg*1.1 ) then
+c          max energy is too large. issue
+c          warning
+         write(msg,*) 'WARGNING: max E=', erg(idx(i)),
+     *   ' is > average total energy for 1 cpu=',
+     *   averg
+         call cerrorMsg(msg, 1)
+      endif
+      end
+
+      
+
+      subroutine movetrack(f, t)
+      implicit none
+#include "Ztrack.h"
+#include "Zearth.h"
+      include "../../SkelFlesh/Zprivate.h"
+      include "Zprivate2.h"
+
+      record /child/ f
+      record /track/ t
+
+      t.p.code = f.code
+      t.p.subcode = f.subcode
+      t.p.charge = f.charge
+      t.p.fm.p(1) = f.fm(1)
+      t.p.fm.p(2) = f.fm(2)
+      t.p.fm.p(3) = f.fm(3)
+      t.p.fm.p(4) = f.fm(4)
+      t.p.mass  = f.mass
+      t.pos.xyz.r(1)  = pp.posx
+      t.pos.xyz.r(2)  = pp.posy
+      t.pos.xyz.r(3)  = pp.posz
+      
+      t.pos.depth = pp.depth 
+      t.pos.height = pp.height
+      t.pos.colheight = pp.colHeight 
+      t.t = pp.atime 
+      t.where = pp.where
+      t.pos.radiallen =
+     *     Eradius + pp.height
+      t.pos.xyz.sys = 'xyz'
+      t.vec.w.sys = 'xyz'
+      t.wgt = 1.0
+      t.asflag = 0
+c      t.user = pp.user
+      call cresetDirec( t )
+      end
+
+

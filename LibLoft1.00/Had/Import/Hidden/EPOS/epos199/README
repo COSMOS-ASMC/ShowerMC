@@ -1,0 +1,49 @@
+in epos in somesystem   /bin/csh not works---> /bin/tcsh
+############################################################################
+#How to run EPOS
+#17/12/08 - Tanguy Pierog
+############################################################################
+To Compile :
+./smake
+(./smake example       (if you want to use a special interface defined in example.f))
+
+("make" can be used if you don't use the path defined in the .epos file)
+
+To run the input file "input.optns"
+./epos input
+
+Output (ASCII) in input.data
+
+(in other word : <file>.optns -> ./epos <file> -> <file>.data)
+
+Input file explained in input.optns
+
+Have fun ! :-)
+
+
+Reference :
+@Article{Werner:2005jf,
+     author    = "Werner, Klaus and Liu, Fu-Ming and Pierog, Tanguy",
+     title     = "{Parton ladder splitting and the rapidity dependence of
+                  transverse  momentum spectra in deuteron gold collisions at
+                  RHIC}",
+     journal   = "Phys. Rev.",
+     volume    = "C74",
+     year      = "2006",
+     pages     = "044902",
+     eprint    = "hep-ph/0506232",
+     archivePrefix = "arXiv",
+     doi       = "10.1103/PhysRevC.74.044902",
+     SLACcitation  = "%%CITATION = HEP-PH/0506232;%%"
+}
+@Article{Pierog:2009cb,
+     author    = "Pierog, Tanguy",
+     title     = "{Forward physics : from SPS to LHC, what can we learn from
+                  air showers ?}",
+     year      = "2009",
+     eprint    = "0906.1459",
+     archivePrefix = "arXiv",
+     primaryClass  =  "hep-ph",
+     SLACcitation  = "%%CITATION = 0906.1459;%%"
+}
+

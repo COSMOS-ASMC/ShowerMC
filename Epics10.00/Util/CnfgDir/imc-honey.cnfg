@@ -1,0 +1,88 @@
+#
+# IMC honeycomb
+#
+
+#eq subLs  45.65
+#eq subL   51.40
+#eq skint 0.052
+#eq hnL 0.3175
+#eq hnW 0.0254
+
+#inc CnfgDir/chd-subst.cnfg
+#inc CnfgDir/imc-s2ndupr.cnfg
+#inc CnfgDir/imc-s2ndlwr.cnfg
+#inc CnfgDir/imc-s3rdlwr.cnfg
+#inc CnfgDir/imc-s1stlwr.cnfg
+#inc CnfgDir/imc-s1stupr.cnfg
+
+
+#subd cfrpcorner
+##1 prism_xz  hollow 0 0 0 / 0 0 0   2.1 skint 0.0 2.1
+# imc-corner
+1 prism_xz hollow 0 0 0 / 0 0 0   0.8177669 skint 0.0 0.8177669 
+2 prism_xz Al7075 0 0 0 / 0 0 0   1.1006096 skint 0.0 1.1006096 / 1
+3 prism_xz hollow 0 0 0 / 0 0 0   2.1 skint 0.0 2.1 / 2
+#end cfrpcorner
+
+#subd substchd
+1 box CFRP 0 0 0 / 0 0 0 subL subL skint / 4
+2 chd-subst sp 0 0 0 / = = +
+3 box CFRP 0 0 0 / = = 2.048 subL subL skint / 5
+#
+4 cfrpcorner sp 0 0 0 / 0 0 0
+5 cfrpcorner sp 0 0 0 / 0 0 2.048
+#
+6 box_w sp 0 0 0 / 0 0 0
+#end substchd
+
+#subd subst2u
+1 box CFRP 0 0 0 / 5.75 5.75 0 subLs subLs skint
+2 s2ndupr sp 0 0 0 / 0 0 +
+3 box CFRP 0 0 0 / 5.75 5.75 1.808 subLs subLs skint
+4 box_w sp 0 0 0 / 0 0 0
+#end subst2u
+
+
+#subd subst3l
+1 box CFRP 0 0 0 / 0 0 0 subL subL skint / 4
+2 s3rdlwr sp 0 0 0 / = = +
+3 box CFRP 0 0 0 / = = 1.808 subL subL skint / 5
+#
+4 cfrpcorner sp 0 0 0 / 0 0 0
+5 cfrpcorner sp 0 0 0 / 0 0 1.808
+#
+6 box_w sp 0 0 0 / 0 0 0
+#end subst3l
+
+
+#subd subst2l
+1 box CFRP 0 0 0 / 0 0 0 subL subL skint / 4
+2 s2ndlwr sp 0 0 0 / = = +
+3 box CFRP 0 0 0 / = = 1.508 subL subL skint / 5
+#
+4 cfrpcorner sp 0 0 0 / 0 0 0
+5 cfrpcorner sp 0 0 0 / 0 0 1.508
+#
+6 box_w sp 0 0 0 / 0 0 0
+#end subst2l
+
+
+#subd subst1u
+1 box CFRP 0 0 0 / 5.75 5.75 0 subLs subLs skint
+2 s1stupr sp 0 0 0 / 0  0  +
+3 box CFRP 0 0 0 / 5.75 5.75 1.508 subLs subLs skint
+4 box_w sp 0 0 0 / 0 0 0
+#end subst1u
+
+
+#subd subst1l
+1 box CFRP 0 0 0 / 0 0 0 subL subL skint / 4
+2 s1stlwr sp 0 0 0 / = = +
+3 box CFRP 0 0 0 / = = 1.568 subL subL skint / 5
+#
+4 cfrpcorner sp 0 0 0 / 0 0 0
+5 cfrpcorner sp 0 0 0 / 0 0 1.568
+#
+6 box_w sp 0 0 0 / 0 0 0
+#end subst1l
+

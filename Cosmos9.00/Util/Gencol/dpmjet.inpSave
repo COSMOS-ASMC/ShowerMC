@@ -1,0 +1,79 @@
+**********************************************************************
+* Example for a DTUNUC input file.
+* Uncomment the input-cards according to your requirements.
+*
+* Format: A10,6E10.0,A8
+*        (except for the section enclosed by "PHOINPUT" and "ENDINPUT"
+*         which is format-free)
+*         lines starting with "*" are comment lines
+**********************************************************************
+*
+* projectile / target
+* -------------------
+
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7...
+PROJPAR         1.0	  1.0	                                      
+TARPAR          1.0       1.0
+*
+* energy of interaction
+* ---------------------
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7...
+*          roots 7 TeV 3.5TeV x 3.5TeV 
+ENERGY     2.6112e7  
+
+*         roots 53 GeV (26.5x26.5)
+* ENERGY     1497.85
+*
+*         roots 200    (100x 100)
+* ENERGY    21316.73
+*
+*         roots 546 GeV (273 x273)
+* ENERGY    158865.3
+*
+*         roots 630 GeV (315 x315 )
+*ENERGY    211506.8
+*
+*         roots 900 GeV 450 GeV x 450GeV
+* ENERGY      431646
+*
+*         roots 2.36 TeV      1.18TeV x 1.18TeV
+* ENERGY     2968100
+*          
+*          roots 7 TeV 3.5TeV x 3.5TeV 
+* ENERGY     2.6112e7  
+*          roots 14 TeV
+*  ENERGY     1.045e8  
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7...
+* diffractive event spec. if first one is 1.  single diff. may occure
+*         but result sometimes strange (only 1 ptcl appears)
+*         if second one is  1,  double diff. may occure. but strange
+*         if first one is 2, forced single diff.  but completely strange.
+*         
+*         even if these are not spcecifed, diff. seems to take palce 
+*         ****so don't use next ***** 
+*         Instead, see IDPROCE etc (see Gencol2.f)
+*  DIFFRACT      1          0
+*
+*   syout--> errorout for Jetset/pythia; no ouput from 
+*      suppress message from Lund
+LUND-MSTU       12.0         0.0
+LUND-MSTU       11.0         0.0
+LUND-MSTU       127.0        0.0
+LUND-MSTU       122.0        0.0
+*
+* PHOJET-specific input
+*
+PHOINPUT
+PROCESS           1 1 1 1 1 1 1 1
+ENDINPUT
+*
+* Output
+* ------
+*   some default output (particle multiplicities etc.)
+* HISTOGRAM      101.0     102.0
+*
+* Start of event generation
+* -------------------------
+START      10000000.       0.0
+STOP
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7...

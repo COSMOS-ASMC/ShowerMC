@@ -1,0 +1,56 @@
+ IntModel = '"qgsjet1"'
+ IntModel = '"qgsjet2"'
+ IntModel = '"dpmjet3"'
+ IntModel = '"sibyll"'
+
+ $PARAM
+ DestEventNo = 10000, 100
+ InitRN = 3335431, -777663,
+ IntModel = '"epos"'
+ Trace = 0,
+ TraceDir = './'
+ SeedFile ='  '
+ $END
+
+ $HPARAM
+ UserHookc ='6 1  1   0.  0   6500.',
+            '6 1  1   0.  0  -6500.',
+
+ UserHookr = -1.0 1.0 100
+ UserHooki = 0 0
+ $END
+make Trace non zero if you want to check the interaction visually.
+	(Use disptarcebygeomv in  Epics/Util/Geomview)
+TraceDir is the directory where trace informatin is put.
+UserHookc:  first line is to specify the projectile.  
+     	       code subcode charge px, py, pz  (GeV);  ptcl moves  +z direction 
+            second line is for the target.
+	       the same as projectile .  -z is the particle direction
+            third line. usually may be absent. If exists, the three real values
+            show the collision point (x,y,z) in cm. If absent, no output for 
+            xyz. (You can also give the position at Epics run thru sepicsfile).
+     ***If you want to change the projectile and target info event by event,
+	you may prepare an ascii file which containes  sets of such two (or 3) lines,
+	(without ') and give following two lines here.
+       UserHookc ='file 52  xyz', 'collision.dat'
+       where "file" must be given as it is, 52 is the number used to open/read
+       the file (logical number; so you may give a different number),
+       "xyz" must present only if you give the collision point info.
+       The second argument "collision.dat" is a file name in which you prepare
+       the projectile and target info. (so the name may be different).
+       Then event generation will continue until EOF is reached or DestEventNo
+	is reached.	
+UserHookr: Output is made for particles within certain range of angles relative to
+        the z-axis  The min and max of such angles are specified by direction cosines
+        relative to the z-axis.
+       First two show such cosine values (min and max).
+       If want to select only those going +z direction, use 0., 1.0
+       3rd one is the length of the track to visualize the collision.
+UserHooki:  First one: If non-zero, Energy to be given in the dpmjet.inp will be
+        shown as /nucleon energy (GeV). and the program run stops there.
+        If zero, program will generate events.
+
+       Second one: Output will contain one blank line at the end of each event.
+         If second one is non-zero, there will be no blank line, if there is
+         no particle to be written.
+

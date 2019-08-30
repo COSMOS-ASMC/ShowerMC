@@ -1,0 +1,40 @@
+The IBM-AIX user should have already  issued the command IBM so that
+chook.f.org has been created to keep the original chook.f and
+current chook.f is a copy of chook.f.IBM.
+
+1) To make the executable, cosmos${ARCH}
+  make clean
+  make [ -f chook.mk ]
+
+2) If you don't have /tmp/loginname directory, make it
+(loginname is your login name)
+
+3) If this is successful, then you can run it by
+
+  cosmos{$ARCH} < param
+
+This will show some output on the screen and put particle
+track info (trace) in /tmp/loginname/trace1, trace2.  
+
+4)  You can display the trace by gnuplot.  
+   Cosmos/Util/slide will work for display.
+
+  The format of the output is:
+
+  x y z code E charge
+  x y z code E charge
+  x y z code E charge
+
+  x y z code E charge
+  x y z code E charge
+  x y z code E charge
+  x y z code E charge
+  x y z code E charge
+...
+
+Two blank lines are to separate the segment of lines. 
+Consecutive data lines make one continuos track, though
+it may have zigzag shape.  code is the paticle code.
+1-gamma 2-electron 3-mu  4-pi  5-kaon 6-nucleon
+7-neue  8-neumu
+For further code definition, see $COSMOS/cosmo/Zcode.h

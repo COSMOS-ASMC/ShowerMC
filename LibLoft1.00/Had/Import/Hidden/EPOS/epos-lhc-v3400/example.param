@@ -1,0 +1,10 @@
+echo on
+
+switch fusion on
+set istmax 1
+
+
+echo off
+
+!the next line is mandatory, don't forget it
+EndEposInput

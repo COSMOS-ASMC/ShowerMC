@@ -1,0 +1,22 @@
+
+*               ityp :  description
+*                 1  :  proton 
+*                 2  :  neutron                                                
+*                 3  :  pion (+)                                               
+*                 4  :  pion (0)                                               
+*                 5  :  pion (-)                                               
+*                 6  :  muon (+)                                               
+*                 7  :  muon (-)                                               
+*                 8  :  kaon (+)                                               
+*                 9  :  kaon (0)                                               
+*                10  :  kaon (-)
+*                11  :  other
+*                12  :  electron                                               
+*                13  :  positron
+*                14  :  photon
+*                15  :  deuteron
+*                16  :  triton                                                 
+*                17  :  3He                                                    
+*                18  :  Alpha                                                  
+*                19  :  Neucleus
+*                20  :  All

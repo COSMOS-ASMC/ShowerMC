@@ -1,0 +1,2 @@
+echo "dpmjet.inp" | ./mkglauberPCLinuxIFC64 2> err
+

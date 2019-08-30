@@ -1,0 +1,8 @@
+Standard atmosphere.
+  If the current model is "1: Standard", the parameter
+  "AtmosFile" in the namelist &HParam may be blank, i.e
+  AtmosFile=" ".  This is equivalent to giving
+  AtmosFile="$LIBLOFT/Data/Atmos/stdatmos1.d"
+
+
+  

@@ -1,0 +1,48 @@
+      structure /xxxx/
+         real*4 z
+         integer j
+      end structure
+----------------- this must be converted as
+
+struct xxxx {
+  float z;
+  int j;
+} ;
+
+===================
+      structure /yyyy/
+         record /xxxx/  a1, a2
+         real*4  a3
+      end structure
+------------------- this must be converted as
+
+struct yyyy {
+  struct xxxx a1, a2;
+  float a3;
+};
+
+======================
+
+      record  /yyyy/ ppp
+      common /abc/ ppp
+-------------------- this must be converted as
+extern struct {
+  struct yyyy ppp;
+} abc_;
+
+==================
+usage is as follows:
+
+#include <stdio.h>  
+void xyz_(float *x, float *y, int *i){
+  printf(" in C  z j %f %d\n", abc_.ppp.a1.z, abc_.ppp.a2.j);
+  printf(" a3 %f\n", abc_.ppp.a3);
+  printf(" in C XYZ %f %f %d\n", *x, *y, *i);
+  *x = 10.0;
+  *y = 20.0;
+  *i = 30.0;
+  pqr_( x, i);
+  printf(" in C  after pqr %f %d\n", *x, *i);
+ }
+
+

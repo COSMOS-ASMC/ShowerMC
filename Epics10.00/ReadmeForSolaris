@@ -1,0 +1,127 @@
+Module/epidentify.f90
+All
+ intent(...),pointer 
+becomes error.
+#if defined (Solaris)
+  intent(...) was removed.
+#else
+  intent(...),pointer..
+#endif
+
+
+prog/epModify.f90
+  module epModify
+    implicit none
+#if defined (Solaris)    
+#else
+    private  
+#endif
+
+
+eprcnf.f
+              ... +
+     *         + Borg(1)
++ in cont line is dropped  (alos for Borg(2) and Borg(3))
+
+
+epModify.f90
+  character*16,save:: Field(nfmax)
+conflicts with the one Zcnfig.h  so modified to
+  character*16,private,save:: Field(nfmax)
+
+  integer,parameter:: iowk=11
+conflicts with the one in ZepManager.h,  so modified to
+  integer,private,parameter:: iowk=11
+
+ep_honeycomb.f
+  comment continuation not recogized.
+! honeycomb_zx  SCIN    0  0  0 /  7   5  6  -60 1 0.6  10  0.05 0\  
+ .5 60  0.3 30 
+must be
+! honeycomb_zx  SCIN    0  0  0 /  7   5  6  -60 1 0.6  10  0.05 0\  
+! .5 60  0.3 30 
+
+
+ep_sqTccl.f
+ asin cannot be used so
+before module definition
+#include "Zcondc.h" is inserted and
+
+#if defined (MATHLOUSY)
+      real(8),parameter:: hpi = 1.57079632679489661923d0
+#else
+      real(8),parameter:: hpi = asin(1.0d0)
+#endif
+
+In Module/epLightCounter.f90
+next modification done
+!     real(4),allocatable:: pet   !  sum of above pe.  
+! Solaris accepts above but actual alloc/dealloc is not  
+!        permited for single varialbe. stupid    
+     real(4):: pet   !  
+Correspondingly in prog/Light/epLighti1ev.f90 and
+                              epLightAtSensor.f
+allocate/deallocate sentences including pet are commented.
+***** when xxx%pe is allocated, xxx%pet should  also
+      must be allocated. If this is ok or not is not
+      yet clear.  If N.G we must define pet as pet(1)
+      and treat is as array.
+ 
+
+prog/Light/epLightAtBndry.f
+At top 
+#include "Zcondc.h" is inserted and next modification done
+   
+
+#if defined MATHLOUSY
+      real(8),parameter::cos45=7.071067811865475244d-1
+#else
+      real(8),parameter::cos45=sqrt(2.d0)/2.d0
+#endif
+
+
+
+in prog/Light/epLightStack.f; next modification done at two points
+
+#if !defined Solaris
+     *           recordsize=size)
+#else
+     *           RECL=size)
+#endif
+
+----------------
+prog/Elemag/epdedxNone.f
+At top, 
+#include "Zcondc.h" is inserted and next modification done.
+
+#if defined MATHLOUSY
+      real(8),parameter:: logbbbeta =-3.10109278921181729466d0
+      real(8),parameter:: loglindbeta =-5.40367788220586297868d0
+#else
+      real(8),parameter:: logbbbeta =log(bbbeta)
+      real(8),parameter:: loglindbeta =log(lindbeta)
+#endif
+
+use epModify was modified like below (two points)
+     use epModify,idmodiy=>id
+so that id  here is different from id in epModify.
+(which is not used here).
+
+-------------
+KKlib/kcubicEq.f90
+At top 
+#include "Zcondc.h" is inserted and following mod. done
+
+#if defined MATHLOUSY
+    real(8),parameter::sq3=1.73205080756887729353d0
+#else
+    real(8),parameter::sq3=sqrt(3.d0)
+#endif
+
+--------------------
+When Zcondc.h  is inserted, comment line starging with
+c 
+becomes error. So all comment lines starting with c
+is changed to start with !.
+----------
+ 

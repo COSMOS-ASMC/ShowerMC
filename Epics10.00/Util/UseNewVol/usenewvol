@@ -1,0 +1,13 @@
+#!/bin/csh -f
+if ( $#argv != 1) then
+	echo "Usage: usenewvol  configpass"
+	exit 1
+endif
+
+./mkNewVolume  $1
+# (cd ..;  make)
+(cd $EPICSTOP/Util/DrawConf/ ; make clean; make -f drawConfig.mk )
+
+
+
+

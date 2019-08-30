@@ -1,0 +1,126 @@
+
+### SciFi #####
+
+## X ##
+#subd xSciFi8
+1 box  SciFi  0  2  0 / 0   0   0   SciFiXsec  SciFiL  SciFiXsec 
+2 box  SciFi  0  2  0 / +spSciFi   =   =   =  =  = 
+3 box  SciFi  0  2  0 / +spSciFi   =   =   =  =  = 
+4 box  SciFi  0  2  0 / +spSciFi   =   =   =  =  = 
+5 box  SciFi  0  2  0 / +spSciFi   =   =   =  =  = 
+6 box  SciFi  0  2  0 / +spSciFi   =   =   =  =  = 
+7 box  SciFi  0  2  0 / +spSciFi   =   =   =  =  = 
+8 box  SciFi  0  2  0 / +spSciFi   =   =   =  =  = 
+9 box_w  sp  0  0  0 / 0   0   0 
+#end xSciFi8
+
+#subd xSciFi64
+1 xSciFi8 sp 0 0 0 /    0  0  0
+2 xSciFi8 sp 0 0 0 / +spSciFi  =  =
+3 xSciFi8 sp 0 0 0 / +spSciFi  =  =
+4 xSciFi8 sp 0 0 0 / +spSciFi  =  =
+5 xSciFi8 sp 0 0 0 / +spSciFi  =  =
+6 xSciFi8 sp 0 0 0 / +spSciFi  =  =
+7 xSciFi8 sp 0 0 0 / +spSciFi  =  =
+8 xSciFi8 sp 0 0 0 / +spSciFi  =  =
+9 box_w sp 0 0 0 /  0  0  0
+#end xSciFi64
+
+#subd xSciFi
+1 xSciFi64 sp 0 0 0 /    0  0  0
+2 xSciFi64 sp 0 0 0 / +spSciFi  =  =
+3 xSciFi64 sp 0 0 0 / +spSciFi  =  =
+4 xSciFi64 sp 0 0 0 / +spSciFi  =  =
+5 box_w sp 0 0 0 /  0  0  0
+#end xSciFi
+
+## Y ##
+#subd ySciFi8
+1 box  SciFi  0  2  0 / 0   0   0   SciFiL  SciFiXsec  SciFiXsec 
+2 box  SciFi  0  2  0 / = +spSciFi  =   =  =  =
+3 box  SciFi  0  2  0 / = +spSciFi  =   =   =  =
+4 box  SciFi  0  2  0 / = +spSciFi  =   =   =  =
+5 box  SciFi  0  2  0 / = +spSciFi  =   =   =  =
+6 box  SciFi  0  2  0 / = +spSciFi  =   =   =  =
+7 box  SciFi  0  2  0 / = +spSciFi  =   =   =  =
+8 box  SciFi  0  2  0 / = +spSciFi  =   =   =  =
+9 box_w  sp  0  0  0 / 0   0   0 
+#end ySciFi8
+
+#subd ySciFi64
+1 ySciFi8 sp 0 0 0 /  0    0   0
+2 ySciFi8 sp 0 0 0 /  =  +spSciFi  =
+3 ySciFi8 sp 0 0 0 /  =  +spSciFi  =
+4 ySciFi8 sp 0 0 0 /  =  +spSciFi  =
+5 ySciFi8 sp 0 0 0 /  =  +spSciFi  =
+6 ySciFi8 sp 0 0 0 /  =  +spSciFi  =
+7 ySciFi8 sp 0 0 0 /  =  +spSciFi  =
+8 ySciFi8 sp 0 0 0 /  =  +spSciFi  =
+9 box_w sp 0 0 0 /  0  0  0
+#end ySciFi64
+
+#subd ySciFi
+1 ySciFi64 sp 0 0 0 /   0    0    0
+2 ySciFi64 sp 0 0 0 /   =  +spSciFi   =
+3 ySciFi64 sp 0 0 0 /   =  +spSciFi   =
+4 ySciFi64 sp 0 0 0 /   =  +spSciFi   =
+5 box_w sp 0 0 0 /  0  0  0
+#end ySciFi
+
+
+#subd IMCtop
+1 box Acrylic 0 0 0 / -14.8 -14.8 0 27.6 2 0.6
+2 box Acrylic 0 0 0 /  12.8 -14.8 = 2 27.6 0.6
+3 box Acrylic 0 0 0 / -12.8  12.8 = 27.6 2 0.6
+4 box Acrylic 0 0 0 / -14.8 -12.8 = 2 27.6 0.6
+5 box Acrylic    0 0 0 / -12.8 -12.8 0 25.6 25.6 0.2
+6 xSciFi sp 0 0 0 / = = +
+7 ySciFi sp 0 0 0 / = = +
+8 box Acrylic    0 0 0 / -12.8 -12.8 + 25.6 25.6 0.2
+9 box_w sp 0 0 0 / 0 0 0
+#end IMCtop
+
+#subd IMCmid
+1 box Acrylic 0 0 0 / -14.8 -14.8 0 27.6 2 0.6
+2 box Acrylic 0 0 0 /  12.8 -14.8 = 2 27.6 0.6
+3 box Acrylic 0 0 0 / -12.8  12.8 = 27.6 2 0.6
+4 box Acrylic 0 0 0 / -14.8 -12.8 = 2 27.6 0.6
+5 box W    0 2 0 / -12.8 -12.8 0.05 25.6 25.6 0.15
+6 xSciFi sp 0 0 0 / = = +
+7 ySciFi sp 0 0 0 / = = +
+8 box Acrylic    0 0 0 / -12.8 -12.8 + 25.6 25.6 0.2
+9 box_w sp 0 0 0 / 0 0 0
+#end IMCmid
+
+#subd IMCbot
+1 box Acrylic 0 0 0 / -14.8 -14.8 0 27.6 2 0.9
+2 box Acrylic 0 0 0 /  12.8 -14.8 = 2 27.6 0.9
+3 box Acrylic 0 0 0 / -12.8  12.8 = 27.6 2 0.9
+4 box Acrylic 0 0 0 / -14.8 -12.8 = 2 27.6 0.9
+5 box W    0 2 0 / -12.8 -12.8 0.15 25.6 25.6 0.35
+6 xSciFi sp 0 0 0 / = = +
+7 ySciFi sp 0 0 0 / = = +
+8 box Acrylic    0 0 0 / -12.8 -12.8 + 25.6 25.6 0.2
+9 box_w sp 0 0 0 / 0 0 0
+#end IMCbot
+
+#subd imc
+1 IMCtop sp   0 0 0 / 0 0 0
+2 box hollow  0 0 0 / -14.8 -14.8 + 29.6 29.6 1.25
+3 IMCmid sp   0 0 0 / 0 0 +
+4 box hollow  0 0 0 / -14.8 -14.8 + 29.6 29.6 1.25
+5 IMCmid sp   0 0 0 / 0 0 +
+6 box hollow  0 0 0 / -14.8 -14.8 + 29.6 29.6 1.25
+7 IMCmid sp   0 0 0 / 0 0 +
+8 box hollow  0 0 0 / -14.8 -14.8 + 29.6 29.6 1.25
+9 IMCmid sp   0 0 0 / 0 0 +
+10 box hollow 0 0 0 / -14.8 -14.8 + 29.6 29.6 1.25
+11 IMCmid sp  0 0 0 / 0 0 +
+12 box hollow 0 0 0 / -14.8 -14.8 + 29.6 29.6 1.25
+13 IMCmid sp  0 0 0 / 0 0 +
+14 box hollow 0 0 0 / -14.8 -14.8 + 29.6 29.6 0.95
+15 IMCbot sp  0 0 0 / 0 0 +
+16 box hollow 0 0 0 / -14.8 -14.8 + 29.6 29.6 1.05
+17 box_w sp   0 0 0 / 0 0 0
+#end imc
+

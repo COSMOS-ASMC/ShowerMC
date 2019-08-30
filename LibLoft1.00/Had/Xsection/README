@@ -1,0 +1,81 @@
+ctotx.f
+Basic St for proj.  x  and target p is obtained. 
+For A target, 
+  St(xp) is converted to A target.
+  (St(pp) may be average of pp and np) 
+
+St(pp) is obtained by PGD formula when  Pp>2TeV,  by table Pp>0.4GeV and by
+Sel(pp) below that. (i.e Sinel=0 there).
+
+Sel(pp) is by table below Pp=2TeV. Above that, 
+   Sel(pp)=St(pp,p) * Sel(pp,p=2TeV)/St(pp,p=2TeV)
+
+Sinel(pp) is by St(pp) - Sel(pp)
+
+
+Sinel(pA);
+  Sinel(pp)  is converted to A target.   Sinel(pp) may be (Sinel(np) + Sinel(pp))/2
+
+
+
+
+The basic xsection routines are in
+
+         cppXsec0.f
+
+which includes:
+
+  p-p, pb_p, pi- p, pi+ p, k- p, k+ p
+
+at  energies below 100 GeV by tables or formulas. 
+AT higher energies, Particle data group formulas are used.
+But they must not be used at e > 2x10**6 GeV for Pbar P and
+e > 500 GeV for others.
+
+These can be used for other incident particle or neutron target case.
+
+         cppXsec.f
+
+is for the entire energy region for the same collisions. At energies
+> 1000 GeV (for pp,pbarp), or > 500 GeV (for others),
+  if IncreaseXsec == 1 (default),
+the power dependence of the lab energy is assumed. 
+The power index is Deltpp, Deltpip, Delkp; defaults are
+given by the block data 'blkxsectionp' in this file.
+
+         cprotonAXsec.f
+
+includes routines for a neucleus target case.  The value is
+calculated from proton target case with a conversion process to
+neuclus target case, which was made by some Glaubar theoretic
+calculation.
+
+         cxp2xAXsec.f
+
+is for converting x-p xsection into x-A xsection.
+
+         xp2xA.eps 
+
+is to show calculated results for various vaulues of the proton target
+xsection into neuclus target.
+
+
+Example of Pbar -p and pbar air cross section
+
+
+                momemtum GeV/c       pbar-p mb           pbar-air mb
+ antip p =  20.4636048582137 xsxp=  39.2703450209532 xs=  289.596463219352
+ antip p =  13.1435415901318 xsxp=  41.3400871661774 xs=  296.488469873637
+ antip p =  10.4650922923639 xsxp=  42.6405422011888 xs=  300.671424752326
+ antip p =  8.51164932889355 xsxp=  43.9886033577564 xs=  304.894840193714
+ antip p =  6.29906698775885 xsxp=  46.2984030249793 xs=  311.881346782266
+ antip p =  6.27392570027126 xsxp=  46.3322334956449 xs=  311.981436636977
+ antip p =  5.70402661597025 xsxp=  47.1648882840341 xs=  314.425332687015
+ antip p =  3.86545696820468 xsxp=  51.1898484665502 xs=  325.738442537117
+ antip p =  2.95587042177492 xsxp=  54.6979506116936 xs=  334.984582355119
+ antip p =  2.46594620411520 xsxp=  57.5088042148580 xs=  342.025038173995
+ antip p =  1.79068507501717 xsxp=  63.6101997686763 xs=  356.316249170876
+ antip p =  1.45506707546931 xsxp=  68.5806723166984 xs=  367.081431355479
+ antip p =  .448176225721939 xsxp=  129.075209098377 xs=  460.355523164600
+ antip p =  .201452624359320 xsxp=  249.554331003989 xs=  561.242988536569
+ antip p =  .119241085714415 xsxp=  413.534715981282 xs=  639.986170504101

@@ -1,0 +1,4 @@
+V2 65 65 9 /home/Users/kasahara/Cosmos7.53/UserHook/FirstKiss/src/kgetenv.c /home/Users/kasahara/Cosmos7.53/UserHook/FirstKiss/src/kgetenv.c kgetenv_ 14 6 1 E 0 32 getenv(E) 2 38 strcpy(E)
+V2 65 65 9 /home/Users/kasahara/Cosmos7.53/UserHook/FirstKiss/src/kgetenv.c /home/Users/kasahara/Cosmos7.53/UserHook/FirstKiss/src/kgetenv.c kgetpid_ 53 2 1 E
+V2 65 65 10 /home/Users/kasahara/Cosmos7.53/UserHook/FirstKiss/src/kgetenv.c /home/Users/kasahara/Cosmos7.53/UserHook/FirstKiss/src/kgetenv.c kgettime_ 70 3 1 E 0 74 time(E)
+V2 65 65 9 /home/Users/kasahara/Cosmos7.53/UserHook/FirstKiss/src/kgetenv.c /home/Users/kasahara/Cosmos7.53/UserHook/FirstKiss/src/kgetenv.c kgetnow_ 93 5 1 E 0 99 time(E) 1 101 sprintf(E) 2 105 strncpy(E)

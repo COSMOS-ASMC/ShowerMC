@@ -1,0 +1,142 @@
+c      subroutine epbndry(pos, icon)
+      subroutine epbndry(pos, el, icon)
+      implicit none
+#include "ZepTrackp.h"
+#include "ZepTrackv.h"
+#include "Zcnfig.h"
+c
+c       current track pos is assumed to be inside the current
+c       component. 
+c       get the crossing point of cTrack extending from the current
+c       location with a given direction
+c
+      record /epPos/ pos ! output. obtained crossing point 
+                         ! in the current local coord.
+      integer icon   !  output 0 --> normal. pos, el found
+                     !         1 --> something wrong. adjuested safely.
+                     !               pos. el obtained  
+                     !         2---> ptcl is near void and judged
+                     !               inside at some place and
+                     !               in void at other place. so 
+                     !               discard it.
+      character*120 msg
+      real*8  tmpel, el2, el
+      integer i, cnxx, j, cnx, jcon
+      record /epPos/postemp
+      record /epDirec/ dirtemp
+c          present comp, boundary
+      call epbndry2(Cn, el, jcon)
+      if(jcon .ne. 0) then
+c               No boundary found in the  present comp. strange.
+c         This happens if a partcle is on a boundary or 
+c         very near to the boudnary.  We can adust the  position
+c         etc and continue the execution.
+c         However, this also happens if a wrong incident direcion is given,
+c         too or by some unkown reason. So we count the occurence / event
+c         issue messages.
+         Bndryerr = Bndryerr + 1    ! count it
+         call eppos2cn(Cn, cTrack, cnxx)
+         if(cnxx .ge. Det.nct) then
+            icon = 2
+            return !  *******
+         endif
+         call cerrorMsg(' ',  1)
+         call cerrorMsg(
+     *    'If following message comes out at the very beginning of', 1)
+         call cerrorMsg(
+     *    ' an event, better to suspect that your incident particle',1)
+         call cerrorMsg(
+     *    'direction might be wrong; check it.!!!!!', 1)
+         call cerrorMsg(
+     *    'If not,  a particle on or very near to a ', 1)
+         call cerrorMsg(
+     *    'component boundary might have buffalloed Epics.' , 1) 
+         call cerrorMsg(
+     *    'Epics is expected to recover the matter safely.', 1)
+         call cerrorMsg(
+     *    'However, some unknown cause may lead to this, ', 1)
+         call cerrorMsg(
+     *    'so check the coordinate below, if they are very ',1)
+         call cerrorMsg(
+     *    'near to the boundary, it will  be ok', 1)
+         call epfordebug('epbndry')
+!         write(msg, *) ' Cn for current pos=',Cn, ' name=',
+!     *     Det.cmp(Cn).struc, ' which should be ', cnxx, ' ',
+!     *     Det.cmp(cnxx).struc
+!         call cerrorMsg(msg, 1)
+!         write(msg,*) 'local x y z=', cTrack.pos.x, cTrack.pos.y,
+!     *        cTrack.pos.z
+!         call cerrorMsg(msg, 1)
+!         write(msg,*) 'local Move.Track.pos =', Move.Track.pos.x,
+!     *        Move.Track.pos.y, Move.Track.pos.z
+!         call cerrorMsg(msg, 1)
+!         write(msg,*) 'local cTrack wx.y,z=',cTrack.w.x,
+!     *        cTrack.w.y, cTrack.w.z
+!         call cerrorMsg(msg, 1)
+         write(msg,*) 'NOTE: local above means local coordinate'
+         call cerrorMsg(msg, 1)
+         write(msg,*) '  so  if component name has "_", it is different'
+         call cerrorMsg(msg, 1)
+         write(msg,*) '  from  canonical coordinate'
+         call cerrorMsg(msg, 1)
+         write(msg,*) ' cTrack T.E=',cTrack.p.fm.p(4), ' Move TE=',
+     *        Move.Track.p.fm.p(4),  ' code=',cTrack.p.code,
+     *      ' subcode=', cTrack.p.subcode,' chg=',cTrack.p.charge
+         call cerrorMsg(msg,1)
+         call cerrorMsg('-------------------------------',1)
+         if( Bndryerr  .gt. 
+     *       max(int(10*Total1ryE/100), 10) ) then
+            call cerrorMsg('too many boundary error', 0)
+         endif
+         if(Cn .ne. cnxx) then
+            cTrack.cn = cnxx
+            call epl2w(Cn, cTrack.pos, postemp)
+            call epw2l(cnxx, postemp,  cTrack.pos)
+
+            call epl2wd(Cn, cTrack.w,  dirtemp)
+            call epw2ldm(cnxx, dirtemp, cTrack.w, cTrack.p)
+            pos = cTrack.pos
+            call epnewComp(cTrack)
+         else
+            pos = cTrack.pos
+            cTrack.pos.x = cTrack.pos.x - EpsLeng*cTrack.w.x
+            cTrack.pos.y = cTrack.pos.y - EpsLeng*cTrack.w.y
+            cTrack.pos.z = cTrack.pos.z - EpsLeng*cTrack.w.z
+         endif
+         el = EpsLeng
+         icon = 1
+         jcon = 0
+         CrossMode = 0
+      else
+         CrossMode = 0
+c          partial  container's boundary, if any, may be closer
+         do j = 1, Det.cmp(Cn).NPContainer
+c((((((((((
+c           cnx = Det.cmp(Cn).PContained(j)
+            cnx = CnArea(Det.cmp(Cn).PContained+j)
+c))))))))))))
+            call  epbndry2(cnx,  el2, jcon)
+            if(jcon  .eq. 0) then
+               if(el2 .lt.  el) then
+                  el = el2
+                  CrossMode = 2
+               endif
+            endif
+         enddo
+c          Matreska may be in between
+         do i = 1, Det.cmp(Cn).NMatreska
+c((((((((((((((((
+c           call epbndry2(Det.cmp(Cn).Contains(i),  tmpel, jcon)
+            call epbndry2(CnArea( Det.cmp(Cn).Contains+i),  tmpel, jcon)
+c))))))))))
+            if(jcon .eq. 1 .and. tmpel .lt. el) then
+               el = tmpel
+               CrossMode = 1
+            endif
+         enddo
+         pos.x = cTrack.pos.x + el*cTrack.w.x
+         pos.y = cTrack.pos.y + el*cTrack.w.y
+         pos.z = cTrack.pos.z + el*cTrack.w.z
+         icon = 0
+      endif
+      end

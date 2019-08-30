@@ -1,0 +1,16 @@
+appearance {
+        +edge
+	shading smooth
+	material { ambient  0.75 1.0 0.75 
+		   edgecolor 1 1 1
+	}
+}
+UCMESH
+2 2
+#  x        y       z      R   G   B 
+-200.  -200.  -5.00        1  1  1 1  1 1 1
+ 200.  -200.  -5.00       1  1 1 1  1 1 1
+
+-200.   200.  -5.0       1 1  1 1  1 1 1
+ 200.   200.  -5.0      1 1  1 1  1 1 1
+

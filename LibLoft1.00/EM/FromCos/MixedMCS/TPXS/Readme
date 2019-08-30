@@ -1,0 +1,21 @@
+For input/output
+area : in cm2
+E :     eV
+1)cixsec or cixsec2
+  This is needed in the test prog.
+2) cmkTPXSconst
+     allocate  TPXSnega
+     call cMWconstForMedia(TPXSnega)
+     same for TPXSposi
+           3)cMWconstForMedia
+	     read S0,S1,S2 for each elem.
+	     add them for the media 
+             call  cPrepIntpTPXS( thatmedia )
+             
+             get A0,A,B
+	     
+             get spline coef.  for A0, A, B <mu> <mu2>
+
+             4)  cPrepIntpTPXS
+               make logKEele  
+               take log of S0, S1, S2; make spline coef for them.

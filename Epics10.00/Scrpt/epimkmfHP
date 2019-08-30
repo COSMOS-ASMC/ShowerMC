@@ -1,0 +1,38 @@
+#!/usr/local/bin/tcsh -f
+#   mkmf for epics
+#   usage:  epimkmf   or  epimkmf -l
+#
+     if($#argv == 0) then
+	     mkmf -F $EPICSTOP/Template.mk "FFLAGS=-I$EPICSINC -I$COSMOSINC"
+     else	
+	     mkmf $argv -F $EPICSTOP/TemplateLib.mk "FFLAGS=-I$EPICSINC -I$COSMOSINC"
+     endif
+
+     if($#argv != 0 ) then
+
+#            replace   xxxxx.o:  ysksls.h   etc  by $(LIBRARY)(xxxxx.o): ysksls.h  etc
+
+	sed 's/^\([A-Za-z0-9]\{1,\}\.o\)/$(LIBRARY)(\1)/g' Makefile > tempMake
+
+#            create    $(LIBRARY):                     \
+#                                  $(LIBRARY)(xxxx.o)  \
+#                                 ...
+#                                  $(LIBRARY)(yyyxxxx.o) 
+#   this is the target.
+
+	echo ""  >> tempMake
+	echo '$(LIBRARY):         \\' >> tempMake
+	set ff=`ls | grep  "\.f"`
+	if($#ff != 0) then
+		foreach f (*.f)
+			echo '               $(LIBRARY)'"($f:r.o) \\" >> tempMake
+	        end	
+	endif	
+	sed '$ s/\\//' tempMake > Makefile
+     endif
+
+     sed  's|'$EPICSINC'|\$(EPICSINC)|g'  Makefile  > tempMake
+     sed  's|'$COSMOSINC'|\$(COSMOSINC)|g'  tempMake  >! Makefile
+
+     rm tempMake
+exit 0

@@ -1,0 +1,239 @@
+!         this may be used from ephook.f
+!         incident is assumed to be a neutrio
+!      Suupose a newtrino passes thru  many componests
+!      we see it runs in many different media. The path
+!      is devided into many segments, each of which consists
+!      of the same medium.  If medium changes or component
+!      number changes during the path, segment becomes different.
+!
+      module  epModGeometry
+      implicit none
+
+      real(4),allocatable:: MatLen(:)  !cm-length of each segment
+      real(4),allocatable:: MatGrm(:)  ! its g/cm2 equivalent
+      real(4),allocatable:: MatRL(:)  ! its r.l equivalent
+      real(4),allocatable:: MatPos1(:,:) ! (1:3,:) is coord of
+               !  segment starting  point. each segment
+      real(4),allocatable:: MatPos2(:,:)  ! ending point
+      integer,allocatable:: MatCn(:)   !  component # of the segment
+      character(12),allocatable:: MatName(:) ! media name
+      real(8),save:: InciDir(3), InciPos(3)  ! Incident direction
+                         ! cosine, and pos.  Always world coord.
+      real(8),save:: tempPos(3)  ! working array to save position
+      real(8),save:: ZeroLeng   ! EpsLeng(in epicsfile) * 1.01 
+      integer:: NoOfSegments  ! # of segments for a neutrino passed
+      integer,save:: SuppressBlank=0 ! suppress blank in the output(=1) or not(0)
+      integer,save:: ToWorld = 1  ! coor. is written in world
+                                   ! coordinate. if 0, local. 
+      contains
+
+      subroutine epGeom0
+!          set countIO flag for all components.
+!          To be called from uiaev
+       implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+#include  "ZepTrackp.h"
+       integer n, m
+       n = Det%nct
+!
+       write(0,*) ' # of comps=',n
+!
+       Det%cmp(1:n)%CountIO = 3  ! set boundary count flag for oall comp. 
+       m = n*2  ! m could normally be much smaller if n is very large
+       allocate(  MatLen(m) )
+       allocate(  MatGrm(m) )
+       allocate(  MatRL(m) )
+       allocate(  MatPos1(3,m) )
+       allocate(  MatPos2(3,m) )
+       allocate(  MatName(m) )
+       allocate(  MatCn(m) )
+       ZeroLeng = EpsLeng*1.01d0
+
+       call epqHooki(1, SuppressBlank)   ! read control parameters
+       call epqHooki(2, ToWorld)
+
+       end  subroutine epGeom0
+
+      function epGeomPos(trk) result(pos)
+!           track pos (is converted world, if
+!           ToWorld == 1 and) is stored in pos 
+!           as a function value. 
+      implicit none
+#include  "ZepTrack.h"
+       type(epTrack)::  trk
+
+      real(8):: pos(3)
+
+
+      if( ToWorld == 1 ) then
+         call epl2w(trk%cn, trk%pos, pos)
+!/////////////
+!          write(0,...) cannot be used, since
+!          epGeomPos is used in write(0,*) epGeomPpos
+!          and results is  recursive use of '0' device.
+!         write(*,*) 'l pos=',
+!     *   trk.pos.x, trk.pos.y, trk.pos.z
+!         write(*,*) ' pos=',pos(:)
+!///////////////
+      else
+!         since union/map is disabled now  in ZepPos.h  (why?)
+!         we cannot use pos(:) = aTrack.pos.r(:)
+
+         pos(1) = trk%pos%x
+         pos(2) = trk%pos%y
+         pos(3) = trk%pos%z
+      endif
+      end  function epGeomPos
+
+      subroutine epGeom1
+      implicit none
+      !       init for 1 event; to be called from uafi1ev
+#include  "ZepTrack.h"
+       type(epTrack)::  incident
+      NoOfSegments = 0
+
+      call epqinc(incident) !  get incident info. local coord
+      tempPos(:) = epGeomPos(incident)    
+      call epl2wd( incident%cn, incident%w, InciDir)
+      call epl2w( incident%cn, incident%pos, InciPos)
+      end      subroutine epGeom1
+
+
+      subroutine epGeomB(info, aTrack, Move, media)
+!         boundary  business; to be called from
+!           userbd 
+       implicit none
+#include "ZepTrack.h"
+#include "Zmove.h"
+#include "Zmedia.h"
+#include "Zcode.h"     
+        integer,intent(in)::info 
+             ! 0--> ptcl is exiting to void
+             ! <0 --> ptcl is exiting to |info| comp.
+             ! >0 --> ptcl is entering from info comp.
+       type(epTrack):: aTrack 
+             ! input. Current track before it is moved.
+             !  If info <=0, the Move.Track's  position is 
+             !  somewhere inside the component from which
+             !  the track is existing.
+             !  If info >0, aTrack.pos is the position 
+             !  just before exiting the prvious component
+       type(epmove)::  Move
+             ! input/output. 
+             ! Move.Track is the track
+             ! infomation of the current particle
+             ! moved to a new position.
+             ! Say, Move.Track.cn is the  current
+             ! comp. number.  For other details,
+             ! see userde.
+!
+!                      comp.1    comp.2
+!          info<0    |  *-----x|          |        
+!                                  * is aTrack.pos 
+!                             for nu * and x is same
+!                                  x is Move.Track.pos
+!          info>0    |        *|x         |       
+!                          x is saved to tempPos.
+       type(epmedia):: media   ! input.
+      
+      real(8):: dist
+      
+!!!!!!!!
+      character(len=12):: struc
+      integer:: surfn, icon
+      real(8):: normal(3), cosangle 
+!!//////////////////
+!      write(0,*) ' info=',info
+!!                next epGeomPos is in the write statement
+!!                so if epGeomPos has write statement with 0
+!!                dev#   inside, it will make recursive error
+!!      write(0,'(a, 1p,3g15.5)') ' aTrack.pos=',epGeomPos(aTrack)
+!!      write(0,'(a, 1p,3g15.5)')
+!!     *  ' Move.pos=',epGeomPos(Move.Track)
+!!      write(0,*) ' media=', media.name
+!//////////////////
+      if( info <= 0 ) then      ! exiting to void or other comp.
+         dist =
+     *      sqrt( sum( (epGeomPos(Move%Track) - tempPos(:))**2 ) )
+
+         if( dist <= ZeroLeng ) then
+                 !      <=  EpsLeng  ===> 0
+         else
+            NoOfSegments =  NoOfSegments  + 1
+
+            MatName(NoOfSegments) = media%name
+            MatCn(NoOfSegments) = aTrack%cn
+
+            MatLen(NoOfSegments) = dist
+            if( media%name == 'sp' .or.
+     *           media%name == 'hollow' ) then
+               MatGrm(NoOfSegments) = 0.
+               MatRL(NoOfSegments) = 0.
+            else
+               call epqstruc(aTrack%cn, struc)
+               if( struc(1:5) == 'prism') then
+                  call epLightNormalVecFE
+     *           (Move%Track%pos,aTrack%cn, surfN, normal,icon)
+!                       current comp. local
+                  cosangle= aTrack%w%x*normal(1) +
+     *                      aTrack%w%y*normal(2) +
+     *                      aTrack%w%z*normal(3) 
+                  write(*,'(a, 2i5, f9.5)')
+     *             'ezen ', aTrack%cn, surfn, cosangle
+               endif
+
+               !  dt = rhoc/x0g/gtocm*dl
+               MatGrm(NoOfSegments) = dist*media%rho * media%rhoc
+               MatRL(NoOfSegments) =
+     *          dist* media%rhoc/media%X0g/media%gtocm
+            endif
+            MatPos1(:,NoOfSegments) =tempPos(:)
+            MatPos2(:,NoOfSegments) = epGeomPos(Move%Track)
+         endif
+         tempPos(:) = epGeomPos(Move%Track)
+      else
+         tempPos(:) = epGeomPos( Move%Track)
+!         Move.Track info is local for the new comp.
+         call epqstruc(Move%Track%cn, struc)
+         if( struc(1:5) == 'prism') then
+            call epLightNormalVecFE
+     *       (Move%Track%pos, Move%Track%cn, surfN, normal,icon)
+!                       current comp. local
+                  cosangle= aTrack%w%x*normal(1) +
+     *                      aTrack%w%y*normal(2) +
+     *                      aTrack%w%z*normal(3) 
+                  write(*,'(a, 2i5, f9.5)')
+     *             'izen ', Move%Track%cn, surfn, cosangle
+               endif
+      endif
+      end      subroutine epGeomB
+
+
+      subroutine epGeomE1ev
+      ! to be called when 1 event ended from  ue1ev
+      implicit none
+      integer:: i, nev
+      integer:: nc  ! # of characters containe 'line' below
+      character(200):: line
+
+      call  epqevn(nev)  ! # of events
+      write(line,'(a, i7, i4, 1p,3g14.5, 3g17.9)')
+     *  "h ", nev, NoOfSegments, InciPos(:), InciDir(:)
+      if( SuppressBlank == 1) then
+         call ksupblank(line, nc) ! supress blank
+      endif
+      write(*, '(a)') trim(line)
+      
+      do i = 1, NoOfSegments
+         write(line,'(i3, i6, " ",  a8, 1p, 9g14.6)')
+     *    i, MatCn(i), MatName(i), MatPos1(:,i), MatPos2(:,i),
+     *    MatLen(i), MatGrm(i), MatRL(i)
+         if(SuppressBlank == 1) then
+            call ksupblank(line, nc)
+         endif
+         write(*, '(a)') trim(line)
+      enddo
+      end      subroutine epGeomE1ev
+
+      end module  epModGeometry            

@@ -1,0 +1,153 @@
+c                  testing cmollerPath etc
+c      implicit none
+c      real*8 ee, w, path, e1, er, cos1, cosr
+c      integer i
+c      read(*, *) ee, w
+c      do i=1, 10000
+c         call cmollerPath(ee, w, path )
+c         call cmollerEnergy(ee, e1, er)
+c         call cmollerAngle(cos1, cosr)
+c         write(*, *) sngl(path), sngl(e1), sngl(er),
+c     *                      sngl(cos1), sngl(cosr),
+c     *              sngl(e1+er)
+c      enddo
+c      end
+c     ****************************************************************
+c     *
+c     * cmollerPath: samples moller scattering path in r.l
+c     * cmollerEnergy:samples energy of survival and recoil electrons
+c     * cmollerAngle: //      angle of survival and recoil electrons
+c     *
+c     ************************ tested 84.06.22 ***********************
+c
+c   /usage/  call cmollerPath(e, w, path)
+c
+c   --input--
+c    e: electron energy in GeV
+c    w: minimum kinetic energy of recoil electron to be treated.
+c       (around .25e-3 GeV).
+c
+c   -- output --
+c path: sampled path in r.l
+c   e1: survival electron energy
+c   er: recoil //                (e1>=er always).
+c
+c cos1: cos and sin of survival electron
+c cosr:       cos of recoil electron
+c
+c  **** note ***
+c        before calling cmollerEnergy, cmollerPath must be called and
+c        befroe calling cmollerAngle, cmollerEnergy must be called.
+c
+c        constm=.03*z/a*x0inkgpm2
+c
+c  
+       subroutine cmollerPath(ein, w, path)
+       implicit none
+c
+       real*8  ein, w, path, e1save
+
+       real*8 e1, er, cos1, cosr, tmp, tp, g, ge, esave
+c
+
+c
+       real*8  beta2, t0, em, u, tr, ep, eps, t1, cos12
+       real*8 gef, e2, gefem
+       real*8 constm/5.475d0/
+       real*8  emass/.511d-3/
+       save  em, t0, e1save, beta2, esave
+c
+       gef(ep)=(1.d0-2.d0*em)/beta2 * (1.d0 + (ep/(1.d0-ep))**2 +
+     *           (t0/esave * ep)**2
+     *          - (t0*2.0d0 + emass)/esave * ep/(1.d0-ep) )
+c
+
+       esave = ein
+       g=emass/ein
+       beta2=1.d0 - g**2
+       t0=ein - emass
+       if(t0 .gt. 0.d0) then
+          em= w/t0
+       else
+          em = 10000.
+       endif
+       if(em .ge. 0.5d0) then
+           path=1.d50
+           tp = 1.d-50
+       else
+           if(em .lt. 5.d-4) then
+               tp =1./w* emass * constm
+           else
+              tp = ( (t0/ein)**2*(0.5d0-em) + (t0*2.d0+emass)/ein *
+     *        log(em/(1.d0-em)) + 
+     *        (1.d0-em*2)/em/(1.d0-em)  )/ t0 /beta2
+     *        *emass* constm
+           endif
+           call rndc(u)
+           path=-log(u) / tp
+       endif
+       return
+c
+c      ************
+       entry cmollerEnergy(ein, e1, er)
+c      ************
+c
+       if(em .ge. 0.5d0) then
+           er=emass
+           e1=ein
+           tr=0.
+       else
+           if(em .gt. 0.40d0) then
+c                 approximately flat in tr/t0=(em to .5)
+               call rndc(u)
+               ep=em + (0.5d0 - em) * u
+            else
+c                   rejection method
+                gefem = gef(em)
+c                *** until loop*** 
+                do while (.true.)
+                    call rndc(u)
+                    ep=1.d0/ (  (1.d0-em*2.d0)*u/em + 2.d0 )
+c
+                    ge=gef(ep)
+                    call rndc(u)
+                    u=u* gefem
+                    if( u .lt. ge)
+     *                             goto 100
+                enddo
+  100           continue
+            endif
+            tr=ep*t0
+            er=tr + emass
+       endif
+       e1= max(ein - er + emass, emass)
+       e1save = e1
+       return
+c
+c      ************
+       entry cmollerAngle(cos1, cosr)
+c      ************
+c
+       t1=e1save - emass
+       e2=emass*2.d0
+       eps=t0-t1
+       if(eps/(t0+e2) .lt. 0.05d0) then
+           cos1=1.d0- eps*emass/(t0*(t0+e2))
+       else
+           cos12=t1*(t0+e2)/( t0*(t1+e2))
+           if(cos12 .lt. 0.d0) then
+c              this is due to energy loss.
+              cos1=0.d0
+           else
+              cos1=sqrt(cos12)
+           endif
+       endif
+c
+       tmp= tr*(t0+e2)/(t0*(tr+e2) )
+       if(tmp .lt. 0.) then
+           cosr=0.
+       else
+           cosr=sqrt(tmp)
+       endif
+       end
+

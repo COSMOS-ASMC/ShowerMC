@@ -1,0 +1,20 @@
+END {print "(zoom c0 60)";
+     print "(transform world world world translate -150 0 0)";
+     print "(transform world world world rotate -0.95 0 0)";
+     print "(transform world world world translate 0  0 -250)";
+     for(i=0; i<65; i++) {
+     printf( "(snapshot focus ts%5.5d.ppm ppmscreen)\n ",i);
+     print "(zoom c0 0.937)";
+     print "(transform world world world rotate -0.0055 0 0)";
+     print "(transform world world world translate -20  0 -40)";
+#      print "(transform world world world translate -54.15  0 139.076)";      
+    }
+    printf( "(snapshot focus ts%5.5d.ppm ppmscreen)\n ",i+1);
+    print "(sleep-for 5)";
+    print "(transform world world world translate -3500  0 9000)";
+    printf( "(snapshot focus ts%5.5d.ppm ppmscreen)\n ",i+2);
+}
+#	      /dev/null > doScaleRot
+ 
+
+

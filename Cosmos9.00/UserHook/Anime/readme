@@ -1,0 +1,8 @@
+infinite loop analsys of pythia
+
+type      no. of loops
+1           not come 
+2         ~( exp(-0.53n) + 17/64834 exp(-0.029n) )dn
+3           not come
+4         ~exp(-0.53n)dn
+

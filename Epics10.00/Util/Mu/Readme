@@ -1,0 +1,23 @@
+   mu   -> mu + (gamma, e+e-pair, hadrons)
+   Emu -->Em' +   Eo
+   k = Eo/(Em-Mmu)
+   
+1) To test muon brems. sampling and brems function
+   a) Go to Brems
+   b) ./testMuBrSamp.sh
+         will tell you the usage
+2) To test muon pair creation (pair creation by muons)
+   a) Go to Pair
+   b) ./testMuPrSamp.sh will tell you the usage.
+3) To test muon nuclear interaction
+   a) Go to NucI
+   b) ./testMuNiSamp.sh
+       will tell you the usage.
+
+The input muon energy  must be > 10 GeV or so.
+   (fo N.I, much larger).
+For small energies, no graph will be shown.  (error
+message will be shown).
+
+In all cases, data and graphs in .png will be stored
+in /tmp/$USER/Work

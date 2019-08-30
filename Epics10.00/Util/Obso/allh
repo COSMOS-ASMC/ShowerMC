@@ -1,0 +1,10 @@
+set hidden
+# rev=`cat .Reverse`
+# if(rev == 0 && $0+1 == 1) rep "<awk -f hmode /tmp/$$USER/trace1" w l
+# if(rev == 0 && $0+1 > 1)  rep "<awk -f hmode /tmp/$$USER/trace$0" w l
+
+if($0+1 == 1) rep "<awk -f hmode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace1" w l
+if($0+1 > 1)  rep "<awk -f hmode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace$0" w l
+set nohidden
+
+

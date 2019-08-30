@@ -1,0 +1,16 @@
+sdum part  (from 71 col.)
+of  projectile/target for meson is one of next
+
+   DATA BTYPE / 'PROTON  ' , 'APROTON ' , 'ELECTRON' , 'POSITRON' ,
+     &'NEUTRIE ' , 'ANEUTRIE' , 'PHOTON  ' , 'NEUTRON ' , 'ANEUTRON' ,
+     &'MUON+   ' , 'MUON-   ' , 'KAONLONG' , 'PION+   ' , 'PION-   ' ,
+     &'KAON+   ' , 'KAON-   ' , 'LAMBDA  ' , 'ALAMBDA ' , 'KAONSHRT' ,
+     &'SIGMA-  ' , 'SIGMA+  ' , 'SIGMAZER' , 'PIZERO  ' , 'KAONZERO' ,
+     &'AKAONZER' , 'NEUTRIM ' , 'ANEUTRIM' , 'NEUTRIT ' , 'ANEUTRIT' ,
+     &'BLANK   ' /
+But
+   next cannot be used                 next is ok
+ KAONZERO                              PION+ PION- KAON+ KAON-
+ KAONLONG                              PIZERO APROTON
+
+

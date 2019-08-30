@@ -1,0 +1,26 @@
+This is a code to follow individual particle down to
+Ekine < 1MeV while calculating  A.S size (Ne) by a hybrid
+method. You can verify that the hybrid method and
+full M.C results  agrees rather well (except for far
+place than shower max)
+If particle tracking is done by 1 dimensional mode. However, if
+individual particle traking is done by 3-D mode, 
+many low energy particles are scattered away, thus
+the particle number at a given vertical  depth  
+becomes  different from the one by 1-D mode.  As a
+result, 3-D showers develop rapider than those of the
+hybrid mode (the hybrid mode  has no difference
+between 1-D and 3-D modes, becuase the hybrid mode
+replaces  high energy electrons by a formula (
+so called B-approximation of shower theory ) and
+for such high energy particles scattering can be neglected.
+
+The shower max values become less than the hybrid
+mode by a factor of 20~30 %.
+The shower tail of 3-D showers becomes 
+little bit larger than the hybrid mode. This last fact 
+is due to the difference of cross-sections;
+The B-approximation dose not include the Compton scattering
+while the constant pair creation cross-section is assumed,
+and thus makes the rapider attenuation of showers.
+

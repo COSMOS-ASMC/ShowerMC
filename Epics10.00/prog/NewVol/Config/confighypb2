@@ -1,0 +1,10 @@
+# hyperboloid of two sheets:  (x/a)**2 + (y/b)**2 = -1 + (z/g)**2
+#  only one sheet is used. so that g<=h1<h2
+
+#  type  matter  c    de maxpath  / x y z  a  b c 
+-------------------------------------------------------------------
+#news   new-1  hypb2
+1   hypb2  Fe   0  0   / 0  0  0  5 3  2  3  5
+2   hypb2  Al   0  0   / 12 10  0  5 3  2  3  5  1 0 0  0 0 -1
+-------------------------------------------------
+

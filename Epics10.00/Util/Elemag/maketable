@@ -1,0 +1,9 @@
+#!/bin/csh -f
+foreach f(../../Data/BaseM/*)
+   echo $f
+#    echo 'enter y or n'
+#   set x = $< 
+#   if( $x == "y" ) then
+       ./AutoCreateTab $f ../../Data/Media
+#    endif
+end

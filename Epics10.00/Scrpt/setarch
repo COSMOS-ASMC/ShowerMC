@@ -1,0 +1,3 @@
+#!/bin/csh -f
+setenv ARCH `awk '$1=="ARCH" && $2=="=" {print $3}' $EPICSTOP/site.config`
+

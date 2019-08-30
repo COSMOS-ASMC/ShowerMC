@@ -1,0 +1,24 @@
+# code chg r g b a   ptcl  color;   5  3   n  0.373 0.425 0.967 1    mu-   anti-yellow
+1  1   z  0 1 1 0.5  gamma  cyan
+2  2   p  1 0 0 1    positron  red 
+3  2   n  0.964 0.855 0.314 1     e-   yellow
+4  3   p  0 0 1 1    mu+  blue 
+5  3   n  0 0 1 1    mu-  blue
+6  4   p  1 0 1 1    pi+       mazenda
+7  4   n  0 1 0 1    pi-       green
+8  4   z  0 0 0 1    pi0  black
+9  5   p  1 0.5 0 1  K+  orange  
+10 5   n  0 0.5 1 1  K-  anti=orange
+11 5   z  0.3 0.3 0.3 1  K0
+12 6   p  0.5 0 0.5 1   proton  purple
+13 6   n  0  0.5  0  1  anti-proton dark green
+14 6   z  0.5 0.5 0.5 1   neutron   dark white   
+15 7   z  0.2 0.8 0.1 1  electron neutrino
+16 8   z  0.8 0.2 0.1 1  muon neutrino
+17 9   p  0.6 0.4  0.2 1   He etc  brown
+18 9   n  1   1   1  1    white for square to show flat area
+19 9   z  1  0.6 0.6 1    pink
+20 any any 1  0.6 0.6 1    all others pink
+
+
+

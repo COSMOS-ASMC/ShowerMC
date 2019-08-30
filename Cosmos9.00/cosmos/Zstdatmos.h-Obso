@@ -1,0 +1,11 @@
+
+!             common for std atmosphere.    
+      real*8 AlmostVacH  ! almost vacuum height
+      real*8 AlmostVacT  ! thickness there
+      parameter (AlmostVacH = 101.d3, AlmostVacT = 1.d-3)
+
+      real*8  ha, hb, hl, hm, hn, hc, t0, hmi, hlhmi
+
+      common /comstdatm/  ha, hb, hl, hm, hn, hc, t0,
+     *         hmi, hlhmi
+!     -----------------------------------

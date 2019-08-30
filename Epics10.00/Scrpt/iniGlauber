@@ -1,0 +1,75 @@
+#!/bin/csh -f
+if( $#argv < 2 || $#argv > 4 ) then
+cat <<EOF
+   This command can be invoked at any place.
+  Usage:   iniGlauber Basic_media_file outputDir [projFlag nomake].
+
+     basic_media_file: is the file name e.g, Epics/Data/BaseM/BGO
+
+     outputDir: Directory to store the calulated result files such as
+                BGO.GLB, BGO.inp 
+     *******  It must be an absolute path or starting with \$EPICSTOP
+              or with ~/.
+
+     projFlag:  1-->projectile is upto Fe.
+                2-->projectile is upto Pb. (default)
+                    (need much longer time than 1)
+     ****** Don't run the program  for the same media simultaneously
+            even one is for <= Fe and the other is > Fe.
+            (however, if the "COSMOSTOP" differs, it's OK)
+
+        Cosmos/Util/DPM/GlaubIniTemplateX.inp will be used.
+	(X = projFlag)
+     nomake:  if given any value, make is skipped. 
+        (use when calling this from  iniGlauberALL.csh;
+	This method is used since
+	 judging whether this is called from iniGlauberALL.csh
+	 or not is system dependent)
+EOF
+	exit
+endif	
+
+#  Procedure.
+#  1)  First, input 'filename' is obtained and 'filename.inp' is 
+#      created in dir (X=projFlag)  by referring to
+#      Cosmos/Util/DPM/GlaubIniTemplateX.inp
+#      Note:  Media1 is alias of Media.
+#  2)  Second, using filename.inp,  preinitialization 
+#      of Glanuber calculation is performed. This will create
+#     'filename'.GLB file to be used at the simulation
+#       Preinitialization  program is in Cosmos/Util/DPM
+#
+
+if( ! -f $1 ) then
+	echo $1 not exists
+	exit
+endif
+set filename = $1:t
+set leng = `echo $filename | awk '{print length($1)}' -`
+
+if ( $leng > 8 ) then
+   echo $filename must be 8 char. length or less.
+   exit
+endif
+
+set dir = $2
+
+if( $#argv >= 3 ) then
+    set X = $3
+else
+    set X = 2
+endif
+
+
+awk -f $EPICSTOP/Scrpt/iniGlauber.awk BaseM=$1 filename=$filename  $1 $COSMOSTOP/Util/DPM/GlaubIniTemplate${X}.inp  > $dir/${filename}.inp
+
+set ARCH = `awk '$1=="ARCH" {print $3}' $EPICSTOP/site.config`
+
+if( $#argv != 4 ) then
+ (cd $COSMOSTOP/Util/DPM; make clean; make -f mkglauber.mk )
+endif
+
+ (cd $COSMOSTOP/Util/DPM; \
+    echo "$dir/${filename}.inp" |  ./mkglauber$ARCH; mv ${filename}.GLB $dir/ )
+
+

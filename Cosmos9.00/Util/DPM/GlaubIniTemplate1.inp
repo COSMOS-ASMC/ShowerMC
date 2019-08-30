@@ -1,0 +1,44 @@
+*  Template of glauber calcualtion for an Epics detector component.
+*  There are two parts to be modified:
+*  EMULSION_part; to specify the matter components
+*  filename:   max of 8 char.file  name to be given to a file
+*              which is to contain the result of Glauber calculation.
+*  Using this template, a new file is created as dpmjet.inp (fixed name)
+*  which is used as a basic first input file to the dpmjet initialization.
+* 
+* maximum projectile mass
+*
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7...
+PROJPAR         56.0      26.0
+* possible targets: this is determined later
+*  1 nucleus in a line.
+* EMULSION       40.0     18.0       1
+*
+* PHOJET-specific input
+*
+PHOINPUT
+PROCESS           1 0 1 1 1 1 1 1
+ENDINPUT
+*
+*  write profile function data to file:  dpmjet below must be replaced by 
+*  a max of 8 char. name
+*          
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7...
+GLAUB-PAR     750.0      49.0       1.0      -1.0                     dpmjet
+*
+* energy range for initialization of profile function data
+* (negative values: c.m.system, positive values: lab. system)
+*
+*                      10       22+2=24       20    = 4800
+*           NSET0 = (NEBIN+1)*(NABIN+MAXOFF)*NBBIN <= MAXSET
+*      for air  NEBIN =4800/(24*3)-1 = 65  : enough large
+*      proj: A=1,2,3...14,15, 21,27,33,39,45,51,56  --> 22 A's
+*      Energy bin for Epics material:  0.5 ~ 4x10^6 GeV.
+
+*           E_min     E_max    # of bins  step1     step
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7...
+GLAUB-INI   0.5d0      4.d6       10.0      15.0        6
+* GLAUB-INI   0.5d0      4.d6       20.0      15.0        6
+*
+STOP
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7...

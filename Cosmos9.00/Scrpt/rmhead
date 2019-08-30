@@ -1,0 +1,11 @@
+#!/bin/csh -f
+    while(1)
+        if( ! -f /tmp/temp ) exit
+	set line=`wc /tmp/temp`
+ 	if( $line[1] > 10 )  then
+	     tail -5 /tmp/temp > /tmp/temp2
+             cp /tmp/temp2 /tmp/temp
+        endif
+    end
+
+   	

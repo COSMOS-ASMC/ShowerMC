@@ -1,0 +1,15 @@
+#name   Format    Nuclear Emuslsion G5
+G5 	2
+#
+#  Elem	 rho(g/cm^3)	Gas/Solid(1/0)  refl.index Birks c
+
+6         3.828		0                  0       0 0 0
+# 	Z	A  	N
+	47	107.87	1.013
+	35	79.9	1.007
+	1	1	3.2
+	6	12	1.39
+	7	14	0.318
+	8	16	.938
+#  ⟨Z/A⟩   I[eV]   a       k      x0    x1     Cbar  delta0
+0.45453 331.0  0.1240  3.0094  0.1009  3.4866  5.3319 0.00

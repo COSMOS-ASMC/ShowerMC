@@ -1,0 +1,7 @@
+(normalization world none)
+(backcolor allcams 0 0 0.22)
+(look-recenter)
+(sleep-for 3)
+(transform world world world rotate 0  1.5708 0  10)
+
+

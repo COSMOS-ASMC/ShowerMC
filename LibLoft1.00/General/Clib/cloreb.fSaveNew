@@ -1,0 +1,145 @@
+#include "ZsaveStruc.h"
+cc              to test cloreb: obsolute. should be modified
+c        include 'clorez.f'
+c        include 'cgetRotMat4.f'
+c        include 'clorep.f'
+c  -----------------------------
+c      implicit none
+c      include '../Zptcl.h'
+c      record /fmom/ p, q, r, s, gb, gbn
+c      real*8  rm(4,4), rmz(4,4), rmy(4,4), g, bx, by, bz
+c      real*8  fai1, fai2, tmp, pabs, gba
+c      real*8  am/.938/ 
+c      integer i, j
+c 
+c      g=1.1
+c      do j=1, 45
+c         gba=g*sqrt(1.d0-1.d0/g/g)
+c         bx=-sqrt(2.d0)/2.
+c         by=sqrt(2.d0)/5.
+c         bz=sqrt(1.d0 - bx**2 - by**2)
+c         gb.p(1) = bx*gba
+c         gb.p(2) = by*gba
+c         gb.p(3) = - bz*gba
+c         gb.p(4) = g
+c         gbn.x = - gb.p(1)
+c         gbn.y = - gb.p(2)
+c         gbn.z = - gb.p(3)
+c         gbn.t= gb.p(4)
+cc                 matrix for z-axis
+c         fai1=atan2(gb.p(2), gb.p(1))
+c         call cgetRotMat4(3, fai1, rmz)
+c         tmp=gb.p(1)**2 + gb.p(2)**2
+cc               matrix for y-axis
+c         fai2=atan2(sqrt(tmp), gb.p(3))
+c         call cgetRotMat4(2, fai2, rmy)
+cc                 combined rotaion matrix
+c         call cmultRotMat4(rmy, rmz, rm)
+c         p.px=1.
+c         p.py=10.
+c         p.pz=10000.
+c         call cpxyzp(p, pabs)
+c         p.e=sqrt( pabs**2 + am**2)
+c         call cloreb(1, gb, p, q)
+cc
+c         call clorep(1, gbn, q, r)
+cc                 do rotaion
+c         call capplyRot4(rm, r.p, s.p)
+c         s.e = r.e
+c         write(*, *) " ------ gamma=", g
+c         write(*,*) ( (p.p(i)-s.p(i))/p.p(i), i=1, 4)
+cc        write(*,*)   (p.p(i),s.p(i), i=1, 4)
+c         g = g * 10.d0**.25
+c      enddo   
+c      end
+c       **************************************************************
+c       *
+c       *    cloreb: General Lorentz transformation.
+c       *            The z axis is on the beta direction.
+c       *
+c       **************************************************************
+c
+c /usage/   call cloreb(i, gb, q,  p)
+c
+c          suppose a system (K') moving with a velocity beta
+c          (3-d vector) and gamma factor g relative to another
+c          system (K).  q is  4 momentum given in
+c          K' (of which the z axis is parallel to beta.)
+c                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+c          This routine converts q into p seen from K.
+c
+c          4 moemnta are assumed to be in the order of (px, py,
+c          pz, e)
+c
+c     i: input. integer*4.  if 1, gb is assumed to be new
+c                           else they are the same as previous call.
+c    gb: input. structure /fmom/ (g*beta, g)
+c     q: input. structure /ptcl/. 4 momentum and mass of a particle.
+c     p: output. structure /ptcl/ transformed one ( p may be q)
+c
+c    Note: we cannot use clorep directry, because if muon decays
+c        particles are not isotropic at the rest system of muon
+c       (logitudinal polarization).
+c
+      subroutine cloreb(i, gb, q, p)
+         implicit none
+#include  "Zptcl.h"
+         record /fmom/ gb
+         record /ptcl/  q, p
+         integer i
+
+         record /ptcl/ qq
+         record /fmom/ a, b, beta
+         real*8 betanorm, anorm
+#ifdef USESAVE
+         save a, b, beta, betanorm
+#endif
+c         if(i .eq. 1) then
+            betanorm = gb.p(1)**2 + gb.p(2)**2 + gb.p(3)**2 
+            if(betanorm .ne. 0.) then
+               betanorm = sqrt(betanorm)
+               beta.p(1) = gb.p(1)/betanorm
+               beta.p(2) = gb.p(2)/betanorm
+               beta.p(3) = gb.p(3)/betanorm
+               a.p(1)= beta.p(2)
+               a.p(2) = -beta.p(1)
+               a.p(3)= 0.
+               anorm = a.p(1)**2 + a.p(2)**2
+               if(anorm .eq. 0.) then
+                  a.p(1) = 1.
+                  a.p(2) = 0.
+                  a.p(3) = 0.
+               else
+                  anorm = sqrt(anorm)
+                  a.p(1) = a.p(1)/anorm
+                  a.p(2) = a.p(2)/anorm
+               endif
+c     
+               b.p(1) = beta.p(2)*a.p(3) - beta.p(3) * a.p(2)
+               b.p(2) = beta.p(3)*a.p(1) - beta.p(1)* a.p(3)
+               b.p(3) = beta.p(1)*a.p(2) - beta.p(2)* a.p(1)
+            endif
+c         endif
+         if(betanorm .eq. 0.) then
+            p = q
+         else
+c                 assume that  qx is  a-direction and qy is b direction.
+c                 This dose not lose generality
+            qq = q
+            qq.fm.p(1) = q.fm.p(1)*a.p(1) +  q.fm.p(2)*b.p(1) +
+     *           q.fm.p(3)*beta.p(1)
+            qq.fm.p(2) = q.fm.p(1)*a.p(2) +  q.fm.p(2)*b.p(2) + 
+     *           q.fm.p(3)*beta.p(2)
+            qq.fm.p(3) = q.fm.p(1)*a.p(3) +  q.fm.p(2)*b.p(3) +
+     *           q.fm.p(3)*beta.p(3)
+            qq.fm.p(4) = q.fm.p(4)
+c              Lorentz boost by gb
+            call clorep(i, gb, qq, p)
+         endif
+
+      end
+
+
+
+
+

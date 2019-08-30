@@ -1,0 +1,47 @@
+about Cerenkov:
+
+Old Cosmos:
+   Tracking/cputCerenkov.f
+
+A) 61<= Trace < 100;    cputCerenkovが呼ばれる．
+    cputCerenkovでは
+   粒子のエネルギーが閾値より大きければ（ーーー＞ここがおかしそう**）
+　まず，電荷を持っていなければすぐreturnすれば良いのにてない，　　
+**　　　the=58.*粒子のmass   （GeV)，(電子なら，~30e-3 GeV=30MeV)でいいと思う
+が，おかしな低い値が使われ，閾値がないに等しい．
+ 高度による屈折率の低下に対する効果はrho(地上)/rho(現在高度)を掛けている
+ race-60が通常のTraceの値だと想定して， 座標変換を行い，
+ 書き出しは 粒子の走った始点と終点の座標などを与えている
+ この方式は書き出したデータをもとに後で光に変換しするという事のよう．
+ エネルギーが高いイベントだと，書き出し量が膨大に なり始末に負えないだろう（thin samplingしても)．
+
+B)100<=Trace<160;
+   chookTraceが呼ばれる．chookTraceはchook.f中にあるが，
+   何も書き出しはしないので，書き出し情報はユーザ任せ．
+
+C) 161<=Trace<200      cputCerenkovが呼ばれる．
+　　Traceの値から100を引き，　A)と同じように進むが，書き出しの部分だけユーザ
+  任せでcall　chookCeren(ka, chrg, e1, itb, it, f, t)とする．
+
+上記　A,B,Cの場合，各イベントの初めに，putCerenkovS
+ が呼ばれ，　イベントヘッダーが書き込まれる．
+
+
+chookCerenは　chook.fの頭に#include “ctemplCeren.f”
+ として雛形が，Cosmos/cosmos/
+ 　から取り込まれている．これがDONTUSEの理由らしい．
+ 実際に使うには，Cosmos/cosmos/ctemplCeren.f
+ を自分の領域に取り込み，中身を改変することになるだろう．ファイル名はそのままで
+ もOKだと思う．chookCeren.fに変えて，#include “ctemplCeren.f”も変えてもいいだろう．
+
+実際にCerenkovを出すのには
+ Epics/prog/Light/epLightCerenkov.fを使うことになるだろう．
+	chookCerenからepLightCerenkovを
+	       呼び出す．thresholdはここの中で計算されている．
+
+
+  A)の場合のような書き出しはEpics/prog/Light/epLightWriteCPath.fでもやっている
+  ．
+  Rayleigh散乱やattenuaitonはepLightProc.f内でやっている．
+  これらはTrackの形式がCosmosとEpicsで異なるので，mediaをAirに
+  しただけでは使えない．構造改革が必要．

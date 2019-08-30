@@ -1,0 +1,11 @@
+#  type  matter  c    de maxpath  / x y z  a  b c 
+ This is to test <dE/dx> of a given media.  Only one component
+ may be written
+-------------------------------------------------------------------
+1   box  Al  0  0      / 0  0  0  10 10 1
+2   box  Cu   0  0      / 0  0  +  10 10 1
+3   box  Pb    0  0      / 0  0  +  10 10 1
+4   box  SCIN    0  0      / 0  0  +  10 10 1
+5   box  sp    0  0      / 0  0  +  10 10 1
+-------------------------------------------------
+

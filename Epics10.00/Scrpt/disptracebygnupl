@@ -1,0 +1,109 @@
+#!/bin/bash
+if [ $# -lt 2  ] || [ $# -gt 4 ]; then
+    cat <<EOF
+
+  Usage:  disptracebygnupl  [s][i]  trace {det|-det|nodet}  [Emin]
+
+    s:  optional.  If given, we assume splitting of the trace file 
+        has been done and skip time consuming splitting.
+    i:  optional.  If not given, display order is:
+            e-, e+, mu, pi, K, (p,pbar)  heavy. Others are neglected.
+        If given,  above oreder is inverted.
+      (gnuplot is slow for hidden mode, so "i" many be
+            used to  hide small # of particles).
+ trace: path to a tracefile, such as /tmp/$USER/trace3
+  {det|-det|nodet} :  To draw the detector together or not.
+          det:  draw detector hidden mode (takes long time)
+         -det:  no hidden mode.(faster).
+        nodet:  no detector (recomended)
+        Note: better to  use geomview interface
+ Emin: optional.  numerical value in GeV. Only those of
+       E>Emin (K.E) will be shown.
+       Default is 100e-6 (=100keV: for 100GeV/n Fe 1ry, ~15 MeV
+       may be needed.)   
+** note** To change the bg color, adjust $EPICSTOP/Util/Gnuplot/bgcolor
+EOF
+    exit;
+fi
+
+bg=`awk '$1 != "#" {print $1; exit}'  $EPICSTOP/Util/Gnuplot/bgcolor`
+skip="n";inv="n";
+Emin=100e-6
+if [ $# -gt 1 ]; then
+    if [ $1 == "s" ] || [ $1 == "si" ]; then
+	skip="s";
+    fi
+    if [ $1 == "i" ] || [ $1 == "si" ]; then
+	inv="i";
+    fi
+    if [ $skip != "n" ] || [ $inv != "n" ]; then
+	shift;
+    fi
+fi
+
+if [ $# -ge 2 ]; then
+    echo "trace file is " $1
+    if [ $2 == "det" ]; then
+	hidden="y"
+    elif [ $2 == "-det" ]; then
+	hidden="n"
+    elif [ $2 == "nodet" ]; then
+	hidden = "0"
+    else    
+	echo " arg " $2 " invlid: must be one of 'det', '-det', 'nodet'"
+        exit
+    fi
+    if [ $# -eq 3 ]; then
+	Emin=$3
+    fi	
+fi
+
+    
+# embed trace file in  Work/.trace.
+# This is to workarond that Mac gnuplot cannot deal with
+# comman argument correctly; without using argument,
+# file name is transmited via /tmp/$USER/.trace file.
+
+mkdir -p /tmp/$USER
+Work="/tmp/$USER"
+
+ # put trace filename in /tmp/$USER/.trace here
+echo $1 >  $Work/.trace;
+
+
+
+if [ $hidden == "y" ]; then
+    sed -e s/splot/rep/g  /tmp/$USER/Work/gnu > /tmp/$USER/Work/gnuc
+elif [ $hidden == "n" ]; then
+    sed -e s/splot/rep/g  /tmp/$USER/Work/gnu2 > /tmp/$USER/Work/gnuc
+fi
+#   get x,y,z range
+#   and put in /tmp/$USER/range
+awk -f $EPICSTOP/Util/Gnuplot/getrange.awk file=$Work/range  $1;
+ if [ $skip == "n" ]; then
+     # rm old data if any
+     rm -f /tmp/$USER/trace_*
+     echo "*** spliting trace data; will take few min for ~1.5GB data***"
+     awk -f $EPICSTOP/Util/Gnuplot/splitTrace.awk  Work=$Work Emin=$Emin $1;
+ fi
+ (cd $EPICSTOP/Util/Gnuplot/;
+   if [ $hidden != "0" ]; then
+       if [ $inv == "i" ]; then
+	   cat  do_invplot.gp  /tmp/$USER/Work/gnuc > /tmp/$USER/Work/doplot.gp;
+       else    
+	   cat  do_plot.gp /tmp/$USER/Work/gnuc > /tmp/$USER/Work/doplot.gp;
+       fi
+       gnuplot -background "$bg"  /tmp/$USER/Work/doplot.gp  -;
+   else
+       if [ $inv == "i" ]; then
+	   #	   gnuplot -background "midnightblue"  do_invplot.gp - ;
+	   gnuplot -background "$bg"  do_invplot.gp - ;
+       else    
+	   gnuplot -background "$bg"  do_plot.gp - ;
+       fi
+   fi
+ )
+
+
+    
+    

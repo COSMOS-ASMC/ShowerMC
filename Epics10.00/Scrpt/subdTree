@@ -1,0 +1,56 @@
+#!/bin/tcsh -f
+if ( $#argv == 0 || $#argv > 2 ) then
+   cat << EOF
+   Usage: subdTree  configpass  [option]
+      show subdetector list and their hierarchy
+      option:  0  don't show simple components if they
+                  don't contain other component(s) 
+                  (default)
+               1  show simple components too.
+      The output is on stdout. 
+      For simple component (non subdetecor), shanpe name is
+      shown with *
+
+      Hierarchy  can  be compressed by using a command
+      compSubdTree, e.g,
+ 
+         subdTree  config > hierarchy
+         compSubdTree hierarchy
+      This file may be again compressed by
+         compSubdTree hierarchy 
+      or evern
+         compSubdTree hierarchy  | compSubdTree
+
+      Or you can use like
+         subdTree config | compSubdTree >  hierarchy 
+
+         subdTree config 1 
+      will show full list 
+EOF
+exit
+endif
+
+set pwd=`pwd`
+
+
+cd $EPICSTOP/Util; make clean;make -f getSubdTree.mk
+
+cd $pwd
+set config=$1
+if ( $# == 1 ) then
+  set opt=0
+else
+  set opt=$2
+endif	 
+echo $config > temp$$
+echo $opt >> temp$$
+$EPICSTOP/Util/a.out < temp$$
+rm temp$$
+
+
+   	
+
+
+
+
+

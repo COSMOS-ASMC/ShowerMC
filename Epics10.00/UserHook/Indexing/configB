@@ -1,0 +1,62 @@
+---------------------------------------------
+#alias  CHDx  SCIN
+#eq d  0.5
+#          W 2 cm 
+#subd  abc
+1 box  CHDx 0 2 0 / 0 0 0 0.5  30 d
+2 box  CHDx 0 2 0 / + 0 0 =    =  =
+3 box  CHDx 0 2 0 / + 0 0 =    =  =
+4 box  CHDx 0 2 0 / + 0 0 =    =  =
+5 box_w   sp  0 0 0 / 0 0 0
+#end  abc
+#           W 10 cm
+#subd  abc4
+1 abc sp 0 0 0 / 0 0 0
+2 abc sp 0 0 0 / + 0 0
+3 abc sp 0 0 0 / + 0 0
+4 abc sp 0 0 0 / + 0 0
+5 abc sp 0 0 0 / + 0 0
+6 box_w  sp 0 0 0 / 0 0 0
+#end abc4
+
+#           2.0cm 
+#subd odd
+1 box CHDx 0 2 0 / 0 0 0 0.5 20 d
+2 box CHDx 0 2 0 / + 0 0 =   =   =
+3 box CHDx 0 2 0 / + 0 0 =   =   =
+4 box CHDx 0 2 0 / + 0 0 =   =   =
+5 box_w sp  0 0 0 / 0 0 0
+#end  odd
+#           6 cm
+#subd oddx4
+1 odd sp 0 0 0 / 0 0 0
+2 odd sp 0 0 0 / + 0 0
+3 odd sp 0 0 0 / + 0 0
+4 box_w  sp 0 0 0 / 0 0 0
+#end oddx4
+
+#     W 50 cm + 0.8cm     
+#subd sheet
+1 abc4  sp  0 0 0 / 0 0 0
+2 box     Al  0 0 0 / + 0 0 0.2 30 0.5
+3 abc4  sp  0 0 0 / + 0 0
+4 box     Al  0 0 0 / + 0 0 0.2 30 0.5
+5 abc4  sp  0 0 0 / + 0 0
+6 box     Al  0 0 0 / + 0 0 0.2 30 0.5
+7 abc4  sp  0 0 0 / + 0 0
+8 box     Al  0 0 0 / + 0 0 0.2 30 0.5
+9 abc4  sp  0 0 0 / + 0 0
+10 box_w sp 0 0 0 / 0 0 0
+#end sheet
+
+1 sheet   sp 0 0 0 / 0 0 0
+2 box     Al  0 0 0 / + 0 = 0.2 30 d
+3 box     Fe 0 0 0 /  +  20 = 6 10 d
+4 oddx4     sp 0 0 0 /  =  0  = 
+5 box     Acrylic  0 0 0 / 0 0 + 52 30 2
+6 sheet   sp 0 0 0 /  0 0 +
+7 box     Al  0 0 0 / + 0 = 0.1 30 d
+8 box     Fe 0 0 0 /  +  20 = 6 10 d
+9 oddx4     sp 0 0 0 /  =  0 = 
+10 box_w  sp 0 0 0 / 0 0 0
+---------------------------------------

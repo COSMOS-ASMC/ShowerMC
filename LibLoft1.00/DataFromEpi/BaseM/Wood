@@ -1,0 +1,10 @@
+#name   Format   Wood
+Wood 1
+#  ~ cellulose (C_6 H_10 O_5)n + 15% water (15.1% in this table)
+#  Elem  rho(g/cm^3)    Gas/Solid(1/0)  refl.index Birks c
+
+3         0.4          0              0        0 0 0
+#       Z       A       N
+        6       12     10
+        1       1      22
+        8       16     11   

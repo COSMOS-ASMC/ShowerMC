@@ -1,0 +1,17 @@
+#!/bin/bash
+if [ $# -ne 1 ]; then
+   cat << EOF
+   ./dispconfigbygnup  {h|noh}
+     h :  hidden mode  slow
+     noh:  no hidden mode  faster
+EOF
+   exit
+fi
+work=/tmp/$USER/Work
+if [ $1 == "h" ]; then
+   gnuplot $work/gnu -
+elif [ $1 == "noh" ]; then
+    gnuplot $work/gnu2 -
+else
+    echo arg  $1 is invalid
+fi

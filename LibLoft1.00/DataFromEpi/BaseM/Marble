@@ -1,0 +1,10 @@
+#name   Format    Marble
+Marble 	1
+#
+#  Elem	 rho(g/cm^3)	Gas/Solid(1/0) refl.index  Birks c
+
+	3         2.7		0         0     0 0 0
+# 	Z	A  	N
+	20	40	1
+	6	12	1
+	8	16	3

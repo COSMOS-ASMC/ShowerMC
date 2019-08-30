@@ -1,0 +1,17 @@
+#name   Format    carbon (graphite)
+Carbon 	2
+#
+#  Elem	 rho(g/cm^3)	Gas/Solid(1/0)  refl.index  Birks c
+#  rho may be 2.21
+1         2.265             0             0        0 0 0
+# 	Z	A  	N
+	6	12	1
+
+#  ⟨Z/A⟩   I[eV]   a       k      x0    x1     Cbar  delta0
+   0.5    78.0    0.2076  2.9532 -0.0090  2.4817  2.8926 0.14
+
+	
+
+
+
+

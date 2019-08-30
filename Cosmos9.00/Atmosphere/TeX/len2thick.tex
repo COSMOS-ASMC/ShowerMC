@@ -1,0 +1,130 @@
+\documentstyle[a4,epsf]{article}
+\setlength{\textheight}{23cm}
+\setlength{\textwidth}{15cm}
+\setlength{\evensidemargin}{0.3cm}
+\setlength{\oddsidemargin}{0.3cm}
+\setlength{\topmargin}{-2cm}
+\setlength{\footskip}{2.5cm}
+
+\begin{document}
+
+%%Begin InstantTeX Picture
+\let\picnaturalsize=N
+\def\picsize{8cm}
+\def\picfilename{earthGeom.eps}
+\begin{figure}[h]  % [t] or [b]
+%  ////// YOU NEED epsf.sty  AS   \documentstyle[epsf]  //////////
+ \hspace*{1cm}
+ \epsfysize=\picsize
+ \leavevmode\epsffile{\picfilename}
+ \caption{Geometrical relation}
+ \label{Label}
+\end{figure}
+
+%%End InstantTeX Picture
+
+\begin{eqnarray}
+r \cos\theta - r'\cos\theta' = s\\
+r\sin\theta = r'\sin\theta\\
+r^2 + s^2 - 2rs\cos\theta = r'^2
+\end{eqnarray}
+Then, we have
+
+\begin{eqnarray}
+z'& = & \sqrt{r^2 + s^2-2rs\cos\theta} - R \nonumber \\
+ & = & r\sqrt{ 1 +({s \over r})^2 -2{s \over r}\cos\theta} - R \nonumber \\
+ &=& r[1+{1 \over 2} \{({s \over r})^2 -2{s \over r}\cos\theta\} -{1 \over 8} \{({s \over r})^2 -2{s \over r}\cos\theta\}^2 -{1 \over 16}8({s \over r})^3\cos^3\theta...]-R \nonumber\\
+ & = & z - s\cos\theta + {s^2 \over 2r}\sin^2\theta + {s^3 \over 2r^2}\cos\theta\sin^2\theta + O(s^4)
+\end{eqnarray}
+The slant thickness in the length $s$ is
+
+\begin{eqnarray}
+t & = & \int_{0}^{s}{\rho(s)ds}\nonumber \\
+& = & \int_{0}^{s}{\rho(z + f(s,z))ds}
+\end{eqnarray}
+where
+\begin{eqnarray}
+f(s, z) \approx - s\cos\theta + {s^2 \over 2r}\sin^2\theta + {s^3 \over 2r^2}\cos\theta\sin^2\theta\end{eqnarray}
+
+\begin{eqnarray}
+\rho(z + f(s,z)) \approx \rho(z) + \rho'(z)f(s,z) + {\rho''(z)\over 2}f^2(s,z) +
+{\rho'''(z) \over 6}f^3(s,z)
+\end{eqnarray}
+
+Taking upto $s^4$, the indefinit integral is
+
+\begin{eqnarray}
+sf_1(s,z) & \equiv &\int{f(s,z)ds} =-{s^2 \over 2}\cos\theta + {s^3 \over 6r}\sin^2\theta + {s^4 \over 8r^2}\cos\theta\sin^2\theta\\
+sf_2(s,z) &  \equiv &\int{f^2(s,z)ds} = {s^3 \over 3}\cos^2\theta-{s^4 \over 4r}\cos\theta\sin^2\theta\\
+sf_3(s,z)& \equiv &\int{f^3(s,z)ds} =-{s^4 \over 4}\cos^3\theta
+\end{eqnarray}
+Then,
+
+
+\begin{eqnarray}\label{gett}
+t=s \left\{  \rho(z) + \rho'(z)f_1(s,z)+\rho''(z)f_2(s,z)+\rho'''(z)f_3(s,z) \right\}
+\end{eqnarray}
+
+
+Error estimation:
+
+
+
+\begin{eqnarray}
+\rho = \rho_0 \exp(-z/z_0)
+\end{eqnarray}
+is an not so bad approximation for the atmosphere.  Then,
+
+\begin{eqnarray}
+\rho'(z) &=&- \rho(z)/z_0\nonumber \\
+\rho''(z) & = & \rho(z)/z_0^2\\
+\rho'''(z) &=& -\rho(z)/z_0^3
+\end{eqnarray}
+
+\begin{eqnarray}
+t&=&\rho(z)\{s + {s^2 \over 2z_0}\cos\theta-{s^3 \over 6rz_0}\sin^2\theta +{s^3 \over 6z_0^2}\cos^2\theta -{s^4 \over 8r^2z_0}\cos\theta\sin^2\theta\nonumber \\
+& & - {s^4 \over 8rz_0^2}\cos\theta\sin^2\theta +{s^4 \over 24z_0^3}\cos^3\theta\} \\
+%
+&=&\rho(z)s\{ 1 + {1 \over 2}{s\over z_0}\cos\theta-{1 \over 6}{s\over r}{ s\over z_0}\sin^2\theta
+ +{1 \over 6}({s\over z_0})^2\cos^2\theta \nonumber \\ 
+%
+& &-{1 \over 8}({s \over r})^2{s \over z_0}\cos\theta\sin^2\theta
+-{ 1\over 8} {s \over r}({s \over z_0})^2\cos\theta\sin^2\theta
++{1 \over 24}({s \over z_0})^3\cos^3\theta\} \\
+%
+&=&\rho(z)s\{ 1 +{1 \over 2}{s\over z_0}\cos\theta+{1 \over 6}({s\over z_0})^2\cos^2\theta+{1 \over 24}({s \over z_0})^3\cos^3\theta + ...\\
+& &
+-{1 \over 6}{s\over r}{ s\over z_0}\sin^2\theta-{1 \over 8}({s \over r})^2{s \over z_0}\cos\theta\sin^2\theta
+-{ 1\over 8} {s \over r}({s \over z_0})^2\cos\theta\sin^2\theta\}
+\end{eqnarray}
+The  first series is nothing but the one which comes from
+an exponential term.
+
+For a near vertical case, we put $\cos\theta=1$ and  $\sin\theta=0$, then
+
+\begin{eqnarray}
+t&=&\rho(z)s\left\{ 1 + {1 \over 2}{s\over z_0}
+ +{1 \over 6}({s\over z_0})^2 +{1 \over 24}({s\over z_0})^3 \right\}
+\end{eqnarray}
+Then the relative error is order of $O((s/z_0)^4/100)$, i.e., if we take $s=100$ m
+it is $\sim 10^{-9}$, since $z_0\sim 6$ km. For near horizontal case,
+we put $\cos\theta= 0$ and  $\sin\theta = 1$, then, we get,
+
+\begin{eqnarray}
+t&=&\rho(z)s(1 -{1 \over 6}{s\over r}{ s\over z_0})
+\end{eqnarray}
+
+The rellative error should be order of $O(({ s\over r})^2{s \over z_0})\sim 10^{-11}$ and is very small.
+
+In practical application,  if $\cos\theta\neq0$ we may 
+neglect the last terms in $f_1$ and $f_2$.
+
+It is easy to get  thickness corresponding to a given small
+s.  Inversely, if a small t is given, s may be obtained by 
+solving Eq.\ref{gett}:  
+\begin{eqnarray}\label{gets}
+s=t/ \left\{  \rho(z) + \rho'(z)f_1(s,z)+\rho''(z)f_2(s,z)+\rho'''(z)f_3(s,z) \right\}
+\end{eqnarray}
+This can be solved by iteration with the first $s=0$.
+
+\end{document}

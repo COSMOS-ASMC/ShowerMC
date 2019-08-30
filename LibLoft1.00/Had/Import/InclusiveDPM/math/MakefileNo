@@ -1,0 +1,14 @@
+include $(COSMOSTOP)/site.config
+
+#FOBJECTS = math-bspl.o math-character.o math-lorentz.o math-rnd.o\
+	math-heapsort.o math-initrand.o
+FOBJECTS = math-bspl.o math-character.o math-lorentz.o\
+	math-heapsort.o 
+# COBJECTS = makeseed.o
+
+#libanmath.a : $(FOBJECTS) $(COBJECTS)
+#	ar r libanmath.a $(FOBJECTS) $(COBJECTS)
+$(LIBRARY) :   $(FOBJECTS)
+
+clean :
+	rm -f *.o *.a *.il

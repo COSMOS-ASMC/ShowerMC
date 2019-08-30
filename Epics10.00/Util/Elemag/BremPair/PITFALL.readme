@@ -1,0 +1,15 @@
+Suppose a distribution is like f(x)dx= dx/x (eps< x < 1), and generate random sampling
+following this distribution. 
+We may make histogram of the random variable and display  x f(x)
+In this case, if we make a histogram from eps to 1 with bin, e.g, 0.01,
+and display it bin valuex vs (bin value)* dN/dx. Then, at near x=0,
+we see a sharp peak in the histogra while the xf(x) is flat.
+This looks like discrepancy. But if we plot a histogram without
+multiplying x, then the histogram and f(x) coinside well.
+
+To avoid such an apparent disagreement, we may use the min
+of histogram -bin/2. Or we may  use log x binning.
+Then, we can avoid such paradox. 
+See below.
+
+ awk 'BEGIN {  eps=1.e-4; for(i=1; i<=100000; i++) { u=rand();  print eps**(1-u) }}'  | histo -l 1.e-4 0.01  100000 > temp.hist

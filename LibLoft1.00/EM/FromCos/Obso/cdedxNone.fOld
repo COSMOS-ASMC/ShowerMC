@@ -1,0 +1,96 @@
+c     ****************************************************************
+c     *                                                              *
+c     * epdedxNone: gives -de/dx  (gev/(g/cm2)) of non e+/e-
+c     *                                                              *
+c
+c
+c
+      subroutine cdedxNone(aPtcl, rhoin, dedt)
+      implicit none
+#include "Zptcl.h"
+#include "Zmass.h"
+#include  "ZdedxAir.h"
+      real*8 emass, emass2 
+
+c       MeV unit electron mass.
+      parameter(emass = masele*1000., emass2=emass**2)
+
+      record /ptcl/aPtcl        ! input. a particle
+      real*8  rhoin             ! input. density of air in kg/m3 
+      real*8 dedt               ! output. Energy loss rate.   GeV / (g/cm2). 
+
+ 
+      real*8  E,  mass,  Beta2, x
+      real*8 dltx,  wm,  dlt
+      real*8 bbbeta2, lindbeta2, truebeta2
+      real*8 bbbeta, lindbeta 
+      real*8 logbbbeta, loglindbeta
+      real*8 a, b, c, xx, gra, gb2, g, integ
+      parameter (bbbeta = 0.1d0,  lindbeta = 0.005d0, gra=5.d0/3.d0)
+      parameter (bbbeta2 = bbbeta**2, lindbeta2=lindbeta**2)
+      parameter (logbbbeta =-2.302585093E+00,
+c     *           loglindbeta =-4.605170186E+00)
+     *           loglindbeta =-5.298317367E+00)
+      parameter (a = (1.+gra)/2.d0/(logbbbeta-loglindbeta),
+     *           b = 2*a*loglindbeta + 1.) 
+      real*8  sha, shb
+      data  sha/7.6693e-2/, shb/18.0571513/
+      save   sha, shb
+
+c
+c               energy in MeV unit
+      E = aPtcl.fm.p(4)*1000.
+      mass= aPtcl.mass*1000.
+      g = E/mass
+      truebeta2 = 1. -(1.0d0/g)**2
+      if(truebeta2 .lt. bbbeta2) then
+c            fix at beta=0.1
+         Beta2 = bbbeta2
+         E = mass*(1. + Beta2/2)
+         g = E/mass
+      else
+         Beta2 = truebeta2
+      endif
+      call cdedxdlt(rhoin, g, dlt)
+c     
+      gb2 = Beta2 * g**2   !  g^2 b^2
+
+c          x=log10(p/mc)  = log10(g*beta)
+      x=log10( gb2 ) / 2
+      dltx= dlt + 4.605*x
+      wm = 2* emass * gb2
+     *        /(1.0 + 2.0*g*(emass/mass) +(emass/mass)**2)
+c          first compute full average dE/dx
+c 
+      dedt=sha/Beta2 *( shb + 0.693 +  log(wm)
+     *        -2.0*Beta2 + dltx)
+c             see if restriceted energy is requested
+      if(wm .gt. w0inMeV) then
+c            yes. requested
+c                subtract average loss rate due to Ek>Tcut
+         integ = log(wm/w0inMeV) - Beta2*(1.0-w0inMeV/wm)
+c            assume spin 0 particle is only pi, K
+         if(aPtcl.mass .lt. 0.11 .or. aPtcl.mass .gt. 0.9) then
+c               mu, p, etc. spin = 1/2
+            integ = integ + 
+     *           (wm - w0inMeV)*(wm+w0inMeV)/4.0/E/E
+         endif
+         integ = integ*sha/Beta2
+         dedt = dedt - integ
+      endif
+
+      if(truebeta2 .lt. bbbeta2) then
+         c = log(dedt) + ( a* logbbbeta - b )*logbbbeta
+         if( truebeta2 .gt.  lindbeta2) then
+            xx = log( truebeta2 )/2.
+            dedt =exp( (-a*xx + b)*xx + c)
+         else
+            dedt = exp( (-a*loglindbeta + b)* loglindbeta + c) *
+     *             sqrt(truebeta2)/lindbeta
+         endif
+      endif
+c         x  Z**2 and to GeV unit
+      dedt=dedt * aPtcl.charge**2 * 1.d-3
+
+      end
+

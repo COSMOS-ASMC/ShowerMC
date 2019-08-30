@@ -1,0 +1,396 @@
+#
+# TASC top panel, side panel x4
+#
+
+#subd tasc-toppnl
+1 octagon_z Al7075 0 0 0 / 0 0 0   0.2 42.6 42.6 5.0
+#2 box_w sp 0 0 0 / 0 0 0
+#end tasc-toppnl
+
+
+
+#subd tasc-pnl-h01
+1 box hollow   0 0 0 / 0   0  0   4.05 1.80 2.153
+2 horse hollow 0 0 0 / 0   =  +   4.05 1.80 0.15   0.0 0.0  3.90 1.80 
+3 horse hollow 0 0 0 / 1.0 =  +   2.90 1.80 0.50   0.0 0.0  2.40 1.80 
+#
+4 box_w Al7075 0 0 0 / 0 0 0
+#end tasc-pnl-h01
+
+#subd tasc-pnl-c01
+1 cyl_y hollow 0 0 0 / 1.135 1.80 0.683  0.80 0.20
+2 cyl_y hollow 0 0 0 / 3.177 1.80 0.683  0.80 0.20
+#
+3 box Al7075 0 0 0 / 0 1.80 0   4.05 0.20 2.803 / 1 2
+#end tasc-pnl-c01
+
+
+#subd tasc-pnl-h02
+1 horse hollow 0 0 0 / 1.0 0  0   2.40 1.80 0.50   0.0 0.0  2.90 1.80 
+2 horse hollow 0 0 0 / 0   =  +   3.90 1.80 0.15   0.0 0.0  4.05 1.80 
+3 box hollow   0 0 0 / 0   =  +   4.05 1.80 2.94
+4 horse hollow 0 0 0 / 0   =  +   4.05 1.80 0.15   0.0 0.0  3.90 1.80 
+5 horse hollow 0 0 0 / 1.0 =  +   2.90 1.80 0.50   0.0 0.0  2.40 1.80 
+#
+6 box_w Al7075 0 0 0 / 0 0 0
+#end tasc-pnl-h02
+
+#subd tasc-pnl-c02
+1 cyl_y hollow 0 0 0 / 1.135 1.80 2.12  0.80 0.20
+2 cyl_y hollow 0 0 0 / 3.177 1.80 2.12  0.80 0.20
+#
+3 box Al7075 0 0 0 / 0 1.80 0   4.05 0.20 4.24 / 1 2
+#4 box_w sp 0 0 0 / 0 0 0
+#end tasc-pnl-c02
+
+
+#subd tasc-pnl-h03
+1 horse hollow 0 0 0 / 1.0 0  0   2.40 1.60 0.50   0.0 0.0  2.90 1.60 
+2 horse hollow 0 0 0 / 0   =  +   3.90 1.60 0.15   0.0 0.0  4.05 1.60 
+3 box hollow   0 0 0 / 0   =  +   4.05 1.60 2.94
+4 horse hollow 0 0 0 / 0   =  +   4.05 1.60 0.15   0.0 0.0  3.90 1.60 
+5 horse hollow 0 0 0 / 0.6 =  +   3.30 1.60 0.50   0.0 0.0  2.80 1.60 
+6 box hollow   0 0 0 / 0.6 =  +   2.80 1.60 0.997
+#
+7 box_w Al7075 0 0 0 / 0 0 0
+#end tasc-pnl-h03
+
+#subd tasc-pnl-c03
+1 cyl_y hollow 0 0 0 / 1.135 1.60 2.12  0.80 0.40
+2 cyl_y hollow 0 0 0 / 3.177 1.60 2.12  0.80 0.40
+#
+3 box Al7075 0 0 0 / 0 1.60 0   4.05 0.40 5.237 / 1 2
+#4 box_w sp 0 0 0 / 0 0 0
+#end tasc-pnl-c03
+
+
+#subd tasc-pnl-h04
+1 box hollow   0 0 0 / 0   0  0   3.90 1.80 2.153
+2 horse hollow 0 0 0 / 0   =  +   3.90 1.80 0.65   0.65 0.0  2.60 1.80 
+#
+3 box_w Al7075 0 0 0 / 0 0 0
+#end tasc-pnl-h04
+
+#subd tasc-pnl-c04
+1 cyl_y hollow 0 0 0 / 0.969 1.80 0.683  0.80 0.20
+2 cyl_y hollow 0 0 0 / 3.011 1.80 0.683  0.80 0.20
+#
+3 box Al7075 0 0 0 / 0 1.80 0   3.90 0.20 2.803 / 1 2
+#end tasc-pnl-c04
+
+
+#subd tasc-pnl-h05
+1 horse hollow 0 0 0 / 0.65 0  0   2.60 1.80 0.65   -0.65 0.0  3.90 1.80 
+2 box hollow   0 0 0 / 0    =  +   3.90 1.80 2.94 
+3 horse hollow 0 0 0 / 0    =  +   3.90 1.80 0.65    0.65 0.0  2.60 1.80 
+#
+4 box_w Al7075 0 0 0 / 0 0 0
+#end tasc-pnl-h05
+
+#subd tasc-pnl-c05
+1 cyl_y hollow 0 0 0 / 0.969 1.80 2.12  0.80 0.20
+2 cyl_y hollow 0 0 0 / 3.011 1.80 2.12  0.80 0.20
+#
+3 box Al7075 0 0 0 / 0 1.80 0   3.90 0.20 4.24 / 1 2
+#4 box_w sp 0 0 0 / 0 0 0
+#end tasc-pnl-c05
+
+
+#subd tasc-pnl-h06
+1 horse hollow 0 0 0 / 0.65 0  0   2.60 1.60 0.65   -0.65 0.0  3.90 1.60 
+2 box hollow   0 0 0 / 0    =  +   3.90 1.60 2.94 
+3 horse hollow 0 0 0 / 0    =  +   3.90 1.60 0.65    0.65 0.0  2.60 1.60 
+4 box hollow   0 0 0 / 0.65 = 4.24    2.60 1.60 0.997
+#
+5 box_w Al7075 0 0 0 / 0 0 0
+#end tasc-pnl-h06
+
+#subd tasc-pnl-c06
+1 cyl_y hollow 0 0 0 / 0.969 1.60 2.12  0.80 0.40
+2 cyl_y hollow 0 0 0 / 3.011 1.60 2.12  0.80 0.40
+#
+3 box Al7075 0 0 0 / 0 1.60 0   3.90 0.40 5.237 / 1 2
+#4 box_w sp 0 0 0 / 0 0 0
+#end tasc-pnl-c06
+
+
+#subd tasc-pnl-h07
+1 box hollow   0 0 0 / 0    0  0   4.05 1.80 2.153
+2 horse hollow 0 0 0 / 0    =  +   4.05 1.80 0.15   0.15 0.0  3.90 1.80 
+3 horse hollow 0 0 0 / 0.15 =  +   2.90 1.80 0.50   0.50 0.0  2.40 1.80 
+#
+4 box_w Al7075 0 0 0 / 0 0 0
+#end tasc-pnl-h07
+
+#subd tasc-pnl-c07
+1 cyl_y hollow 0 0 0 / 0.873 1.80 0.683  0.80 0.20
+2 cyl_y hollow 0 0 0 / 2.915 1.80 0.683  0.80 0.20
+#
+3 box Al7075 0 0 0 / 0 1.80 0   4.05 0.20 2.803 / 1 2
+#end tasc-pnl-c07
+
+
+#subd tasc-pnl-h08
+1 horse hollow 0 0 0 / 0.65 0  0   2.40 1.80 0.50  -0.5 0.0  2.90 1.80 
+2 horse hollow 0 0 0 / 0.15 =  +   3.90 1.80 0.15  -0.15 0.0  4.05 1.80 
+3 box hollow   0 0 0 / 0    =  +   4.05 1.80 2.94
+4 horse hollow 0 0 0 / 0    =  +   4.05 1.80 0.15   0.15 0.0  3.90 1.80 
+5 horse hollow 0 0 0 / 0.15 =  +   2.90 1.80 0.50   0.50 0.0  2.40 1.80 
+#
+6 box_w Al7075 0 0 0 / 0 0 0
+#end tasc-pnl-h08
+
+#subd tasc-pnl-c08
+1 cyl_y hollow 0 0 0 / 0.873 1.80 2.12  0.80 0.20
+2 cyl_y hollow 0 0 0 / 2.915 1.80 2.12  0.80 0.20
+#
+3 box Al7075 0 0 0 / 0 1.80 0   4.05 0.20 4.24 / 1 2
+#4 box_w sp 0 0 0 / 0 0 0
+#end tasc-pnl-c08
+
+
+#subd tasc-pnl-h09
+1 horse hollow 0 0 0 / 0.65 0  0   2.40 1.60 0.50   -0.50 0.0  2.90 1.60 
+2 horse hollow 0 0 0 / 0.15 =  +   3.90 1.60 0.15   -0.15 0.0  4.05 1.60 
+3 box hollow   0 0 0 / 0    =  +   4.05 1.60 2.94
+4 horse hollow 0 0 0 / 0    =  +   4.05 1.60 0.15   0.15 0.0  3.90 1.60 
+5 horse hollow 0 0 0 / 0.15 =  +   3.60 1.60 0.50   0.50 0.0  3.10 1.60
+6 box hollow   0 0 0 / 0.65 =  +   3.10 1.60 0.997
+#
+7 box_w Al7075 0 0 0 / 0 0 0
+#end tasc-pnl-h09
+
+#subd tasc-pnl-c09
+1 cyl_y hollow 0 0 0 / 0.873 1.60 2.12  0.80 0.40
+2 cyl_y hollow 0 0 0 / 2.915 1.60 2.12  0.80 0.40
+#
+3 box Al7075 0 0 0 / 0 1.60 0   4.05 0.40 5.237 / 1 2
+#4 box_w sp 0 0 0 / 0 0 0
+#end tasc-pnl-c09
+
+
+#subd tasc-pnl-ca
+1 tasc-pnl-h01 sp 0 0 0 / 0  0  0.50
+2 tasc-pnl-c01 sp 0 0 0 / =  =  0.50
+3 tasc-pnl-h02 sp 0 0 0 /    =  =  3.503
+4 tasc-pnl-c02 sp 0 0 0 /    =  =  3.503
+5 tasc-pnl-h02 sp 0 0 0 /    =  =  7.943
+6 tasc-pnl-c02 sp 0 0 0 /    =  =  7.943
+7 tasc-pnl-h02 sp 0 0 0 /    =  = 12.383
+8 tasc-pnl-c02 sp 0 0 0 /    =  = 12.383
+9 tasc-pnl-h02 sp 0 0 0 /    =  = 16.823
+10 tasc-pnl-c02 sp 0 0 0 /    =  = 16.823
+11 tasc-pnl-h03 sp 0 0 0 /    =  = 21.263
+12 tasc-pnl-c03 sp 0 0 0 /    =  = 21.263
+13 box_w Al7075 0 0 0 / 0 0 0
+#end tasc-pnl-ca
+
+
+#subd tasc-pnl-ha
+1 tasc-pnl-h01 sp 0 0 0 / 0  0  0.50
+2 tasc-pnl-h02 sp 0 0 0 /    =  =  3.503
+3 tasc-pnl-h02 sp 0 0 0 /    =  =  7.943
+4 tasc-pnl-h02 sp 0 0 0 /    =  = 12.383
+5 tasc-pnl-h02 sp 0 0 0 /    =  = 16.823
+6 tasc-pnl-h03 sp 0 0 0 /    =  = 21.263
+7 box_w Al7075 0 0 0 / 0 0 0
+#end tasc-pnl-ha
+
+
+#subd tasc-pnl-cb
+1 tasc-pnl-h04 sp 0 0 0 / 0  0  0.50
+2 tasc-pnl-c04 sp 0 0 0 / =  =  0.50
+3 tasc-pnl-h05 sp 0 0 0 /    =  =  3.503
+4 tasc-pnl-c05 sp 0 0 0 /    =  =  3.503
+5 tasc-pnl-h05 sp 0 0 0 /    =  =  7.943
+6 tasc-pnl-c05 sp 0 0 0 /    =  =  7.943
+7 tasc-pnl-h05 sp 0 0 0 /    =  = 12.383
+8 tasc-pnl-c05 sp 0 0 0 /    =  = 12.383
+9 tasc-pnl-h05 sp 0 0 0 /    =  = 16.823
+10 tasc-pnl-c05 sp 0 0 0 /    =  = 16.823
+11 tasc-pnl-h06 sp 0 0 0 /    =  = 21.263
+12 tasc-pnl-c06 sp 0 0 0 /    =  = 21.263
+13 box_w Al7075 0 0 0 / 0 0 0
+#end tasc-pnl-cb
+
+
+#subd tasc-pnl-hb
+1 tasc-pnl-h04 sp 0 0 0 / 0  0  0.50
+2 tasc-pnl-h05 sp 0 0 0 /    =  =  3.503
+3 tasc-pnl-h05 sp 0 0 0 /    =  =  7.943
+4 tasc-pnl-h05 sp 0 0 0 /    =  = 12.383
+5 tasc-pnl-h05 sp 0 0 0 /    =  = 16.823
+6 tasc-pnl-h06 sp 0 0 0 /    =  = 21.263
+7 box_w Al7075 0 0 0 / 0 0 0
+#end tasc-pnl-hb
+
+
+#subd tasc-pnl-cc
+1 tasc-pnl-h07 sp 0 0 0 / 0  0  0.50
+2 tasc-pnl-c07 sp 0 0 0 / =  =  0.50
+3 tasc-pnl-h08 sp 0 0 0 /    =  =  3.503
+4 tasc-pnl-c08 sp 0 0 0 /    =  =  3.503
+5 tasc-pnl-h08 sp 0 0 0 /    =  =  7.943
+6 tasc-pnl-c08 sp 0 0 0 /    =  =  7.943
+7 tasc-pnl-h08 sp 0 0 0 /    =  = 12.383
+8 tasc-pnl-c08 sp 0 0 0 /    =  = 12.383
+9 tasc-pnl-h08 sp 0 0 0 /    =  = 16.823
+10 tasc-pnl-c08 sp 0 0 0 /    =  = 16.823
+11 tasc-pnl-h09 sp 0 0 0 /    =  = 21.263
+12 tasc-pnl-c09 sp 0 0 0 /    =  = 21.263
+13 box_w Al7075 0 0 0 / 0 0 0
+#end tasc-pnl-cc
+
+
+#subd tasc-pnl-hc
+1 tasc-pnl-h07 sp 0 0 0 / 0  0  0.50
+2 tasc-pnl-h08 sp 0 0 0 /    =  =  3.503
+3 tasc-pnl-h08 sp 0 0 0 /    =  =  7.943
+4 tasc-pnl-h08 sp 0 0 0 /    =  = 12.383
+5 tasc-pnl-h08 sp 0 0 0 /    =  = 16.823
+6 tasc-pnl-h09 sp 0 0 0 /    =  = 21.263
+7 box_w Al7075 0 0 0 / 0 0 0
+#end tasc-pnl-hc
+
+
+
+#subd tasc-pnl-r55
+1 cyl_y hollow 0 0 0 / 0 0    0   0.55 1.60
+2 cyl_y hollow 0 0 0 / = 1.60 =   0.28 0.40
+3 cyl_y Al7075 0 0 0 / 0 0 0   0.55 2.00 / 1 2
+#end tasc-pnl-r55
+
+
+
+
+#subd tasc-sd-pnl1
+1 box Al7075 0 0 0 / 0  0  0   33.30 2.00 27.00 / 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 
+### hollow
+2 tasc-pnl-ca sp 0 0 0 /  0.20   0 0
+3 tasc-pnl-cb sp 0 0 0 /  4.45   0 0
+4 tasc-pnl-cb sp 0 0 0 /  8.55   0 0
+5 tasc-pnl-cb sp 0 0 0 / 12.65   0 0
+6 tasc-pnl-cb sp 0 0 0 / 16.75   0 0
+7 tasc-pnl-cb sp 0 0 0 / 20.85   0 0
+8 tasc-pnl-cb sp 0 0 0 / 24.95   0 0
+9 tasc-pnl-cc sp 0 0 0 / 29.05   0 0
+###
+10 tasc-pnl-r55 sp 0 0 0 / 4.35  0   3.403
+11 tasc-pnl-r55 sp 0 0 0 / =  =   7.843
+12 tasc-pnl-r55 sp 0 0 0 / =  = 12.283
+13 tasc-pnl-r55 sp 0 0 0 / =  = 16.723
+14 tasc-pnl-r55 sp 0 0 0 / =  = 21.163
+15 tasc-pnl-r55 sp 0 0 0 / =  = 25.603
+#
+16 tasc-pnl-r55 sp 0 0 0 / 8.45  0   3.403
+17 tasc-pnl-r55 sp 0 0 0 / =  =   7.843
+18 tasc-pnl-r55 sp 0 0 0 / =  = 12.283
+19 tasc-pnl-r55 sp 0 0 0 / =  = 16.723
+20 tasc-pnl-r55 sp 0 0 0 / =  = 21.163
+21 tasc-pnl-r55 sp 0 0 0 / =  = 25.603
+#
+22 tasc-pnl-r55 sp 0 0 0 / 12.55  0   3.403
+23 tasc-pnl-r55 sp 0 0 0 / =  =   7.843
+24 tasc-pnl-r55 sp 0 0 0 / =  = 12.283
+25 tasc-pnl-r55 sp 0 0 0 / =  = 16.723
+26 tasc-pnl-r55 sp 0 0 0 / =  = 21.163
+27 tasc-pnl-r55 sp 0 0 0 / =  = 25.603
+#
+28 tasc-pnl-r55 sp 0 0 0 / 16.65  0   3.403
+29 tasc-pnl-r55 sp 0 0 0 / =  =   7.843
+30 tasc-pnl-r55 sp 0 0 0 / =  = 12.283
+31 tasc-pnl-r55 sp 0 0 0 / =  = 16.723
+32 tasc-pnl-r55 sp 0 0 0 / =  = 21.163
+33 tasc-pnl-r55 sp 0 0 0 / =  = 25.603
+#
+34 tasc-pnl-r55 sp 0 0 0 / 20.75  0   3.403
+35 tasc-pnl-r55 sp 0 0 0 / =  =   7.843
+36 tasc-pnl-r55 sp 0 0 0 / =  = 12.283
+37 tasc-pnl-r55 sp 0 0 0 / =  = 16.723
+38 tasc-pnl-r55 sp 0 0 0 / =  = 21.163
+39 tasc-pnl-r55 sp 0 0 0 / =  = 25.603
+#
+40 tasc-pnl-r55 sp 0 0 0 / 24.85  0   3.403
+41 tasc-pnl-r55 sp 0 0 0 / =  =   7.843
+42 tasc-pnl-r55 sp 0 0 0 / =  = 12.283
+43 tasc-pnl-r55 sp 0 0 0 / =  = 16.723
+44 tasc-pnl-r55 sp 0 0 0 / =  = 21.163
+45 tasc-pnl-r55 sp 0 0 0 / =  = 25.603
+#
+46 tasc-pnl-r55 sp 0 0 0 / 28.95  0   3.403
+47 tasc-pnl-r55 sp 0 0 0 / =  =   7.843
+48 tasc-pnl-r55 sp 0 0 0 / =  = 12.283
+49 tasc-pnl-r55 sp 0 0 0 / =  = 16.723
+50 tasc-pnl-r55 sp 0 0 0 / =  = 21.163
+51 tasc-pnl-r55 sp 0 0 0 / =  = 25.603
+###
+52 box_w sp 0 0 0 / 0 0 0
+#end tasc-sd-pnl1
+
+
+
+#subd tasc-sd-pnl2
+1 box Al7075 0 0 0 / 0  0  0   33.30 2.00 27.00 / 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 
+### hollow
+2 tasc-pnl-ha sp 0 0 0 /   0.20   0 0
+3 tasc-pnl-hb sp 0 0 0 /  4.45   0 0
+4 tasc-pnl-hb sp 0 0 0 /  8.55   0 0
+5 tasc-pnl-hb sp 0 0 0 / 12.65   0 0
+6 tasc-pnl-hb sp 0 0 0 / 16.75   0 0
+7 tasc-pnl-hb sp 0 0 0 / 20.85   0 0
+8 tasc-pnl-hb sp 0 0 0 / 24.95   0 0
+9 tasc-pnl-hc sp 0 0 0 / 29.05   0 0
+#
+10 tasc-pnl-r55 sp 0 0 0 / 4.35  0   3.403
+11 tasc-pnl-r55 sp 0 0 0 / =  =   7.843
+12 tasc-pnl-r55 sp 0 0 0 / =  = 12.283
+13 tasc-pnl-r55 sp 0 0 0 / =  = 16.723
+14 tasc-pnl-r55 sp 0 0 0 / =  = 21.163
+15 tasc-pnl-r55 sp 0 0 0 / =  = 25.603
+#
+16 tasc-pnl-r55 sp 0 0 0 / 8.45  0   3.403
+17 tasc-pnl-r55 sp 0 0 0 / =  =   7.843
+18 tasc-pnl-r55 sp 0 0 0 / =  = 12.283
+19 tasc-pnl-r55 sp 0 0 0 / =  = 16.723
+20 tasc-pnl-r55 sp 0 0 0 / =  = 21.163
+21 tasc-pnl-r55 sp 0 0 0 / =  = 25.603
+#
+22 tasc-pnl-r55 sp 0 0 0 / 12.55  0   3.403
+23 tasc-pnl-r55 sp 0 0 0 / =  =   7.843
+24 tasc-pnl-r55 sp 0 0 0 / =  = 12.283
+25 tasc-pnl-r55 sp 0 0 0 / =  = 16.723
+26 tasc-pnl-r55 sp 0 0 0 / =  = 21.163
+27 tasc-pnl-r55 sp 0 0 0 / =  = 25.603
+#
+28 tasc-pnl-r55 sp 0 0 0 / 16.65  0   3.403
+29 tasc-pnl-r55 sp 0 0 0 / =  =   7.843
+30 tasc-pnl-r55 sp 0 0 0 / =  = 12.283
+31 tasc-pnl-r55 sp 0 0 0 / =  = 16.723
+32 tasc-pnl-r55 sp 0 0 0 / =  = 21.163
+33 tasc-pnl-r55 sp 0 0 0 / =  = 25.603
+#
+34 tasc-pnl-r55 sp 0 0 0 / 20.75  0   3.403
+35 tasc-pnl-r55 sp 0 0 0 / =  =   7.843
+36 tasc-pnl-r55 sp 0 0 0 / =  = 12.283
+37 tasc-pnl-r55 sp 0 0 0 / =  = 16.723
+38 tasc-pnl-r55 sp 0 0 0 / =  = 21.163
+39 tasc-pnl-r55 sp 0 0 0 / =  = 25.603
+#
+40 tasc-pnl-r55 sp 0 0 0 / 24.85  0   3.403
+41 tasc-pnl-r55 sp 0 0 0 / =  =   7.843
+42 tasc-pnl-r55 sp 0 0 0 / =  = 12.283
+43 tasc-pnl-r55 sp 0 0 0 / =  = 16.723
+44 tasc-pnl-r55 sp 0 0 0 / =  = 21.163
+45 tasc-pnl-r55 sp 0 0 0 / =  = 25.603
+#
+46 tasc-pnl-r55 sp 0 0 0 / 28.95  0   3.403
+47 tasc-pnl-r55 sp 0 0 0 / =  =   7.843
+48 tasc-pnl-r55 sp 0 0 0 / =  = 12.283
+49 tasc-pnl-r55 sp 0 0 0 / =  = 16.723
+50 tasc-pnl-r55 sp 0 0 0 / =  = 21.163
+51 tasc-pnl-r55 sp 0 0 0 / =  = 25.603
+###
+52 box_w sp 0 0 0 / 0 0 0
+#end tasc-sd-pnl2
+
+

@@ -1,0 +1,1 @@
+-L/Loft1/Intel/ifc10.1/lib -L/usr/lib/gcc/x86_64-redhat-linux/4.1.1/32 -L/usr/lib/gcc/x86_64-redhat-linux/4.1.1/32/.. -L/usr/lib -Bstatic -lifport -lifcore -limf -Bdynamic -lm -Bstatic -lipgo -lirc -Bdynamic -lc -lgcc_s -lgcc -Bstatic -lirc_s -Bdynamic -ldl -lc /usr/lib/gcc/x86_64-redhat-linux/4.1.1/32/crtend.o /usr/lib/crtn.o

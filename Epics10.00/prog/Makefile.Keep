@@ -1,0 +1,544 @@
+include  $(EPICSTOP)/site.config
+
+
+EXTHDRS	      = $(LIBLOFTINC)/Zcmuint.h \
+		$(LIBLOFTINC)/Zcode.h \
+		$(LIBLOFTINC)/Zcondc.h \
+		$(LIBLOFTINC)/Zcoord.h \
+		$(LIBLOFTINC)/Zelemagp.h \
+		$(LIBLOFTINC)/Zevhnp.h \
+		$(LIBLOFTINC)/Zevhnv.h \
+		$(LIBLOFTINC)/Zglobalc.h \
+		$(LIBLOFTINC)/Zheavyp.h \
+		$(LIBLOFTINC)/Zmagfield.h \
+		$(LIBLOFTINC)/Zmanagerp.h \
+		$(LIBLOFTINC)/Zmass.h \
+		$(LIBLOFTINC)/Zmaxdef.h \
+		$(LIBLOFTINC)/Zpos.h \
+		$(LIBLOFTINC)/Zptcl.h \
+		$(LIBLOFTINC)/ZsaveStruc.h \
+		$(LIBLOFTINC)/ZsubstRec.h \
+		$(LIBLOFTINC)/Ztrack.h \
+		$(LIBLOFTINC)/Ztrackp.h \
+		$(LIBLOFTINC)/Ztrackv.h \
+		$(LIBLOFTINC)/Zunionmap.h \
+		$(LIBLOFTINC)/ZbpPE.h \
+		$(LIBLOFTINC)/ZbpSample.h \
+		$(LIBLOFTINC)/ZbpTbl.h \
+		$(EPICSINC)/Zcnfig.h \
+		$(EPICSINC)/Zcnfig2.h \
+		$(LIBLOFTINC)/Zelement.h \
+		$(LIBLOFTINC)/Zep3Vec.h \
+		$(LIBLOFTINC)/ZepDirec.h \
+		$(LIBLOFTINC)/ZepManager.h \
+		$(LIBLOFTINC)/ZepMaxdef.h \
+		$(LIBLOFTINC)/ZepPos.h \
+		$(EPICSINC)/ZepTrack.h \
+		$(LIBLOFTINC)/ZepTrackp.h \
+		$(EPICSINC)/ZepTrackv.h \
+		$(EPICSINC)/Zepdebug.h \
+		$(EPICSINC)/Zepi2cos.h \
+		$(LIBLOFTINC)/Zmedia.h \
+		$(EPICSINC)/Zmove.h \
+		$(LIBLOFTINC)/Zmubpn.h \
+		$(LIBLOFTINC)/Zstern.h \
+		$(EPICSINC)/Zepcondc.h \
+		$(LIBLOFTINC)/Zurban.h
+
+HDRS	      =
+
+
+MAKEFILE      = Makefile
+
+OBJS	      = ep3p2plane.o \
+		ep3p2plane0.o \
+		epRange.o \
+		epNewVolume.o \
+		epOutCnf.o \
+		ep_cap.o \
+		ep_cone.o \
+		ep_ecyl.o \
+		ep_simpleb.o \
+		epaux.o \
+		epgen.o \
+		epTraceFE.o \
+		epbndry.o \
+		epbndry2.o \
+		epcosIntF.o \
+		epdeflection.o \
+		epenvlpAll.o \
+		epquery.o \
+		epSetXsecMedia.o \
+		epparaphrase.o \
+		epparm.o \
+		epcountStruc.o \
+		eppos2cn.o \
+		eprcnf.o \
+		eptransVect.o \
+		eptransVectZx.o \
+		epqEmin.o  \
+                epprism.o \
+		epdebug.o \
+		epgetRhoc.o
+
+
+PRINT	      = pr
+
+SHELL	      = /bin/sh
+
+SRCS	      = ep3p2plane.f \
+		ep3p2plane0.f90 \
+		epRange.f  \
+		epNewVolume.f \
+		epOutCnf.f \
+		ep_cap.f \
+		ep_cone.f \
+		ep_ecyl.f \
+		ep_simpleb.f \
+		epaux.f \
+		epgen.f \
+		epTraceFE.f \
+		epbndry.f \
+		epbndry2.f \
+		epcosIntF.f \
+		epdeflection.f \
+		epenvlpAll.f \
+		epquery.f \
+		epSetXsecMedia.f \
+		epparaphrase.f \
+		epparm.f \
+		epcountStruc.f \
+		eppos2cn.f \
+		eprcnf.f \
+		eptransVect.f \
+		eptransVectZx.f \
+		epqEmin.f  \
+                epprism.f \
+		epdebug.f \
+		epgetRhoc.f90 \
+
+
+SYSHDRS	      =
+
+all:
+	make	Checkdir $(LIBRARY) SeeSubDir "TARGET=$@"
+
+clean:
+	@rm -f $(OBJS) core  *~ a.out 
+	make SeeSubDir "TARGET=$@"
+
+veryclean:
+	@rm -f $(OBJS) core  *~ a.out temp*.f temp*.f90
+	make SeeSubDir "TARGET=$@"
+
+clobber:
+	@rm -f $(OBJS) $(LIBRARY) core tags
+	make SeeSubDir "TARGET=$@"
+
+depend:
+	@mkmf -f $(MAKEFILE) ROOT=$(ROOT)
+	make SeeSubDir "TARGET=$@"
+
+echo:
+	@echo $(HDRS) $(SRCS)
+	make SeeSubDir "TARGET=$@"
+
+extract:
+	@ar x $(LIBRARY)
+
+
+index:
+	@ctags -wx $(HDRS) $(SRCS)
+	make SeeSubDir "TARGET=$@"
+
+install:	$(LIBRARY)
+		@echo "****" Installing $(LIBRARY) into $(DEST)
+		$(INSTALL) -f  $(DEST) $(LIBRARY)
+		@echo "****" Installing Template files into $(TEMPLATE)
+		cp -r  $(EPICSTOP)/Data  $(EPICSTOP)/Util \
+		 $(EPICSTOP)/UserHook  $(EPICSTOP)/Scrpt  \
+		 $(EPICSTOP)/Doc        $(TEMPLATE)/
+		cp $(EPICSTOP)/site.config $(TEMPLATE)/
+		@echo "****" Installing header files into $(HEADER)
+		cp -r $(EPICSTOP)/epics  $(HEADER)/
+		@echo "****" Installation ended.
+		@echo "****" Owner and group should be changed by hand
+
+print:
+	@$(PRINT) $(HDRS) $(SRCS)
+	make SeeSubDir "TARGET=$@"
+
+tags:           $(HDRS) $(SRCS)
+	@ctags $(HDRS) $(SRCS)
+	make SeeSubDir "TARGET=$@"
+
+
+Checkdir:
+	@( cd $(EPICSTOP)/lib; if [ ! -d  $(ARCH) ]; then  mkdir $(ARCH); fi)
+
+
+SeeSubDir:
+	(cd NewVol;  $(MAKE) $(TARGET) )
+	(cd Light;  $(MAKE) $(TARGET) )
+	@for i in  * \
+	;do   \
+		if [ -d  $$i ] ; then \
+			(cd $$i; \
+			if [ -f Makefile  -a  $$i != Test \
+			-a $$i != Util -a $$i != UC  \
+	                -a $$i != Data  -a $$i != epics \
+	                -a $$i != Obso  -a $$i != TeX \
+	                -a $$i != lib  -a $$i != UserHook \
+	                -a $$i != Scrpt -a $$i != DistJob ] ; then \
+		            $(MAKE) $(TARGET) \
+			;fi) \
+		; fi \
+	done
+
+###
+$(LIBRARY)(ep3p2plane.o): $(LIBLOFTINC)/ZepPos.h
+$(LIBRARY)(epNewVolume.o): $(LIBLOFTINC)/ZepPos.h \
+	$(LIBLOFTINC)/ZepDirec.h \
+	$(LIBLOFTINC)/Zep3Vec.h \
+	$(EPICSINC)/Zcnfig.h \
+	$(LIBLOFTINC)/ZepMaxdef.h \
+	$(EPICSINC)/Zcnfig2.h
+$(LIBRARY)(epOutCnf.o): $(LIBLOFTINC)/Zep3Vec.h \
+	$(EPICSINC)/Zcnfig.h \
+	$(LIBLOFTINC)/ZepMaxdef.h \
+	$(EPICSINC)/Zcnfig2.h
+ep_cap.o: $(LIBLOFTINC)/Zep3Vec.h \
+	$(EPICSINC)/Zcnfig.h \
+	$(LIBLOFTINC)/ZepMaxdef.h \
+	$(EPICSINC)/Zcnfig2.h \
+	$(LIBLOFTINC)/ZepPos.h \
+	$(LIBLOFTINC)/ZepDirec.h \
+	$(EPICSINC)/Zepdebug.h
+ep_cone.o: $(LIBLOFTINC)/Zep3Vec.h \
+	$(EPICSINC)/Zcnfig.h \
+	$(LIBLOFTINC)/ZepMaxdef.h \
+	$(EPICSINC)/Zcnfig2.h \
+	$(LIBLOFTINC)/ZepTrackp.h \
+	$(LIBLOFTINC)/ZepPos.h \
+	$(LIBLOFTINC)/ZepDirec.h \
+	$(EPICSINC)/Zepdebug.h
+ep_ecyl.o: $(LIBLOFTINC)/Zep3Vec.h \
+	$(EPICSINC)/Zcnfig.h \
+	$(LIBLOFTINC)/ZepMaxdef.h \
+	$(EPICSINC)/Zcnfig2.h \
+	$(LIBLOFTINC)/ZepManager.h \
+	$(LIBLOFTINC)/ZepPos.h \
+	$(LIBLOFTINC)/ZepDirec.h \
+	$(EPICSINC)/Zepdebug.h
+ep_simpleb.o: $(EPICSINC)/ZepTrackv.h \
+	$(LIBLOFTINC)/ZepMaxdef.h \
+	$(LIBLOFTINC)/Zmedia.h \
+	$(LIBLOFTINC)/Zelement.h \
+	$(LIBLOFTINC)/ZbpTbl.h \
+	$(LIBLOFTINC)/Zstern.h \
+	$(LIBLOFTINC)/ZbpSample.h \
+	$(LIBLOFTINC)/ZbpPE.h \
+	$(LIBLOFTINC)/Zurban.h \
+	$(LIBLOFTINC)/Zmubpn.h \
+	$(EPICSINC)/ZepTrack.h \
+	$(LIBLOFTINC)/Zptcl.h \
+	$(LIBLOFTINC)/Zunionmap.h \
+	$(LIBLOFTINC)/ZepPos.h \
+	$(LIBLOFTINC)/ZepDirec.h \
+	$(EPICSINC)/Zmove.h \
+	$(LIBLOFTINC)/Zep3Vec.h \
+	$(EPICSINC)/Zcnfig.h \
+	$(EPICSINC)/Zcnfig2.h
+$(LIBRARY)(epaux.o): $(LIBLOFTINC)/ZepTrackp.h \
+	$(LIBLOFTINC)/ZepPos.h \
+	$(LIBLOFTINC)/Zptcl.h \
+	$(LIBLOFTINC)/Zunionmap.h \
+	$(LIBLOFTINC)/Zglobalc.h \
+	$(LIBLOFTINC)/ZepDirec.h \
+	$(LIBLOFTINC)/ZepManager.h \
+	$(LIBLOFTINC)/ZepMaxdef.h
+$(LIBRARY)(epgen.o): $(LIBLOFTINC)/ZsubstRec.h \
+	$(EPICSINC)/ZepTrackv.h \
+	$(LIBLOFTINC)/ZepMaxdef.h \
+	$(LIBLOFTINC)/Zmedia.h \
+	$(LIBLOFTINC)/Zelement.h \
+	$(LIBLOFTINC)/ZbpTbl.h \
+	$(LIBLOFTINC)/Zstern.h \
+	$(LIBLOFTINC)/ZbpSample.h \
+	$(LIBLOFTINC)/ZbpPE.h \
+	$(LIBLOFTINC)/Zurban.h \
+	$(LIBLOFTINC)/Zmubpn.h \
+	$(EPICSINC)/ZepTrack.h \
+	$(LIBLOFTINC)/Zptcl.h \
+	$(LIBLOFTINC)/Zunionmap.h \
+	$(LIBLOFTINC)/ZepPos.h \
+	$(LIBLOFTINC)/ZepDirec.h \
+	$(EPICSINC)/Zmove.h \
+	$(LIBLOFTINC)/Zep3Vec.h \
+	$(EPICSINC)/Zcnfig.h \
+	$(EPICSINC)/Zcnfig2.h \
+	$(LIBLOFTINC)/Zmanagerp.h \
+	$(LIBLOFTINC)/Zmaxdef.h \
+	$(LIBLOFTINC)/ZepManager.h \
+	$(LIBLOFTINC)/ZepTrackp.h \
+	$(EPICSINC)/Zepcondc.h \
+	$(LIBLOFTINC)/Zcode.h \
+	$(LIBLOFTINC)/Zmass.h \
+	$(LIBLOFTINC)/Zglobalc.h
+$(LIBRARY)(epTraceFE.o):$(LIBLOFTINC)/ZsubstRec.h \
+	$(EPICSINC)/ZepTrackv.h \
+	$(LIBLOFTINC)/ZepMaxdef.h \
+	$(EPICSINC)/ZepTrack.h \
+	$(LIBLOFTINC)/Zptcl.h \
+	$(LIBLOFTINC)/Zunionmap.h \
+	$(LIBLOFTINC)/ZepPos.h \
+	$(LIBLOFTINC)/ZepDirec.h \
+	$(EPICSINC)/Zmove.h \
+	$(LIBLOFTINC)/Zep3Vec.h \
+	$(LIBLOFTINC)/Zmaxdef.h \
+	$(LIBLOFTINC)/ZepManager.h \
+	$(LIBLOFTINC)/ZepTrackp.h \
+	$(EPICSINC)/Zepcondc.h \
+	$(LIBLOFTINC)/Zcode.h \
+	$(LIBLOFTINC)/Zmass.h \
+	$(LIBLOFTINC)/Zglobalc.h
+$(LIBRARY)(epbndry.o): $(LIBLOFTINC)/ZepTrackp.h \
+	$(EPICSINC)/ZepTrackv.h \
+	$(LIBLOFTINC)/ZepMaxdef.h \
+	$(LIBLOFTINC)/Zmedia.h \
+	$(LIBLOFTINC)/Zelement.h \
+	$(LIBLOFTINC)/ZbpTbl.h \
+	$(LIBLOFTINC)/Zstern.h \
+	$(LIBLOFTINC)/ZbpSample.h \
+	$(LIBLOFTINC)/ZbpPE.h \
+	$(LIBLOFTINC)/Zurban.h \
+	$(LIBLOFTINC)/Zmubpn.h \
+	$(EPICSINC)/ZepTrack.h \
+	$(LIBLOFTINC)/Zptcl.h \
+	$(LIBLOFTINC)/Zunionmap.h \
+	$(LIBLOFTINC)/ZepPos.h \
+	$(LIBLOFTINC)/ZepDirec.h \
+	$(EPICSINC)/Zmove.h \
+	$(LIBLOFTINC)/Zep3Vec.h \
+	$(EPICSINC)/Zcnfig.h \
+	$(EPICSINC)/Zcnfig2.h
+$(LIBRARY)(epbndry2.o): $(LIBLOFTINC)/ZepTrackp.h \
+	$(EPICSINC)/ZepTrackv.h \
+	$(LIBLOFTINC)/ZepMaxdef.h \
+	$(LIBLOFTINC)/Zmedia.h \
+	$(LIBLOFTINC)/Zelement.h \
+	$(LIBLOFTINC)/ZbpTbl.h \
+	$(LIBLOFTINC)/Zstern.h \
+	$(LIBLOFTINC)/ZbpSample.h \
+	$(LIBLOFTINC)/ZbpPE.h \
+	$(LIBLOFTINC)/Zurban.h \
+	$(LIBLOFTINC)/Zmubpn.h \
+	$(EPICSINC)/ZepTrack.h \
+	$(LIBLOFTINC)/Zptcl.h \
+	$(LIBLOFTINC)/Zunionmap.h \
+	$(LIBLOFTINC)/ZepPos.h \
+	$(LIBLOFTINC)/ZepDirec.h \
+	$(EPICSINC)/Zmove.h \
+	$(LIBLOFTINC)/Zep3Vec.h \
+	$(EPICSINC)/Zcnfig.h \
+	$(EPICSINC)/Zcnfig2.h
+$(LIBRARY)(epcosIntF.o): $(LIBLOFTINC)/ZsubstRec.h \
+	$(LIBLOFTINC)/Zunionmap.h \
+	$(EPICSINC)/Zepi2cos.h \
+	$(LIBLOFTINC)/Ztrack.h \
+	$(LIBLOFTINC)/Zcondc.h \
+	$(LIBLOFTINC)/Zptcl.h \
+	$(LIBLOFTINC)/Zcoord.h \
+	$(LIBLOFTINC)/Zpos.h \
+	$(LIBLOFTINC)/Zmagfield.h \
+	$(LIBLOFTINC)/Ztrackv.h \
+	$(LIBLOFTINC)/Zmaxdef.h \
+	$(LIBLOFTINC)/Zcode.h \
+	$(EPICSINC)/ZepTrack.h \
+	$(LIBLOFTINC)/ZepPos.h \
+	$(LIBLOFTINC)/ZepDirec.h \
+	$(LIBLOFTINC)/Zglobalc.h \
+	$(LIBLOFTINC)/Ztrackp.h \
+	$(LIBLOFTINC)/Zheavyp.h \
+	$(LIBLOFTINC)/Zelemagp.h \
+	$(LIBLOFTINC)/Zevhnp.h \
+	$(LIBLOFTINC)/Zevhnv.h \
+	$(LIBLOFTINC)/Zcmuint.h \
+	$(LIBLOFTINC)/Zmedia.h \
+	$(LIBLOFTINC)/ZepMaxdef.h \
+	$(LIBLOFTINC)/Zelement.h \
+	$(LIBLOFTINC)/ZbpTbl.h \
+	$(LIBLOFTINC)/Zstern.h \
+	$(LIBLOFTINC)/ZbpSample.h \
+	$(LIBLOFTINC)/ZbpPE.h \
+	$(LIBLOFTINC)/Zurban.h \
+	$(LIBLOFTINC)/Zmubpn.h
+$(LIBRARY)(epdeflection.o): $(EPICSINC)/ZepTrackv.h \
+	$(LIBLOFTINC)/ZepMaxdef.h \
+	$(LIBLOFTINC)/Zmedia.h \
+	$(LIBLOFTINC)/Zelement.h \
+	$(LIBLOFTINC)/ZbpTbl.h \
+	$(LIBLOFTINC)/Zstern.h \
+	$(LIBLOFTINC)/ZbpSample.h \
+	$(LIBLOFTINC)/ZbpPE.h \
+	$(LIBLOFTINC)/Zurban.h \
+	$(LIBLOFTINC)/Zmubpn.h \
+	$(EPICSINC)/ZepTrack.h \
+	$(LIBLOFTINC)/Zptcl.h \
+	$(LIBLOFTINC)/Zunionmap.h \
+	$(LIBLOFTINC)/ZepPos.h \
+	$(LIBLOFTINC)/ZepDirec.h \
+	$(EPICSINC)/Zmove.h \
+	$(LIBLOFTINC)/Zep3Vec.h \
+	$(LIBLOFTINC)/ZepTrackp.h
+$(LIBRARY)(epenvlpAll.o): $(LIBLOFTINC)/ZsaveStruc.h \
+	$(LIBLOFTINC)/Zep3Vec.h \
+	$(EPICSINC)/Zcnfig.h \
+	$(LIBLOFTINC)/ZepMaxdef.h \
+	$(EPICSINC)/Zcnfig2.h \
+	$(LIBLOFTINC)/ZepPos.h
+$(LIBRARY)(epquery.o): 	$(EPICSINC)/ZepTrackv.h \
+	$(LIBLOFTINC)/ZepMaxdef.h \
+	$(LIBLOFTINC)/Zmedia.h \
+	$(LIBLOFTINC)/Zelement.h \
+	$(LIBLOFTINC)/ZbpTbl.h \
+	$(LIBLOFTINC)/Zstern.h \
+	$(LIBLOFTINC)/ZbpSample.h \
+	$(LIBLOFTINC)/ZbpPE.h \
+	$(LIBLOFTINC)/Zurban.h \
+	$(LIBLOFTINC)/Zmubpn.h \
+	$(EPICSINC)/ZepTrack.h \
+	$(LIBLOFTINC)/Zptcl.h \
+	$(LIBLOFTINC)/Zunionmap.h \
+	$(LIBLOFTINC)/ZepPos.h \
+	$(LIBLOFTINC)/ZepDirec.h \
+	$(EPICSINC)/Zmove.h \
+	$(LIBLOFTINC)/Zep3Vec.h \
+	$(EPICSINC)/Zcnfig.h \
+	$(EPICSINC)/Zcnfig2.h \
+	$(LIBLOFTINC)/Zmanagerp.h \
+	$(LIBLOFTINC)/Zmaxdef.h \
+	$(LIBLOFTINC)/ZepManager.h \
+	$(LIBLOFTINC)/ZepTrackp.h \
+	$(EPICSINC)/Zepcondc.h \
+	$(LIBLOFTINC)/Zcode.h \
+	$(LIBLOFTINC)/Zmass.h \
+	$(LIBLOFTINC)/Zglobalc.h 
+$(LIBRARY)(epSetXsecMedia.o):$(LIBLOFTINC)/Zmedia.h \
+	$(EPICSINC)/ZepTrackv.h
+f90$(LIBRARY)(epparaphrase.o): $(LIBLOFTINC)/Zep3Vec.h \
+	$(EPICSINC)/Zcnfig.h \
+	$(LIBLOFTINC)/ZepMaxdef.h \
+	$(EPICSINC)/Zcnfig2.h
+$(LIBRARY)(epparm.o): $(LIBLOFTINC)/ZepTrackp.h \
+	$(LIBLOFTINC)/ZepManager.h \
+	$(LIBLOFTINC)/ZepMaxdef.h \
+	$(EPICSINC)/ZepTrackv.h \
+	$(LIBLOFTINC)/Zmedia.h \
+	$(LIBLOFTINC)/Zelement.h \
+	$(LIBLOFTINC)/ZbpTbl.h \
+	$(LIBLOFTINC)/Zstern.h \
+	$(LIBLOFTINC)/ZbpSample.h \
+	$(LIBLOFTINC)/ZbpPE.h \
+	$(LIBLOFTINC)/Zurban.h \
+	$(LIBLOFTINC)/Zmubpn.h \
+	$(EPICSINC)/ZepTrack.h \
+	$(LIBLOFTINC)/Zptcl.h \
+	$(LIBLOFTINC)/Zunionmap.h \
+	$(LIBLOFTINC)/ZepPos.h \
+	$(LIBLOFTINC)/ZepDirec.h \
+	$(EPICSINC)/Zmove.h \
+	$(LIBLOFTINC)/Zep3Vec.h \
+	$(LIBLOFTINC)/Zmass.h
+$(LIBRARY)(epcountStruc.o): $(LIBLOFTINC)/ZepMaxdef.h \
+	$(LIBLOFTINC)/Zep3Vec.h \
+	$(EPICSINC)/Zcnfig.h
+
+$(LIBRARY)(eppos2cn.o): $(EPICSINC)/ZepTrack.h \
+	$(LIBLOFTINC)/Zptcl.h \
+	$(LIBLOFTINC)/Zunionmap.h \
+	$(LIBLOFTINC)/ZepPos.h \
+	$(LIBLOFTINC)/ZepDirec.h \
+	$(LIBLOFTINC)/Zep3Vec.h \
+	$(EPICSINC)/Zcnfig.h \
+	$(LIBLOFTINC)/ZepMaxdef.h \
+	$(EPICSINC)/Zcnfig2.h \
+	$(EPICSINC)/ZepTrackv.h \
+	$(LIBLOFTINC)/Zmedia.h \
+	$(LIBLOFTINC)/Zelement.h \
+	$(LIBLOFTINC)/ZbpTbl.h \
+	$(LIBLOFTINC)/Zstern.h \
+	$(LIBLOFTINC)/ZbpSample.h \
+	$(LIBLOFTINC)/ZbpPE.h \
+	$(LIBLOFTINC)/Zurban.h \
+	$(LIBLOFTINC)/Zmubpn.h \
+	$(EPICSINC)/Zmove.h
+
+$(LIBRARY)(eprcnf.o): $(LIBLOFTINC)/Zep3Vec.h \
+	$(EPICSINC)/Zcnfig.h \
+	$(LIBLOFTINC)/ZepMaxdef.h \
+	$(EPICSINC)/Zcnfig2.h \
+	$(LIBLOFTINC)/ZepManager.h \
+	$(EPICSINC)/ZepTrackv.h \
+	$(LIBLOFTINC)/Zmedia.h \
+	$(LIBLOFTINC)/Zelement.h \
+	$(LIBLOFTINC)/ZbpTbl.h \
+	$(LIBLOFTINC)/Zstern.h \
+	$(LIBLOFTINC)/ZbpSample.h \
+	$(LIBLOFTINC)/ZbpPE.h \
+	$(LIBLOFTINC)/Zurban.h \
+	$(LIBLOFTINC)/Zmubpn.h \
+	$(EPICSINC)/ZepTrack.h \
+	$(LIBLOFTINC)/Zptcl.h \
+	$(LIBLOFTINC)/Zunionmap.h \
+	$(LIBLOFTINC)/ZepPos.h \
+	$(LIBLOFTINC)/ZepDirec.h \
+	$(EPICSINC)/Zmove.h \
+	$(LIBLOFTINC)/ZepTrackp.h
+$(LIBRARY)(eptransVect.o): $(LIBLOFTINC)/ZepDirec.h
+
+$(LIBRARY)(eptransVectZx.o): $(LIBLOFTINC)/ZepDirec.h
+
+$(LIBRARY)(epqEmin.o): $(LIBLOFTINC)/ZepTrackp.h \
+		$(EPICSINC)/ZepTrackv.h \
+		$(EPICSINC)/Zcnfig.h \
+		$(LIBLOFTINC)/Zmass.h
+
+
+$(LIBRARY)(epRange.o): $(LIBLOFTINC)/Zmedia.h \
+		$(LIBLOFTINC)/Zcode.h \
+		$(LIBLOFTINC)/Zptcl.h 
+
+$(LIBRARY):         \
+               $(LIBRARY)(ep3p2plane.o) \
+               $(LIBRARY)(ep3p2plane0.o) \
+	       $(LIBRARY)(epRange.o)  \
+               $(LIBRARY)(epNewVolume.o) \
+               $(LIBRARY)(epOutCnf.o) \
+               $(LIBRARY)(ep_cap.o) \
+               $(LIBRARY)(ep_cone.o) \
+               $(LIBRARY)(ep_ecyl.o) \
+               $(LIBRARY)(ep_simpleb.o) \
+               $(LIBRARY)(epaux.o) \
+               $(LIBRARY)(epgen.o) \
+               $(LIBRARY)(epTraceFE.o) \
+               $(LIBRARY)(epbndry.o) \
+               $(LIBRARY)(epbndry2.o) \
+               $(LIBRARY)(epcosIntF.o) \
+               $(LIBRARY)(epdeflection.o) \
+               $(LIBRARY)(epenvlpAll.o) \
+               $(LIBRARY)(epquery.o) \
+		$(LIBRARY)(epSetXsecMedia.o) \
+		$(LIBRARY)(epparaphrase.o) \
+               $(LIBRARY)(epparm.o) \
+               $(LIBRARY)(epcountStruc.o) \
+               $(LIBRARY)(eppos2cn.o) \
+               $(LIBRARY)(eprcnf.o) \
+               $(LIBRARY)(eptransVect.o) \
+		$(LIBRARY)(eptransVectZx.o)  \
+		$(LIBRARY)(epqEmin.o)  \
+		$(LIBRARY)(epprism.o)  \
+		$(LIBRARY)(epdebug.o) \
+		$(LIBRARY)(epgetRhoc.o) 
+
+

@@ -1,0 +1,45 @@
+c
+#include "gathernrfai.f"
+#include "gatherhyb.f"
+      if(mpirank .eq. 0) then
+c         reduce rec part so that the # of ptcls in each sector be
+c         ~ limit. Simultaneousely, ascii data record is put  in a
+c         sigle file successively.
+c        Namely, 
+c        if rank = 0,  open the  .dat file
+c        rwind rank0 .dat file and read, and write data
+c        if it is accepted by referring to rec part
+c        when finised, mpi_send mesagag to rank-1
+c      
+c        if rank != 0,  mpi_recieve signal from a rank younger 
+c        by 1, and do  the same as rank0, 
+c        if the rank is not the last rank, send to next rank.
+c
+
+      if(mpirank .eq. 0) then
+         msg =dir(1:lengdir)//"/"//execid(1:lengid)//".nrfai"
+         call copenfw2(fnonrfai, msg, 1, icon)
+         if(icon .gt. 1) then
+            write(0,*) ' icon=', icon
+            call cerrorMsg(msg, 1)
+            call cerrorMsg('could not be opened', 0)
+         endif            
+         msg =dir(1:lengdir)//"/"//execid(1:lengid)//".dat"
+         call copenfw2(fnodat+1, msg, 1, icon)
+         if(icon .gt. 1) then
+            write(0,*) ' icon=', icon
+            call cerrorMsg(msg, 1)
+            call cerrorMsg('could not be opened', 0)
+         endif            
+         
+         rewind(fnodat)
+#include "readAndput.f"
+         call mpi_send(1,1,MPI_INTEGER,0,0,MPI_COMM_WORLD,icon)
+      else
+         call mpi_recv(dum,1, MPI_INTEGER, mpirank-1,0,stat,icon)
+#include "readAndput.f"
+         if(mpirank .eq. mpisize) then
+         else
+            call mpi_send(1,1,MPI_INTEGER,mpirank,0,MPI_COMM_WORLD,icon)
+         endif
+      endif

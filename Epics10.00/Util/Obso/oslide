@@ -1,0 +1,106 @@
+#   a=3              to wait 3 sec
+#   call "slide"
+#   
+#   (if a=-1         wait until return
+#
+ load "xconfig"
+ rep "<awk -f cmode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace1"  w l
+ print 1
+ pause  a
+
+
+ load "xconfig"
+ rep "<awk -f cmode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace2"  w l
+ print 2
+ pause  a
+
+ load "xconfig"
+ rep "<awk -f cmode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace3"  w l
+ print 3
+ pause  a
+
+ load "xconfig"
+ rep "<awk -f cmode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace4"  w l
+ print 4
+ pause  a
+
+ load "xconfig"
+ rep "<awk -f cmode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace5"  w l
+ print 5
+ pause  a
+
+ load "xconfig"
+ rep "<awk -f cmode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace6"  w l
+ print 6
+ pause  a
+
+ load "xconfig"
+ rep "<awk -f cmode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace7"  w l
+ print 7
+ pause  a
+
+ load "xconfig"
+ rep "<awk -f cmode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace8"  w l
+ print 8
+ pause  a
+
+ load "xconfig"
+ rep "<awk -f cmode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace9"  w l
+ print 9
+ pause  a
+
+ load "xconfig"
+ rep "<awk -f cmode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace10"  w l
+ print 10
+ pause  a
+
+ load "xconfig"
+ rep "<awk -f cmode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace11"  w l
+ print 11
+ pause  a
+
+ load "xconfig"
+ rep "<awk -f cmode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace12"  w l
+ print 12
+ pause  a
+
+ load "xconfig"
+ rep "<awk -f cmode  zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace13"  w l
+ print 13
+ pause  a
+
+ load "xconfig"
+ rep "<awk -f cmode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace14"  w l
+ print 14
+ pause  a
+
+ load "xconfig"
+ rep "<awk -f cmode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace15"  w l
+ print 15
+ pause  a
+
+ load "xconfig"
+ rep "<awk -f cmode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace16"  w l
+ print 16
+ pause  a
+
+ load "xconfig"
+ rep "<awk -f cmode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace17"  w l
+ print 17
+ pause  a
+
+ load "xconfig"
+ rep "<awk -f cmode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace18"  w l
+ print 18
+ pause  a
+
+ load "xconfig"
+ rep "<awk -f cmode zoff=`cat .Revmax` zrev=`cat .Reverse`  /tmp/$$USER/trace19"  w l
+ print 19
+ pause  a
+
+ load "xconfig"
+ rep "<awk -f cmode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace20"  w l
+ print 20
+ pause  a
+

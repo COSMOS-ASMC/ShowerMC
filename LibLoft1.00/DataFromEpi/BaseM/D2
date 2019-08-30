@@ -1,0 +1,10 @@
+#name   Format    H2 gas
+D2 	2
+#
+#  Elem	 rho(g/cm^3)	Gas/Solid(1/0)  refl.index  Birks c.
+
+1         0.1677e-3	0                 1.128   0 0 0
+# 	Z	A  	N
+	1	2.016	2
+#  ⟨Z/A⟩   I[eV]   a       k      x0    x1     Cbar  delta0
+ 0.49603   19.2 0.1409  5.7273  1.8793  3.2872   9.6543 0.00

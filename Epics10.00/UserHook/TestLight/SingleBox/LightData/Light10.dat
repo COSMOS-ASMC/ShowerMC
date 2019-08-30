@@ -1,0 +1,203 @@
+  Format: basically the same as sepicsfile. But we write example
+  values after "/",  So the values before "/" are always employed.
+
+  Any comment before ----------------------- line.
+  After that, a 'name' starting from the 2nd column must be the one
+  defined in the system. It must be followed by  value(s) which in 
+  turn followed by "/" (slash).  The values after "/" are typical
+  example values.
+  The name may appear in any order.
+  If a line starts  from the 3rd or a later column, it is regarded
+  as a comment line. 
+  Light parameter given in sepicsfile means
+    Light=0  the values below are not referred. (this file is not
+             read)
+    Light=11  on-fly light ray tracing
+          12  Cerekov/Synchrotrton is on fly, but Scinti light ray
+             tracing starts at end of each event
+          21  No ray tracing, but data for the tracing is put
+          22  Data by 3 is read and ray tracing is done
+------------------------------------------------------------
+ refracIndex     / 2.2
+      component's  refracion index n.
+      Used if refracFile is "dummy".
+      If blank, data given in config file will be used. 
+      If single data is given, it is used as refractive index 
+      For gases one may get wave length dependence in the following form:
+      If two terms, a and b, are given, index n is assumed to be
+      (n-1)*10^8 = a + b*f^2.  (Note not (n-1)x10^6 as in PDG).
+      where f = 1/w.l (w.l = wave length in cm, not nm here). 
+      If three terms, a, b, c are given, index n is assumed to be
+      (n-1)*10^8 = a + b/(c-f^2).   For these, see 
+        M. Sneep, W. Ubachs
+	Journal of Quantitative Spectroscopy & Radiative Transfer
+        92 (2005) 293–310
+     
+      If it is difficult to use simple formulas, tabulate the values
+	and give it in next.
+ refracFile  'dummy' / 'dummy' 
+      File name which is assumed to be in the dirctory shown in
+      "LightDir" (i.e,  the directory given by LightDir in sepicsfile).
+      The refraction index is usally a function of the wave
+      length. If it is known, this must be given in this file: pairs
+      of (wl, index) in each line. Wave length unit is nm.
+      index is unitless. If 'dummy', no file is
+      assumed and the value given by refracIndex is used.
+
+ refMode  1 0  1 1 0  1     /   1   0   1  1   0      1    
+	1--> wrapper is reflector.  0-->grease etc.  -1-->no wrapper
+       see below.
+ wrapper 0.9 1.445 0.9 0.9 1.445 0.9  / 0.80 1.445 0.8  0.8  1.445 0.8
+	wrapper is a thin 'light' medium such as grease,  thin
+      light reflector such as Al or white paint... which are not
+      included in config.
+      used when wrapperReflecFile="dummy" for reflection (refMode=1)          
+      or   when wrapperRefracFile="dummy" for refraction (refMode=0)           
+           wrapperRefracFile is different from RefracFile                     
+      The values specify how the each surface of the compoent is
+      surrounded.  Normally, we don't put very thin wrapper or grease
+      surrounding the component in the config, but we have to consider
+      such wrapper or grease for light propagation. The values in refMode
+      and wrapper correspond to surface # 1, 2,...  of the component
+      in local coordinate. (see surfaceNo.pdf):
+      box:  #1 xy@z=0, #2 yz@x=boxa, #3 xz@y=0, #4 xz@y=boxb
+            #5 yz@x=0, #6 xy@z=boxc.
+      cylinder: #1 bottom, #2 top, #3 column part.
+         If the # of surfaces is n and  less than the # of values 
+	 given above, only first n are used. 
+
+     refMode: 1--> wrapper is a reflector (such as Al, Ag, white sheet..)
+               with the reflection coeff.,   the value in wrapper.
+              0--> wrapper is a grease or very thin transparent material
+	           such as clad of a fiber. It's refractive index is given
+                   in the corresponding wrapper value.
+              -1--> no warpper; the componet is adjacent to another componet
+	           (or void) described in config. wrapper is not consulted.
+                   If the refraction index of that adjacent component is
+		    0, the light is instantly  absorbed.
+
+     wrapper. See above.  Normally, if the value is less than 1,
+          it should be a reflector and if it is greater than 1, it should
+	  be a transparent thin medium. So we may live without "refMode".
+	  But in some case, we may use 1 for both so we introduced refMode.
+	  (For low energy X-ray, refraction index may be < 1., though
+	  we don't treat such case at present).
+	  If the index is given, we compute the reflection or refraction 
+	  probability  and continue the ray tracing.
+          If the component has multi-layer clads, we should put such 
+	  clads in config file directly with wrapper=0.
+       If refMode is 1 and r=wrapper > 0, r-fraction of light is reflected
+       and (1-r)-fraction of light is absorbed.
+       If refMode is 0 and n2=wrapper> 0, reflection or refraction happenes.
+       Their ratio is computed automaticaly using n1 and n2 and light angle
+       and ray tracing continues.  The refracted light may enter a sencor
+       in some case.
+ wrapperReflecFile  "dummy" / "dummy" 
+       see above. wave length vs  wrapper's reflection coef.          
+ wrapperRefracFile  "dummy" / "dummy" 
+       see above. wave length vs wrapper's refraction coef.   
+ mirror  1.0 1.0 1.0 1.0 1.0 1.0 /  1.0 1.0 1.0 1.0 1.0 1.0 
+      (see FuzzyFac,too)
+      The angle of the reflected light is dermined by this.
+      The values correspond to the surface # as refMode or wrapper do.
+      If mirror is 1, the reflected light has the same angle as
+      the incident light with respect to the normal vector of the
+      surface at the reflection point. (complete mirror reflection).
+        It is  assumed that  (1.-"mirror") is diffusive refl. 
+      Normally, if the wrapper is white, it is said that diffusive
+      (random) reflection happens so that the reflection angle becomes
+      isotropic.  Normally, mirror may be 0 or 1.
+ fuzzy  0. 0. 0. 0. 0. 0.  /  0. 0. 0. 0. 0. 0.  
+      This introduces some fuzzy factor for the reflection/refraction angle.
+      If 0, exact Snell's law is assumed. 
+      If > 0., it is taken as a Gaussian spread sigma in deg around the
+      exact Snell's law; light angle is fuzzified by the Gaussian random
+      factor. (Not used for diffusive reflection).
+
+ maxPathFac 100. / 50. etc　
+      Let maxPath=maxPathFac*(max dimension of the component) 
+      If the light travels longer than this maxPath, ray tracing
+      is ceased and the light is assumed to be absorbed.
+
+ Rayleigh    0  /  
+      If this is 0 or blank, Rayleigh scattering is not considered
+      in Light media. Note this is independent of coherent scattering
+      (Rayleigh scattering) of X/gamma rays > 1keV which is always
+      considered in Epics.
+
+ Mie         0 /
+      If this is 0 or blank, Mie scattering is not considered
+      in Light media. 
+
+ attenL 0.   / 150 etc
+      Light attenuation length.  If attenFile is not given, this is 
+      is used for all light wave length.   (cm)
+      (Note: 0 is special;  no attenuation in this case) 
+
+ attenFile  'dummy' / 'dummy'.  
+      File name.  The file is assumed to be in "LightDir" (see refRacFile)
+      referred when actual ray tracing is performed.
+      If the light attenuation length is a function of wave length,
+      and is known, give the list of (wl, attenL) in the file
+      one pair in one line.  Unit is (nm, cm)
+      
+ NpPerMeV 2000  / 3000 etc
+      Absolute scintillation photon number generated by MeV energy deposit.
+      Poisson fluctuation will be introduced if the number is small.
+
+
+ waveLenFile 'dummy' / 'dummy'
+       File name.  The file is assumed to be in "LightDir".
+       This is referred when ray tracing is needed.
+       If the wave length distribution of emitted light is known, give
+       it in the file; pair of (wl, dN/d(lamda) must be given  in each
+       line.  Unit (cm, arbitrary). If this is dummy,
+       no file is assumed and peakWl is used.
+
+ peakWL 550   / 500 
+       Effective  Wave Length (nm) of the scinti. of emitted light. 
+       If waveLenFile is not given, this is used, but
+       even if  waveLenFile is given, this is used for the effective
+       wave length (peak wave length) in some case.
+        If the max value in the file and this one differ very much, 
+       warning may be issued.
+       quench    0 0 0      / 0 0 0    obso
+       Bircus coef. for quenching effect of the scintillator 
+       If 0, or not given, values defined in media file is employed
+       
+ minmaxWL  200  800 /  200 800
+       (nm).  When a Cerekov light is emitted, its  wave length 
+       distribution is 1/L^2 dL and short wave length light is
+       more probable. However, short wave length light is normally
+       instantly absorbed in the media, or the sensor may not have
+       quantim efficiency to that light. These factors might be not
+       well known so we may cut the light outside of this range
+       for Cerenkov light.  For low energy charged particles,
+       the upper limit may be automatically lowered.
+  
+ NpSample  1000  / 5000
+       Used when Light=2 or 4
+       Maximum number of photons actually traced for scinti photons
+       generated  in a given unit cell.  If the number of photons
+       is larger than  this, we get the final result by increasing 
+       the result so far by a factor of RNp/NpSample, 
+        where RNp is the total number  of photons.  
+ CellSize  1 10 10 / 1 10 10  (let 3 values be p, q, r)
+       When Light is 12, 21 or 22, and scintillation is to be treated
+       (i.e, B's 3 bits are xx1; see manual), we store energy deposit
+       in Edepo(:::) which corresponds to a number of cells in a
+       component.  The unit cell size
+       (dx,dy,dz) is determined p,q,r(%) of the component size.
+       If the component is a box, dx = p*boxa/100, dy=q*boxb/100,
+       dz=r*boxc/100
+       In normal situation, boxa is longest side so p may be smallest.
+       However, if boxc is longest, r must be smallest. 
+
+       If the component is a cylinder, dx=p*R/100, dy=q*R/100, dz=r*H/100.
+       In this case, normal situation is that sensor is at xy plane
+       (z=0 and/or z=H) so r should be small (~1)  while p,q may be 
+       larger (~10).
+       For example, (p,q,r)=(1,10,10), and box size (20,2,2)cm
+       (dx,dy,dz)=(2, 2, 2) mm.  One may think 10 % is too large, but
+       for the direction transverse to the sensor direction, normally
+       ~10 % is OK.  

@@ -1,0 +1,15 @@
+This  directory contains soubroutines for Atmosphere structure.
+The earth is assumed to be a complete sphere.
+The atmosphere is an approximation to U.S standard
+one: this approximation is good at height <
+40 km. At around 100 km,  the atmosperic depth
+is computed as 0.1 g/cm2 while better approximation
+gives 0.2g/cm2.
+ At altitude > 100km, the approximation becomes worse.
+  If we need this better approximation
+we may use
+
+   stdatmos1.d, stdatmos2.d 
+and cstdatmos0.f. cstdatmos0.f is not yet
+completed.
+

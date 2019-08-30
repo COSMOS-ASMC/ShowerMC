@@ -1,0 +1,12 @@
+#name   Format   sunAtmos ; 74 % H, 15 % He   1% O
+sunAir 	2
+#  Elem	 rho(g/cm^3)	Gas/Solid(1/0) refl.index               Birks corr.
+#                                     (for gas, (n-1)*10^6)
+
+3         3.0e-7		  1    293                       0  0  0
+# 	Z	A  	N
+	1	1	0.75
+	2	4	0.14
+	8	16	0.01
+#  ⟨Z/A⟩   I[eV]   a       k      x0    x1     Cbar  delta0
+ 0.87      25.6   -100   -100   -100  -100    -100    0.00

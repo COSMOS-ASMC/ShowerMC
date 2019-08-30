@@ -1,0 +1,160 @@
+      subroutine catmosCnst1
+
+!   catmosCnst1:  compute some basic constants
+!      a,  b,  d0, cum, H
+! where
+!     a, b; const shown below
+!       d0: see the formula below.
+!     cumd: amount of atmospher above the node.
+!        H: scale height at the node
+!     all in mks unit.
+!
+!     The scale height is approximated by a
+!   number of stright lines as a function of height. The data in
+!   stdatmos1.d gives height, temperature, etc at  each nodal point.
+!
+!         The scale height, H, is expressed by H = H0 + a(z-z0)
+!                                                = kT/mg      
+!   in each region.
+!   We neglect height dependence of gravitational accelleration g,
+!   and the average mass of  air molecules, m.   
+!   Since the data table gives T(z)= T0 + b(z-z0) at the nodal points, 
+!   we can first get b,
+!   and then a by a = dH/dz = k/mg * b.  H at a nodal point, z,  
+!   is obtained as H(z) =kT(z)/mg.
+!
+!   The density off a nodal point is given by
+!
+!              rho = rho0 * (1+ a(z-z0)/H(z0))**(-1-1/a)      (a != 0)
+!                  = rho0 * exp(- (z-z0)/H)            (a =0; hence H is const)
+!
+!   (We employ H(z0) as the scale height in the segment)
+!   The amount of air between  given heights, z1 and z2  is by
+!
+!              d = d0 *(fd(z1) - fd(z2))  where
+!         
+!            fd(z) = (1+ a(z-z0)/H(z0))**(-1/a)                   (a != 0)
+!
+!                  =  exp(-(z-z0)/H )                             (a = 0)
+!
+!   where  d0 = rho0*H(z0)
+!
+!   If z1=z0,  d becomes
+!
+!              d= d0 ( 1 - fd(z2))
+!
+!
+
+!
+      use modAtmosDef  
+      implicit none
+#include  "Zglobalc.h"
+#include "ZmediaLoft.h"
+
+
+
+      
+
+      real*8  k, nuc, c2, dtdz
+!     m: avrage molecule mass number of air
+!     sum(Volmue fraction of each Atom * its A )
+!       Media(i)%A * Media(i)%sumNo 
+!      g: gravitational acceleration.
+!      k: Boltzman's const. eV/K
+!     c2: c**2
+      parameter(  nuc =938.3d6,  c2=c*c, k= 8.617d-5)
+
+
+      real(8),save:: m = 14.5*2 ! molecule's volume weighted A.
+      real(8),save:: g =9.80665  ! gravitational accel. m/s2
+      real(8),save:: kbymg      !   =  k*c2/(m*nuc*g)
+      integer nodes, medianum
+      real(8):: mm
+!  #include  "Zstdatmosf.h" -> modAtmosDef
+      integer:: i
+
+      
+
+      nodes = atmos%nodes
+
+      do i = 1, nodes-1
+         medianum=atmos%node2mediaNo(i)
+         mm = Media(medianum)%A *  Media(medianum)%sumNo
+         if( Media(i)%name == "Air" ) then
+            write(0,*) 'Air m=', m, ' sum Am of media=',mm
+         endif
+         kbymg = k*c2/(m*nuc*g)
+         dtdz = (atmos%T(i+1) - atmos%T(i))/ (atmos%z(i+1) - atmos%z(i))
+         atmos%H(i) = kbymg * atmos%T(i)                 ! at atmos%z(i)
+         atmos%b(i) = dtdz
+         atmos%a(i) = kbymg * atmos%b(i)
+         atmos%d0(i) = atmos%rho(i) * atmos%H(i)
+!            for const rho, dtdz =0.  .b=0, a=0,  T = Thigh
+!         d0 large, H large
+!///////////
+!        write(0, *)
+!     * atmos.z(i), atmos.d0(i), atmos.a(i), atmos.b(i), atmos.H(i)
+!////////
+      enddo
+
+      atmos%cumd(nodes) =  atmos%rho(nodes) * Hinf   ! put  very small amout
+
+      do i = nodes-1, 1, -1
+         if( atmos%P(i) == 0. ) then
+            atmos%cumd(i) = atmos%cumd(i+1) +
+     *      atmos%rho(i)* (atmos%z(i+1)-atmos%z(i))
+         else
+            atmos%cumd(i) = atmos%cumd(i+1) +
+     *       atmos%d0(i)*
+     *       rhoInte(atmos%z(i+1), atmos%a(i),atmos%z(i), atmos%H(i) )
+         endif
+      enddo
+      do i = 1, nodes
+!         atmos.logP(i) = log(atmos.P(i))
+         atmos%logrho(i) = log(atmos%rho(i))
+         atmos%logcumd(i) = log(atmos%cumd(i))
+         atmos%logcumdi(atmos%nodes-i+1) = atmos%logcumd(i)
+         atmos%logrhoi(atmos%nodes-i+1) = atmos%logrho(i)
+         atmos%zi(atmos%nodes-i+1) = atmos%z(i)
+      enddo
+      end
+
+      subroutine catmosCnst2
+!     compute c-spline coef. for later use
+      use modAtmosDef
+      implicit none
+!  #include "Zatmos.h"
+
+      integer  nodes
+      
+      nodes = atmos%nodes
+!                           height--> rho
+      call kcsplCoef(atmos%z, atmos%logrho, nodes, atmos%coefh2r,
+     *      maxnodes)
+!                           height--> log(depth)
+      call kcsplCoef(atmos%z, atmos%logcumd, nodes, atmos%coefh2d,
+     *      maxnodes)
+!                           h--> log(P)
+!      call kcsplCoef(atmos.z, atmos.logP, nodes, atmos.coefh2P,
+!     *      maxnodes)
+!                           h--> scale H
+      call kcsplCoef(atmos%z, atmos%H, nodes-1, atmos%coefh2H,
+     *      maxnodes)
+!                           h--> T
+      call kcsplCoef(atmos%z, atmos%T, nodes, atmos%coefh2T,
+     *      maxnodes)
+!                           log(rho)--> h
+!      call kcsplCoef(atmos.logrho, atmos.z, nodes, atmos.coefr2h,
+!     *      maxnodes)
+!                           log(depth)--> h
+      call kcsplCoef(atmos%logcumdi, atmos%zi, nodes, atmos%coefd2h,
+     *      maxnodes)
+
+!               log(detph) --> log(rho)
+      call  kcsplCoef(atmos%logcumdi, atmos%logrhoi, nodes,
+     *      atmos%coefd2r, maxnodes)
+!                           log(P) --> h 
+!      call kcsplCoef(atmos.logP, atmos.z, nodes, atmos.coefP2h,
+!     *      maxnodes)
+
+      end

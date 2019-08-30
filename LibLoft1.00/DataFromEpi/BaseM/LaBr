@@ -1,0 +1,19 @@
+# ************************************************ 
+#     This table  has been made by using /home/Users/kasahara/Epics/Data/BaseM/LaBr 
+#     with Bremsstrahlung formula: # 1
+#     and  Pair creation  formula: # 2.
+#     Fri Aug  8 00:36:16 JST 2008 by KASAHARA Katsukai using
+#     version uv8.74  
+#     host was tasim501 
+# 
+#name   Format    LaBr3
+LaBr 	2
+#  rho may be as small as 5.08
+#  Elem	 rho(g/cm^3)	Gas/Solid(1/0)   refl.index Birks C
+
+2         5.3			0          0     0 0 0
+# 	Z	A  	N
+	57	138.9	1
+	35	79.9	3
+#  ⟨Z/A⟩   I[eV]   a       k      x0    x1     Cbar  delta0
+0.42787     454.5  0.2197  3.0000  0.3581  3.0000  5.6997      0.0

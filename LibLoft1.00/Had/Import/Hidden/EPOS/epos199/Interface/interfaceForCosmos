@@ -1,0 +1,59 @@
+1)   init onece for all
+     
+     call aaset(0)
+     call IniEpos(  )
+***       modification:
+**     inhibit decay :if  life>= K0short level (except pi0)
+                   with some non-negligible  production rate.
+
+       pi0, Lamda0, K0short, Sigma, ( Gzai ?)
+
+      iframe=12  ! target rest system
+**       file management: initl, inidi, iniev, inirj, inics
+      fnnx=...
+      fnii=...
+      nfnii=...  
+**     debug unit     
+      ifch=0  
+      ifmt=0   ! message 
+**
+      nevent=1   ?
+      modsho=1   ?	  
+**      projectile and target spec. deferred  to 1 event
+	generation. energy of  proj.
+          idproj,laproj, maproj, idtarg, latarg, matarg
+
+      hydro effect ? 	   default yes.
+
+
+2)  init for 1 event
+     set projectile and target.  energy
+     idproj,laproj, maproj, idtarg, latarg, matarg
+     energy
+         elab =  xxx  in GeV (total energy ?)
+       also ekin GeV  may be used.        
+**     get interacton cross-section 
+     call xsigma ?   answer is ?
+           sigtot, sigela, sigine
+           sigtotaa, sigelaaa, 
+                  *** sigineaa  (same as sigine for pp)
+**     init  
+     call ainit
+
+3)    generate 1  event
+
+      call aepos(-1)
+c Fix final particles and some event parameters 
+        call afinal
+          -->  epos code  
+c Fill HEP common
+        call ustore  --> pdg code
+-------------------
+  photo-hadron  interactions at high energies.
+  
+  give a vector meson as projectile 
+  (one of rho, omega, phi) ?--> pi0 is ok.
+
+
+  
+   

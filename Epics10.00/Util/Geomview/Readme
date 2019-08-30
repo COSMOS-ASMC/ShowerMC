@@ -1,0 +1,118 @@
+0-a)  
+  You have to setup an environmental variable
+  
+       GEOMVIEW
+ 
+  which must show the pass to the Geomview executable binary.
+
+  For example, 
+   setenv GEOMVIEW /usr/bin/geomview             (probably for Linux, etc)
+ or
+   setenv GEOMVIEW /usr/local/Apps/Geomview.app/Geomview  (probably for nextstep)
+ etc.
+0-b) Too see particle tracks (trace information), you have to
+   fix 'vdir' in 'disptracebygeomv' file in this directory.  Its default is
+   /tmp/$USER/Work.   Also you may
+   adjust particle code list to be displayed by 'set ptcls'.
+
+----------------
+1)  To see the detector configuration,  first you have to use
+    Util/drawconfig.  Fix the display conditions and select menu
+    Then, issue,
+ 
+     ./dispconfigbygeomv
+ 
+or 
+  
+     ./dispconfigbygeomv -e
+
+or 
+
+     ./dispconfigbygeomv -a
+
+  In most of the cases, this will be enough for you.  
+
+If -e is given, detector display is made by component base
+(you can access every component in Geomview display, but
+ if the number of components becomes too large, you will
+ feel subdetector base display (without -e) is more
+ convienent; without -e, only level 0~1 components
+ (and subdetectors) are fed to Geomview.
+if -a is given, all components are put in a file so
+that Geomview access the only one whole detector.
+
+   
+For other options, type 
+
+	./dispconfigbygeomv -h
+
+2) To know the color and media correspondence in detector display,
+   you may type
+
+  ./showmediacolor
+
+*****NOTE******
+ A perl script 'hvectext' must exist for this.  The pass to it must be
+ given in an environmental variable
+
+    GEOMVIEWTEXT 
+
+ For example;
+   /usr/bin/hvectext  (prob. for Linux)
+
+   /usr/local/Apps/GEOMVIEW.app/bin/next/hvectext  (prob. for NEXTSTEP)
+
+
+3) You can combine 1) and 2) above as
+
+  ./dispconfigbygeomv -i.
+or
+  ./dispconfigbygeomv -e -i
+or
+  ./dispconfigbygeomv -a -i
+
+4) You can specify the working directory to store display data, and config 
+   files  explicitly as
+
+  ./dispconfigbygeomv [-e] [-i] workdir config1 config2 ...
+
+------------
+
+
+5) To see particle trace, 
+ 5-1) If a trace data (say, /tmp/foo/trace1) by Epics is available
+   use
+   ./disptracebygeomv  /tmp/foo/trace1
+
+  This will create ptcl2p1.vect, ptcl3n1.vect. ptcl6p1.vect etc
+  (some may be missing if there is no such particle trakcs) in $vdir.
+
+  ptcl2p1.vect containes data for particle code 2 with positive charge
+ (i.e., positron)  and ptcl2n1.vect for negative charge (i.e, electron).
+  For neutral particles (say, gamma rays), ptcl1z1.vect will be
+  created (z for zero charge).
+
+  You can control the charge of particles as
+
+	./disptracebygeomv  [-{c|z|b}] /tmp/foo/trace1
+
+  where -c is for charged particle selection, -z for zero charge particle 
+  selection, -b for the both.  The default is -c.
+
+
+
+ 5-2) To display trace and detector configuration together,
+     use
+	
+	./disptracebygeomv  [-{c|z|b}] /tmp/foo/trace1 det [-e|-a][-i] [outdir]
+
+     where -e,-a -i and outdir are the same as for dispconfigbygeomv.
+
+
+6) The 'colortab' in this directory determines the default color of 
+   each particle code. Color can be changed within Geomview.
+
+
+
+
+

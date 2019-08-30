@@ -1,0 +1,18 @@
+#!/bin/csh -f
+if ( $#argv != 1) then
+	echo "Usage: usenewvol  configpass"
+	exit 1
+endif
+set pwd=`pwd`
+
+echo  " pwd is " $pwd
+
+cd $EPICSTOP/Util/UseNewVol/;   ./usenewvol $pwd/$1
+
+cd $pwd
+
+
+
+
+
+

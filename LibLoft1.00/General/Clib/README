@@ -1,0 +1,26 @@
+This directory contains subroutines mainly concerned with the 
+Lorentz boost. Although it can be treated if we have information
+of four momentum without knowing the mass explicitly
+(i.e., /fmom/ structure is enough),
+we use systematically the /ptcl/ structure thoughout, in 
+which we assume 4 momentum and mass are given explicitly.  
+                ~~~~~~~~~~~~~~~~~~~ 
+  One may suspect that mass can be derived from (4 momentum)**2
+without giving it explicitly, and  for the Lorentz transformation
+we even need not know the mass value.  However, if a Lorentz transormation
+like  E = gamma ( E' - beta * Pz') is applied at very high energy,  
+beta is almost one and E' - Pz' is so close and we lose accuracy.
+In that case, we have to use approximate formula where the mass
+must be given.  Mass by sqrt ((4 momenum)**2) loses also accuracy
+in this case.  So our resolution on this problem is to use /ptcl/
+structure always.   
+  This is somewhat different from giving 4 momentum and mass
+separately in subroutine calles: In that case we have to specify
+the type of  mass (real*4 or real*8 or ) in the subrouines, 
+so that we cannot change the declaration in  /ptcl/ structue later. 
+  To make a particle with /ptcl/ structure, one may use a subroutine call,
+   
+     call cmkptc(code, subcode, charge, particle).
+
+
+

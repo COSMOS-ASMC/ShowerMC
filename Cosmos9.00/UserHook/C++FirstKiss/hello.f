@@ -1,0 +1,2 @@
+      write(*,*) "hekllo world"
+      end

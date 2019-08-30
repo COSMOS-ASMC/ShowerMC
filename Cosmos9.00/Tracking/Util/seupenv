@@ -1,0 +1,4 @@
+#!/bin/csh
+
+setenv  PARAM	../../UserHook/Anime/param
+setenv  FROMTO  det2xyz

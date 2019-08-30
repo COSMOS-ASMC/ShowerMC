@@ -1,0 +1,61 @@
+A)To generate  collisions at a given energy and write result to stdout so
+that they can be an input to the primary file to Epics. (file name should
+start with +).
+B) Similar to A) but for cheking eta, y, Ek etc distributions with
+   various cuts. 
+C) Also you can generate a kind of trace files to visualize
+particle tracks at each collision.  (Use geomview).
+
+If you use an interaction model other than dpmjet, 
+you may directly go to 2) how to prepare the
+param file.  For dpmjet, you have to read the next 1)
+
+
+1)  preparation of files for dpmjet.
+The standard files for dpmjet are organized so that the
+maximum lab energy is 4x10^14 eV. This is not enough for
+,say, generating collisions at LHC energies.  Therefore, 
+we have to prepare appropriate files at such a high 
+energy.
+
+We distingush  projectile and target for the collision.
+Collision generation is performed at the rest system of
+the target and the resultant particle information is
+obtained in the original system.  (Say, CMS where
+the target is moving).  
+
+Modify dpmjet.inp as follows:
+a) nucleon or nucleus case
+* projectile / target
+*...+....1....+....2....+....3....
+PROJPAR        2          1         give mass # and charge
+TARPAR         14         7           //
+*
+* energy of interaction
+*...+....1....+....2....+....3....+.
+ENERGY       21480.                 give lab energy/n  in GeV.
+
+b)  hadron (pi, K) case
+  
+*...+....1....+....2....+....3....                                ...7....
+PROJPAR                                                               PION+  
+TARPAR         14         7          
+
+(for Kaon,  give KAON+ etc).    hadron cannot be a target.
+
+2) Read param file and give parameters.
+    px,py,pz is momentum / n in GeV.
+The energy in dpmjet.inp may be known as equivalent lab. energy /n.
+when you run the program.  Then, give ( that value +epsilon) in
+dpmjet.inp
+The output format for purpose A) is sepcified by giving 0 for the
+2nd term of UserHooki. (see outresul)
+If it is 1,  purpose B) is assumed.  (see outresulB).
+
+  
+
+3) ./make.csh to compile
+4) ./Gencol$ARCH.out < param > +somefile  ;  purpose (A)
+
+dpmjet.GLB files are not needed.
+

@@ -1,0 +1,13 @@
+NR<=4 {print; next}
+NR>4 && nc<=2 {++ nc; for(i=1;i<=NF;i++) {nx++; v[nx]=$i}; next}
+NR>4 && nc==3 {for(i=nx;i>=nx-12;i--)  printf("%6.2f",v[i]); print ""}
+NR>4 && nc==3 {for(i=nx-13;i>=nx-25;i--) printf("%6.2f",v[i]); print ""}
+NR>4 && nc==3 {for(i=nx-26;i>=1;i--) printf("%6.2f",v[i]); print ""; nc=0; nx=0}
+NR>4 && nc<=2 {++ nc; for(i=1;i<=NF;i++) {nx++; v[nx]=$i}; next}
+END  {for(i=nx;i>=nx-12;i--)  printf("%6.2f",v[i]); print ""}
+END  {for(i=nx-13;i>=nx-25;i--) printf("%6.2f",v[i]); print ""}
+END  {for(i=nx-26;i>=1;i--) printf("%6.2f",v[i]); print ""; nc=0; nx=0}
+
+
+
+

@@ -1,0 +1,18 @@
+2019/Mar/27
+From Felix:  Kon  xsec. bug removed.  the version is named
+sibyll2.3c02.f and linked as sibyll2.3c.f now.
+--------
+s_rndm is now double precision.  As in sibyll2.1 interface, it is
+included in Interface/csibyll.f, but it is double precision now
+(in the 2.1 version, it is single precision).
+
+
+GASDEV in utils/rndm_dbl.f 
+is used by the sibyll2.3c.f.
+If we use all of rndm_dbl.f,  other routines  related to the random number generator
+such as  pho_rndin  etc confilict with those included in phojet.f.   So only GESDEV is
+extracted and placed here.  utils/rndm_dbl.f  is not touched.
+
+
+
+

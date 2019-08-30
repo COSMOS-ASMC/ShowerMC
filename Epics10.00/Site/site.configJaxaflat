@@ -1,0 +1,84 @@
+#  jaxa f90jxflat
+#
+#
+#  NOTE the two variables are only for at the time of  'make' to 
+#    make the library.
+#    The same environmental variables should  be set to different 
+#    values when using the library, if the library was moved to a 
+#    different place than original one.
+#    If the library was not moved, the same ones are
+#    usable.  You better issue the setenv's in  .cshrc when
+#    you use the library.  The details is given  in man.ps.
+#
+
+ARCH          = jaxaflat
+
+
+ARCHVOPT       = rv
+
+AR = /usr/ccs/bin/ar         #archiver
+
+LDFLAGS       =			# non-HP
+
+LD            = f90jxflat
+DFLAGS        = -D$(ARCH)
+INCHEADER     =  -I$(EPICSINC) -I$(COSMOSINC)
+
+FFLAGS       =    $(DFLAGS) $(INCHEADER)		#  non-HP
+
+FC            = $(EPICSTOP)/Scrpt/cppFCJaxaflat
+
+################probably you need not change until next '##########' line
+#
+LIBLOC        = $(EPICSTOP)/lib/$(ARCH)
+LIBNAME       = epics
+CLIBNAME       = lib$(LIBNAME).a
+
+LIBRARY	      = $(LIBLOC)/$(CLIBNAME)
+
+INSTALL	      = /etc/install
+
+
+
+##########################################################
+#  Following is used only when 'make install' and when creating 
+#  a complete executable "cosmos"  (DEST is used in the latter case)
+#  After make install, you may need to execute ranlib
+#  chmod, chwon, in some system.
+#############################################make install spec.
+#    where to copy the library.  
+#    if DEST directory not exist, you must make it by hand
+#    before 'make install'
+
+
+DEST	= $(LIBLOC)
+
+#   where to copy  header files by 'make install'
+#   if the directory not exist, you must make by hand before 'make install'
+
+HEADER     = /usr/local/include
+
+
+#    where you copy some template files by 'make install'
+#   if the directroy not exist, you must make by hand before 'make install'
+
+TEMPLATE  = /usr/local/lib/$(LIBNAME)/template
+
+##############################################make install spec end
+#   archiver suffix rule
+#
+.SUFFIXES:	.f90
+.f.a:
+	$(FC) -c $(FFLAGS) $<
+	$(AR) $(ARCHVOPT) $@ $*.o
+	rm -f $*.o
+.c.a:
+	$(FC) -c $(FFLAGS) $<
+	$(AR) $(ARCHVOPT) $@ $*.o
+	rm -f $*.o
+.f90.a:
+	$(FC) -c $(FFLAGS) $<
+	$(AR) $(ARCHVOPT) $@ $*.o
+	rm -f $*.o
+.f90.o:
+	$(FC) -c $(FFLAGS) $<

@@ -1,0 +1,7 @@
+This is to try to the case where the main progrma is in Fortran.
+
+c/c++; array index always starts from 0;
+
+an array xxx[n] in c/c++ can be used arbitrary in Fortran by
+	declaring  xxx(L:M) ( M-L+1 =n ). the first element
+xxx[0] alaways correspontds to xxx(L).

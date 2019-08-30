@@ -1,0 +1,47 @@
+#!/bin/bash
+if [ $# -lt 3 ]; then
+   cat << EOF
+   Usage: tree2index  configpass  spec
+     configpass: path to the config file
+     spec: Suppose subdirectory hierarchy of
+           A B T
+           is enough to specify the target media T,
+           give this  A B T.
+           The detector contains sub-detector A 
+           which in turn contains B which in turn
+           contain T.   Containment may be not direct.
+           spec of the following type can be accepted.
+           (...)  |...|  must be enclosed by ' '.
+           '|A1,A2|' .. T
+           A  '(B1,B2)'  T
+           Optional parameters are not usable.
+           For that, visit UserHook/Indexing.
+      The output is on stdout. 
+          It shows the index table by which the
+      user can know the component number of desired T's.
+EOF
+exit
+fi
+pwd=`pwd`
+
+cd $EPICSTOP/Util; make clean;make -f tree2index.mk
+
+cd $pwd
+#  config path
+echo $1 > temp$$
+shift 
+#  spec data
+echo $@ >>  temp$$
+
+$EPICSTOP/Util/a.out < temp$$
+rm -f temp$$
+rm -f a.out
+
+
+
+   	
+
+
+
+
+

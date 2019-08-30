@@ -1,0 +1,1836 @@
+v9.21
+ Feb.11,2017.
+ As to the treatment of multiple Couloumb scattering:
+ With this release, sbMin introdcued V.9.201 is disabled.
+ Instead, we prepared a number of files to be put
+ $EPICSTOP/Data/MCS; by selecting one of them, we can
+ control the speed of the El_hin method. The method has
+ been usable from the frist implementaion time, but
+ files with various speed control parameters were not
+ yet prepared.  Also the method of selecting a
+ parameter file was rather dangerous; (A file must be
+ linked to a fixed name by the "ln -s" command.)
+ We introduced 2 variables to select a parameter file.
+ (MCSdir, MCSparam;  normmally only MCSparam may be
+  given in epicsfile). For this change, Cosmos8.01
+  and Epics9.202 must be used.
+
+ In older vesions, MCSmodel must be given in param file.
+ From this version, MCSmodel, MCSparam, MCSdir may be
+ given in epicsfile.  (Still possible to give them
+ in param file; but those in epicsfile have priority).
+ 
+v9.201
+No public release.
+For MCS (multiple coulmb scattering), El_hin model should be
+most reliable. In many applicaitons, it gives almost the same
+results as the Moliere(=2) scatting case. However,
+in some case, we find there is a difference between them.
+At present, one known case is CALET configution.
+(El_hin gives smaller lateral spread).
+The problem is that El_hin model takes very long computation
+time.  So we want use Moliere=2 with modified parameters so 
+that it gives almost the same results as El_hin.
+For that puprpse, we introduce a new parameter sbMin;
+it is used to judge whether Moliere theory may be applied or not.
+If not, we employ Gaussian scattring. (equation B- log(B) = b
+is solved for some b.  If b < sbMin, we judge Moliere
+theory cannot be used.)
+The defulat sbMin so far is 1.5 for Moliere=2
+and 3.395 for Moliere=1.  For CALET, sbMin=6.8~7.4 seems
+better (7.4 gives same  spread as El_hin, 6.8 gives same
+longitudinal gdevelopment as El_hin).
+If the user does not give any valu for sbMIn in epicsfile,
+the default is employed as old one.
+If needed, the user may give, e.g
+  sbMin  7.4 /
+  Moliere 2 /
+in epicsfile.
+
+
+v9.20
+New feature Gfortran compatible version.
+ See  readme of Cosmos8.00 or later
+ 
+Bug fix: When a hadron passes  rotated component(s)
+located some where, and later make an interaction
+in a component without rotation,  hadronic interactions lead 
+to wrong results, though the effect at low energies
+are not so significant.  (Generated particle momenum
+is affected; (Px, Py) are negated.)
+To fix it, 
+In epgen.f and  epbndry.f  (each first appearing one)
+   call epl2wd(Cn, cTrack%w,  dirtemp)
+      is changed to
+   call epl2wdm(Cn, cTrack%w,  dirtemp, cTrack%p)
+
+New feature: 
+   In old versions, "FreeC   F" in epicsfile forces to
+make the interaction of 1ry at the specified position
+of the incident but no interaction at all before the
+starting point (say knock-on).
+
+
+It has been found that Pt of  p/n particls when the
+target is large A becomes very large
+(Emssion angle is > 50~70 deg even E is >> 100  GeV.
+ For incident is ~20 TeV and  A=207, the rate seems
+ 1/1000 ~1/10000; for A=16, the rate is much smaller.
+ Other interaction model does not show such event)
+
+ 
+v9.170
+
+Prerelease   2014 Dec. 20
+fordpmjetGLB and fordpmjetINP commands have been updated
+since they have a bug against negative numbers appearing
+2nd and 3rd field (excluding level index field). 
+(awk command with $2 !~ /^[0-9]/ must be like 
+ $2 !~ /^[0-9]/ && $2 !~ /^-[0-9]/ )
+
+
+For multiple scattering, ELSEPA based hinge and condense method 
+are now available.  A new parameter, MCSmodel (or MCSModel*), 
+
+      *)  If the compiler is case insensitive.
+
+is provided to specify the MCS model.  It must be given in the 
+param file similarily to IntModel, like
+$PARAM
+ IntModel ='"phits" 2 "dpmjet3" '
+ MCSmodel = '"El_hin" 10e-3 "El_con" 100e-3 "Mol"'
+$END
+
+
+
+The format is the same as IntModel. E.g
+   MCSmodel=' "M1" E1 "M2" E2 "M3"'
+where Mi is a model name, Ei is the energy below which
+the model Mi is to be used. The last one is assumed to be
+below 1 GeV ( Since ELSEPA can be used below 1GeV,
+the  model sepcification is applied below 1GeV (KE).)
+
+As  models, three are now available.
+ El_hin:  Elsepa based hinge method
+ El_con:  Elsepa based condense method
+ Mol:     Old parameter Moliere is referred. (default)
+ If you don't give MCSmodel, default (Mol) is used; Moliere=2,
+ AlateCor=0 is recomended.
+
+M1,M2,M3,M4...M6  may be any combiantion of above  three.
+(Max specification must be <=6).
+The default is "Mol".
+El_hin requires 3~4 times longer cpu time than others.
+El_hin should give the most reliable result but others
+(execpt for "Mol" with Moliere = 0) give quite similar results.
+
+Data base used.
+ Cosmos/Data/Elsepa. Basic Coulomb scattering data by ELSEPA.
+      ds/dOmega for mu=0 to 1 (606 steps) (mu= (1-cos)/2).
+      for energy 100 eV to 1GeV (106 steps).
+      Size is large.
+ Epics/Data/MCS
+   Data created using ELSEPA for the soft multiple scattering 
+   treatment.  File names are the same as those in Data/Media
+   This must corresponds to Data/Media/PWO etc, so if
+   the user make a new media, a corresponding new data must
+   be created.  For that go to Epics/Util/Elemag/MixedMCS
+   and see Readme.
+
+v9.166
+   2014 (not public open)
+Many of basic programs in Epics/prog/KKlib
+have been moved to Cosmos/KKlib/
+(say, kcubiceq.f)
+Opeining angle of brems photon and pair electrons
+are now treated by Tsai's formula explicitly.
+It must be initialized in epReadTab.f after
+epGetEffZA is called.
+
+cmplx(..,..)--->cmplx(..,..,8).  In each of next, all are updated
+    ep_ciecone.f  ; this is essential for new pants of LHCf
+    Draw_ciecone.f
+    kcquadEq.f90
+    kinout.f
+    kxplineseg in kklib.f
+    kxplvsq.f90
+
+ep_octagon.f must be compiled by -O0 or -O1; -O2 or -O3
+cannot make correct display coordinate. Resolution:
+prog/NewVol/OptDanger was created and ep_octagon.f is
+moved there.  cppFCPCLinuxIFC64  cppFCPCLinuxIFC
+and cppFCMacIFC were modified so that files in OptDanger
+are complied with -O1.
+
+v9.165
+Jun 5,2014
+It's found that the tables in Data/Media/W etc
+are not correct as to the LPM effect for photon
+(e.g >5TeV for W). The utilities to make them and
+related programs in Epics/Util/Elemag/BremPair/
+are updated.
+In Epics/Util/Elemag/BremPair,
+to test brem/pair cross-section and/or sampling
+Air*0.05 type specification is now possible.
+(0.05 means that the density is 0.05 of the
+standard in Basic media file).
+This wrong talbes have been used from v9.15 to
+v9.164.  The new tables have message that the
+table is created by using v9.164 but it's 
+true # is v9.165. 
+prog/NewVol/ep_torus.f was wrongly named
+(as ep_toruc.f). This was corrected.
+
+v9.164
+Jul 26,2014
+Now it is possible to utilize subdetector
+hierarchy for getting component number of
+target media systematically. See 
+a separate manual (indexing.pdf).  
+
+Data/Media/Wood has a format part
+ wood 1
+This must be Wood 1. This was corrected.
+Also Data/BaseMedia/Wood.
+YBWood and SUS304 used for the Tibet exp. are
+now implemented. YBWood  and Wood have the
+same elemetns. Also the same is true for
+SAS304 and Steel.
+
+Now volume-shape name length can be a max of
+16.  (If _xy _w etc are used, it must be included
+in 16).  
+Now not only box, sphere, cyl any volume-shape
+can be an explicit world, provided that its
+attributes must be epxlicitly given by the user.
+Exceptions are cyl_y cyl_x;  attributes may not
+be given. In that case, attributes are fixed by
+looking at BB.
+
+So far the head part of a new volume-shape name
+cannot have the same string as the exisiting name
+(say, box exists, so boxing, boxskewed etc were
+not permitted, though skewedbox was ok.) 
+Now this restriction was removed.
+
+The difference from  implicit world is that
+with _w, subdetector hierarchy is correctly
+recognized so that the user can use such 
+subdetector by epGetIndex.  epGetIndex
+is newly introduced. It is not called by
+the Epics system but may be called from
+the user program (typically from uiaev to 
+get target component number systematically
+by giving subdetector hierarchy). Also
+there is a  utility command (tree2index)
+for getting such index list. See configMenu.
+
+A short manual is now ready for these
+matter (indexing.pdf).
+
+The boundary search program of sqtccl sometimes
+fails but it is automatically corrected. At present
+sqtcll itself is not updated but epbndry.f supresses
+the message for that.  
+
+epquery.f
+  epqCn2AliasMediaName.f
+is added to get alias name of media and true name.
+
+eprcnf.
+ module modAlias is added
+uncontained related subroutine
+  epProcAlias
+  epSeeIfAlias
+
+ZepMaxdef.h
+ is modified so that matter (media) length 8 
+ is defined  by MAX_MEDIANAMELENG
+
+Zcnfig.h is modified so as to use MAX_MEDIANAMELENG
+
+v9.163
+May 21
+Data/Media/PWO and Data/BaseM/PWO
+are changed to contain fake quenching consts.
+It is to prepare future quenching treatment
+in epGUI.
+Trace file shows 0 energy for dead particle.
+It sounds strange so the K.E before the
+particle die is now shown.
+
+V9.162
+Apr. 3, 2014
+As to the usual program run, there should be no change
+in this version.  
+The default optimization is now  -O3 for the intel compiler.
+(Linux and Mac OS). As compared with -O0, speed up factor
+is about 1.8.  must be used with Cosmos7.645 or later.
+
+A utility routine to show p(or E...) vs dE/dx in a given
+medium is in Epics/Util/Elemag/dEdx.  When AutoEmin was
+introcuded, it had to be updated, but it hadn't done.
+Now it is compatible with the new Epics program.
+Use testdEdx.sh
+This version can run at JAXA (SUN OS super computer
++ Facom compiler.  use site.configJaxaflat or
+site.configJaxa).  
+
+In default, a complete list of volume-shape and the # of
+such volumes in the config file is shown (So far,those
+with _x _y _xy and standard box, pipe, cyl, prism sphere
+are omitted).
+Also, infomation about 'world' or bounding box is
+printed on stderr.  (If MsgLevel>=1).
+
+Constants used in the sqtccl component are printed 
+so far by calling ep_sqtcclPrintCnst. Now it is called
+only when MsgLevel>=2.
+
+eppos2cn is updated so that partially contained component
+can be correctly treated. (such components are not used
+in normal applications so far)
+
+V9.161
+Dec.3, 2013	
+First collision point information is sometimes
+wrong. (<< 1/1000 events)  It happens when
+a high energy knock-on electron is emitted
+and the electron emits  high energy brems gamma
+and the gamme makes photo-hadron production.
+If it happens before the incident collsion (
+in the sense of tracking order), and a generated
+pion decyas or makes collsion.  Even the
+wrong information is issued, simulation itself
+is ok.
+The was fixed.  epq1stIntTrack is added in
+epquery.f which can get complete track information
+by 
+
+	call epq1stIntTrack(track)
+
+at the time of first interaction. (pos. dir. cos
+momentum are in the world coordinate)
+
+
+V9.160
+Now upper and lower case problem  arises and
+sqTccl must be used as sqtccl.  All related
+program and config must change sqTccl to sqtccl.
+
+Quenchig treatment is now good. 
+epGUI in epUI.f in UserHook should manage the
+quenching.
+
+V9.159
+Oct 15, 2013
+Now addin/removing  hadronic interaction models in 
+Cosmos does  not affect the source of Epics.
+(see ReadmeNI in prog/)
+
+Geomerty routines are now placed in UserHook with
+some update (it now write r.l together with cm and
+g/cm2 length of segment).  (It may be placed
+in any other place for exectuion).
+If incidnet particles are made by another program,
+and put in +primary file, the incident position may
+falls in exactly the boundary of two components.
+In such a case,  Epics could get neurotic (evern 
+neutrino needs  sec to min to escape such status).
+To workaround, the user may shift the position
+about 10^-5 cm.  For such purpose, shitxy.awk
+is avilable. Also new parameter ShiftInciPos
+is usable in sepicsfile. Read epGeom.f and 
+Readme in Geometry.
+
+prog/KKlib/kxplhorse.f was updated against
+'geting neurotic'
+
+V9.158
+Sep. 28 2013
+Quenching effect treatment is updated. The user must
+modify  epUI.f (subroutine epGUI) depending on
+the conditions.
+Some template is in ForQuench.tar.gz, and
+for modification of epGUI, the user may need
+simulation, which may be helped by using
+Quench.tar.gz (usual UserHook routine).
+The manual is prepared. 
+Cosmos V7.639 is recommended for this version.
+(7.638 will work but it has a problem for
+ anti-neutron of energy ~ mass)
+ When a particle is exactly on a side surfaces of 
+a horse at the simulation starting time, boundary
+error is issued although Epics could recover it.
+Error is removed by updatign
+prog/KKlib/kxplhorse.f (the line next to  100 continue).
+(>= was made to > @ two places).
+
+V9.157
+ Sep. 1 2013
+ When a some component (A) contains another component(s)
+(B...)  and they (B...) are not fully contained  by A,
+(note: this is different from partially contained case),
+they (uncontained part)  must be contained by another
+component.  If this another component is the world, 
+the user use  / B.. notation like
+ 10 box_w  sp  0 0 0 / 0 0 0 /  list of B's
+In this case, world size is automatically determined
+and other components to be contained are automatially
+added. 
+This situation happens typically when a honeycomb 
+contains other components.
+
+The user may give the size of the world like
+ 10 box_w  sp  0 0 0 / -10  20 2  100 20 40 / list of B's
+
+If the user gives the  same number in the list of B's (by mistake)
+duplication is avoided. 
+
+ Bug correction for  ep_horse.f:  envelop part.
+ now can be compiled by  sun fortran @SIT.
+ but with in a few tens events in FirstKiss,
+ loop happnes. Cosmos7.638  is runnable if non-EPOS
+ model is specifed.
+
+  Bug for making a  prism world when its attributes
+  contain negative values.  Now all prism attributs
+  can be negative. If a is < 0, be carefull that
+  origin is shifted by a and a is made to be > 0,
+  c starts from the shifted origin.
+  The routine for getting normal vector for the prism
+  is updated. 
+  UserHook/Geometry is created (so far it was placed
+  outside of Epics). It can be used to confirm the normal vector
+  setting (for prism), beside geometry test..
+
+  Intel Fortran compiler for Mac OS X is now usable
+ (site.configMacIFC).
+
+9.156
+  Jul 29,2013
+ EPOS is now usable for detector simulation.
+ (v3700).
+ Scrpt/fordpmjetGLB and fordpmjetINP are updated
+ (#123 box ... type comment lines buffaloed awk--
+   $1~"[0-9]+" should be $1~"^[0-9]+" etc.)
+The = notation in the origin part of config is
+redefined.  Unless #org=  ebb is not used in the
+config, it is treated same as older versions if
+the related components are simple components
+(not subdetector). This is default but #org= o
+explicitly specifies so.
+#org= ebb or #org= o should be used only once
+for one detector config. 
+
+
+
+9.155
+  Jul ,2013
+Quenching treatment:  R restricted dE/dx, F full dE/dx
+ D: delta ray,  O: other 
+portion of ecf of R  and cf of F contribute to lihgt.
+cf is experimentally obtained.
+    ecf*R + D + O  = cf*F
+    D = F- R
+so  ecf = 1 + (cf-1)*F/R - O/R.  
+Control parameter: HowQuench = 0 use cf instead of ecf
+(equivalent to older verisons).
+HowQuench = 1:  use ecf instead of old cf.
+
+9.154
+  May 25,2013
+ AutoEmin seems to set little bit too high Emin (say for 1mm SciFi;
+  10 keV is better).  Also there was a dangour that the same media
+  with different detector thickness may use the same RecoilKEmin.
+  These was corrected.  If AutoEmin=3, the scheme for AutoEmin=2 is
+  applied only  to photons.
+  The new one has been tested for 32 mum to 1.04 mm Si. 
+  Negative box edge length, cyl height, pipe height are permitted.
+  For such components, message is issued and # of such one
+  is shown after all comps. are read.
+
+9.153
+  May 2013
+  Utility commands,  subdTree and compSubdTree are added
+  to see the hierarchy of subdetectors.
+  Also some querry  subroutines to see that a given component number
+  belongs to a subdetector and get it's name etc.
+  When config has been read, new vol-shapes are listed.
+  Those with > 8 char length (e.g honeycomb) was not
+  listed. This was  corrected.
+
+9.152	
+  May 2013
+
+Epics/Util/Gencol is now in Cosmos/Util/Gencol. It can run
+under Cosmos environment only.
+box edge length, cylinder and pipe height can be negative 
+values now.
+
+
+It has been an unexpected circumstances that
+the (first) component in a subdetector  has non-zero origin value(s)
+and a component is added by using + or +V notation (in the origin part)
+in that subdetector, the resultant coordinate values become wrong.
+By the Current update, now this type of description is accepted.
+(Note, however, there  is a pitfall so look at subdDescription.pdf 
+in Doc.)
+
+The box edge length, (a,b,c), must be > 0. This hasn't been
+checked so far, and a box which has a negative value for some of 
+a, b, c,  was correctly displayed and program execution did not
+issue any errors. However, its treatment was not correct. 
+Now check is made for such case. (Volume-shapes introduced
+in the intial stage of Epics are simple, and trivial constraint
+hasn't been  checked; those in prog/NewVol are much safe.
+Now for cyl, pipe, sphere, check is made). 
+
+
+Now, box manipulating program in progl/KKlib/kklib.f has two
+programs: kxplbx and kxplbxNew.  kxplbx is used at present
+(which has been used so far, though little update is included
+for stability). kxplbxNew is not used. This has completley
+different from kxplbx.  If present kxplbx has some problems
+we may  try kxplbxNew (for that we may renkame kxplbx--->kxplbxOld
+kxplbxNew-->kxplbx).  Current one is little bit faster than
+"New".
+
+In Cosmos/Manager/cerrorMsg.f 
+cbacktrace routine is added  (Cosmos7.635),
+which may be called to display backtrace information
+when a severe error takes plaece.  In some Epics progams, this
+call is placed; so Cosmos7.635 is now needed
+for Epics9.152
+
+ 
+
+9.151
+PreRel. Apr.   2013
+Gencol:
+ Due to sofia and some update of sibyll and qgsjet01,  sibyll and 
+qgsjet01 had duplicate name problems with qgsjetII and sofia.
+These are corrected.   aqgsjet01 is under Test/QGSI/withDiffCode/
+
+Now, impact parameter can be obtained by using getImactParam
+for dpmjet3, qgsjet2,qgsjet1
+
+Max # of new structure (volume-shape definenabl by #news) is
+15 and equal to the
+ones used in CaletCad model.  So for safety, it is increased to 20.
+The list of new structure namaes is now printed on stderr
+at a time of drawconfig.
+
+The treatment of new structure horse has been changed at around
+v9.13 (some part is made to be a subroutine--kxplhorse.f, but
+the argments when it is called (in ep_horse.f)  was wrong. 
+This is corrected.  honeycomb routine is changed to be able to
+use different size honeycombs.  ocyl drawing routine is 
+simplified. 
+
+When pipe parameters are read, no check has be done so far.
+Now if inner pipe radius is  >= outer pipe radius, error
+is reported and stop is made.
+"drawtracebygeomv"  command placed in Epics/Scrpt/ is improved
+so that it can treat trace data in  pwd. (so far absolute
+path must be sepcified.)  (it is one of the commands shown 
+by the configMenu command)
+
+Honeycomb now can be defined without subdetector and treatable
+like a pipe.
+
+9.15
+Ja.24 2013
+Some of epicsfile paramers related to hadronic interactions
+are now deleted; instead they must be given in param file
+($HPARAM part. )
+In Util/Gencol:
+  When we specify dpmjet3 as an interaction model, sometimes 
+we forget to check consistency of energy, projectile 
+and target in the param file and dpmjet.inp file.
+Now Gencol.f is updated to check the consistency.
+  Within dpmjet3, PHOTON can be a projectile if Eg > 6
+(target is p/n) or Eg>7 GeV (A target). But it is difficult
+to use this photo-hadron produciton in the cascade process.
+(If we try, loop happend in dt_xslau)
+
+   LPM is now extended to lower energies (down to Ee ~200 MeV
+ region in the case of W) where the effect starts to appear
+ for 10 keV photons. The staring point of electron enegy is
+ Elpm = 0.3 X0(cm)/0.561 GeV.   X0 is the  radiation length
+ in cm.  This is very small and no effect on  many of 
+ applications. 
+ To control actual starting point of LPM,  Flmp (>=1;
+ default is 1) is  introduced.  Then, the actual starting
+ point of LPM  is  Ee= Flpm*Elpm.  Older  version 
+ corresponding to Flpm ~ 100. 
+ This means, in older versions, LPM starts  at ~30 GeV in
+ heavy materials. Even  this, LPM effect is not seen in 
+ many of calorimetirc  calculations.
+ However, for SLAC type test (P.L. Anthony et al.
+ Phys. Rev. Lett. Vol.75, No.10, 1995), Flpm=10
+ must be used.
+
+ Basically, three different  Brems x-sections have been 
+ used so far. 1) Berger & Seltzer numerical one, 2) Tsai's
+ analytic one with partial screenig and 3 Tsai's  complete
+ screening case. At the connection point there is a some
+ glitch.  This version normalize the cross-sections. 
+ Default is to take the complete screening case as the base.
+ The parameter to control this is HowNormBrems. (-1 is
+ default, 0: not normalize, 1: take Seltzer & Bergers'
+ as the base). The glitch between 1 and 2 is ~1.5% level.
+ and 2 and 3 are < 1%.
+
+ Another parameter to control Brems is EpartialSC (default
+ is 10 GeV).  X-sections 1) is prepared up to 10 GeV
+ and 2) is down to 100 MeV. EpartialSC fixes from where 2) 
+ is to be used. (So it must be 0.1 ~ 10.).  For the light
+ element such as He gas, 1) and 2) are different rather 
+ largely at around 1 GeV.  So EpartialSC may be usefull
+ to investigate the x-section diff. for such matter.
+
+   TargerElecBrems is introduced to control dE/dx
+ calculations: It controls the brems effect  by  atomic
+ electrons in the target be included or not in dE/dx.
+ If bit 0 (LSB bit of integer TargetElecBrems) is on,
+ the effect is taken into account for muon (default of
+ older versions.). The  bit 1 is for p,pi,K. 
+ In older versions, the effect has not be considered for
+ p,pi,K.  Default value of TargetElecBrems is 3.
+ Bit 2 is to specify the brems energy upto maximum.
+ This may be used if the medium is very thick.
+
+ These tree may be given in "epicsfile"
+
+ Now default Glauber file (.GLB, .inp files in
+ Data/Media/ is usable for projectile upto Pb.)
+ (File size became ~ twice).
+
+   In conclusion, normally we need not touch three 
+ these parameters.  Result of many applications will 
+ not change from older versions.
+
+9.136
+Nov.25
+subroutine ep3p2plane returns un-normalized normal vector.
+This is sometimes inconvenient so now it returns unit vector.
+(In some very rare case, its non-unit vector could be harmful)
+The subroutine is used by ccone and gbox, and indirectly by
+ep_honeycomb.f ep_ocone.f ep_ocyl.f ep_oecyl.f ep_sccyl.f
+ep_scyl.f ep_sqTccl.f ep_sqpipe.f ep_tripyra.f
+
+9.135
+Release Nov.15 2012
+1) So far Seltzer & Berger's numerical computation result for Bremsstralung
+   has been used from  5keV to 100 MeV (the original table is ready for
+   1 keV to 10 GeV of electron kinetic energy for various Z's). 
+   Now in the Brems sampling table, it is used from 5 keV to 10 GeV. 
+   (Since we are dealing with mainly high energy showers, data below 5 keV
+   is not used. i.e, brems below 5 keV is neglected.  )
+
+     Brems treatment from  5 keV to 100 MeV is also changed.  In the previous
+   versions, we made table by fixing vmin= Eg/(Ee-me) = 10^-4.  This is too low
+   for, say, Ek=(Ee-me)=10 keV (Eg=> 1eV).   So in the present version,
+   we use fixed Egmin=0.1 keV and hence  Egmin/Ek is chaning with Ek.  However,
+   at 100 MeV to 10 GeV,  vmin=10^-5 is used as in the other energy reions.
+
+     For heavy materials such as Pb, W, PWO etc, the cross-sections in
+   100MeV~ 10 GeV is very close to partial screening cross-sections by
+   Tsai (<1~2% difference), which has been used so far in that energy
+   region.  For light materials  such as SCIN, Carbon, etc, the diffrenece 
+   of the cross-sections  is much larger at around 1 GeV. 
+   In many detectors, heavy materials are used  and the cross-section for
+   ligth materials are small, the net effect (change  from the previous
+   versions) is expected to be very small. 
+
+   Calulations for the Caltet and LHCf do not change from the old versions.
+   If a detector consists of almost light materials,  and ~ 1GeV region
+   electrons play important role, 1~2% diff. may be seen.
+
+
+9.132
+Not released. (finished Nov.11, 2012)
+1) Default quenching effect treatment (using data in Media file) has been
+disabled in the recent versions (If modifier is set, non default values
+are correctly used).
+Now default values are also usable.
+
+2) The fordpmjet command can now create .GLB and .inp files
+for projectiles heavier than Fe. (up to Pb) and make
+dpmjet.GLB and dpmjet.inp for a given config file.
+  For that, .GLB and .inp files compatible with heavy projectiles
+must be downloaded from the web site. The directory  where those 
+files are to be saved is arbitrary. $EPICSTOP/Data/DPM/GLB/ may be a 
+good place. The .GLB and .inp files in $EPICSTOP/Data/Media
+are normally assumed to be for projectiles <= Fe.  However,
+if the user almost  always use heavy projectiles ( > Fe), 
+those in Data/Media/  may be replaced by those for >Fe.
+
+3) Some of the commands related to deal with the config file can be
+   invoked without going to $EPICSTOP/Util or $EPICSTOP/Util/Geomview
+   configMenu command will tell a short summary as shown below.
+
+    configMenu:               Show this summary
+
+    usenewvol config:         If config contains some new volume-shapes 
+			      not so frequently used. Prepare to use it.
+                              Need not put ./ before the file name.
+			       
+    expandconfig config:      Get expanded config information.
+                              Note: Redirection will get some garbage
+                              too.
+                  
+    mkdrawconfig:             Make executalbe to draw  config files
+                              ('usenewvol'  will do this too)
+
+    drawconfig config         Prepare to draw a given config file. 
+                              Need not put ./ before the file name.
+
+    dispconfigbygeomv         Using Geomview, show the config prepared
+                              as above
+
+    disptracebygeomv argments Show trace data (with the detector, if 
+                              specified).
+                              The path to the trace data must be
+                              aboslute path (e.g, /tmp/$USER/tracexx) or 
+                              starting with ~/
+
+4) In the dE/dx calculation, the effect of target electron bremsstrahlung
+has been so far included only for the  muon. 
+(Since the theory is developed for the  muon).  However, it will be effective
+for other charged partilces (cascading will mask the effect, since the 
+effect shows up at high energies( > 5GeV. At 100 GeV few % effect). 
+So the effect has been considered in the case of muons so far.
+
+  However, high energy protons may be used for calibration of MIP in space.
+The 2012 beam test at CERN showed that the MIP by 150 GeV muons is lower
+than 400 GeV protons. We found that this feature is not reproduced by the
+present simulation without including the effect for the proton
+(i.e, MIP by protons is < the one by muons).  
+ If we include the effect for the proton, too, the experimentally observed
+MIP ratio (proton's MIP is  ~1.4 % higher than muon ) is well reproduced.
+So we now included the effect for all singly charged particles (p, pi, K..)
+(But not e+/e- and heavy ions.  In the case of e+/e-, low energy particles
+are effective to energy loss.  For heavy ions, may be better to include but
+not sure. Now pending).  If calibration in space is done by ~10 GeV/n
+protons or He,  the effect could be small. 
+ To disable the effect in the simulation, we must modify the #define 
+statment in prog/Elemag/epdedxNone.f
+
+5) When we track partilces inside the detector, the 
+   contain/contained  relation of components are important. So the
+   world of subdetectors  are also important. Some of the concepts 
+   realted to  these  are not well documented.  So it is clarified. 
+   The tracking scheme was changed. The result for the complex config:
+   the speed becomes much faster (at a machine--for LHCf-- with the
+   CALET config file,  1.68 times faster for the 100 GeV electron
+   incident while the result  is completely the same as old method.) 
+   For simple configs for which  we don't need the "world"
+   (say,piled-up boxes of the same cross-section),  the speed is not
+   affected (with or without the world).
+
+   The material "world" for the sub-detector world  is introduced, 
+   which will be replaced by the materila of the final detector world.
+   (material "world" could be used for non-world of sub-detector).
+   The "sp" of the sub-detector's  world will be replaced by that of the
+   contaier  (contaier is the component  such as 2 below.
+     1  some subdetctor  ...
+     2  a component           / 1 
+     ..
+     n  world  
+   If it is like
+     1  some subdetctor  ...
+     2  a component           
+    ...
+     n  world
+
+   1 is not contained. (Though it will be included in thea last world
+   defined later)
+   If there is no gap between  the world and the contained components,
+   it is better to use 'sp2' which will be eventually replaced by 'sp'
+   (because it is  not hidden  when showing the config). For the simulation,
+   "sp" is always ok.
+
+6) Flat polygon (fpolygon)  and torus are now usable as a new component.
+   
+7) Related to Cosmos update (7.632).  (p or n) + nucleus (A) collisions
+   in PHITS.
+   If we see the p/(n+p) ratio of nucleons knock-out from the 
+   target (A>10; knock-out nucleons mean those hit by the incident nucleon
+   and escaping from the target nucleus. Note those evapolating from the
+   target is not included), it is very small for the n-incident case
+   (i.e, almost all are nutrons.) while it is large for the p-incident case.
+
+     This may be somewhat strange. It may be  close to the Z/A of the target.
+   So we introduced, a parameter,
+     DoNPadjust,
+   The default value 0 is to use the original PHITS assigmnment, 
+   1 is to adjust the ratio so that it becomes close to Z/A. The charge
+   is conserved.  This parameter can be specified in
+   $param.  
+   
+
+9.131
+Jul. 2012
+Scrpt/manageIntInfo.sh cannot modify ephook.f correctly, 
+if Scrpt/hookIsOutSide.sh has been executed earler.
+This inconvinience is corrected.
+
+subroutine epqstn2(ns, nd)
+is added in epLightStack.f.  integer output ns, nd: 
+ns is the  current max pos. of particles in the memory stack.
+nd is the  current max pos. of particles in the disk stack.
+nd=0--> all particles are in memory stack
+To get n-th  particle in the stack, use 
+   call epgetTrack(n, aTrack, icon)
+    icon=0; ok
+    icon/=0; no such particle
+n may be > ns. if so, let m=n-MaxStackSize, and if m<=nd, 
+data is read from disk.
+
+IncGp usage chaged. Related bug fixed. 
+Example of UserHook(muInt) for getting product information
+of photon-hadron or muon-hadron production process.
+It can be used outside of Userhook.
+
+9.13
+Jan. 2012
+Now h-A cross-section update in Comsos can be used.
+Also there is a choice for  AA-cross sections.
+(AAXsec=0 => default;  old values: 
+ AAXsec=1 => cross-seciton is normalized to Shen's value at 5GeV/n;
+ normally larger than old values )
+Jam (original version) can now use spectator fragmentation.
+by setting JamFragment=1 (default).  If JamFragment=0, all
+spectators are made  to be nucleons. 
+
+Some new version of awk (say, v3.1.5) cannot deals with a regular
+expression like [a-z][A-Z]?*. ([A-Z] is neglected).  This is
+fatal for fordpmjet command.  A workaround is to make it 
+[a-zA-Z].
+
+
+9.12
+Dec. 2011
+Bug fix
+1) for heavy ion knock-on process;
+2) for Glauber data creation by the fordpmjet commnad
+   for heavy ion collisions used  by dpmjet3.  
+3) for  photo-hadron interaction useage (Nproduced=0
+   in cintePhoton.f 
+
+9.11  
+Release Oct. 2011
+New volume-shape sqTccl is available.
+Related codes update.  (Some are not
+directly related so, the version number
+is not 9.101 but 9.11)
+UserHook can be now put any place. To be able to do so
+use hookIsOutSide.sh.
+manageIntInfo.sh is update to be more versatile 
+
+(Template/{epicsfile,ephook.f} can be used somewhere
+other than in normal UserHook directory.
+
+
+9.10
+Release Sep. 2011
+This version can use jam which is the same one  as in earlier 
+versions. (i.e., original jam but not the one extracted from
+phits)
+The usage of AutoEmin is changed.  
+Emin is fixed as follows.
+ AutoEmin =0:  same as older version.
+          =1:  same as 9.09
+          =2:  similear to 1 (but bit larger Emin) and
+               if energy < Emin, see the residual range 
+               and if it is < length to the boundary,
+               the energy is absorbed, else tracking 
+               continues.  (But, for pbar, e+, nbar,
+               they are tracked until stop to annihilate) 
+            Default is 2.
+octagon/honeycomb are now usable.  prism_xy type notation
+is now treated by a differernt shecme than older verions.
+This needed a lot of source chages.  But the change is
+reflected to Epics9.08 (version is now made to be Epics9.081)
+
+
+
+
+9.09
+Release Jun. 8 /2011
+1)Srim data can be utilized.
+2) AutoEmin is introduced in epicsfile. If 1 (default),
+  minimum energy is adjuested for each component by 
+  looking at the thickness.  10 kev ~ 100 keV.
+  100 (sqrt( thickness/(g/cm2)) keV  is used.
+  If 0, no adjustement and input EminGamma etc are used.
+  However, see next
+3) If ModifyFile in epicsfile is given (default is blank),
+  Epics assumes some compoenent requires special values of
+  quenching effect and/or  minimum energies.
+  The correspondence between the component and ModifyFile
+  is by modifier digit which comes after maxpath field: e.g
+	3 box SCIN  0 2 0 4 /  ...
+  In this case 4 is the modifier and the data with the same
+  index in the ModifyFile is employed.
+  If modifier exists, this has higher priority than AutoEmin.
+
+  Example of ModifyFile is in UserHook/Template.
+4) For quenching, now either of Birks, Talre and Log formula can be used.
+ 5)Moliere multiple scattering is  treated completely
+   different and more rigorous way than old one. (small angle
+   assumption was removed)
+ But  the result of cascade spread is completely the same
+ as the old one while the cpu time increased 1.6 times.
+ The parameter "Molier" in epicsfile is now integer. Old f/t 
+ can still be used.
+ Old f --> Molier = 0
+ Old t --> Molier = 1 
+ New implimentaion is Molier=2. Default is 1.
+6)  prog/epbndry.f was split into two epbndry.f and epbndry2.f
+    otherwise, Util/testCnf2.f or testCnf3.f compilation results
+    in link error due to call epnewComp.f in epbndry.f.
+7) testCnf4.sh and testCnf5.sh were introduced in Util; testCnf4.sh
+    can be used to see Emin for each component.
+   testCnf5.sh can be used to see quenching info. for each component.
+8) New user interface was  introduced so that the user can know 
+   interaction information of each particle.  This is disabled
+   in default. To make this work, the user must edit Epics/epics/Zepcondc.h
+   and
+  a)  change #undef INTINFO --> #define INTINFO
+  b)  make clean ;make at prog
+  c)  if UserHook/xxxxx is not the one included in the new version,
+      the user must issue 
+      manageIntInfo.sh 
+        This will add some lines after #inlcude "../main.f" in @ephook.f 
+        and copy UserHook/epUI.f into xxxx/
+        Then,
+      make clean; make
+      if UserHook/xxxxx/yyyy is the your hook directory, you must
+      modify the top part of ephook.f by hand (see Firstkiss/ephook.f)
+      and copy epUI.f
+   If the user don't touch Zepcondc.h, no need to worry this new feature
+   at all.
+9) epgen.f  pi0 coll. is  forced to decay.
+
+
+9.08
+Release Jan. 31/2011. 
+Update for the interaction model 'jam'.  Disabling elastic collision
+at > 10GeV didn't work so we allow the elastic collsion and use
+total cross-section for all energies if ActiveMdl='jam'. 
+For heavy interaction in jam, we cannot get elastic collision cross-section,
+so we repeat event generation until inelastic event comes out.
+We made a subroutine  cjamElaInfo in cjam.f to put/get inela information
+of the jam event. (Cosmos 7.57/Epics9.08)
+For heavy ion interaction in jam, departure from dpmjet3 is too large
+and still under investigation.
+Sampling method  of direct pair by muon introduced in 9.07 was
+changed so that only common sampling tables are used for all media.
+(Since the  specturm shape is the same for all medida; cross-section
+value is Z dependent).
+
+9.07
+Treatment of direct pair creation, brems and nuclear interaction by
+muon was updated.  For MuPr=3, sampling at low energies (<150 GeV)
+was not so good (due to the poor approximate formula); it is difficult
+to make a better approximaion, we use csampAF function which enables
+sampling of arbitrary numerical function.  This method is now used
+from ~3GeV to 1.5 TeV. 
+For MuPr, MuBr, MuNI=2, old version didn't work. This was updated.
+For MuPr, etc =1, the old version was valid, although it must not
+be used for small thickness  material and energy dposit calculations.
+At any rate, MuPr etc =3 is safe.
+
+
+
+9.06
+Event counters are somewhat updated.
+Nevent specified in sepicsfile is the # of events to be generated
+actually (not including the discarded events by the user).
+If the user don't discard, this has the same meaning as older versions.
+
+Interface routines
+call epqevn(nev1):  will get the event # being generated or goiging to be
+               generated.  nev - 1 gives always the # of events
+               completely generated.
+call sqtevn(nev2):  will return the # of events tried to be generated so far.
+               nev1 -1 = nev2 if the user didn't discard any events.
+call sqCompEvents(n1, n2):
+	       n1 = nev2
+               n2 = nev1 -1
+               if the user didn't discard any events, n1 = n2.
+If the user want to discard an event generation there are 3 points:
+   In uafi1ev:
+	the user may
+	    call epempty 
+	    call epSkipUpdateNo
+        to discard the event
+   In userde or In userbd:
+	the user may set
+	   Move.Abort = 1 or 2 (see ephook.f)
+      in this case, need not to call epempty and epSkipUpdateNo
+
+Three method can be mixed.
+---------------
+
+9.05
+Release Dec. 28/2010
+Util/Gencol/Gencol.f
+  Bug for Moving nucleus case was fixed in formpjtg
+
+
+9.04
+Release Dec. 26/2010
+
+ epLightCountDE.f
+In epLightCountDE, mnCounter has been changed. This was not
+good because mnCounter should keep the max mn number. 
+This was corrected by Akaike.
+
+
+
+
+9.03
+ phits cross-section calculation in epixsec.f was corrected.
+Also one ouput for debug is commentout.
+ UserHook/GetXsec can be used for getting xsections for various
+interaction models.
+
+
+9.02
+ bug correction in prog/epgen.f.  For stopping muon, 9.01 was ok but
+for high ernergy muon, program stops.  (happens only if muon is incident).
+This waw corrected.
+
+9.01
+phits cannot treate anti-proton/neutron.  Workaround 
+is to use jam or dpmjet3 irrespectively of energy.
+If jam/dpmejet3 is not available, error stop will happen.
+
+Stopping muon capture treatment is more comprehensive
+
+9.00
+Light generation by scintillation and Cerenkov and ray tracing are
+supported.
+
+
+8.82
+Molier scattring treatment was updated. 
+It has effect for compound media of which
+components has largely different Z values.
+Say, the lateral spread of cascade for PWO shrinks.
+For Pb, unchanged.
+
+
+8.81
+UserHook/FirstKiss/epicsfile contained wrong RecoilKeMin
+(100 was given; but it must be 100.e-6 or 0).
+For Air*0.98 type notation, the fordpmjet command
+fails.  This was corrected.
+
+
+uv8.80
+A) Sternheimer's consts and related stuff were updated.
+The effect:
+ e+/e-. If an electron is injected to a thin layer
+matter, effect is large:  5~8% decrease of <dE>.
+If the cascade develops, effect becomes small.
+For the total absorption calormeter, such as Calet, 0.5% level <dE> decrease
+For the sampling calorimeter with thin sensors such as LHCf, 2~3% decrese
+
+mu, (pi,p..):  dependent on material whether the old excitation energy
+	is close to the new one or not.
+	In the case of BGO at 2 GeV, almost no diff. at 150GeV, small
+	diff.
+	In the case of PWO at 2 GeV, diff. is rather large (~5%).
+
+B) In older version, if we want to use a different density for the same
+	media, we had to define a new media with such a density.
+	From version 8.80, we can use different denstiy by giving
+	the media name as, e.g, Air*0.904; which means Air with a density
+	0.904 times smaller than the standard one.
+ 
+
+uv8.78
+QGSJET2 cannot accept lamda0 baryon.  This workaround is implemented
+correctly in Cosmos 7.46,  7.47.
+ (Older workaround was wrong).   The cross-section calculation
+ in Epics  is independent of Cosmos so some modification is 
+ introduced for lambda0. (Also for Sigma, Gzai baryons).
+
+uv8.77
+For compound material and hadron projectile, interaction cross-section
+calculation has been updaed to be more sure. For example, the 
+cross-section in SciFi will decrease a little bit.
+
+uv8.76
+Release Jul.09,2008
+"fordpmjet config " now works even if config contains "#inc".
+If #inc is used, Util/testCnf1.f is used to expand the config file
+and resultant config file is modified and input to fordpmjet.
+It will work both for sh and csh.
+ 
+
+uv8.75
+Release Feb.20, 2008
+User defined parameters (epHooks etc)
+are now placed only in sepicsfile. 
+
+
+uv8.74
+muon brems gamma has charge. This is not 
+harmulf  for simulation, but corrected.
+
+ 
+uv8.73
+Release Jan.23, 2007
+epics/ZepTrackp.h and crresponding BlockData
+are not updated in the previous version. 
+This was corrected.
+
+uv8.72
+Release Nov.24, 2007
+IncGP to activate photo-production of hadrons
+hase been not effective during some versions.
+This is corrected.
+The current version updated the  treatment of
+photo-electric effect.  When Eg> Eshell,
+a photo-electron of energy  Ee=Eg-Eshell+Me
+appeares (same as older versions)  and at the
+same time, characteristic X-ray  of energy
+Ex=Eshell is generated (in this version).
+(Currently, no Auger electron is included).
+Also, if Eg > Kshell, all reaction is assumed
+to be on Kshell but not L,M,.. shells.
+This treatment is effective when bit 1 is 0
+of Eabsorb in the epicsfile.   IF bit 1 is
+1,  no Xray is generated and all the photon
+energy is assumed to go into energy loss.
+
+
+uv8.71
+Release Jun 25, 2007
+LPMeffect = f has not been  made effective 
+because I forgot updating some stuff in 
+prog/Elemag/ (8.68~8.70).
+This was corrected.
+
+uv8.70
+Release May 21, 2007
+Description of sepicsfile specification is made to be more clear.
+They are given in sepics file of FirstKiss, a separate document
+sepicsfileDoc.pdf and UserHook/Test-sepicsfile
+
+Meaning of Cosnormal, normal vector, InputP='usph', etc is 
+given clearly.  Confusing 'sph' and 'gsph' are now removed;
+New specification 'u->sph', 'u->sph2',  'g->sph', 'g->sph2'
+are introduced. Some explanation of how to specify the
+incident by a file with "+" at its file name is given.
+
+uv8.69
+Release Apr 6, 2007
+Bug fix done in uv8.67 led to another bug;
+At config display, no selection by media becomes possilbe.
+This was corrected.  (simulation itself is ok).
+Default max number of components is made to be larger than
+previous versions.
+
+uv8.68
+Release Mar 21, 2007
+Now Excom1, Excom2, LPMeffect can be put in epicsfile as parameters.
+The parameters in sepicsfile and epicsfile may appear in any order
+(but for epHookc, epHooki and epHookr, better to put after epHooks)
+If some are missing, default will be used.
+See for meaning and defaults, see epicsfile in FirstKiss.
+
+
+uv8.67
+Release Mar 17, 2007
+max subdetector name length 8-->16
+printable number for components 4 digits --> 6 digits
+wrong media name in  subdetector drawing corrected.
+
+
+uv8.66
+Release Jul.31, 2006
+Xray  treatmen above 1keV is by XCOM.  XCOM gives upto 100GeV, but
+we use it below 1MeV.  Photo electic effect angular distribution
+is now more precise. This version needs Cosmos uv7.23 or later.
+
+uv8.65
+Release Jun.03, 2006
+Gencol is enhanced so that the event-by-event changing collision
+conditions can be treated. (collision angle, particle type, energy,
+positions can vary event-by-event).
+e+ anihilation cross-section is corrected. (old one was 2 times lower).
+But almost no effect for almost all jobs.
+
+uv8.64
+Release Feb.19, 2006
+SomeDir/AntherDir/+primary type primary input
+is now ok. Last file's + is recognized.
+ep_ecyl.f has a bug. fixed. 
+
+uv8.63
+Release Nov.26,2005
+So far when an anti particle stops (typicall anti-proton; when
+ it's mass  > min energy),
+ a large value (length/beta=1.e8  cm) is added to the time.
+This gives strange time value to the decendents when the
+particle anihilates. We don't add any time for the
+anihilation now.
+
+uv8.62
+Release Nov.23,2005
+
+Particle tracking was made to be correct
+in detector parts which are  rotated 180 degrees.
+
+When an incident particle is exactly on the
+surfaces of two adjacent cylinders,
+wrong result might be obtained depending
+on the particle direction and detector
+configuration. This is corrected. 
+
+A small bug in The e+ anihilation angle 
+sampling is corrected.
+
+Marble (CaCo3) is added as media. 
+
+In the track record, "track.user", is
+added which can be used by the user freely.
+Util/Gencol/Gencol.f  particle generator
+now add one additional quantity (
+particle number counter; 1 is for highest
+energy partiles ). This index is read by
+the system as a track.user variable.
+
+
+uv8.60
+Release Nov. 6, 2005
+Magnetic deflection in 'sp' may  result in
+infinite loop. Also adding method of defection to the
+old track was wrong in versions around 8.xx.
+This was corrected.
+
+uv8.55
+Release Aug. 19, 2005
+A routine epretTrack(n, aTrack, icon)
+is added so that in combination with
+ epgetTrack(n, aTrack, icon)
+the user can modify particle track info.
+already in the n-th stack region can be
+modified. (n: n-th stack position,
+aTrack: tarck in the n-th pos. 
+icon: 0 OK, 1, NG).
+Readme file in Util/Anime is updated.
+
+
+
+ 
+
+uv8.54
+Release Aug. 18, 2005
+1) As incident particles, a file which contains particle
+information can be specified by PrimaryFile in sepicsfile.
+The file name must start with +. These features has been
+implemented from uv8.11.  However, it has been difficult to specify
+multiple particles as the incident partilces in one event.
+This version supports such a case easily; one bunch of incident
+partilces may be separated by a blank line.  To indicate that
+multi-particles are incident, the file must contain 'mul' 
+in the first line.  Then, for example, the first few lines 
+may look like
+#  mulsubKEdir
+#--------------------
+6 1 1 100.  0 0 1
+4 1 -1 30   0.0903  0.1105 0.98...
+4 1 -1 30   0.010   0.1050 0.99...
+
+6 1 1 35   0 0.1 0.99
+...
+
+2)  Epics/Util/Gencol
+is available;  the user can generate, say, LHC events, by
+various models and make a file which can be an input
+to the primary of Epics execution.
+
+
+
+uv8.53
+Relaese Jul. 22, 2005
+The treatment in 8.51/2 was wrong. 8.50 has a problem with Pb for QGSJetII.
+The last one was corrected.
+
+
+uv8.52
+Relaese Jul. 21, 2005
+For Pb, sometimes A=208 may happen while A=207 is
+the prefined  max; this leads to loop. and corrected.
+
+uv8.51
+Relaese Jul. 20, 2005
+X-section treatmen for QGS-jet-II for complex media is corrected.
+site.configPCLinuxIFC is modified so that LD contains -static
+(for large memeroy)
+
+
+uv8.50
+Release Jul. 09, 2005
+QGSJet-II is now available.
+ 
+uv8.14
+Release Jun. 11, 2005
+When using drawConfig,r usenewvol or testtCnf1 (or ...) , unresolved reference 
+mae result in. This is avoiided to move ep_bbox  etc in epbndry.f to ep_simpleb.f
+New volume, ciecone (cut inclided eliptic cone) is made to be public.
+This can be used to create pants.
+
+
+uv8.13
+Release May 24, 2005
+Some confusion about splitted files etc led to
+unresolved references. This was resolved.
+
+
+uv8.12
+Release May.15, 2005
+eppush.f was missing in 8.11. 
+
+
+uv8.11
+Release Apr.29, 2005
+Using cosmos generated partiles with +xxxx primary
+file and InputP='usph' has some problem.  This was
+updated.
+
+uv8.10
+Release Mar.28, 2005
+'cos 1' sampling sampled 'cos -1'. corrected.
+Util/Anime section is added to make a movie for
+time development of cascades.
+
+
+uv8.06
+Escaping method from the synchrotoon semi infinite loop 
+has been chaged to be more sure.
+
+uv8.05
+Loop due to the prolem at boundary  has detected and
+corrected. (epgen.f  see do while(     .. n .lt. 10)
+
+uv8.04
+A long-standing  annoying problem which may happen at 
+boundary of a component has been settled. Although
+it is rare, the treatment so far is to stop 
+execution.  The matter can be safely recovered now
+so the execution can continue with some messages.
+
+uv8.03
+Particles made by Cosmos can be put to Epics easily.
+Make a file which contains the particles; the file
+name must start with "+", (say, +primary).
+each line should contain at least code charge.  Additional
+infomation for subcode, energy (TE or KE) , direction
+cosines, time, position can be specified.  The first 2
+lines shoud be, for example, 
+#    TEdir
+#-------------------------
+which are followed by 
+code charge  TE  dir
+code charge  TE  dir
+...
+
+TEdir means that the file contains Total energy,
+and direction cosines.  Other information is 
+supplied by Epics  as in normal Epics run.
+
+
+uv8.02
+Release Dec.
+Bug in the Geomview display routine was corrected.
+
+The '=' notation in the shape attribute part
+(say, length of 3 edges of a box)  is extended so
+that the offset can be added after '='; for example
+
+1  box SciFi  0 2 0 /   0.    0    0    0.1  0.5   0.1
+2  box SciFi  0 2 0 / =0.1   =-0.1  =    =   =0.2   =
+3  box SciFi  0 2 0 / =0.1   =-0.1  =    =   =0.2   =
+4  box SciFi  0 2 0 / =0.1   =-0.1  =    =   =0.2   =
+
+will produce configuration like (=0.2 above couldn't be
+used in the previous versions):
+
+
+      |
+     ||          
+    |||          
+   ||||          
+   ||||             
+   ||||             
+   ||||          
+   ||||          
+    |||          
+     ||          
+      |
+     
+
+epExpot.f is modified so that Absoft Fortran on Mac OS X can compile it.
+( array  index must be scaler for Absoft Fortran on Mac OS X; i.e,
+	x( abc.xyz.I )
+is not permitted so that we must   use 
+	i = abc.xyz.I 
+	x( i).
+
+Some gramatically ileagal (but compiled correctly) statements are
+corrected.
+
+
+ 
+uv8.00
+Release Jun.23, 2003
+Pair creation cross-section default is fixed to be Nelson's one.
+It gives higher cross-section for larger Z and at low energyies
+as compared to the Tsai's formula.However, it has a glitch
+at 50 MeV; this glitch is unnatural so that we put an ad-hoc
+smooth transition from 7 MeV to 70 MeV.
+Muon single peak position was evaluated 5 % lower than the
+correct one and this was fixed.  (For Pions and protons
+the same is true).   The electron case is almost unchaged.
+Cross-section table is enlarged by factor 2 or more.
+This has almost no effect on the cascade development,
+but if you make a simulation at a fixed energy and
+see the distribution for, say, brems, we may see
+a little bit smoother result.
+According to this, all Media table have been 
+updated.
+
+
+
+uv7.24
+Release Apr.20. 2002
+Geomview display interface is made to be much faster and compact.
+
+The error message issued when a new volume shape is used without 
+having used 'usenewvol' command in Util has been made to be
+more comprehensive.
+
+
+uv7.23
+Release Apr.02, 2002
+If the random number seed  Ir(2) in sepicsfile is negative, the seed is
+reset by using the timer and the hostname as in the case
+of Cosmos.
+
+uv7.22
+Release Mar.25, 2002
+The menu 8 of drawconfig dose not work correctly due to the problem
+of integer*2 and integer corrected in uv7.21.
+Complex config is now completely processed.
+Too many IFC warinig is now suppressed.
+
+
+uv7.21
+Release Mar.13, 2002.
+On some platforms, Util/drawConfig.f cannot be compiled.
+due to th error of type max(integer*2  integer) so
+ZepDraw.h  was corrected; integer *level* single variables are
+made to be integer*2
+Also, write(msg, '(i,a,a)') is not usable ; it was
+changed to write(msg, '(i5, a, a)') 
+some command invocation is changed to have ./ before the
+comand name.
+
+uv7.20
+Release Feb.28, 2002.
+config with subdetectors deployed lateral directions
+are not properly treated. (say, YBarray). corrected.
+
+IFC support.
+
+Geomview support.
+
+
+
+uv7.10
+Releas Jun. 18, 2001
+For pcLinux, we use f90 instead of f77. This is to make
+compatibility with Cosmos which must use f90 for pcLinux.
+
+All of the following statement must be modified like below.
+
+  record /media/  ---> record /epmedia/
+  recore /move/   ---> record /epmove/
+
+All of temp*.f generated by cpp are kept in the same
+directory as the current program being compiled.
+If you want to remove these, issue 
+       make veryclean
+
+
+uv7.00
+Release May 20, 2001
+1) dpmjet3 is supported.  Cosmos.uv6.00 or later must be used.
+2) array usage is optimized so that the large number of detectors
+   can be contained in a configuraition.
+ For details, see new appendix.
+3) PC Linux can be used with Absoft Pro Fortran.
+
+
+  
+uv6.60
+Releas Sep.15, 2000
+1) Bug fix for wrong deployment of epmoller.f and epbhaba.f. Those
+   in Epics/Util/Elemag/ are the correct ones. They
+   should, however, be  in prog/Elemag.
+   Effect is small, but in uv6.4 ~6.50  the first event may look strange.
+2) The main Makefile is modified to make the ingredients
+   in Epics/Util/DrawNewVol automatically.
+3) Dobuly defined implicit none in Util/DrawNewVol/epDraw_ellips.f
+   is corrected. (some system is not aware of it).
+4) nvtx in Util/DrawNewVol/epDraw_csph.f confilict with
+   NVTX in a common (some system disregards the capital and small
+   letters). nvtx--> nvtxx
+5) At very low energies ( Ee ~ Me),  Selzer brems formula is
+   used. The calling sequence for energy sampling is missing
+   the mass term and the spectrum becomes strange. This was
+   corrected.  The effect is also very small except for that
+   the user is looking for brems gamma for low energy electrons.
+6) prog/KKlib/kbetar.f is no more needed. It is in Comsos library.
+   But it is  kept.
+7) After 'mkNewVolume config', no more make is needed in Epics home;
+	it is automatically done.
+8) Some irrelevant comment about  Trace file open in epicsfile is
+   removed.
+
+uv6.50
+Release Aug.11, 2000
+New manual has been ready together with a descripiton of
+newly defined 21 volume-shapes.
+A bug correction when a one line of config file  has > 100 characters.
+
+uv6.22
+Release Jul 17, 2000
+Some minor correction for mkNewVolume. Template for 'no new volume' was
+error. prog/epNewVol.f contained two new volume-shames. It is 
+replaced by the one without newvolume.
+
+
+uv6.21
+Release Jun.29, 2000
+Some correction for site.config etc
+
+
+
+uv6.20
+Release  Jun.26, 2000
+This version supports Alpha Linux two ways. See Readme in Cosmos/Version.
+
+ 
+uv6.10
+Release  Apr.20, 2000
+Restricion for the number of volume attributes are now
+dropped.  There is some change in usage of the eprpst subroutine
+and how to use the volume attributes. These must be considered if
+the user makes new volume-shapes.  Bug fix when a first
+component is inclided one.   A number of new volume-shapes are
+supported. They are in prog/NewVol (subs for tracking) and
+Util/DrawNewVol (subs for drawing). 
+
+
+uv6.00
+Release Mar.10, 2000
+1) A very large number of componets can be accomodated with an efficient
+   use of arrays.   Default setting is for approx. ~10^4 comps.
+2) New volume-shape, gcyl and horse are available for use.
+   gcyl:  general cylinder which permits the starting and ending angles.
+   horse: vaulting horse volume. including a triangular pyramid as a
+	special case.
+   Default number of volume attributes is 10. (old one was 5).
+   
+3) The user need not worry about "Maxpath" part in the configuration 
+   file except for very special cases.
+4) Supplemental manual is prepared.
+
+
+uv5.30
+Release Feb.20, 2000.
+1)Bug correction.  Sampling table (m.f.p) of compound material such as
+  H2O,  Air etc was wrong for energy approximately above 80 GeV where
+  the LPM effect becomes not negligible.  (m.f.p was too short, and
+  showers with a high energy cut are ~1 r.l shifted to the shallower
+  depth.  All related tables were corrected, and table making routines
+  were corrected.
+2)After making tables, older version made the table unwritable.
+  This was ceased.
+
+
+uv5.20
+Release Feb.15, 2000.
+1) some of the epicsfile parameters are changed.
+2) sepicsfile can contain userdefned parameters.
+3) sepicsfile has new parameters to ease the incident
+   beam position setting.
+4) Eabsorb in sepicsfile are modified so that a various
+   treatment is possible  when a  particle energy
+   becomes lower than the threshold,
+5) moller scattering is refined.
+6) bug in config file treatment (the last comp. must be
+   world in v5.18) is removed. 
+
+ 
+uv5.18
+cqHookr has read real variable as integer; corrected.
+Made to be compatible with Cosmos.uv.5.20
+New material (Bakelite, Acrylic, Hollow) added.
+Bug in G5 table corrected.
+
+uv5.17
+Release Aug. 10. 1999
+When drawconfig is used to print the configuration info.
+and if the many components are contained by the world,
+the print area shortage is detected in eprcnf.f
+This is corrected (but not perfect).
+
+
+uv5.16
+Release Jul 19 1999
+Bug correction for epicsfile input parameter
+placed last part (=epHooks).
+Change of distjob function so that it 
+puts epHooks ='1 0 0' and and epHookc(1)
+=' path to the main output file'. This will
+enable ephook.f to handle the main output
+file by some number other than  sysout.
+
+
+uv5.15
+Release   Jul 3. 1999
+ InputP ='gxy' was not acceptable. corrected
+ sqrt( -eps ) problem in epanihi.f was corrected.
+ dedx in the Lindhard region is treated more 
+ accurately.  Its treatment for non electons 
+ was buggy and corrected.
+ For the stopped  particles, energy loss is
+ doubly counted.  For the stopped particles,
+ we don't call userde now.
+
+uv5.10
+Release Jun 08, 1999
+There is still very rare hapening of error
+(something like  'boundary error')
+by a stopping annihilating or decayable particle.
+It is so rare that we decided to neglect it without
+issuing the message.  If the particle is still moving,
+the error is not neglected and 	the messages are issued
+and the  system will stop.
+
+
+uv5.07
+Release Jun 03, 1999
+Cosmos treatment about charge conservation sometimes
+neglect the difference between the pic and pi0 mass.
+This might lead to inconsistent direction cosine 
+assignment at very low energy and cause boundary error.
+This was corrected.  Knockon electron direction is
+corrected.
+
+#do
+...
+...
+#end 
+in config file is supported so that it is easy to make 
+repeated structure.  This must be processed before it is
+processed by epics.   That is, for example
+  expando configwithDo > config
+Beside InputP='uxy', 'uxy2' is introduced to make it easy
+to give the particle direction.  Some inquiry sub.s are
+introduced to get info. about config.
+
+uv5.05
+Release May 11, 1999
+In many cases, fingures by drawconfig are felt to be upside down.
+So drawconfig now has a mode to draw the detector configuration inverting
+Z-coordinate and you can look it as you expects.  In this mode,
+cascade tracks are also automatically z-inverted.
+
+
+uv5.04
+Release May 08, 1999
+drawconfig in some system cannot be compiled with default compilation
+options. (There are the same variables in ZepDraw.h and Zcnfig.h
+if disregard the difference between lower and upper characters).
+This was fixed.  There was also some undefined record in drawConfig.f
+and fixed. Cosmos main program was excluded from its library and
+now compilation of drawConfig has no problem.
+New parameters that can be used by the user are introduced.
+They are epHookr, epHooki, epHookc (real*8, integer, character*100)
+They are arrays with size 10,10,5 in default.
+They must be placed at the end of epicsfile. See Template
+
+
+uv5.03
+Release May 03, 1999
+When drawconfig writes config data, now comment can be
+printed out. This mode can be made to be on/off by putting
+#com 0 
+or 
+#com 1
+in the config file. (0 for off). Default is on.
+The commet here is the line starting with  #, c or !, 
+or one with 5 blanks at head. (#eq, #news, #subd #com are not
+comment line).  /*  */ is not included as comment.
+Manual was updated.
+
+---------------------
+Apr 29, 1999  uv5.02
+prog/Mu/epRdmuTab.f
+There are two implicit none in the top part and
+it makes error in DEC Alpha.
+
+#eq for integer value result in wrong result.
+   (  CountIO and CountdE affected. )
+     correction has been made.
+
+
+Apr 28, 1999  uv5.01
+Some system cannot understand vpath in ephook.mk so
+ephook.f is changed to contain #incldue "../main.f"
+vpath and main.o is droped in ephook.mk
+
+prog/eprcnf.: In the part that write config dsn,
+msg is too short in some system so that 
+some change.
+
+
+
+
+Apr 26, 1999  uv5.00
+ Subdetector can be drawn separately
+ Cleanup everything.
+
+
+Mar 19. 1999  uv4.98
+ Almost all are implemented.
+ NewVolume definition etc.
+ Manual is not yet completed.
+
+Jun. 15.1998  uv3.91
+  carbon is added with density 2.2 g/cm^3
+
+Jun. 13 1998  vu3.90
+ Some bug fixes (negative sqrt etc).
+ The path to the parameter file names can be longer than
+ previous. This is for Distjob.
+ CsI density corrected.
+ Air and H2O supported.
+
+Mar. 26 1998  uv3.82
+  More refined boundary check error. Density was wrong for scinti.
+ 
+Mar. 24 1998  uv3.81
+  No mseeage for safe boundry set error;
+Mar. 21 1998  uv3.80
+  A  robust version has been reached.
+  Numerical presion error will probably never happen. Even if it
+  happens, correction is automatic.
+
+  Boundary set error may happen very rarely, but the job can continue
+  by discarding a particle which is a stopped e+/p+ at the edge of
+  a chamber.  
+
+  Landau/Vavilov/Gaussian energy loss fluctuation is now available
+  for use.  It is used when 2 is given for energy loss counting 
+  in the config file.  
+
+  Moliere scattering routine is changed to use a version in 
+  the Cosmos library.
+
+Oct. 16 1997  uv3.73
+  External names related to the old Lund Fritiof  was
+  changed in Cosmos so that they have been changed in epics, too.
+  Some dummy subroutines are necessary to avoid unresolved
+  external names (which are some subrouitnes in Cosmos).
+  They are added in ephook*.f
+  cppFCDECALPHA2 is corrected to work for Digital unix.
+Mar. 13 1997  uv.3.72
+   Numerical precision error may be killed by upgrading
+   kklib.f.  E < mass in epcosIntF.f is eliminated.
+
+Nov. 05 1996   uv3.71 Release.
+  BGO is supported as as medium.
+
+
+Jun. 23  1996   uv3.70 Release.
+ 1)  In the ephook.f,  a user interface routine "uafi1ev" is added so that
+  one can gain the control after all the initialization for an event
+  has been finished.  One must add
+ 
+       subroutine uafi1ev 
+       end
+  if one uses existing one's own hook routine.
+ 2) In userbd, one can  use (xbndry, ybndry) in Zuser.h for the boundary
+    (x,y) coordinates of a particle when it enters into or exits from
+    a component.
+ 3)  In  prog/Sepics/main.f,  "external ebplkde" is correccted to be
+  "external  epblkde".  DEC alpha detected this. 
+ 4)  compa in Elemag/gbrems.f is corrected so that DEC alpha does not
+     produce error (save statement)
+ 5) site.configDECALPHA2 is usable for DEC alpha, digital unix O.S
+
+----------------
+Jan. 05  1996   uv3.60 Release. 
+  1)  You may put 2 instead of  1 for particle counting specification; 
+      in this case, counting is performed when a particle goes out of a
+      given component.  Note when you give 1 for the component where
+      the incident particle  is given, the incident particle is not
+      counted as entering that component. It is in that component from
+      the first.
+  2)  chookTrace.o  sometimes  appeared as an  unresolved external reference.
+      This is bypassed by putting dummy subroutine  chookTrace in the
+      epcosIntF.f  Therefore if the user wrote such a  dummy routine in
+      his/her UserHook program, he/she must drop it.
+  3)  Epics sometimes stops its execution with the message 'boundary set 
+      error':  This can happen when a particle crosses the boundary of one
+      component to another due to the finite accuracy of computation.
+      This may be controlled by giving  some value to a new Epics 
+      parameter, EpsLeng, which is in the last place of EPICS file.
+     (see, Data/Param/EPICS). The default value is 10^-4 cm (1 micron
+      meters).  You may try to change this to a smaller  or larger values
+      by a factor of 3~10 or so.  	
+  4)  When the critical energy is low such as in Pb, and minimum energy
+      for observation
+      is much lower than the scattering energy, the number of particles
+      (electrons) for inclined incident showers becomes larger than the one
+      for vertical showers. (say 20 ~ 30 for 45 degrees).  This seems
+      to contradicting to naive expectations. However, this is a valid
+      characteristics of such showers and confirmed before the release
+      of this version.
+                                 
+
+Jun. 13  1995   uv3.50 Release.  In the prvious version, there were bugs
+                                 of trace information output and time
+                                 data.  Also, hadron incident showeres
+                                 were not correctly treated. 
+Jun. 3   1995.  uv3.46 Release.  a bug that results in "numerical precision
+                                 error" has been corrected.  
+                                 Bets config with 10 GeV protons with
+                                 cos = 0.5 to 1.0 has been tested against
+                                 30000 events. No error detected.
+May. 21  1995.  uv3.40 Release.  fatal bug that no energy loss count in 
+                                 a thin layer is corrected.
+Mar. 18, 1995.  uv3.39 Release.  some delicate problems about geometrical
+                                 relation have been updated.
+	                         10000 0.5GeV electrons tested with BETS
+	                         chamber with Emin=100 keV.
+
+Mar. 17, 1995.  uv3.34 Release.  xyzton.f has two bugs.  drawConfig.f has 1 bug
+	                         These have been corrected.
+Mar. 9, 1995.   uv3.31 Release.  + in Z field has bug.  fixed.  vn command 
+Mar. 1, 1995.   uv3.3  Release.  
+
+

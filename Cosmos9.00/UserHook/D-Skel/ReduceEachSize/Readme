@@ -1,0 +1,8 @@
+Reduced .dat (bin) file size. Data  is still not 
+assembled ones. (However,assembled .nrfai file must exist)
+input.  .dat bin 
+	.nrfai (assembled)
+output. .dat-red
+	.nrfai-red (for each  input data). This must be
+	assembled again.
+

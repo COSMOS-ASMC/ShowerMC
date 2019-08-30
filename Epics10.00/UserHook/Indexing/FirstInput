@@ -1,0 +1,19 @@
+'epicsfile', 'config', 'sepicsfile', f,  'param'  /
+
+'epicsfile', '../CALETGeometry_v5.1/config', 'sepicsfile', f,  'param'  /
+
+
+'epicsfile', 'config', 'sepicsfile_mu-_150GeV_run096', f,  'param'  /
+
+If you need to specify the interaction model or some other
+features specific to Cosmos, you can give Cosmos parameter
+file at the last part of the above input data line as
+
+'epicsfile', 'config', 'sepicsfile', f, 'param'   /
+
+If it is ' ' instead of 'param',  default model is selected.
+
+  (See "param" file in this directory.)
+
+
+

@@ -1,0 +1,22 @@
+
+In this directory are contained moudules that are needed to generate a
+primary particle(s), to push it in the stack area, and to invoke the
+tracking routine "ctrackingAll".  When the tracking is finished, 
+control is returned to a program unit in this directory.
+
+Other basic manager routines are here.
+
+
+The scheme of realizing skeleton/flesh.
+
+Generate  has em          T           F         T         F
+              as/lat      F           T         T         F
+
+KEmin                     KEminObs   KEminObs  KEminObs   KEminObs
+
+KEminCas                  KEminObs   *1         *2        infinity
+
+
+*1:      KEminCas = EminAS  (= max(1, EratioAS * E0) )
+*2:      KEminCas = min(EminAS, KEmin)
+

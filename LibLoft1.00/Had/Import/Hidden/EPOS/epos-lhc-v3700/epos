@@ -1,0 +1,113 @@
+#!/bin/csh 
+#################################################################
+# script to run epos ; argumentS: file name ;  version number
+#################################################################
+
+if ( -e $HOME/.epos ) then
+source $HOME/.epos
+else
+source .epos
+endif
+
+if ( -e $OPT/$1.optns ) then
+else
+echo $OPT/$1.optns "does not exist"
+exit
+endif
+
+#if ( -e $OPT/$1.def ) then
+#source $OPT/$1.def
+#endif
+setenv  URQMD13_TAB  "$EPO/urqmd13/tables.dat"
+setenv  URQMD_TAB  "$EPO/../urqmd23/tables.dat"
+
+rm -f $CHK/z-$1.check 
+rm -f $CHK/z-$1.copy 
+rm -f $CHK/z-$1.log 
+
+if ( $OPT == '.' ) then 
+    setenv odir `pwd`
+else
+    setenv odir $OPT
+endif
+
+if ( $HTO == '.' ) then 
+    setenv hdir `pwd`
+else
+    setenv hdir $HTO
+endif
+
+#setenv seedj `date  '+%S%M%d%m%y%H%N'`
+#setenv seedi `date  '+%S%M%d%m%y%N%H'`    
+setenv seedj `date  '+%N'`
+setenv seedi `date  '+%N'`    
+
+#---------------------------------------------------------------------
+time $OBJ/$SYSTEM/Xepos -n << END
+echo on
+!uncomment the following line to get random seed
+set seedj $seedj
+set seedi $seedi
+fname pathnx $EPO/
+fname histo  $hdir/$1.histo
+fname check  $CHK/z-$1.check
+fname copy   $CHK/z-$1.copy
+fname log    $CHK/z-$1.log
+fname data   $hdir/z-$1.data
+fname input  $hdir/$1.data
+fname initl  $EPO/epos.initl
+fname inidi  $EPO/epos.inidi              
+fname inidr  $EPO/epos.inidr              
+fname iniev  $EPO/epos.iniev   
+fname inirj  $EPO/epos.inirj
+fname inics  $EPO/epos.inics
+fname inigrv $EPO/epos.inigrv
+fqgsjet dat   $EPO/qgsjet/qgsjet.dat
+fqgsjet ncs   $EPO/qgsjet/qgsjet.ncs
+fqgsjetII dat   $EPO/qgsjetII-04/qgsdat-II-04
+fqgsjetII ncs   $EPO/qgsjetII-04/sectnu-II-04
+fqgsjetII03 dat   $EPO/qgsjetII/qgsdat-II-03
+!fqgsjetII03 dat   $EPO/qgsjetII/qgsdat-II-03.64bit.cg
+fqgsjetII03 ncs   $EPO/qgsjetII/sectnu-II-03
+nodecay 1220
+nodecay -1220
+nodecay 1120
+nodecay -1120
+nodecay 120
+nodecay -120
+nodecay 130
+nodecay -130
+nodecay -20
+nodecay 14
+nodecay -14
+nodecay 17
+nodecay 18
+nodecay 19
+input  $EPO/epos.param
+input $odir/$1.optns
+!input  $EPO/epos.paramhy
+runprogram
+stopprogram
+END
+if ( -z $hdir/z-$1.data ) then
+  rm -f $hdir/z-$1.data
+else
+  echo "###############################################################"
+  echo "      output from/to $hdir/z-$1.data"
+  echo "###############################################################"
+endif
+if ( -z $CHK/z-$1.check ) then
+  rm -f $CHK/z-$1.check
+endif
+if ( -z $hdir/$1.histo ) then
+  rm -f $hdir/$1.histo
+endif
+rm -f $CHK/z-$1.log
+rm -f $CHK/z-$1.copy
+if ( -z $CHK/z-$1.see ) then
+rm -f $CHK/z-$1.see
+endif
+#rm -f gmon.out
+date
+exit
+

@@ -1,0 +1,247 @@
+The description of parameters frequently used:  &Param data
+----------------------------------------------------------
+
+<<ASDepthList>>   real*8 
+ This is DepthList for AS observation. Used only if Generate contains 
+ "as". See DepthList. 
+
+<<ASHeightList>>   real*8 
+ This is HeightList for Air Shower observ. Used only if Generate contains 
+ "as". See HeightList. 
+
+<<Azimuth>>   complex*16 
+ Range of azimuthal angle in deg. Say, (0, 45). Default is (0,360). 
+ Can be such as (300., 390.). Used when Za1ry is 'is'\newline 
+ If ObsPlane=3 (spherical), this is used to show the half opening angle 
+ range where the primary injection position is uniformly distributed 
+ on a sphere. The center of the opening angle is (Latit, Longit, HeightOfInj). 
+ In this case, for the upper opening angle, min( Imag(Azimuth),180.) is used. 
+
+<<BaseTime>>   real*8 
+ Rough cpu time needed for completing one event (say, for protons, or 
+ gamma rays) with energy BaseErg. The cpu time estimation is based on 
+ A * ( E1ry par nucleon )**BasePower / BaseErg * BaseTime, where A is mass number 
+ (for nucleus; otherwise 1). 
+
+<<Cont>>   logical 
+ If T, continuation from a previous job is assumed. Contfile content is used. 
+
+<<ContFile>>   character*70 
+ Job continuation information file (full or relative path). 
+ default is "ContInfo". This will be created when job 
+ is finished normally. 
+
+<<CosZenith>>   complex*16 
+ Range of cos(zenith angle). Say, (0.5, 1.0). Used when Za2ry is 'is' 
+ If ObsPlane=3 (spherical), real(CosZenith) must be $>$0, and means 
+ the zenith angle range at the incident point (not in Exyz system). 
+ In that case, azimuth is 0 to 2pi. 
+
+<<CutOffFile>>   character*70 
+ Geomagnetic cut-off file 
+
+<<Ddelta>>   real*8 
+ SourceDec $\pm$ Ddelta is the region for 'aps' (deg). 
+
+<<DeadLine>>   character*8 
+ The dead line before which the job should terminate. 
+ Should be given like '10.11.15' which means the nearest 10th, 11 O'clock, 
+ 15 min. Not used if Within has non zero value. 
+
+<<DepthList>>   real*8 
+ Depth List of Observation level in kg/m$^2$. If $< 0$, HeightList has priority. 
+ (See HeightList) 
+
+<<DestEventNo>>   integer 
+ 2 integers: Final event no. to be generated and events to be generated 
+ in the current run. If negative, their absolute is used and counting 
+ includes discarded ones due to rigidity cutoff. 
+ If DestEventNo(2)=0, DestEventNo(1) is used. If it is negative, only 
+ DestEventNo(2) is checked to see events in the current run. For the 
+ flux calculation, negative ones are better. 
+
+<<DtGMT>>   real*8 
+ Difference of the local time of the observation place from GMT (hour). 
+
+<<Freec>>   logical 
+ if F, the first interaction point is forced to be the injection point else 
+ the interaction poin is randomly sampled. 
+
+<<Generate>>   character*16 
+ specify what should be generated \newline 
+ 1) Electro-magnetic cascade(em), \newline 
+ 2) one dimensional hybrid AS(as/qas) and/or \newline 
+ 3) AS Lateral distribution(lat). \newline 
+ If Generate= ' ', hadronic cascade shower is generated. \newline 
+ For example, you may give as follows: \newline 
+ Generate='em,as' or 'em/as' (order/case/separator insensitive) is to generate EM-cascade and AS. \newline 
+ Generate='as' will generate AS with some adequate EM cascade (EM cascade is automatically generated 
+ so that hybrid A.S can be observed, but the minimum energy in EM cascade is independent of KEminObs). \newline 
+ If 'qas' is given, quick generation of AS for heavy primaries is tried. See chookASbyH.f 
+
+<<HeightList>>   real*8 
+ Height of observation levels in m. This is made from DepthList internally. 
+ I.e., this one is usually not an input. However, if the DepthList values are 
+ negative, this is used as input and corresponding DepthList is computed internally. 
+
+<<HeightOfInj>>   real*8 
+ The vertical height of primary injection point (m). 
+ If this is $<$ deepest obs. level and zeinth angle of primary is $< 0$, 
+ the primary is assumed to be upgoing even if Reverse =0. 
+ NOTE: BorderHeightH must be given explicitly in this case. 
+
+<<Hidden>>   logical 
+ Make T, if hidden parameters are to be written. 
+
+<<IncMuonPolari>>   logical 
+ if T, consider muon polarization 
+
+<<InitRN>>   integer 
+ Initial random number seed. 2 integers. If InitRN(1) $<$ 0, file dev \# 14 
+ is assumed to have pairs of IR in each row, and they are read to 
+ initialize each event. This feature is ignored when Job = 'flesh' or 
+ 'newflesh'. The \# 14 file should be opened by the user routine 
+ (chookBgRun). This is almost debug purpose.\newline 
+ If InitRn(2)$<$0, timer, hostname and process number are used for the 
+ initialization. 
+
+<<IntModel>>   character*64 
+ Interaction model description. Usage was changed from v6.0. 
+ One may list code name and upper energy bound for the code.\newline 
+ E.g. IntModel = '"dpmjet3"' ; to specify the dpmjet3 in the entire energy region 
+ IntModel = '"dpmjet3" 100 "nexus2" to specify dpmjet3 at $<$ 100 GeV and nexus2 
+ at E$>$100 GeV \newline 
+ IntModel = '"nucrin" 5 "fritiof1.6" 500 "adhoc" to specify Nucrin, 
+ fritiof1.6, and ad-hoc model in the respective energy region. This 
+ corresponds to the old IntModel='int1'. \newline 
+ IntModel = '"nucrin" 5 "fritiof1.6" 10 "fritiof7.02" and \newline 
+ IntModel = '"dpmjet3"' \newline 
+ are most promissing models that fit the observed 
+ data (muons and gamma rays) for which the primary is well known by 
+ BESS and AMS observations ($<$ 100 GeV). 
+
+<<Job>>   character*10 
+ What kind of job you are going to do.\newline 
+ =' ' (default). nothing special.\newline 
+ ='skeleton'. Makes skeleton. \newline 
+ ='flesh'. Flesh skeleton events. See manual.\newline 
+ ='newskel' \newline 
+ ='newflesh' see manual. \newline 
+
+<<KEminObs>>   real*8 
+ The min kinetic energy of particles for observation. 
+
+<<LatitOfSite>>   real*8 
+ Latitude of the deepest observation level in degree. East is positive. 
+
+<<LongitOfSite>>   real*8 
+ Longitude of the deepest observation level in degree. North is positive. 
+
+<<LpmEffect>>   logical 
+ If t, the LPM effect is considered when Ee $>$ LpmBremEmin for electrons and 
+ Eg $>$ LpmPairEmin for gamma rays. 
+
+<<MinPhotoProdE>>   real*8 
+ Below this energy, no photo-prod of hadron. See also PhotoProd. 
+
+<<ObsPlane>>   integer 
+ How to observe particles. \newline 
+ 0$ \Rightarrow $ no detector plane is used for observation. BorderHeightL 
+ and BorderHeightH are used to detect particles. This is for, say, neutrino 
+ observation. See BorderHeight{L,H}. However, the primary is directed to 
+ the deepest depth. \newline 
+ 1,-1$ \Rightarrow $ detector at the observation place is horizontal. Note 
+ that the horizontal means not tangential plane, but rather a spherical surface \newline 
+ 2,-2$ \Rightarrow $ detector is perpendicular to the primary. \newline 
+ 3$ \Rightarrow $ spherical observation. See text. \newline 
+ For ObsPlane={1,2}, the user observation routine will receive coordinate values in 
+ the corresponding detector system. However, if it is 0, 3 or negative, Exyz values 
+ are obtained. 
+
+<<OneDim>>   integer 
+ If 0, 3 dimensional simulation. if $\ge$1, one 
+ dimensional simulation is performed. \newline 
+ 1: onedim without use of table. \newline 
+ 2: table is used for thickness $ \leftrightarrow$ length conversion. if cos $<$ .5 \newline 
+ 3: table is always used for any angle. 
+ ( for height $>$ 30 km, table is not used in any case). 
+
+<<PhotoProd>>   logical Obsolete.
+ Switch. if .false., no photo prod. of hadron is considered at all. 
+ See also MinPhotoProdE. 
+
+<<PrimaryFile>>   character*70 
+ Primary Spectrum data file (full or relative path) 
+
+<<SeedFile>>   character*70 
+ File to contain the initial random numbers for those events to 
+ which you want to flesh. You can create the file by calling 
+ cwriteSeed in a user hook routine (say, in chookEnEvent) at 
+ skeleton making time. Default is 'Seed'. For a normal run with 
+ Job=' ', if SeedFile is not ' ', two integer initial random numbers 
+ and the event number are automatically output on the speicfied disk file. 
+
+<<SkeletonFile>>   character*70 
+ Skeleton information file (full or relative path). created if Job = 
+ 'skeleton'. Default is 'skeletonParam'. This is the Namelist data 
+ referred by Cosmos automatically if Job='flesh' is specified. For 
+ Job='flesh', you have to modify some part of this file. 
+
+<<SourceDec>>   real*8 
+ Source declination of point source.(deg) 
+
+<<ThinSampling>>   logical 
+ if F, thinsampling is not tried. if T, alla Hillas thinning.
+ It could be used with skeleton/flesh method, but not tested
+ yet.  See also EthinRatio. 
+
+<<TimeStructure>>   logical 
+ If T, time information is computed 
+
+<<Trace>>   integer 
+ Flag for trace information output.\newline 
+ 0 $\rightarrow$ no trace information is output.\newline 
+ $<$10$\rightarrow$ x, y, z in the primary system(say, 1)\newline 
+ $<$20 $\rightarrow$ x, y, in the primary sys. z in kg/m$^2$.(say,11)\newline 
+ $<$30 $\rightarrow$ x, y, z in the detector system\newline 
+ $<$40 $\rightarrow$ x, y, in the detector system. z in kg/m2\newline 
+ $<$50 $\rightarrow$ x, y, z in 'xyz' system.\newline 
+ $<$60 $\rightarrow$ x,y, in 'xyz' and z in kg/m2\newline 
+ 61-100 $\rightarrow$ for Cherenkov observation. For Coord system, subtract 60.\newline 
+ if the value is even, binary output is made on TraceDev.\newline 
+ if the last digit is 1 or 2, trace is always taken. if the last digit is 3 or 4, trace is taken 
+ only if the particle is located below the heighest observation depeth. 
+ $>$ 101 $\rightarrow$ subtract 100 and apply the above, but chookTrace or chookCeren are used.\newline 
+ Primary system: Origin is the deepest detector. Z-axis is the primary direction. 
+ X-axis is Z x Vertical axis. X-Y plane is orthogonal to the primary.\newline 
+ Detector system: origin is the deepest detector. Z-axis is the vertical one. X-axis is 
+ directed to the magnetic east. X-Y plane is horizontal.\newline 
+ z in kg/m$^2$ : Vertical depth in kg/m$^2$ above the deepest detector to the particle. 
+
+<<TraceDir>>   character*70 
+ Directory. Default Trace information is put TraceDir/trace1, 2,.. 
+ for event 1, 2, ... The directory should exist. Default is ' ' and in this case 
+ /tmp/YourLoginName/ is employed. The last "/" should not be given. 
+ *** NOTE that default Cherenkov output is made only using TraceDev, 
+ TraceDir is not used. You have to open the disk file at chookbgRun 
+ It can by binary or ascii file depending on Trace value. 
+
+<<WaitRatio>>   real*8 
+ Wait A.S generation until the electron energy, Ee, becomes $<$ WaitRatio* E0. 
+ This many be 1.0 for hadron origin case. But for gamma/electron primary, 
+ this should be as low as 0.01 to enjoy full fluctuation. 
+
+<<Within>>   integer 
+ The job should end within this minutes from now. Default is 99999. 
+ If 0 is given, DeadLine is used. 
+
+<<YearOfGeomag>>   real*8 
+ Like 1999.5. Year when Geomagnetic field is to be calculated. 
+
+<<Za1ry>>   character*4 
+ Specify the primary angle sampling method by one of 'is', 'ps' or 'aps'.\newline 
+ "cos".  isotropic 1ry. i.e,  cos dcos is assumed.  \newline
+ "is" is isotropic. The range is by CosZenith. Almost no use\newline 
+ "ps" is for point source (See also SourceDec)\newline 
+ "aps" is around point source (See also SourceDec and Ddelta) \newline 
+ If ObsPlane=3 (spherical), this must be "cos". 

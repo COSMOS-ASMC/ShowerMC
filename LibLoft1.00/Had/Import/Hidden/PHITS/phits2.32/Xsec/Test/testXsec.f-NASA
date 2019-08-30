@@ -1,0 +1,44 @@
+c       cp this as testXsec.f and make; ./test$ARCH
+      program testxs
+      implicit none
+      integer incp, ia, iz
+      integer i
+      real(8)::EMeV,  sigr, sigel, bmax
+      real(8)::ap, zp, ep
+      real(8)::at, zt
+      integer iargc
+      integer narg, ldat
+      character(10)::in
+
+      ap = 56
+      zp = 26
+      at = 12
+      zt = 6
+
+      narg=iargc()
+      if( narg .ne. 4 ) then
+         write(0,*) "Enter proj. (A,Z) and target (A,Z)"
+         stop
+      endif
+      call getarg(1, in, ldat)
+      read(in,*) ap
+      call getarg(2, in, ldat)
+      read(in,*) zp
+      call getarg(3, in, ldat)
+      read(in,*) at
+      call getarg(4, in, ldat)
+      read(in,*) zt
+
+      write(0,*) '(A,Z)p =', ap, zp
+      write(0,*) '(A,Z)t =', at, zt
+
+      EMeV = 0.1
+      do while (EMeV < 1000.e3)
+c         ep = (EMeV + 938)* ap
+         ep = EMeV* ap
+         call nasa(ap,zp,ep,at,zt,sigr,sigel,bmax)
+         write(*,'(1p, 4g12.4)') EMeV, sigr, sigel, bmax
+         EMeV = EMeV *10.**0.1
+      enddo
+      end program
+

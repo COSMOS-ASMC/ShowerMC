@@ -1,0 +1,14 @@
+#!/bin/csh -f
+#    make NameList Description table using Z?*p.h files.
+#   Usage:  mkNLD 1  or mkNLD 2
+#           1 is for important namelist
+#           2 is for special purpose namelist
+alias awk gawk
+	if ($argv[1] == 1) then
+		ListNameLD 1 | awk 'NF>0 {print}' | /usr/local/bin/sort | awk  '{gsub(/\!1/, "\!");print}' |  awk 'BEGIN {RS="\!"}{print}' | \
+                awk '{if(index($1, "<<")) printf("\n"); print}'
+	else if ($argv[1] == 2) then
+		ListNameLD 2 | awk 'NF>0 {print}' | /usr/local/bin/sort | awk '{gsub(/\!2/, "\!");print}' |  awk 'BEGIN {RS="\!"}{print}' | \
+                awk '{if(index($1, "<<")) printf("\n"); print}'
+	endif	
+

@@ -1,0 +1,192 @@
+Example of distributed parallel job of an 10^18eV vertical
+proton case.  Individual particle output is too huge so
+that  we get only histogram data and hybdid A.S data.
+Let's use 30 cpu's.
+0)  goto UserHook/Hist
+	ifort -c k90whist*.f
+
+1) go to UserHook/SkelFlesh
+	cp paramSkelForDistJob paramHistDemo
+	Edit paramHistDemo
+	we set
+	ASDepthList = 1000 to  13000  with step 1000
+	CosZenith = (1.0, 1.0)
+	DepthList same as ASDepthList
+	DestEventNo = 1 1
+	Generate = 'em'
+	IntModel ='"dpmjet3"'
+	Job = 'newskel'
+	KEminObs = 1.e6
+        SkeletonFile = '../DisPara/FleshHist/Sparam'
+	Generate2 = 'em/as'
+	KEminObs2 = 500.e-6
+	 UserHookc = '../DisPara/FleshHist/Skeleton',
+	'/tmp/skelwork_#','noappend',
+	 UserHooki =  15,  16,   0       0,         0,
+	 UserHookr =             00,    00,
+
+	 Edit primary and put 10^18 eV proton.
+2) compile
+	make clean; make -f chookSkel.mk
+3) execution
+	./skelPCLinuxIFC < paramHistDemo
+	
+	execution will end within a minute with the 
+	following message at the end.
+	
+	++++++++++++
+       1 events are memorized as skeleton
+	their  seeds are also memorized
+	-----------
+	  No of cummulative events = 1 No of events in this run=  1
+	  comp.    sampled    accepted
+	   1           1           1
+
+	You may delete /tmp/skelwork_xxxx
+
+2) Smash
+	goto UserHook/DisPara/ 
+	Make a file 'Host' and put hostname list as follows
+	(the hosts must alive. mkHost may help you. To get alive hosts
+	the next one may help: 192... may be replaced by the broadcat IP
+	address of you environment.
+	ping -b -c 10 192.168.1.0 | awk '$1==64 {print $4}' | sort | uniq
+
+	
+	3  tasim503
+	4  tasim503
+	5  tasim504
+	...
+	49  tasim526
+	50  tasim526
+
+	goto UserHook/DisPara/Smash
+	Edit setupenv to set up environmental variables.
+	(name "setupenv" must be kept; )
+	setenv FLESHDIR     FleshHist
+	setenv NCPU     40
+	setenv SKELETON  ../$FLESHDIR/Skeleton
+	etenv SKELDIR  ../$FLESHDIR/SkelDir
+	setenv SKELNAME  Skeleton
+	setenv HOSTLIST ../Host
+	
+	go to  SKELDIR you specified in setupenv
+	(i.e, UserHook/DisPara/FlesHist/SkelDir)
+	and delete all in that directory.
+	go back to Smash
+	make
+	source setupenv
+	./smashSkel$ARCH 
+	
+	you will see the following result in a second
+
+	 # of cpu's=          40
+	output directory is ../FleshHist/SkelDir/
+	        40 files will be created there as Skeleton001 etc
+	------------
+         325 ptcls are observed ones in skeleton
+	 # of total ptcls at flesh=       39229
+	 cpu#   cpuPW    Sum E        # of ptcls
+	   1    1.0   0.2499899E+08      980
+	   2    1.0   0.2499899E+08      981
+	   3   	1.0   0.2499899E+08      981
+	   4    1.0   0.2499899E+08      980
+	   5    1.0   0.2499899E+08      981
+	....
+	  38    1.0   0.2499899E+08      981
+	  39    1.0   0.2499899E+08      980
+	  40    1.0   0.2499899E+08      980
+	all events have been smashed
+	This shows that 39229 particles generated
+	in the skeleton are going to be distributed
+	to 40 cpus; the each host will have the 
+	sum energy of 2.499..e7 GeV and number of
+	particles are 980 or 981 (i.e., almost
+	equally distributed).
+
+3)  Then goto FleshHist directory.
+	you will find a binary file "Skeleton" which contains
+	skeleton information made in the step 1)
+	You will also see 'Sparam' file  and
+	data files in SkelDir/
+
+	Edit setupenv
+
+	setenv HISTDEP  '5  7  8  9  10  11  13/'	
+	setenv INDIVDEP '0/'
+	setenv OUTPUT   't t t t t t t t t t t t t/'
+	setenv PARAMDIR ./ParamDir
+	setenv OUTDIR  ../Assemble/OutDir
+	setenv ERRDIR  ./ErrDir
+
+	goto PARAMDIR and delete all in that directory.
+	goto ERRDIR and delete all in that directory.
+	goto OUTDIR and delete all in that  directory.
+
+	go back to FleshHist.
+
+	make clean; make
+	 ../execflesh
+	Assume the file specified by SkeletonFile at
+	 Skeleton making time is
+	./Sparam
+	Enter y if it is so.
+	y
+	FleshHist
+	no. of cpu is inconsistnet; NCPU=50 but count=40
+	parameter files have been created in ./ParamDir
+	1) Do you flesh skeletons at all hosts in ../Host
+	2) Or specify some hosts among them  for flesh job ?
+	3) stop at here
+	Enter 1, 2 or 3
+	1
+	You selected 1;  Enter y, if it is correct
+
+	Then you will see the following messages:
+	
+	3 tasim503
+	003 tasim503
+	command used at tasim503 is
+	cd $COSMOSTOP/UserHook/DisPara/FleshHist
+	source ./setupenv
+	setenv NUMB 003
+	source $COSMOSTOP/Scrpt/setarch
+	(./DHflesh$ARCH < $PARAMDIR/param$NUMB  > 
+	$OUTDIR/$HOST.$NUMB.dat ) >& $ERRDIR/$HOST.$NUMB.err &
+
+	....
+	
+
+	By this, jobs are submitted to  hosts listed in ../Host.
+	However,  after submission it was found that one host
+	is dead and two jobs were not running. So we modified
+	Host; removed dead host name and add alive host.
+	Then, again:
+
+	../execflesh
+	Assume the file specified by SkeletonFile at Skeleton making time is
+	./Sparam
+	Enter y if it is so.
+	y
+	FleshHist
+	no. of cpu is inconsistnet; NCPU=50 but count=40
+	parameter files have been created in ./ParamDir
+	1) Do you flesh skeletons at all hosts in ../Host
+	2) Or specify some hosts among them  for flesh job ?
+	3) stop at here
+	Enter 1, 2 or 3
+	2
+	Give a list of hostnames for flesh.
+	They must be some of those listed in ../Host
+	If the same host name appers twice, you must give
+	the name twice
+	tasim527 tasim527
+	You gave:
+	tasim527 tasim527
+	Is it OK?; Enter y if yes
+	y
+	You gave 2 hosts
+	....	
+
+
+	

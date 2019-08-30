@@ -1,0 +1,42 @@
+include $(COSMOSTOP)/site.config
+#
+#
+
+
+src = testSPrimAng.f csPrimAng.f
+
+objs := $(src:.f=.o)
+
+
+sPrimAng :  $(objs)  
+	$(LD) $(LDFLAGS) -o $@  $(objs) -L$(LIBLOC) -l$(LIBNAME)
+	touch sPrimAng
+###
+
+testSPrimAng.o: $(LIBLOFTINC)/Ztrack.h \
+	$(LIBLOFTINC)/Zptcl.h \
+	$(LIBLOFTINC)/Zcoord.h \
+	$(LIBLOFTINC)/Zpos.h \
+	$(LIBLOFTINC)/Zdirec.h \
+	$(LIBLOFTINC)/Zmagfield.h \
+	$(LIBLOFTINC)/Zincidentp.h \
+	$(COSMOSINC)/Zincidentv.h \
+	$(LIBLOFTINC)/Zglobalc.h \
+	$(LIBLOFTINC)/Zobs.h \
+	$(COSMOSINC)/Zobsp.h \
+	$(COSMOSINC)/Zobsv.h \
+	$(COSMOSINC)/BlockData/cblkElemag.h \
+	$(COSMOSINC)/Zelemagp.h
+
+$(LIBRARY)(csPrimAng.o): $(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zincidentp.h \
+	$(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Zincidentv.h \
+	$(COSMOSINC)/Zglobalc.h \
+	$(COSMOSINC)/BlockData/cblkIncident.h
+
+

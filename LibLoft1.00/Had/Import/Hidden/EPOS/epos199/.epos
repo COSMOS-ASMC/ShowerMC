@@ -1,0 +1,10 @@
+############################################################################
+#Fichier .epos
+#17/12/08 - Tanguy Pierog : environnement variables for EPOS
+############################################################################
+setenv EPO  $PWD
+setenv CHK  $EPO
+setenv OBJ  $EPO/Lib
+setenv OPT  .
+setenv HTO  .
+

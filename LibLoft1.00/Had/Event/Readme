@@ -1,0 +1,21 @@
+cNucMass.f90
+cTargetFrag.f90
+are linked from LibLoft/Module/cNucMass.f90 ,...
+
+
+To check if a file (say,cNucMass.f90) is linked from another
+part,
+goto some upper directory (xxxx say,LibLoft/) where such part may located in some of sub
+directroy of xxxx, and issue
+   find ./ -type l -ls | grep cNucMass.f90
+or if the scrit is given as
+   findLinking.sh cNucMass.f90
+then you see, 
+
+8612451073        0 lrwxr-xr-x    1 kasahara         admin                  25  1 16 18:35 .//Module/cNucMass.f90 -> ../Had/Event/cNucMass.f90
+
+Don't go to the top of your home.  It will need very long time to check.
+
+To us find  at here,
+   find ../../  -type l -ls | grep cNucMass.f90
+is OK.

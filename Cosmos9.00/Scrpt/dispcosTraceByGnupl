@@ -1,0 +1,80 @@
+#!/bin/bash
+if [ $# -eq 0 ] || [ $# -gt 3 ]; then
+    cat <<EOF
+
+  Usage:  dispcosTraceByGnupl  [s][i] [Emin]  trace
+
+    s:  optional.  If given, we assume splitting of the trace file 
+        has been done and skip time consuming splitting.
+    i:  optional.  If not given, display order is:
+            e-, e+, mu, pi, K, (p,pbar)  heavy. Others are neglected.
+        If given,  above oreder is inverted.
+      (gnuplot is slow for hidden mode, so "i" many be
+            used to  hide small # of particles).
+ Emin: optional.  numerical value in GeV. Only those of
+       E>Emin (K.E) will be shown.
+       Default is 100e-6 (=100keV: for 100GeV/n Fe 1ry, ~15 MeV
+       may be needed.)   
+ trace: path to a tracefile, such as /tmp/$USER/trace3
+EOF
+    exit;
+fi
+
+
+skip="n";
+inv="n";
+Emin=100e-6
+if [ $# -gt 1 ]; then
+    if [ $1 == "s" ] || [ $1 == "si" ]; then
+	skip="s";
+    fi
+    if [ $1 == "i" ] || [ $1 == "si" ]; then
+	inv="i";
+    fi
+    if [ $skip != "n" ] || [ $inv != "n" ]; then
+	shift;
+    fi
+fi
+
+if [ $# -eq 2 ]; then
+    echo "setting Emin to " $1 " GeV" ;
+    Emin=$1;
+    shift;
+fi
+
+
+if [ ! -f $1 ]; then
+    echo " assumed trace file " $1;
+    echo 'does not exist';
+    exit;
+fi
+
+    
+# embed trace file in  Work/.trace.
+# This is to workarond that Mac gnuplot cannot deal with
+# comman argument correctly; without using argument,
+# file name is transmited via /tmp/$USER/.trace file.
+
+mkdir -p /tmp/$USER
+Work="/tmp/$USER"
+
+ # put trace filename in /tmp/$USER/.trace here
+ echo $1 >  $Work/.trace;
+ #   get x,y,z range from the incident pos and 10kem sq at z=0
+ #   and put in /tmp/$USER/range
+awk -f $COSMOSTOP/Util/Gnuplot/getrange.awk file=$Work/range  $1;
+ if [ $skip == "n" ]; then
+   echo "*** spliting trace data; will take few min for ~1.5GB data***"
+   awk -f $COSMOSTOP/Util/Gnuplot/splitTrace.awk  Work=$Work Emin=$Emin $1;
+ fi
+ (cd $COSMOSTOP/Util/Gnuplot/; 
+    if [ $inv == "i" ]; then
+	gnuplot -background "midnightblue"  do_invplot.gp - ;
+    else    
+	gnuplot -background "midnightblue"  do_plot.gp - ;
+    fi
+ )
+
+
+    
+    

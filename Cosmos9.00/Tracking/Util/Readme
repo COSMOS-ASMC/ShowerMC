@@ -1,0 +1,9 @@
+Almmost Obso
+
+make  initObs 
+will create initObs which can be used to check the input obseration sites.
+For example,
+
+initObs < ../../Data/Namelist/parameters
+
+

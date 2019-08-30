@@ -1,0 +1,83 @@
+#            This config file is for proton primary of energy 1 TeV
+#            1000 events will be created on each host
+#            file name where alive host name list is given
+alive	alive
+#            epics executiable program path
+prog	~/Epics/UserHook/LHC/sepics
+#            first input file to sepics
+input	~/Epics/UserHook/LHC/FirstInput
+#            copies of parameters (detector config, primary etc)
+#            will be kept under paramOut/hostname/ with the following names:
+#            input epics detConfig sepics primary  execConfig
+paramOut ~/Epics/UserHook/LHC
+#            output data will be placed in datadir/hostname/datafile
+datadir	/tmp/kkk
+datafile allLHC
+#               the main output may  be piped with the following pipe
+#               operation.  This may be, say,
+#               |  gzip
+#               or  even.
+#               | awk 'NF>1 {print}'  | gzip
+#               Note you need | symbol too. If not need, keep blank.
+pipe1	 
+#               output should be appended to the existing file or not
+append  no   
+#
+#
+#  ***********  below is used only by "collect"  job *******
+#
+#               collector host name (be sure to attach domain name if
+#               it is in a different domain than the data files)
+#               Note: if the user id at the collector host is different
+#               from the current one, attach "-l loginname"
+#
+collector	caalp1.clab.se  -l kasahara
+#
+#         	device name (8mm tape or path to a large disk dir)
+#               if media is a disk dir, the format would be like
+#               media	./foo/data
+#                or    
+#               media /fullpath/data
+#               where ./ means home in the collector.
+#                    In the case of disk file, parameters are
+#                    written with the file names of
+#                     epics, detConfig, sepics, primary, execConfig
+#                     (if multiple sepics is to be written, 
+#                      $media/$hostname/sepics is used.)
+#                     the main data is output in $media/$hostname/$datafile
+#                     (consecutive  no)
+#                     or $media/$datafile  (consequtive yes)
+#media	/dev/nrmt0m
+media	/Garden/kasahara/LHC
+#		output block size (used if media is 8mm tape)
+obs	16k
+#    		ignore main data whose size   is less than this
+#               (B)(if main data is ignored, accompanying speics is
+#                also  ignored)
+minsize	 0
+#		if disk file is used to output data, all data
+#               is put together or not
+consecutive	no
+#               epics parameres should be written or not
+#               if 0, no output. if 1, written at the head of
+#               the tape
+#               
+epics	1	
+#               output specification for detector configuration
+detconfig 1      	
+#		primary file output specification
+primary  1
+#               execution configuration output specification
+execconfig 1
+#               output specification for sepics parameter
+#               in this case if 2 is given, it will be written 
+#               before the main data at each host is output.
+sepics	1
+#               if you want to, say, compress before putting the main data 
+#               into tape or disk, give pipe operation for that.
+#               you need  | symbol too, like,
+#                 pipe   | gzip
+#                 pipe   | unzip
+pipe2	
+#
+

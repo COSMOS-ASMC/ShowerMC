@@ -1,0 +1,51 @@
+#
+# IMC Tungsten plate
+#  
+
+#eq   wR    1.0
+
+#eq   wL1   44.8
+#eq   wL1s  43.8
+#eq   wL1ss 42.8
+
+#eq   wL2   40.8
+#eq   wL2s  39.8
+#eq   wL2ss 38.8
+
+#eq   wT1    0.070
+#eq   wT2    0.35
+
+
+
+#subd wA
+1   box  W   0  2   0    / wR   0  0  wL1ss  wL1  wT1
+2   box  W   0  2   0    / 0   wR  =  wL1   wL1ss  =
+3   cyl  W   0  2   0    / wR  wR  =     wR  wT1
+4   cyl  W   0  2   0    / wL1s  wR  =   wR  wT1
+5   cyl  W   0  2   0    / wR  wL1s  =   wR  wT1
+6   cyl  W   0  2   0    / wL1s wL1s =   wR  wT1
+7   box_w  sp   0  0  0      /  0  0  0
+#end wA
+
+
+#subd wB
+1   box  W   0  2   0    / wR   0  0  wL1ss  wL1  wT2
+2   box  W   0  2   0    / 0   wR  =  wL1   wL1ss  =
+3   cyl  W   0  2   0    / wR  wR  =     wR  wT2
+4   cyl  W   0  2   0    / wL1s  wR  =   wR  wT2
+5   cyl  W   0  2   0    / wR  wL1s  =   wR  wT2
+6   cyl  W   0  2   0    / wL1s wL1s =   wR  wT2
+7   box_w  sp   0  0  0      /  0  0  0
+#end wB
+
+
+#subd wC
+1   box  W   0  2   0    / wR   0  0  wL2ss  wL2  wT2
+2   box  W   0  2   0    / 0   wR  =  wL2   wL2ss  =
+3   cyl  W   0  2   0    / wR  wR  =     wR  wT2
+4   cyl  W   0  2   0    / wL2s  wR  =   wR  wT2
+5   cyl  W   0  2   0    / wR  wL2s  =   wR  wT2
+6   cyl  W   0  2   0    / wL2s wL2s =   wR  wT2
+7   box_w  sp   0  0  0      /  0  0  0
+#end wC
+

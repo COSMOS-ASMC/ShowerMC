@@ -1,0 +1,24 @@
+#!/bin/csh -f
+if( $#argv < 2 || $#argv > 3 ) then
+	echo Usage: $0 first_event_number last_event_number  path_to_trace_data_dir
+	exit 1
+endif
+if( $#argv == 3 ) then
+	set tracepath = $3
+else
+	set tracepath = "/tmp/$USER"
+endif
+
+@ ev = $1
+@ last = $2
+
+while ( $ev <= $last )
+     ./disptracebygeomv  $tracepath/trace$ev 
+      set dummy = $<
+      @ ev ++
+
+end
+
+
+
+

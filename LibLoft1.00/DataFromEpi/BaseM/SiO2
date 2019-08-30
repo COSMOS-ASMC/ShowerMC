@@ -1,0 +1,11 @@
+#name   Format    SiO2;  Silicon Dioxide For Yang8Jing soil over M.D
+SiO2   2
+#
+#   rho by PDG is 2.2: 2.1 is measured one (Kawata)
+#  Elem  rho(g/cm^3)    Gas/Solid(1/0)   refl.index Birks C
+2         2.1           0                  1.458   0  0  0
+#       Z       A       N
+        8       16      2
+        14      29      1
+#  ⟨Z/A⟩   I[eV]   a       k      x0    x1     Cbar  delta0
+   0.49930 139.2 0.0841  3.5064  0.1500 3.0140 4.0560 0.00

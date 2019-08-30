@@ -1,0 +1,80 @@
+
+           JAM (Jet AA Microscopic transport Model)
+           This is JAM version 1.000  by Yasushi Nara
+
+   Many interesting phyiscs are jammed in heavy ion collisions.
+   I hope you have a real jam with JAM.
+
+    Last visited  6 Jul. 1997
+    Last visited 13 Mar. 1998   version 0.0083e
+    Last visited 25 Mar. 1998   version 0.0084a
+    Last visited  7 Apr. 1998   version 0.0085a box by Toshiki Maruyama
+    Last visited  6 May  1998   version 0.0087a
+    Last visited 28 Jul. 1998   version 0.0090a
+
+  Manual 'jam.tex' can be found in directory tex for great detail.
+
+ o Program useage of JAM is very similar to PYTHIA,FRITIOF,HIJING,VNI
+ o Particle ID is the same as PDG ID.
+
+
+  If you write
+      fname(1)='jam.cfg'
+  in your own main program. In this case, JAM  use input file
+  of 'jam.cfg'.
+
+ How to input to run.
+ This is a example for input file.
+
+(1) event=100             <-- Total number of siumulation run
+(2) proj=27Si             <-- proj. type
+(3) targ=28Al             <-- Targ. type
+(4) win=10.0GeV           <-- Incident energy(momentum) in GeV(GeV/c).
+(5) frame=nn              <-- Comp. frame is NN center of mass. 
+(6) bmin=0.               <-- Min. impact parameter (fm).
+    bmax=0.               <-- Max. impact parameter (fm).
+(7) dt=50.0               <-- Time step size(fm/c).
+    timestep= 1           <-  Total number of time step.
+(8) mstc(3))=1           <--optional input for mstc(),parc()
+(9) fname(2)=JAMECHO.DAT  <-- File name for front page
+(10)end                   <-- end input
+
+Note:
+(2)(3) proj, targ:
+     For the projectile type, p, p~, n, n~, pi+,pi0,pi-,k-,k+...
+     are avaiable. 
+     If proj=non, we can check the ground state properties of
+     nucleus with target nucleus.
+     targ=100:50  : mass number 100 and 50 neutrons
+
+(4) win: incident energy.  Avaiable Units are gev,gevc,mev or mevc.
+
+     (^_^) If you want to enter momentum,
+             put for exapmele win=1.0gevc or win=1.0mevc.
+     (^_^) If you chose optin frame=collider,
+           the meaning of incident energy becomes c.m. energy/nucleon.
+(5) frame: Avaiable frame (comp. frame) is
+        frame=nn         NN center of mass frame
+        frame=cm         Total center of mass frame
+        frame=lab        Lab. frame.
+        frame=collider   Collider.
+        frame=box1.00    where 1.00 is density in rho_0 unit
+
+(6) If bmax<0, impact parameter is distributed
+      according to the squared b^2 distribution between bmin and bmax,
+     while bmax>0, impact parameter is uniformly distributed
+     between bmin and bmax.
+
+      If mstc(18)(number of impact parameter bin)  gt.1,
+     impact parameter is distributed by the bin
+      \delta b=(bmax-bmin)/mstc(18) and total number of simulation
+      event becomes mstc(18)*nevent.
+
+(8) If you want to change default value of mstc(),parc().
+      put, for example, mstc(65)= 2.
+      '#' or '!' can be used to comment.
+      Blank line is also possible.
+(9)  'fname()' can be changed. 2,3,5,6,7,8 can be avaliable.
+(10) Input file should be ended by 'end' command.
+
+  See the example input file 'jam.cfg'.

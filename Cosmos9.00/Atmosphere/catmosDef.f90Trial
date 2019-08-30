@@ -1,0 +1,144 @@
+#include "ZepMaxdef.h"
+  ! if you change the Earth to another world, cputCerenkov.f in
+  ! Tracking might be updated, if you use it for Cerenkov light
+  ! generation.
+module modAtmosDef
+  !     this should be linked to Cosmos/Module/catmosDef.f90
+  !     as ln -s ../Atmoshere/catmosDef.f90 catmosDef.f90
+  !     in Cosmos/Module/
+  !  This module defines basic variables to describe atmosphere
+  !  and can be used for non-Earth atmosphere too.
+  !  Many variables in Zearth.h and Zatmos.h in Cosmos/cosmos
+  !  were  moved and updated.
+  !
+  !  
+  real(8),save:: Eradius = 6378136.0d0  !  radius in m
+  real(8),parameter:: Eecen2= 0.006694470d0  !  square of the ecentricity
+  ! not used at present
+
+  
+  real(8),save:: Eone_ecen2 = 1.d0 - Eecen2 !   1 - ecen2
+  real(8),save:: Maxheight=220.d3 !  max height with some air. m
+  ! above there sloe exp decrease ~ almost const;
+  ! density 
+  real(8),save:: Minheight = -500.d0 !min height without soil. m
+  real(8):: AlmostVacH  ! almost vacuum height
+  equivalence(Maxheight, AlmostVacH) 
+  real(8),save:: AlmostVacT=1.-3
+!     parameter (AlmostVacH = 101.d3, AlmostVacT = 1.d-3)  old
+
+  
+  !----------------------- from Zatmos.h >>>>>>>>>>>
+  !
+  integer,parameter:: maxnodes = 40
+  ! maximum no. of nodes to express the atmosphere.
+  real(8),save:: Hinf = 1000.d3 ! m  At very high altitude
+  ! (> Maxheight),  air density is calulated using
+  ! this value as the scale height.  rho= rho_m exp( -(z-Zm)/Hinf)
+  !     m means the value at Maxheight.
+  !
+  real(8),save:: Tconst=1.d10   !  for const density medium
+                  ! prob. not effective
+  real(8),save:: Hconst=1.d10   ! scale height for const density medium
+  !       for length to thickness conversion and  v.v 
+  real(8),parameter:: LenStep=1000.d0   ! in m
+  integer,save:: maxl2t=1200.0d3/LenStep
+     ! slant length 1200km ~ vertical length 100km for
+     !  cos~0.083.  The length is divided by LenSetp.
+     
+!      When using the table,
+!      Non-integral point (i.e., values not in the table) is
+!      obtained by using interpolation using 3 integral points.
+!      (see cl2tTblA.f)
+!     maxnodes: 
+
+  integer,save:: NumStep ! table size made by sub.  cl2tTbl
+  real(8),save:: Htop, Hbase
+  real(8),save:: Zsave, ThickSave
+  real(8),allocatable,save::ThickTbl(:), LenTbl(:), CosTbl(:), &
+         HeightTbl(:)  ! size should be maxl2t
+  
+  type atmosph 
+     sequence
+     real*8  z(maxnodes)
+     real*8  zi(maxnodes)
+     real*8  T(maxnodes)
+     real*8  P(maxnodes)
+     real*8  logP(maxnodes)
+     real*8  rho(maxnodes)
+     real*8  logrho(maxnodes)
+     real*8  logrhoi(maxnodes) 
+     real*8  H(maxnodes)
+     real*8  a(maxnodes)
+     real*8  b(maxnodes)
+     real*8  cumd(maxnodes)
+     real*8  logcumd(maxnodes)
+     real*8  logcumdi(maxnodes)
+     real*8  d0(maxnodes)
+     real*8  coefh2r(maxnodes,3)
+     real*8  coefh2T(maxnodes,3)
+     real*8  coefh2d(maxnodes,3)
+     !        real*8  coefh2P(maxnodes,3)      
+     real*8  coefh2H(maxnodes,3)      
+     !        real*8  coefr2h(maxnodes,3)      
+     real*8  coefd2r(maxnodes,3)  
+     real*8  coefd2h(maxnodes,3)      
+        !        real*8  coefP2h(maxnodes,3)
+     integer:: node2mediaNo(maxnodes) !  for a given node number, n,
+        !  j= node2mediaNo(n) gives index for media (for usual atmphere
+        !  1)  and media(j) gives the media name (normally "air")
+        !  max of j can be nodes<=maxnodes.
+        !  If, for a give n, "air" is specified, it means meidia
+        !  between node n and n+1 is "air".  n=1 is the bottom of
+     !  the atmosphere.
+     ! Note:  media name of the node is obtained by
+     !            Media(MediaNo) where MediaNo is fixed by
+     !              MediaNo= atmos%node2mediaNo(node) just after
+     !            the present active track is extracted by calling
+     !     cpop.
+     !            NoOfMedia (# of diff. emdia types in the current
+     !            atmospher.  Medai, MediaNo, NoOfMedia are in
+     !            ZmediaLoft.h
+     character(len=MAX_MEDIANAMELENG)::matter(maxnodes)
+     integer:: nodes  ! actual # of total nodes.
+
+  end type atmosph
+
+  type(atmosph):: atmos
+contains
+  function rhoInte(zz, a, z0, h0) result(ans)
+    !   gives integral of density rho from z0 to zz
+    !      (except some value at z0)
+    ! scale height: H(z) = H0 + a(z-z0) = kT/mg  in each region defined
+    !                           by two nordal points (g, m independent of z)
+    ! Temperature:  T(z) = T0 + b(z-z0). For  equi. temp. b=0.
+    !               a = dH/dz = (dT/dz dH/dT)  = b k/mg:  b=0==> a=0
+    !  rho(z) = rho0 * (1+ a(z-z0)/H(z0))**(-1-1/a)      (a != 0)
+    !         = rho0 * exp(- (z-z0)/H(z0))         (a =0; hence H is const)
+    ! air amount between z1 and z2 is
+    !           rho0*H(z0) *( rhoInte(z1,..)  - rhoInte(z2,..) )
+    !
+    implicit none
+    real(8),intent(in):: zz  ! vertical height m
+    real(8),intent(in):: a   !
+    real(8),intent(in):: z0  ! nordal hight m
+    real(8),intent(in):: h0  ! scale height  at z0
+
+    real(8):: ans
+    
+    if( a == 0.) then
+       !  exponential atmosphere
+       ans = exp(- (zz -z0)/h0)
+    else
+       ans = (1.d0 + a* (zz - z0)/h0) **(-1.d0/a)
+    endif
+  end function rhoInte
+  
+end module modAtmosDef
+
+
+  
+
+
+  
+  

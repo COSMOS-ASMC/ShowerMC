@@ -1,0 +1,35 @@
+#
+# The next is an example of a complex composition at low energy
+#  This is a plausble example.  The unit of flux is
+#   /(m2 sec sr Gev)
+#-----------------------------------------------------------
+  'p'   'GeV'     'KE/n'  'd'     0   /
+	100	.08
+	200	.013
+	500.	1.2e-3
+	1000.	2.e-4
+        10.e3   3.17e-7
+        100.e3  5.e-10
+	200.e3  6.9e-11
+	0.	0.
+  'He'  'GeV'    'KE/n'  'd'      0  /
+	100.	3.7e-3
+	200.	5.e-4
+        2.e3    9.98e-7
+        20.e3  1.99e-9
+       200.e3  3.97e-12
+         0        0
+  'CNO' 'GeV'    'KE/n'  'd'      0
+	100.	2.2e-4
+        200.	3.8e-5
+        2.e3    7.58e-8
+        20.e3	1.51e-10
+	200.e3  3.02e-13
+         0        0
+	0	0
+
+
+
+
+
+

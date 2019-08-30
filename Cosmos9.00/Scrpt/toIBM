@@ -1,0 +1,28 @@
+#  this is to insert comma after data in the namelist 
+#  
+index($0, "'") {gsub(/ /, "");gsub(/''/,"'--'")}
+{sub(/=/, " = ")}
+$2 == "="  {printf(" %s %s",$1,$2)
+   for(i=3; i<=NF; i++){ 
+      if($i == "'--'") 
+         print "' '," 
+      else 
+         printf(" %s, ",$i) 
+      endif
+   } 
+   printf("\n") }
+
+$2 != "=" && ! index($1,"$") {
+    for(i=1; i<=NF; i++) {
+      if($i == "'--'") 
+         print "  ' '," 
+      else 
+         printf(" %s, ",$i) 
+      endif
+    }
+    printf("\n") }
+
+index($1,"$") {print}
+
+
+

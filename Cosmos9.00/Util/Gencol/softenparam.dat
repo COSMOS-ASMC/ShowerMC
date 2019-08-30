@@ -1,0 +1,104 @@
+
+       This is the parameter file to control softenning or related stuff.
+       The file path is $COSMOSTOP/UserHook/modifyX/softenparam.dat
+       softenparam.dat will be seen in $EPICSTOP/Util/Gencol/
+       which is the link to the original shown above.
+
+       Softeinnig:
+       If we find a pi/K/eta with x>xth,
+              apply softening with the prob. of (x-xth)**pw (pw=0.1 default).
+              Softening is done by splitting  the particle into two by
+              calling csplitMeson.  The sum of two particle is made to
+              be the same as the original particle. However, momentum 
+              cannot be conserved: the two particle will have the same
+              Pt as the original one and 3 memeta are adjuested to 
+              satisfy P^2 + m^2 =E^2.
+
+
+      data must be written after next -----------
+      mode 3   / 3  means data for 'mode' is 3. '/' must exist.   3 after / 
+                    is some typical data.  
+                    *******The data must start from the 2nd  column*******
+                    The order of data is arbitrary. 
+-------------------------------------------------------
+ mode       0   /  3
+        mode=0      don't do any cut/modification of X
+        mode=1      discard all pi/K with x>xth. 
+                    However, if the incident is pi/K the highest
+                    energy pi/K, resp, is untouched.
+        mode=2      discard only pi0 with x> xth
+        mode=3      soften pi/K/eta  spectrum; 
+                    If their X is > xth, this is applied with some 
+                    probabiltiy. (see xth)
+                    (except for the leading pi/K when incident is pi/K; 
+                     see leaingPiK)
+       mode=-3      the user must supply own modification routine 
+ xth   0.01   /  0.05
+       X over this, we apply cut or modification.  Modification is 
+       done with probability of (x-xth)**pw
+ pw    0.25   / 0.5
+           softening is determined by comparing uniform random number u
+           and   (x-xth)**pw.
+           pw in (x-xth)**pw is smaller, stronger softening takes place
+ repeat   2.5   /  1.5 apply the simple softenning repeat times
+                for one event if the event has pi/K/eta with X> Xth. 
+                the odd number is probabilistic. If negative,
+                positive number is taken  to be as Poisson average.
+
+ E0th  1000   / 500
+           500 GeV  over this we apply cut/mod.
+           if make this 10 TeV, effect after shower max
+           decreases even for  E1ry=10^19 eV
+ fwbw  3   / 3
+           Used in Gencol; modification is applied to
+           1--> forward only 2--> backword only
+           3--> both ; However, 1 is used when
+           Cosmos output (in cms) is the target, irespectively of
+           fwbw.  
+ special  f   / f 
+                This is used olny in modifyX of  Cosmos. but not used in Gencol of Epics.
+                In Cosomos, it is used to see the x-dist. of
+                pi, K, eta  at the first interaction; 
+                For that, make this  t and 
+                ***set next in parm*** (don't forget to restore
+                them to the default if special=f is reset.
+                     !  =====================================
+                     !  Generate="em" (don't use "em/as")
+                     !  EminObs = 8*xxxx,
+                     !  =====================================
+                     !  where xxxx is a value (GeV) little bit smaller than
+                     !  the 1ry  energy. E.g 0.99999e8 if primary is 10^17 eV.
+                     !
+                     ! output will look like
+                     ! xd  4  1  12.3e-4 
+                     ! xd  4  0  2.89e-1
+                     !  where xd is id, next two are code and charge
+                     !  last one is X. in lab. frame.
+             ! For special=f, i.e, to generate air showers,
+             ! you should have
+             !  =====================================
+             !  Generate="em/as"  (if you don't need to analytic AS, /as
+             !           is not needed.)
+             !  EminObs = 500e-6,
+             !  =====================================
+ leadingPiK  t   /  t
+               ! for Pi/K incident case,
+               ! treat highest energy Pi/K of the same
+               ! charge as leading Pi/K and don't 
+               ! apply the method here
+               ! If used in Cosmos and 
+               !  if make this f, the effect increases a bit esp. at
+               !  after shower max.  about 10 g/cm^2
+ useXinCMS  f  /  f
+                !This is used only in Cosmos.
+                !  In Cosmos, generated particle's E is in Lob. so 
+                !  x= E/E0 is also in Lob.  If this is f, softening by 
+                !  csoftenPiK is applied to the Lab.X. 
+                !  if this is t,  softening is performed after
+                !  converting the energy into cms system, and then
+                !  re-boosted to Lab.  
+ k1u        0.1 / 0.25   ! inside fixed
+ xthl       1  / 1       ! this is used
+ xthu       5  / 10      ! inside fixe
+ rejpw      0.  /  0	 ! this is used
+ 

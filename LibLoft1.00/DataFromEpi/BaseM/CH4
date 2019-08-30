@@ -1,0 +1,14 @@
+#name   Format    Methan  Liq.
+CH4 	2        
+#
+#  Elem	 rho(g/cm^3)	Gas/Solid(1/0)  refl.index  Birks cor.
+
+2         0.424		0	         0          0 0 0
+# 	Z	A  	N
+	6	12.011  1
+	1	1.008	4
+
+#  ⟨Z/A⟩   I[eV]   a       k      x0    x1     Cbar  delta0
+  0.62334  41.7  0.0925  3.6257  1.6263  3.9716  9.5243 0.00
+
+

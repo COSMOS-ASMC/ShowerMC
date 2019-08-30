@@ -1,0 +1,129 @@
+!call xEmsPm 
+
+!-----------------------------------------------
+
+!set xpar1 1   ! 1 or 11  more or less detailed  
+!set xpar2 0.  !b
+!call xFitD1  
+
+set xpar2 0.   !b 
+set xpar3 0    !y 
+set xpar4 3    !  1 1 2 ... 3  more or 
+set xpar5 3    !  3 2 3     3  less detailed
+call xFitD2 
+         
+!set xpar1 1   ! 1 or 11  more or less detailed 
+!set xpar2 1.  !b  
+!call xFitD1  
+
+set xpar2 1.   !b  
+set xpar3 0    !y
+set xpar4 3    !  1 1 2 ... 3  more or  
+set xpar5 3    !  3 2 3     3  less detailed 
+call xFitD2     
+
+!set xpar1 1   ! 1 or 11  more or less detailed 
+!set xpar2 2.  !b  
+!call xFitD1  
+
+set xpar2 2.   !b  
+set xpar3 0    !y
+set xpar4 3    !  1 1 2 ... 3  more or  
+set xpar5 3    !  3 2 3     3  less detailed 
+call xFitD2     
+!-----------------------------------------------
+
+set xpar1 2   !  1 = log  2 = lin  1 = both
+set xpar2 2   !  1        2        2 
+call xEmsPx    
+
+!-----------------------------------------------
+
+message "xEmsP2 "
+call xEmsP2PE05 write "plot 0"  message "."
+call xEmsP2PE15 write "plot 0"  message "."
+call xEmsP2PE25 write "plot 0"  message "."
+call xEmsP2PE35 write "plot 0"  message "."
+call xEmsP2PE45 write "plot 0"  message "."
+
+call xEmsP2IB05 write "plot 0"  message "."
+call xEmsP2IB15 write "plot 0"  message "."
+call xEmsP2IB25 write "plot 0"  message "."
+call xEmsP2IB35 write "plot 0"  message "."
+call xEmsP2IB45 write "plot 0"  message "."
+
+goto SKIP
+
+call xEmsP2PE11 write "plot 0"  message "."
+call xEmsP2PE21 write "plot 0"  message "."
+call xEmsP2PE31 write "plot 0"  message "."
+call xEmsP2PE41 write "plot 0"  message "."
+
+call xEmsP2IB11 write "plot 0"  message "."
+call xEmsP2IB21 write "plot 0"  message "."
+call xEmsP2IB31 write "plot 0"  message "."
+call xEmsP2IB41 write "plot 0"  message "."
+
+call xEmsP2PE12 write "plot 0"  message "."
+call xEmsP2PE22 write "plot 0"  message "."
+call xEmsP2PE32 write "plot 0"  message "."
+call xEmsP2PE42 write "plot 0"  message "."
+
+call xEmsP2IB12 write "plot 0"  message "."
+call xEmsP2IB22 write "plot 0"  message "."
+call xEmsP2IB32 write "plot 0"  message "."
+call xEmsP2IB42 write "plot 0"  message "."
+
+call xEmsP2PE14 write "plot 0"  message "."
+call xEmsP2PE24 write "plot 0"  message "."
+call xEmsP2PE34 write "plot 0"  message "."
+call xEmsP2PE44 write "plot 0"  message "."
+
+call xEmsP2IB14 write "plot 0"  message "."
+call xEmsP2IB24 write "plot 0"  message "."
+call xEmsP2IB34 write "plot 0"  message "."
+call xEmsP2IB44 write "plot 0"  message "."
+
+SKIP
+
+call xEmsP2IB55 write "plot 0"  message "." 
+call xEmsP2OB55 write "plot 0"  message " done" endmessage
+
+!call xEmsRx 
+!call xEmsSe 
+!call xEmsDr 
+call xEmsB 
+call xEmsBg 
+call xParZ  
+set xpar2 0    !b
+call xParPhi1
+set xpar2 1    !b
+call xParPhi1
+call xEpsilon
+
+
+
+!-------------------------------------------------------------------------
+
+
+!call xParOmega1             !Parametrized G function as a function of x
+!set xpar8 2.                !=2 -> f(x+,x-), <2 -> f(x,y)
+!call xParOmega1xy           !(x,y) ((x+,x-)) randomly generated
+!call xbExaD                 !Exact D function as a function of b
+!call xbParD                 !Parametrized D function as a function of b
+!call xyParD                 !Parametrized D function as a function of y
+!call xParSigma             !sigma of b distribution of D function as a function of x
+!set xpar4 1.                !x (momentum fraction of remnant )
+!set xpar5 1.                !y lin scale
+!call xParOmegaN             !different function used by metropolis (W)
+!set xpar6 1                 !normalization on (1) or off (0)
+!call xGexaJ                 !different contributions of G (soft, hard, sum)
+!set xpar5 0.                !calculation of PhiExact in xParPhi
+!set xpar2 0.  call xParPhi  !Phi funcitons for b=0 (xpar2) as a function of x_rem
+!set xpar2 1.5 call xParPhi  !Phi funcitons for b=1.5 (xpar2) as a function of x_rem
+!call xParPro                !1-phi as a function of b, and integration over x of G or GFF or G(1-x+)(1-x-)as a function of b (om1intb (G), om1intbc (GFF), om1intgc (G(1-x+)(1-x-))
+!call xParPomInc            !Inclusive pomeron distribution GFF as a function of x+ for a given x- (xpar4) and b (xpar2)
+!set xpar2 0. call xParPomIncX !Inclusive pomeron distribution GFF as a function of x for a given b (xpar2)
+!set xpar2 1.5 call xParPomIncX !Inclusive pomeron distribution GFF as a function of x for a given b (xpar2)
+!call xParPomIncXI            !Inclusive pomeron distribution GFF as a function of x for integrated over b
+

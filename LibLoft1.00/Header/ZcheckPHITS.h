@@ -1,0 +1,2 @@
+!  #define CHECKPHITS
+#undef CHECKPHITS

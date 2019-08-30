@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>MetaData</key>
+	<dict>
+		<key>kMDItemCreator</key>
+		<string>Create</string>
+		<key>kMDItemNumberOfPages</key>
+		<integer>41</integer>
+		<key>kMDItemPageHeight</key>
+		<integer>842</integer>
+		<key>kMDItemPageWidth</key>
+		<integer>595</integer>
+		<key>kMDItemTextContent</key>
+		<string>E(MeV)
+sigma(b)
+by sigrc
+np
+by sigrc
+pp
+Comp. sigrc and nasa
+pBe
+inela
+inela
+pBe
+pAl
+pFe
+nBe
+nC
+nFe
+nNi
+nCu
+nZn
+nAg
+nSn
+nPb
+nBi
+nU
+E-&gt; big
+deltaE --&gt; negative
+CE--&gt;big
+D--&gt; big  T1-&gt;small
+for D-&gt;big
+  
+check why n-X is wrong:  for nC case
+
+         (KK)Original nasa       PHITSNasa
+
+T1             30	                18
+Xm        -1.48--&gt; 1.0(E&gt;20)   nearly same
+SL             1.6                        1.2--2.8(E&gt;100)  
+S                 0.696                  //     
+deltaE       1.75-&gt;1.1(&gt;1000)  .175--&gt;-0.75(&gt;1000)
+CE             -0.3-&gt;0.2            -0.3-&gt; 2
+D              0.4-&gt;0.195           1.85-&gt;2.0
+X1            2.482                     2.482
+</string>
+	</dict>
+</dict>
+</plist>

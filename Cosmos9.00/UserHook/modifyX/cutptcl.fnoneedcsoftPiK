@@ -1,0 +1,213 @@
+      subroutine cutptcl
+      implicit none
+c          special purpose routine to see the importance of
+c          energetic particles. ( We apply for E0> E0th )
+c    **** parameters are hard-wired, i.e, cannot be controled
+c         after compilation ****
+c mode=0)      don't do any cut
+c mode=1)      discard all pi/K with x>xth. (leading pi/K is not)
+c mode=2)      discard pi0 with x> xth
+c mode=3)      soften pi/K  spectrum at x>xth (except leading pi/K when
+c              incident is pi/K), but # of ptcls at x<xth increases
+c              
+c              If we finde a pi/K with x>xth (let it be xold),
+c              modify it as  xnew<-- xold*u (u is uniform in 1~xth)
+c              To conserve energy, we generate a  ptcl with
+c                    x<--(xold-xnew)
+c              If x is > xnew, divide this new particle into two
+c              and do some buinsess until some condition is satified.
+c              (so, x>xth pi/K may split into two or three).
+c              
+c 
+#include  "Zcode.h"
+#include  "Ztrack.h"
+#include  "Ztrackp.h"
+#include  "Ztrackv.h"
+#include  "Zincidentv.h"
+c
+c       
+c
+      integer,save:: mode = 3 
+      real(8),save:: xth = 0.05    ! over this x, we apply cut 
+      real(8),save:: E0th = 500.   !  500 GeV  over this we apply cut
+                           !  if make this 10 TeV, effect after shower max
+                           !  decreases for E1ry=10^19 eV
+      logical,save:: special=.false.  ! to see x dist. of pions
+                                   ! at first interaction;  make this
+                            !  T, and set Emin large in param. 
+      logical,save:: leadingPiK=.true.  ! for Pi/K incident case,
+                                ! treat highest energy Pi/K of the same
+                                ! charge as leading Pi/K and don't 
+                                ! apply the method here
+                  !  if make this f, effect increase a bit esp. at
+                  !  after max.  
+                  !  leadingPiK=T --> Xmax ==> 35 g/cm^2
+                  !            =F     Xmax ==> 25 g/cm^2
+c
+c   MovedTrack is the particle that made interaction
+c   Pwork contains produced particles.
+c   Nproduced has the number of particles in Pwork
+c   IntInfArray(ProcessNo) contains the type of interaction
+c
+      real(8):: x, E0, Ek, Ex, u, u1, u2
+      integer::code,charge, i, nc, stackpos
+      logical modified, ok
+
+      integer maxi
+      real(8):: maxE, E1, E2
+      integer count
+
+      modified = .false.
+
+      if( IntInfArray(ProcessNo).process == "coll") then 
+         E0 = MovedTrack.p.fm.p(4)
+         if(E0 < E0th) return !!!!!
+         nc = Nproduced
+c            if pi/K is incident, regards the highest one as leading
+c            and avoid to modify 
+         if(leadingPiK .and. (MovedTrack.p.code == kpion .or.
+     *      MovedTrack.p.code == kkaon ) ) then
+            call cgetmaxptcl(MovedTrack.p.code, MovedTrack.p.charge,
+     *            maxi, maxE)
+         else
+            maxi = 0
+         endif
+         count = 0
+         do i = 1, Nproduced
+            x = Pwork(i).fm.p(4)/E0
+            if( mode == 1 .and. i /= maxi ) then
+               if(Pwork(i).code == kpion .or. Pwork(i).code == kkaon 
+     *              .or.   Pwork(i).code ==  keta ) then
+                  if(x > xth) then
+c                        to neglect, put mass as E
+                     Pwork(i).fm.p(4)=Pwork(i).mass
+                     Pwork(i).fm.p(1:3) = 0.
+                     modified = .true.
+                  endif
+               endif
+            elseif( mode == 2 .and. i /= maxi) then
+               if( ( Pwork(i).code == kpion .and.
+     *              Pwork(i).charge  == 0 ) .or.
+     *              Pwork(i).code == keta ) then
+                  if(x> xth) then
+                     Pwork(i).fm.p(4)=Pwork(i).mass
+                     Pwork(i).fm.p(1:3) = 0.
+                     modified = .true.
+                  endif
+               endif
+            elseif( mode == 3 .and. i /= maxi ) then
+               if(Pwork(i).code == kpion .or. Pwork(i).code == kkaon 
+     *       .or.   Pwork(i).code ==  keta ) then
+                  if(x > xth ) then
+c                           neglect mass
+
+                     ok = .false.
+                     do while(.not. ok)
+                        call rndc(u)
+                        u1 = u*(1.-xth) + xth
+                        Ex =  Pwork(i).fm.p(4)
+                        E1 = Ex*u1
+                        E2 = (1.-u1)*Ex
+                        ok = E2 > Pwork(i).mass
+                        count = count +1
+                        if(count > 20 ) goto 100
+                     enddo
+                     modified = .true.                        
+                     Pwork(i).fm.p(4) = E1
+                     call cae2p(Pwork(i))
+                     nc = nc + 1
+                     Pwork(nc) = Pwork(i)
+                     Pwork(nc).fm.p(4) = E2
+                  endif
+               endif
+            elseif( mode == 0 ) then
+c               do nothing
+            elseif(mode > 3 .or. mode < 0 ) then
+               write(0,*) ' mode err=',mode, ' in cutptcl'
+               stop
+            endif
+ 100        continue
+         enddo
+         if(mode == 3) then
+            Nproduced = nc
+         endif
+c **********************   
+         if(special) then
+            do i = 1, Nproduced
+               if(Pwork(i).code == kpion ) then
+                  write(*,'("xd ", 1p,g12.3)')  Pwork(i).fm.p(4)/E0
+               endif
+            enddo
+         endif
+c **********************
+      endif
+      if(modified) then
+c            since stacking has been already done, we clean
+c            such ptlces and  again stack 
+c                 get current stackpos
+         call cgetCurrentStackpos(stackpos)
+c                 adjust the pos
+         stackpos=stackpos-Nstacked
+c                 reset the stack pos. 
+         call cresetStackpos(stackpos)
+c                stack again
+         if(OneDim .eq. 0) then
+c            3 dimensional  
+c            stack the leading ptcl  first (to save stack area)           
+            call cmovePtcl3(MovedTrack, Pwork, Nproduced, Nstacked)
+         else
+            MovedTrack.vec = IncidentCopy.vec
+            call cmovePtcl1(MovedTrack, Pwork, Nproduced, Nstacked)
+         endif
+      endif
+      end
+      subroutine  cae2p( pc )
+      implicit none
+#include  "Zcode.h"
+#include  "Ztrack.h"
+
+
+      record /ptcl/ pc
+      
+      real(8):: E, p, f
+      
+      E = pc.fm.p(4)
+      p = sqrt( pc.fm.p(1)**2  + pc.fm.p(2)**2 + pc.fm.p(3)**2 )
+c           E**2 - (f*p)**2 = m**2; f =sqrt( E**2-m**2)/p
+      if(p > 0 ) then
+         f = sqrt(E**2 - pc.mass**2)/p
+         pc.fm.p(1:3) = pc.fm.p(1:3)*f
+      else
+         pc.fm.p(1:3) = 0.
+      endif
+      end
+      subroutine cgetMaxptcl(pcode, pcharge, maxi, maxE)
+c        get max energy ptcl with the same code / charge as incident
+c        if meson is incident, most probably, it is leading.
+      implicit none
+c #include  "Zmaxdef.h"
+#include  "Zcode.h"
+#include  "Ztrack.h"
+#include  "Ztrackp.h"
+#include  "Ztrackv.h"
+#include  "Zincidentv.h"
+
+      integer(2),intent(in)::pcode    ! incident code
+      integer(2),intent(in)::pcharge  ! //       charge
+      real(8),intent(out):: maxE   ! max Energy with the same code/charg as
+                              ! incident.  if there is no such, 0
+      integer,intent(out)::maxi  !   index of maxE in Pwork.  // 0
+
+      integer i
+
+      maxi = 0
+      maxE = 0.
+      do  i = 1,  Nproduced
+         if( Pwork(i).code /=  pcode ) cycle
+         if( Pwork(i).charge /= pcharge ) cycle
+         if( maxE < Pwork(i).fm.p(4) ) then
+            maxE =  Pwork(i).fm.p(4) 
+            maxi = i
+         endif
+      enddo
+      end

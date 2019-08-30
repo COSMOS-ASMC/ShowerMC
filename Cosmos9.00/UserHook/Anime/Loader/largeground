@@ -1,0 +1,24 @@
+appearance {
+	+texturing
+        +edge
+	shading smooth
+	texture {
+		file  Array/grassfield.pnm
+#		clamp  st
+		apply decal
+	}
+	material { ambient  0.75 1.0 0.75 
+		   edgecolor 1 1 1
+	}
+}
+UCMESH
+2 2
+#  40 km x 40 km ground
+#  x        y       z      R   G   B   A  s t 0
+-20000.  -20000.  -6.00    0.1 1  0.7  1  0 0 0
+ 20000.  -20000.  -6.00    0.1 1  0.7  1  1 0 0
+
+-20000.   20000.  -6.0    0.1 1  0.7  1  0 1 0
+ 20000.   20000.  -6.0    0.1 1  0.7  1  1 1 0
+
+

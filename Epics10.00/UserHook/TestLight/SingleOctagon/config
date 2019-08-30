@@ -1,0 +1,17 @@
+#  type  matter  c    de maxpath  / x y z  a  b c 
+-------------------------------------------------------------------
+#eq   cut 0.5d0
+#eq  ncut -0.5d0  
+#eq   a   30
+#eq   b   1.9d0
+#eq   c   2.0d0
+#news new-1 octagon
+1   octagon  PWO 3  1102  0   / 0  0  0    a  b c cut
+2   octagon  PWO 3  3102  0   / 0  0  +   a  b c cut
+-------------------------------------------------
+#  type  matter  c    de maxpath / x0   y0   z0   a  b  c
+#     1102: scini only with Light10.dat data
+#     2102: ceren //
+#     3102: both  
+
+

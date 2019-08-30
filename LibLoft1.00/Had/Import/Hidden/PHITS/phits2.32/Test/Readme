@@ -1,0 +1,11 @@
+ifort  mymod.f testmymod.f  blk.f 
+or
+gfortran mymod.f testmymod.f  blk.f 
+
+then
+ ./a.out
+
+1)  block data must be outside of module
+2)  common can be put in module
+3)  containes can contain include "file"
+

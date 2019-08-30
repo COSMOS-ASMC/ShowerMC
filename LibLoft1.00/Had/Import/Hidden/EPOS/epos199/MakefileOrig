@@ -1,0 +1,86 @@
+SOURCE_DIR=
+UNAME=$(shell uname)
+ifeq ($(OBJ),"")
+  LIBDIR=$(OBJ)/$(UNAME)/
+else
+  LIBDIR=Lib/$(UNAME)/
+endif
+COMP=`gfortran --version | grep 4`
+COMPIL="$(shell echo $(COMP))"
+OUTDIR=outputs/
+VER=199
+
+LFLAGS= 
+FFLAGS= 
+
+COMP=`which gfortran 2>&1 | grep -v which`
+COMPIL="$(shell echo $(COMP))"
+#COMPIL=""
+FC=g77
+ifeq ($(COMPIL),"")
+  FC=g77
+##   ---     -pg for using gprof
+  SFFLAGS= -Wall -fno-automatic -finit-local-zeros -fbounds-check -g -O0
+  SLFLAGS= -g
+else
+  FC=gfortran
+  SFFLAGS=  -Wall -fno-automatic -fbounds-check -g -O0  -std=legacy
+  SLFLAGS= -g
+endif
+
+  URQMD=
+#   URQMD= -g ../urqmd23/obj/Linux/urqmd/*.o 	   
+
+
+FILES=  \
+epos-bas-199.f  epos-con-199.f  eposu_no.f     \
+epos-dky-199.f  epos-dro-199.f epos-ems-199.f  \
+epos-fra-199.f  epos-ico-199.f epos-hnb-199.f  \
+epos-ids-199.f  epos-int-199.f epos-jps-199.f  \
+epos-omg-199.f  epos-par-199.f epos-sem-199.f  \
+epos-rsh-199.f  epos-qsh-199.f epos-tim-199.f  \
+epos-uti-199.f  epos-xan-199.f epos-xpr-199.f  \
+                                           \
+eposm.f                             \
+
+AFILE=epos-app-199.f
+
+EFILE=example.f
+#EFILE=cdf630.f
+
+CFILES=epostrapfpe.c
+
+IFILES=epos.inc epos.incems epos.incico epos.incpar epos.incsem epos.param \
+	epos.inirj epos.inidi epos.ini1b epos.iniev epos.inirj epos.initl \
+	Makefile epos.inics .epos epos smake isigma.optns epos_all add.pl \
+	models.f input.optns README epos.inchy
+
+
+X: dirs Xepos
+	@echo $(SOURCE_DIR)
+example: dirs EposEx
+	echo $(SOURCE_DIR)
+Xepos: $(FILES:%.f=$(LIBDIR)%.o) $(AFILE:%.f=$(LIBDIR)%.o) $(CFILES)
+	$(FC) $(SLFLAGS) $(LFLAGS) -o $(LIBDIR)$@ $^ $(TRAP:.c=.o) 
+EposEx: $(FILES:%.f=$(LIBDIR)%.o) $(EFILE:%.f=$(LIBDIR)%.o) $(CFILES)
+	$(FC) $(SLFLAGS) $(LFLAGS) -o $@ $^ $(TRAP:.c=.o) 
+$(AFILE:%.f=$(LIBDIR)%.o) : $(LIBDIR)%.o : $(SOURCE_DIR)%.f  
+	$(FC) $(SFFLAGS) $(FFLAGS) -o $@ -c $<
+$(EFILE:%.f=$(LIBDIR)%.o) : $(LIBDIR)%.o : $(SOURCE_DIR)%.f  
+	$(FC) $(SFFLAGS) $(FFLAGS) -o $@ -c $<
+$(FILES:%.f=$(LIBDIR)%.o) : $(LIBDIR)%.o : $(SOURCE_DIR)%.f  
+	$(FC) $(SFFLAGS) $(FFLAGS) -o $@ -c $<
+tar: $(FILES) $(AFILE) $(EFILE) $(CFILES) $(IFILES)
+	tar czvf epos$(VER).tgz $^
+cors: $(FILES) epos.inc epos.incems epos.param epos.inirj epos.inics
+	scp $^ $(HOME)/corsika/corsika.svn/epos/
+cpcc: $(FILES) $(AFILE) epos.inc epos.param epos.inirj epos.inics
+	scp $^ ccali.in2p3.fr:epos
+dirs:
+	@if [ ! -d $(LIBDIR)  ]  ;then                       \
+	set -x; mkdir -p $(LIBDIR); set +x;                  \
+	fi     
+clean:
+	/bin/rm -r $(LIBDIR)
+cleanepos:
+	/bin/rm -f $(LIBDIR)*

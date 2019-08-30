@@ -1,0 +1,65 @@
+Basically the same as
+  ATOMIC DATA AND NUCLEAR DATA TABLES 35,345-418 (1986)
+     BREMSSTRAHLUNG ENERGY SPECTRA FROM ELECTRONS WITH KINETIC
+     ENERGY 1 keV-10 GeV INCIDENT ON SCREENED NUCLEI AND ORBITAL
+     ELECTRONS OF NEUTRAL ATOMS WITH 2 = l-100
+     STEPHEN M. SELTZER and MARTIN J. BERGER
+									
+but data points are more dense than the table in this ref.
+(The values are different from those given in NIM by the same authors
+ in 1985. especially at higher energies say, at 1GeV.)
+ Nuclear Instruments and Methods in Physics Research B12 (1985) 95-134
+ Which is referred in Geant4.  NIM dose not inlude atmic electron
+ effect thus gives smaller cross-section). However at few to 50 MeV
+ region, they say,  uncertanity is 5~10%.
+ 
+  
+
+Why data points are denser than the table in the paper.  I got
+floppy disk from Seltzer directory; probably data given there is
+more precise than paper.( in 1991 ?).  At that time, e-mail
+is not yet so poular (Just before NeXT-STEP was  available. )
+and could not transfer attachemnt easily. Machintosh was used at me.  
+(For ref. see Documents/Phys/BremPair/SelterBerger.pdf
+  SeltzerBergerUpto10GeV.ddf)
+  
+  
+
+y****   seeData.f
+   
+    Seltzer & Berger's data (brems01 ~ bremes10) are decomposed into
+    each element ranging from Z=1 to 100.
+    The data file name is
+        SZ1, SZ2, ... SZ100
+    corresponding to  Z=1, Z=2,...Z=100.
+ 
+     The format of each line is
+      
+        v   cross-section  Ek
+
+    where
+         v = Eg/(Ee-me)
+         cross-section = (beta/Z)**2 v ds/dv (mb)
+         Ek = Electron kinetic energy in GeV
+
+    The upper energy may be specified. (GIVE Emax)
+
+    You can inspect each data file by gnuplot
+
+****   unpack.f
+
+     This is almost the same as seeData.f
+     Difference is that the files name created is Z1~Z100
+     Each file containes only cross-section values.
+
+     The files  Z1 ~Z100 are used when making sampling tables.
+
+
+     The upper energy may be specified. (GIVE Emax)
+
+     Emax = 4001.
+
+     To read all of the data, you have to change the
+     em=41-->53 in Util/Elemag/epBrSeltzer.f
+
+

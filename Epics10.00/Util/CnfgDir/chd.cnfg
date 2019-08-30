@@ -1,0 +1,75 @@
+#
+# CHD
+#
+
+#eq     CHDLw     3.200
+#eq     CHDLl     45.000
+#eq     CHDLh     1.000
+#eq	CHDa	  1.6
+#eq	CHDb	  0.5
+#eq	CHDc	  7.00
+#eq	CHDr	  0.39
+#eq	CHDh	  0.70
+
+#subd chd1x
+### ESR with thickness = 65um
+1 box  sp 0 0 0 / 0  0  0  3.213  45.0065  1.013 / 2
+2 box  SCIN   1 2 0 / 0.0065  0  0.0065  CHDLw CHDLl CHDLh
+3 sqtccl Acrylic 0 0 0 / 1.6065  0  0.5065 CHDa CHDb CHDc CHDr  1 0 0 0 0 1
+4 cyl_y  Acrylic 0 0 0 / CHDa  -7.70  CHDb  CHDr 0.70
+5 box_w sp 0 0 0 / 0 0 0
+#end chd1x
+
+
+#subd chdx
+1  chd1x sp 0 0 0 / 0 0 0
+2  chd1x sp 0 0 0 / + = =
+3  chd1x sp 0 0 0 / + = =
+4  chd1x sp 0 0 0 / + = =
+5  chd1x sp 0 0 0 / + = =
+6  chd1x sp 0 0 0 / + = =
+7  chd1x sp 0 0 0 / + = =
+8  chd1x sp 0 0 0 / + = =
+9  chd1x sp 0 0 0 / + = =
+10 chd1x sp 0 0 0 / + = =
+11 chd1x sp 0 0 0 / + = =
+12 chd1x sp 0 0 0 / + = =
+13 chd1x sp 0 0 0 / + = =
+14 chd1x sp 0 0 0 / + = =
+15 box_w sp 0 0 0 / 0 0 0
+#end chdx
+
+#subd chd1y
+### ESR with thickness = 65um
+1 box  sp 0 0 0 / 0  0  0   45.0065  3.213  1.013 / 2
+2 box  SCIN   1 2 0 / 0 0.0065 0.0065  CHDLl CHDLw CHDLh
+3 sqtccl Acrylic 0 0 0 / 0 1.6065  0.5065 CHDa CHDb CHDc CHDr   0 -1 0 0 0 1
+4 cyl_x  Acrylic 0 0 0 / -7.70  CHDa  CHDb  CHDr 0.70
+5 box_w sp 0 0 0 / 0 0 0
+#end chd1y
+
+#subd chdy
+1  chd1y sp 0 0 0 / 0 0 0
+2  chd1y sp 0 0 0 / = + =
+3  chd1y sp 0 0 0 / = + =
+4  chd1y sp 0 0 0 / = + =
+5  chd1y sp 0 0 0 / = + =
+6  chd1y sp 0 0 0 / = + =
+7  chd1y sp 0 0 0 / = + =
+8  chd1y sp 0 0 0 / = + =
+9  chd1y sp 0 0 0 / = + =
+10 chd1y sp 0 0 0 / = + =
+11 chd1y sp 0 0 0 / = + =
+12 chd1y sp 0 0 0 / = + =
+13 chd1y sp 0 0 0 / = + =
+14 chd1y sp 0 0 0 / = + =
+15 box_w sp 0 0 0 / 0 0 0
+#end chdy
+
+
+#subd chd
+1 chdx sp  0 0 0 / 0.009  0 0
+2 chdy sp  0 0 0 / 0  0.009 1.153
+3 box_w sp 0 0 0 / 0 0 0
+#end chd
+

@@ -1,0 +1,265 @@
+Model parameters for sepics.
+Any comment may be placed before ---- line.
+you must give a value for each row at a column corresponding to
+  "specified"   if you give / only there, the standard is taken.
+  No items  should be deleted or added.  If the column for the
+  standard has only ",", no  standard value is defined.
+  The order of items to appear is arbitrary.
+
+The name field must start from the 2nd column.
+Blank lines, if any,  are ignored. If the first 2 columns are blank,
+the line is regarded as a comment line and ignored.
+
+
+
+name    standard   specified    meaning    options & note
+----------------------------------------------------------------------
+ BaseTime     1.             / average cpu time(sec) for 1 GeV. (not used)
+
+ CosNormal  (1.0,  1.)        / The range of the cosine of the angle 
+	between the "normal vector" and the incident particle
+	direction.  (The incident particle here means the direction 
+	defined in the world coordinate).
+	Used only if InputA = 'is' or 'cos *'
+	The normal vector may be directed to +z axis in most of
+	cases  but actually it depends on InputP as follows.
+	InputP = 'fix':
+		+z axis   (irrespctive of the surface direction)
+	InputP(2:3) = one of '+z', '-z', '+x', '-x', '+y', '-y'
+		Here "(2:3)"  means 2nd to 3rd characters of InputP
+		and shows the normal vector direction. (It is the opposit
+		direction to the usual defenition which is normally
+		directed to the outward from the volmue. We define the
+		the normal vector to be directed to the inward to the volume.
+		For example, if it is '+x', the normal vector is
+		directed to +x axis direction so that CosNormal = (1.,1.)
+		means that the beam is directed to +x axis exactly.
+		CosNormal=(0.,1.) and InputA="cos 1" mean that the bulk
+		of incident is directed to +x and the anglar distribution
+		between the incident and the normal vector  is cos dcos.
+	For CosNormal, see also InputP="usph" etc later.
+                      
+ DCInpX    0.70710678d0  0    /  These three are x, y, z components of the 
+ DCInpY     0.d1           /  direction cosine of  the incident ptcl.
+ DCInpZ     0.70710678d0  1  /  Used only if InputA is 'fix'.
+		The square sum must be equal to 1. within the accuracy of
+		 4~5 digits. Since it is bothersome to give higher accuracy,
+		 sepics renormalizes them. The value is for the world  coordinate.
+
+ DeadLine  '00.00.00'        /     Deadline time  (not used yet)
+ E0Max     300000.         / If the sampled incident energy > E0Max, it will
+                           be discarded.
+ Hwhm       ,         /   Half width at half max of a Gaussian spread beam.
+                    Used when InputP(1:1)='g' (cm) (see also ProfR)
+ InputA    'is'      / 
+	'is' --> Incident particle angle is isotropic
+		(See CosNormal). Normally no chance to specify.
+	'fix'--> Incident particle angle is a fixed one given by the direction
+		cosine, (DCInpX, DCInpY, DCInpZ).
+	cos pw'--> cos^pw dcos angular distribution. if pw = 0 equivalent to 'is'.  
+ InputP    'fix'   'u+z'     /
+	  Specify the incident partilce position in the  world coordinate.  
+        InputP= 'fix'  (Xinp, Yinp, Zinp) (cm) is used.
+
+        InputP= 'usph'  uniform on the world sphere.
+		The world must be given by a sphere.
+		The region of the input position  can be controled by 
+		Xinp, Yinp and Zinp. 
+		*******************
+		Xinp and Yinp are regarded as a polar angle (theta deg. 0~180)
+		and azimuthal angle (phi deg. 0~360) around which the incident
+		particle positions are distributed within an half opening angle of
+                Zinp (deg 0~180).  The particle direction is sampled by referring to
+	        CosNormal and  (theta,phi) direction. The CosNormal is dricted to
+		the incident point to the center of the sphere.
+        InputP='g->sph'  Similar to 'usph' except for
+		1) Zinp must be  <= 90
+		2) Points are so sampled  that they are Gaussian beam when
+		   projected  onto a plane perpendicular to (theta,phi). 
+		   The center is on the (theta,phi) direction from the world center.
+.                HWHM is used but ProfR is not, since the beam spread is 
+		automatically cut by Zinp.
+	InputP='g->sph2'.  Similar to 'g->sph' but Xinp, Yinp, Zinp are not used.
+		In this case, the incident particle direction must be given;
+		(say, in sepicsfile as InputA="fix" and DCinpX, DCinpY, DCinpZ, or
+		by specifing a primary file with file name starting with "+" such
+		as +primary.  See the last part of this file).  The normal vector
+		direction is formed as if (theta, phi) were given by the incident
+		particle and the hemi-sphere is used as if Zinp=90.
+        InputP='u->sph'  This is diff. from 'usph' but similar to 'g->sph'.
+		The difference is that the incident particle positions are
+		uniformly distributed on the plane.
+	InputP='u->sph2'
+		This is similar to 'g->sph2' except for that the distribution 
+		on the plane is made to be uniform.
+        InputP='u-x', 'u+z' etc 
+		Uniform within a box given by Xrange, Yrange, Zrange.
+		If you want to start the beam from z=0 with uniform
+		(x,y) within Xrange, Yrange, you may set, e.g,
+		InputP='u+z' and Zrange=(0.,0.), Xrange=(0.,10.), Yrange=(-5.,5.).
+        InputP='g-x', 'g+z' etc.
+		Gassian beam: The Gasussian beam spread is controled by
+		Hwhm (Half-width at half-max) and ProfR.
+		The latter is the radius of the beam beyond which no particle is
+		distributed. The beam center is (Xinp, Yinp, Zinp). The beam
+		will be distributed on a plane perpendicular to the beam 
+		direction specified by +x, -z etc. For example
+		If you put a Gaussian beam on (x,y) plane at z=0,
+		InputP='g+z' Zinp=0.
+        NOTE: 'gsph' and 'sph' are no more supported from V8.70.
+	If these input positions do not satisfy you, you have to make
+	the incident particle in your userhook rouitne.  For the other
+	more convenient way is describe in the last part of this text.
+
+ Ir1(1)    123             / Random number seed: The generator is the same as
+ Ir1(2)    50000011 -999233     / the one used in Cosmos. It can be initialized
+                             by two 32-bit integers.  If the second one is 
+			negative, the internal timer, hostname, process number	
+			are used to form a seed.
+
+ JobTime   1190           /  cpu time alloted (not used yet)
+ Nevent    1     500   /   # of events to be generated. 
+ PrimaryFile  'primary'   / primary spectrum data file.
+		For details, see $EPICSTOP/Data/Primary/sample.d.
+		The format is completely the same as Cosmos.
+		However, if the first letter of the file name is +,
+		the format is very special so that the output from
+		Cosmos can be easily accepted as the primary (see later).
+ ProfR      ,            /   Limit of gaussian beam radius (cm).
+	        Used when InputP is 'gxy' etc.
+ Xinp     1    15    /   Incident pos of x. Used when InputP='fix'
+
+ Yinp     1    20    /   see Xinp. (see InputP in document)
+
+ Zinp     0.      /   see Xinp
+		The values are in cm in the world coordinate.
+		These are used quite a different purpose if
+		InputP='usph'  or 'gsph'. See InputP.
+
+ LogIr     t       f    / Take log of intial seed of random num. etc 
+                         for each event. Output will appear on the
+                        error out.
+ Xrange (5,5)  (0, 0)  /  These 3 are used when InputP='u-x', 'u+z' etc.
+ Yrange (5,5)  (0, 0)   /  Input particle position is uniformly sampled 
+ Zrange (0, 0)     /  within the box specifed by these 3.  world coordinate in cm.
+
+ Light    0  /  choice:0  11, 12, 21, 22.
+          If 0, no light is treated (no light ray tracing), irrespectively of
+          other settings. (say settings  in config).
+ LightDir  './LightData'   /  used when Light is 11,12,22. Directory where
+	    the property  of component and media for light
+            generation and transportaion 
+           info. is stored.  The file name is Light10.dat, Light11.dat,
+	   Sensor50.dat Sensor51.dat etc.  mn in Lightmn.dat come from
+	   CountDE part of config file. (CountDE=sBmnd; where d is 
+           to specify energy loss fluctuation, 3 bits in B specify scinti,
+           Cerenkov, synchrotron generation;B=1=001(b)-->scinti only
+           B=3=011(b) is scinti and Cerenkov) 
+ OutPrimaryFile  '/tmp/kasahara/+primary'  /
+	   file name path.  (enclose by ' like 'abc/+xyz.dat')
+           Used only when Light=21
+	   **File Name must start from +**.  Psudo primary file
+	   used to generate scintillation from energy deposit and
+	   Cerenkov from charged ptcl path.
+ OutPrimaryFileNo  14  /    Fortran logical dev # for above.
+ StackDiskFile   '/tmp/kasahara/stackdisk'     /
+	    If memory stack area overflows, this disk is used (direct
+	    access file)
+ StackDiskFileNo  13 /     Fortran logical dev # for above.
+ Trace t   f /
+ TraceDir  '/tmp/kasahara/' / dir where trace data is taken. override  
+
+ TraceErg        /  3 two pairs like (a,b), (c,d), (e,f)
+                 which show the kinetic energy retion of partciles
+                 for which we take trace. Use if too much data for trace.
+                 at high energy. Default is not selection
+ epHooks '0 0  0'       / Entry for giving user defined parametes.
+                         Parameters can be a maximum of 5 character
+	                 strings(max of 100 characters each),
+                         10 integers and 10  real*8 numbers.
+                         This entry specifies how many such parameters
+                         follow this. If '0 0 0', no user defined
+                         parameters are assumed.
+                         The defalut limit "5, 10, 10" can be enlarged
+                         by changing epics/ZepMaxdef.h
+                      Example:
+                   epHooks '2 1 2'  /
+                   epHookc 'checkfile'  /
+                   epHookc '1  3  -9.0'   /
+                   epHooki  -1            /
+                   epHookr 100.          /
+                   epHookr -2.5       /
+                     This example shows that 2 strings, 1 integer and 2 real*8
+                     numbers follow this in this order.
+                     They can be accessed in your program by
+                         call epqHookc(i, cv)  ! to inquire i-th string. 
+                                               !    cv will recieve the string.
+                         call epqHooki(i, iv)  ! to inquire i-th integer value
+                                               !    iv will get the value 
+                         call epqHookr(i, rv)  ! to inquire i-th real*8 value
+                                               !    rv will get the value.
+                         If i is out of range, cv=' '
+                                               iv=-9999999
+                                               rv=-1.d-60
+                   These inquiry subroutines may be called whenever/whereever
+                   you need (after sepics paramers is read). 
+        **Note**   There is the same entry in epicsfile, but if this is given
+	           here, the entry in epicsfile is ignored.
+    =======================================================
+	If you prepare a file of which the name starts with "+" (say +primary),
+	you can specify a number of incident particles freely.
+	An example of the content is (# is at the first col.)
+   #  subKEdir
+   #--------------------------------
+    6 -1  1    3038.2      0.0002310511950  0.0004203277407 -0.9999998849700
+    6 -1  0    1483.7     -0.0002703957003 -0.0003187767466  0.9999999126338
+    4 -1  1    1290.8     -0.0006479254653 -0.0003686415914  0.9999997221479
+
+		The first line shows the contents of the file. 
+	sub:  Partile subcode is given in the file. Since code and charge are
+		 mandatory, the file contains 
+		code subcode charge in this order as  (6 -1, 1) etc as above.
+	KE:   Kinetic Energy (GeV) is given. ke is also accepted. If total
+		energy, TE or te may be given, e.g as  3038.2.
+	dir:	The direction cosines are given, e.g as
+		0.0002310511950  0.0004203277407 -0.9999998849700
+
+	Other specifiable variables are:
+	
+	xyz:   Incident (x,y,z) position (cm) in the world coordinate.
+	
+	time:	time data for each particle (ns) is given. This is converted
+		to cm by myltiplying 29.98cm internally.
+	user:  User controllable flag data is given.  (e.g by aTrack.user).
+	mul:	If the incident particles are multiple (say, particles generated 
+		by a nuclear interaction), mul must be given.  One group of
+		incident must be separated by a blank line. If two consecutive
+		blank lines appear, sepics understands an event has no incident
+		particle at all.
+	disk**:  ** stands for a number > 30.  If mul is specified and the number
+		of particles in an event is very large (say, >> 1000), the stack 
+		area inside the program may overflow.  In such a case, disk  file
+		is used.  The ** is used as a fortran logical device number.
+	The order of numericl data must be in the following order.
+
+	code subcode charge energy xyz dir time user.
+  The next example shows, disk file with logcial number 51 is used 
+	 the first event consists of 2 particles
+	second 5...
+  #  mulsubKEdirdisk51
+  #--------------------------------
+  6 -1  1    3038.2      0.0002310511950  0.0004203277407 -0.9999998849700
+  6 -1  0    1483.7     -0.0002703957003 -0.0003187767466  0.9999999126338
+
+  4 -1  1    1290.8     -0.0006479254653 -0.0003686415914  0.9999997221479
+  4  0  0    1042.5     -0.0001392146284  0.0009373155941 -0.9999995510293
+  4  1 -1    941.19     -0.0004777153051 -0.0012272349954 -0.9999991328408
+  4  0  0    732.62      0.0002739187416  0.0007157897289  0.9999997063068
+  5  4  0    658.92     -0.0004665925347 -0.0015489294740  0.9999986915536
+
+  4 -1  1    501.25     -0.0001249329340 -0.0008871217727  0.9999995987033
+
+	***  If some quantities are missing in the file, sepicsfile information
+	is employed. ***
+
+

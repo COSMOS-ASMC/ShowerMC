@@ -1,0 +1,96 @@
+/*
+  c ******************************************************************************
+  c       The user routines here are used only when you give 161 ~ 199 to the Trace value 
+  c       so that you  can manage the Cerenkov light output yourself.
+  c   The main purpose is to enable you to convert each track information to Cerekov light
+  c   on fly and output it with your desired format.  This will save the output disk file 
+  c   volume as compared to writing the track infomation directly by the standard way.
+  c  
+  c     This file is saved  as ctemplCeren.f
+  c   Each user hook program is supplied with #include "ctemplCeren.f"
+  c  (if not supplied, give it somewhere).
+  c   If you really want to make this file usable, save it as chookCeren.f (or whatever
+  c   you like), and change its content.
+  c   Then, you have to change the incldue statement in the user hook program which
+  c   really uses the chookCeren.f:
+  c        #include "chookCeren.f"
+  c ******************************************************************************
+  c
+*/
+extern "C"{
+#include "Zmanagerp.h"
+#include "Ztrack.h"
+#include "Ztrackp.h"
+#include "Ztrackv.h"
+#include "Zcode.h"
+#include "Zmass.h"
+#include "Zprimary.h"
+#include "Zprimaryv.h"
+#include "Zheavyp.h"
+#include "Zincidentv.h"
+  void  chookCerenS_(int * no, primaries * primary, coord * angle) {
+    //c          This is called when one event generation starts.
+    /*
+      integer no  !  input.  Event number.
+      record /primaries/ primary  ! input. Primary particle info.
+      c
+      c   ---------------------------------------------------------------------------------------
+      c        here  you may put some flag info. as header of each event;
+      c     The standard Cerenkov output routine writes the
+      c     following:
+      c
+      c      no      ! event no
+      c      primary.particle.code ! intger: partilce code
+      c      primary.particle.fm.p(4)  ! energy
+      c      angle.r(1), angle.r(2), angle.r(3)      ! direction cos of primary at the observation level.
+      c      
+      c
+    */    
+  }
+  // **********************************************************************
+  void  chookCeren_(int * ka, int * chrg, double * e1, int * itb, int * it, 
+       coord * f, coord * t){
+    /*
+      int ka;        ! input. particle code
+      int chrg;      ! input. particle charge
+      double e1;     ! input. particle energy
+      int itb;      ! input. time expressed in cemeter/beta at the segment top
+      int it;       ! input. track segment length in cm/beta 
+      struct coord f;  ! record /coord/ f  ! input. f.r(i), i=1,3 are the x,y,z co
+      mponent of the
+      segment top. The coordinate system is by the Trace value
+      !        you gave.
+      struct coord t; input. the same as above for the segment tail.
+      c        This is called whenever a charged particle is moved. Cerenkov threshold is
+      c     considered.
+      c     *****************
+      c     The standard Cerekov routine writes the following:
+      c    (see next routine for C++ interface).
+      c
+      c                 ka, chrg, sngl(e1), itb, it,
+      c     *           sngl(f.r(1)), sngl(f.r(2)), sngl(f.r(3)),
+      c     *           sngl(t.r(1)), sngl(t.r(2)), sngl(t.r(3))
+      c
+    */
+  }
+  /*
+    c
+    c     ******************
+  */
+  void chookCerenE_(int * ka, int* chrg, double * e1,int *itb, int * it,
+		    coord * f, coord * t){
+    /*
+      c         This is called when one event has been generated.
+      c         All values (ka etc) are 0. 
+      c     *******************
+      c     The standard Cerekov routine writes the following:
+      c
+      c      *ka, *chrg, *e1, *itb, *it,
+      c      f->r(0), f->r(1), f->r(2)
+      c      t->r(0), t->r(1), t->r(2)
+      c
+    */
+  }
+}
+
+

@@ -1,0 +1,18 @@
+nevap.f:
+  Debug statements inserted; --> commentout
+  statistics and call cputime: disabled
+  igamma should be zero to neglect gamma emitting deexcitation.
+       so if it is non zero, stop is made after:
+      if( igamma .ne. 0 .and. nclsts .gt. 0 ) then
+gem.f
+  call binin2 is disabled. since igamma=0
+  statistics and call cputime: disabled
+  In      function energm(iz,ia)   
+!   ink=           0   rather frequent for Fe 1500 MeV (KE/n) + p case
+!   iz,ia =          10          10  n, inn=      0         150
+!   iz,ia =          11          11  n, inn=      0         150
+!  ---> n= ia-iz=0 ==> ink
+!    current resolution is to use ink=1 to avoid zero index for SN
+!
+!  similar SN in    function fprob (z,a,e)
+!  seems safe.

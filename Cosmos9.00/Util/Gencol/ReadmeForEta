@@ -1,0 +1,5 @@
+Atlas roots 7 TeV
+	charged ptcl def:   charged ptcl from int. point 
+	                     with life > 0.3e-10 sec
+	or charged ptcls from a ptcl with shorter life.
+

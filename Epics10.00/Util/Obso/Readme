@@ -1,0 +1,25 @@
+
+[ev] is the optional event number. If omitted, 1 is assumed 
+ xxxx can be
+  all      for showing all tracks with no hidden mode
+  allh     for  //                     hidden mode
+  only+-   for  //    only charged particles with no hidden mode
+  only+-h  for  //    only charged particles with  hidden mode
+  only0    for  //    only neutral particles with no hidden mode
+  only0h   for  //    only neutral particles with  hidden mode
+  sort     for  //  only charged particles with different colors
+                    for different  particle codes.   No hidden mode
+  sort+-   for  //  only charged particles with differenct colors
+                    for different particle codes and charges.
+                   (no hidden mode)
+
+5) To show 20 events sequentially, use
+ 
+	a = -1 
+	call "slide"
+
+  if a =-1, after display of 1 event, system wait your "return"
+     a = n (>0) //                        system wait  n sec.
+
+
+  

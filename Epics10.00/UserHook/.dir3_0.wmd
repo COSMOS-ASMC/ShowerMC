@@ -1,0 +1,8 @@
+BrowserHeight0 = 442;
+ViewerShelf0 = "~/Epics/UserHook";
+BrowserWidth0 = 458;
+BrowserView0 = Icon;
+BrowserRoot0 = /Users/kasahara/Epics/UserHook;
+BrowserShelfRows0 = 1;
+BrowserDir0 = /Users/kasahara/Epics/UserHook;
+BrowserTop0 = "501 798";

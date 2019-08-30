@@ -1,0 +1,50 @@
+#!/bin/tcsh -f
+cat << EOF
+    config related commands may be invoked without going to Util or 
+    Util/Geomview.  Usage will be shown by invoking without argments.
+
+    configMenu:               Show this summary
+
+    usenewvol config:         If config contains some new volume-shapes 
+			      not so frequently used. Prepare to use it.
+                              Need not put ./ before the file name.
+			       
+    expandconfig config:      Get expanded config information.
+                              Note: redirection will get some
+                              garbage too.
+
+    mkdrawconfig:             Make executalbe to draw  config files
+                              ('usenewvol'  will do this too)
+
+    drawconfig config         Prepare to draw a given config file. 
+                              Need not put ./ before the file name.
+
+    dispconfigbygeomv         Using Geomview, show the config prepared
+                              as above
+
+    disptracebygeomv argments Show trace data (with the detector, if 
+                              specified).
+                              The path to the trace data must be
+                              aboslute path (e.g, /tmp/$USER/tracexx) or 
+                              starting with ~/
+    subdTree  config [1]      Show subdetector hierarchy. if 1 is added
+                              simple compoenent is also shown. 
+                              subdTree without arguments will show more detail
+			      
+    compSubdTree              To compress subdTree result.  
+
+    tree2index  config  spec  To get index table which contains
+                              component # specified "spec" info.
+                              "spec" info is such as "sfx1sheet SciFi"
+                              and shows the target medium "SciFi" with
+			      hierarchy info. For more into type tree2index.
+
+    showEmin                  When AutoEmin in epicsfile is set
+                              to  non zero, minimum energy is set
+                              for each component.  These valuess
+                              are shown together with config data.
+    showQuench                When a quenching factor is set for a
+                              medium, it is shown together with 
+                              config info.  [Obso] no reliable info. 
+EOF
+

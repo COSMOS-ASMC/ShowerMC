@@ -1,0 +1,173 @@
+\documentclass[a4j]{jarticle}
+\usepackage[dvips]{color,graphicx}
+\makeatletter
+\def\neareq{\mathrel{\mathpalette\neareqx@align{\smash.}}}
+\def\neareqx@align#1#2{\lower.2ex\vbox{\baselineskip\z@skip\lineskip\z@
+    \def\finsm@sh{\ht\z@.2ex \dp\z@.2ex\box\z@}%
+    \ialign{$\m@th#1\hfil##\hfil$\crcr#2\crcr=\crcr#2\crcr}}}
+\makeatother
+
+\def\dfrac#1#2{{\displaystyle\frac{#1}{#2}}}
+        \makeatletter
+        \def\le{\mathrel{\mathpalette\gl@align<}}
+        \def\ge{\mathrel{\mathpalette\gl@align>}}
+        \def\gl@align#1#2{\lower.6ex\vbox{\baselineskip\z@skip\lineskip\z@
+                \ialign{$\m@th#1\hfil##\hfil$\crcr#2\crcr=\crcr}}}
+        \makeatother
+%  \def\thefootnote{\fnsymbol{footnote}}
+%\pagestyle{myheadings}  
+%\pagestyle{empty}
+% \thispagestyle{empty}
+% \markright{K.K  \today}
+
+\begin{document}
+\section{Systematics for muons}
+
+
+\subsection{Goal}
+For a given primary type, energy $E_0$, zenith angle($\cos \theta$), 
+  observation depth $z$, core distance $R$,
+  we can know  the muon number density, muon erengy spectrum and arrival time
+distrituion whihc is a function of enery and cordistance of each muon.
+
+\subsection{First step}
+\begin{enumerate}
+\item  Air shower size, $N_e$, is not a good parameter to deal with
+  muons.  The primary energy $E_0$ and center of gravity (COG) of the
+  AS transtion curve are better parameters.
+
+\item The average number of muons, $N_\mu$, as a function of depth
+  (transition curve of muons) is well expressed  by the following
+  function.
+\end{enumerate}
+\begin{equation}
+ N_\mu(x) = a x^m  \exp(-b x^n)
+\end{equation}
+
+The following coefficients are only to show some rough guide and
+must be  updated by using a number of M.C data.
+We must see the heavy primary case separately (say, use effective
+primary energy, or simple super-position model).
+(We express depth in g/cm$^2$,  energy TeV.
+\begin{eqnarray}
+  x &= & z/z_m \\
+  z_m &= & 66.7\log_{10}(E_0)+625 \\
+  a &= &N_\mu \exp(b)\\
+  N_\mu &= & 29 E_0^{0.8} \cos\theta^{0.61} \\
+  b & = & 3.7 \\
+  m &= & bn \\
+  n &= &0.606E_0^{0.0417}
+\end{eqnarray}
+
+The forms  will need some correction if $\cos\theta<0.5$ (i.e, $>60^\circ$).
+(For example, at $\cos\theta \sim 0.5$, $ b=9.5,
+ z_m= ( 66.7\log_{10}(E_0/TeV) + 600) *0.55,
+    n  =0.606E_0^{0.0417} * 0.55$ 
+are better parameters?)
+
+The formulas could be used for $z>150$. However, normally we don't need
+to see shallow depths; if we concentrate only at $z>500$ or so, 
+it would be easier to construct accurate formula  valid upto $\cos\theta < 0.5$.
+
+
+With these formulas, we can fix the average muon number, $<N_\mu>$.
+We have to introduce fluctualtion. We note that the distribution of
+$N_\mu/<N_\mu>$ is well approximated by a
+Gaussian.  Howerver, sampling $N_\mu$ from  this Gaussian distribution
+has no explicit correlation with air shower development.  We, therefore,
+see a correlation between $N_\mu/<N_\mu>$ and $COG$. 
+We define  $<N_mu^n> = < N_\mu/<N_\mu> >$, then, 
+ at $z>400$,
+\begin{equation}
+          <N_\mu^n> = (COG/ A)^B
+\end{equation}
+where  
+As noted above, $N_\mu/<N_\mu> >$
+is distributed like Gaussian with the mean of $<N_\mu^n>$ and
+$\sigma\sim 0.3$.
+  $<N_\mu^n> $ runs from 0.7 to 1.5.
+$A$ and $B$ are weakly dependent on $\cos\theta, E_0 and z$ 
+with typical values of $ A\sim 320, B=0.22\sim  0.35 $. 
+We must parameterize $A, B, \sigma$. 
+
+After these are established, we can proceed as follows:
+\begin{enumerate}
+\item For a given primary type, $E_0, \cos\theta, z$, we can fix $<N_\mu>$
+\item Then,  $<N_\mu^n>$ is obtained from $COG, A, B$.
+\item From $\sigma$ and $<N_\mu^n>$, we can sample $N_\mu/<N_\mu>$.
+\end{enumerate}
+
+
+\subsection{Second step}
+There are almost no muons below 50MeV (kinetic energy). If we can neglect
+energy depencnce of energy deposit in the plastic scintillator,
+we can neglect energy spectrum of muons. 
+
+
+\subsubsection{Lateral speread}
+The lateral speread $R_\mu$.  Its average $<R_\mu>$ and $COG$
+have correlation and it is roughly expressed by
+\begin{equation}
+  <R_\mu> \sim  \exp(-COG/B)
+\end{equation}
+with $B= 700\sim 790$ ( at deeper depths,  large value~
+The distribuion of $x=R_\mu/<R_\mu>$ is approximated by
+\begin{equation}
+ A x^n \exp(-bx^m)
+\end{equation}
+$A$ is determined by the normalization. The rough values of the parameters
+are $n = 0.4\sim 2,    b\sim 3,   m\sim 0.5$, but must be
+investigated dependence of other parameters.
+However, at $x > 0.1$, we get almost universal values. Therefore
+we may investigae the region of $x<01.$ separately (which is
+about  $R_\mu<30$ m and not so important).
+
+\subsubsection{Arrival time, $T_\mu$}
+
+At least we need correlation with $R_\mu$.  If we can neglect the energy
+dependence of energy deposit in the detector, we don't need 
+energy spectrum.
+
+
+Let's denote the geometrical average by $<T>_g$. Then,  
+\begin{equation}
+ <T>_g = A R_\mu^B  
+\end{equation}
+ ($R_\mu$ in m).  A rough estimation is
+$ A\sim  0.01$ and  $B \sim 1.7$. Both should depend on $COG$.
+
+
+It is not easy to find a good function to epress $x=T_\mu/<T_\mu>$.
+One possible way would be to use $y=log_{10}(x)$ and to
+express it by two gaussian functions, $G~_1(y)+G_2(y)$,
+where $G_i(y)=A_i \exp(-( (y-<y>)/\sigma_i)^2/2))$.
+$<y>$ is common to $G_1 and G_2$.
+  $A_i=A_i(R_\mu)$ and $\sigma_i=\sigma_i(R_\mu)$.  The $R_\mu$
+dependece is large.  A rough formulat is
+
+\begin{equation}
+<y> \sim 0.5 x \log_{10}(R_\mu) - 1.4
+\end{equation}
+As   $R_mu= 10 \rightarrow  *1000$, 
+\begin{eqnarray}
+A_1& =& 0.6 \rightarrow  1.4\\
+\sigma_1 & = & 0.9 \rightarrow 0.3 \\
+A_2 & = & 1.4 \rightarrow 1.2  \\
+\sigma_2 & =& 0.9\rightarrow 0.3 \\
+\end{eqnarray}
+
+\end{document}
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+

@@ -1,0 +1,99 @@
+#   Intel Mac  with Intel Fortran Compiler (IFC)
+#  This specifies the site specific information
+#  This file is used when making the Cosmos library  as well as
+#  when using the Epics library.
+#
+#  Before you issue 'make' to make the library,
+#  the following command should be issued to set two environmental 
+#  variables (COSMOSTOP and COSMOSINC).
+#
+#   source Scrpt/sevi
+#
+#
+#  NOTE the two variables are only for at the time of  'make' to 
+#    make the library.
+#    The same environmental variables should  be set to different 
+#    values when using the library, if the library was moved to a 
+#    different place than original one.
+#    If the library was not moved, the same ones are
+#    usable.  You better issue the setenv's in  .cshrc when
+#    you use the library.  The details is given  in man.ps.
+#
+# give next sun4 HP9000 etc to ARCH; 
+#           libcosmos.a is made in $COSMOSTOP/lib/$ARCH/
+
+ARCH          = MacIFC
+
+
+ARCHVOPT       = rv
+
+#ARCHVOPT        = rfv
+AR = /usr/bin/ar         #archiver:  for HP. f option works by native archiver
+
+LDFLAGS       =			# non-HP
+
+LD            = ifort -m64
+DFLAGS        = -D$(ARCH)
+INCHEADER     =  -I$(EPICSINC) -I$(COSMOSINC)
+
+
+FFLAGS       =  $(DFLAGS) $(INCHEADER)
+FC            = $(EPICSTOP)/Scrpt/cppFCMacIFC
+
+################probably you need not change until next '##########' line
+#
+LIBLOC        = $(EPICSTOP)/lib/$(ARCH)
+LIBNAME       = epics
+CLIBNAME       = lib$(LIBNAME).a
+
+LIBRARY	      = $(LIBLOC)/$(CLIBNAME)
+
+INSTALL	      = /etc/install
+
+
+
+##########################################################
+#  Following is used only when 'make install' and when creating 
+#  a complete executable "cosmos"  (DEST is used in the latter case)
+#  After make install, you may need to execute ranlib
+#  chmod, chwon, in some system.
+#############################################make install spec.
+#    where to copy the library.  
+#    if DEST directory not exist, you must make it by hand
+#    before 'make install'
+
+#DEST          = /usr/local/lib/$(ARCH)
+DEST	= $(LIBLOC)
+#DEST          = /tmp/$(ARCH)
+
+
+#   where to copy  header files by 'make install'
+#   if the directory not exist, you must make by hand before 'make install'
+
+HEADER     = /usr/local/include
+#HEADER     = /tmp/include
+
+#    where you copy some template files by 'make install'
+#   if the directroy not exist, you must make by hand before 'make install'
+
+TEMPLATE  = /usr/local/lib/$(LIBNAME)/template
+#TEMPLATE  = /tmp/template
+
+##############################################make install spec end
+#   archiver suffix rule
+#
+.SUFFIXES: .f90
+.f.a:
+	$(FC) -c $(FFLAGS) $<
+	$(AR) $(ARCHVOPT) $@ $*.o
+	rm -f $*.o
+.c.a:
+	$(FC) -c $(FFLAGS) $<
+	$(AR) $(ARCHVOPT) $@ $*.o
+	rm -f $*.o
+.f90.a:
+	$(FC) -c $(FFLAGS) $<
+	$(AR) $(ARCHVOPT) $@ $*.o
+	rm -f $*.o
+.f90.o:
+	$(FC) -c $(FFLAGS) $<

@@ -1,0 +1,50 @@
+module modXsecMedia
+  integer,save:: colElemNo ! collision happened on this element # 
+                      ! in the  medium with mediumNo
+  integer,save:: TargetNucleonNo  ! collision element's A.
+                   !  use this one  if integral value is better.
+                   !  this is not neccesarily  =
+                   !        media(mediumNo)%elem(colElem)%A
+                   ! former colA
+  integer,save:: TargetProtonNo  ! Z of the target. former colZ
+                       !  = media(mediumNo)%elem(colElemNo)%Z
+  real(8),save:: TargetXs       ! Xsection of the target. former
+                                ! colXs  mb
+  
+  
+contains
+
+  subroutine cAllocXsMediaArray(NoOfM)
+!       reserve specified # of media for xsection calculation
+    implicit none
+    integer,intent(in):: NoOfM
+    NoOfMedia = NoOfM
+    allocate( media(NoOfMedia) )
+  end subroutine cAllocXsMediaArray
+
+  subroutine cAllocXsElemArray(n, nelem)
+!     reserve specified # of elements area for the specified
+!     medium 
+    implicit none
+    integer,intent(in)::n ! n-th medium
+    integer,intent(in)::nelem ! # of element composing this mediuam
+    allocate( media(n)%elem(nelem) )
+  end subroutine cAllocXsElemArray
+end module modXsecMedia
+
+!program main
+!  use modXsecMedia
+!  implicit none
+!  call cAllocXsMediaArray( 20 )
+!  call callocXsElemArray(2, 3)
+!  media(2)%elem(1)%A=10
+!  media(2)%elem(2)%A=15
+!  media(2)%elem(1)%Z=5
+!  media(2)%elem(2)%Z=7
+!  write(0,*) media(2)%elem(1:2)%A
+!  write(0,*) media(2)%elem(1:2)%Z
+!end program main
+
+
+
+

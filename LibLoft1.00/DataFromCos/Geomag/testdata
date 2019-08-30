@@ -1,0 +1,146 @@
+Kyoto:
+http://swdcdb.kugi.kyoto-u.ac.jp/igrf/point/
+
+Geographic- Latitude= 40.00 deg. € € € € € € € Longitude=-105.00 deg.
+
+Altitude= 1.60 (km)
+
+Northward Component= 20564.2 nT
+Eastward Component= 3822.4 nT
+Vertical Component= 49934.4 nT
+
+Horizontal Component= 20916.5 nT
+Declination= 10.530 deg.
+Inclination= 67.272 deg.
+
+Total Intensity=54138.2nT
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+ftp://www.ngdc.noaa.gov/Solid_Earth/Mainfld_Mag/DoD_Model/Fortran_Software/
+
+          WMM-2000 TEST VALUES FOR USE IN VALIDATING GEOMAG OPERATION
+	 -----------------------------------------------------------
+
+
+User Input
+ENTER LATITUDE IN DECIMAL DEGREES (+25.0)
+40.
+ENTER LONGITUDE IN DECIMAL DEGREES (-100.0)
+-105.
+ENTER ALTITUDE IN METERS
+1600.
+ENTER TIME IN DECIMAL YEAR
+2000.0
+
+Output:
+LATITUDE:    = 40.00   DEG
+LONGITUDE:   = -105.00 DEG
+ALTITUDE     = 1600.00  METERS
+DATE         = 2000.0
+
+MAIN FIELD COMPONENTS		ANNUAL CHANGE
+TI          = 54114   nT			TI  = -81     nT/yr
+ HI          = 21088   nT			HI  = -14     nT/yr
+ X           = 20739   nT 			X   = -7      nT/yr
+ Y           = 3818    nT			Y   = -39     nT/yr
+ Z           = 49836   nT			Z   = -83     nT/yr
+ DEC         = 10.43   DEG			DEC = -6.05   MIN/yr
+ DIP         = 67.07   DEG			DIP = -1.25   MIN/yr
+
+
+ DO YOU NEED MORE POINT DATA? (y or n)
+-----------------------------------------------------------------------
+------------------
+
+User Input
+
+ENTER LATITUDE IN DECIMAL DEGREES (+25.0)
+45.
+ENTER LONGITUDE IN DECIMAL DEGREES (-100.0)
+105.
+ENTER ALTITUDE IN METERS
+100.
+ENTER TIME IN DECIMAL YEAR
+2001.0
+
+Output:
+LATITUDE:    = 45.00   DEG
+LONGITUDE:   = 105.00  DEG
+ALTITUDE     = 100.00  METERS
+DATE         = 2001.0
+
+MAIN FIELD COMPONENTS		ANNUAL CHANGE
+ TI          = 57936   nT			TI  = 19      nT/yr
+ HI          = 24664   nT			HI  = -24     nT/yr
+ X           = 24641   nT 			X   = -25     nT/yr
+ Y           = -1072   nT			Y   = -5      nT/yr
+ Z           = 52423   nT			Z   = 32      nT/yr
+ DEC         = -2.49   DEG			DEC = -0.84   MIN/yr
+ DIP         = 64.80   DEG			DIP = 2.12    MIN/yr
+
+
+ DO YOU NEED MORE POINT DATA? (y or n)
+-----------------------------------------------------------------------
+------------------
+
+User Input
+ENTER LATITUDE IN DECIMAL DEGREES (+25.0)
+-30.
+ENTER LONGITUDE IN DECIMAL DEGREES (-100.0)
+110.
+ENTER ALTITUDE IN METERS
+250.
+ENTER TIME IN DECIMAL YEAR
+2002.0
+
+Output:
+LATITUDE:    = -30.00  DEG
+LONGITUDE:   = 110.00  DEG
+ALTITUDE     = 250.00  METERS
+DATE         = 2002.0
+
+MAIN FIELD COMPONENTS		ANNUAL CHANGE
+TI          = 57492   nT			 TI  = 7       nT/yr
+ HI          = 23822   nT			HI  = 2       nT/yr
+ X           = 23760   nT			X   = 6       nT/yr
+ Y           = -1728   nT			Y   = 47      nT/yr
+ Z           = -52324  nT			Z   = -7      nT/yr
+ DEC         = -4.16   DEG			DEC = 6.76    MIN/yr
+ DIP         = -65.52  DEG			DIP = -0.03   MIN/yr
+
+
+ DO YOU NEED MORE POINT DATA? (y or n)
+
+-----------------------------------------------------------------------
+------------------
+
+User Input
+
+ENTER LATITUDE IN DECIMAL DEGREES (+25.0)
+-35
+ENTER LONGITUDE IN DECIMAL DEGREES (-100.0)
+-110.
+ENTER ALTITUDE IN METERS
+2000.
+ENTER TIME IN DECIMAL YEAR
+2003.5
+
+Output:
+LATITUDE:    = -35.00  DEG
+LONGITUDE:   = -110.00 DEG
+ALTITUDE     = 2000.00  METERS
+DATE         = 2003.5
+
+MAIN FIELD COMPONENTS		ANNUAL CHANGE
+ TI          = 35851   nT			TI  = -66     nT/yr
+ HI          = 25177   nT			HI  = -44     nT/yr
+ X           = 23737   nT			X   = -43     nT/yr
+ Y           = 8394    nT			Y   = -11     nT/yr
+ Z           = -25522  nT			Z   = 50      nT/yr
+ DEC         = 19.48   DEG			DEC = 0.57    MIN/yr
+ DIP         = -45.39  DEG			DIP = 0.35    MIN/yr
+
+
+ DO YOU NEED MORE POINT DATA? (y or n)
+

@@ -1,0 +1,425 @@
+c  
+c     *******************************************
+c
+      subroutine epCreBrSTblS(mediain, cnst)
+      implicit none
+#include "Zmedia.h"
+#include "Zmass.h"
+#include "ZBPgene.h"
+c     *                                                             
+c     *       create sampling table for Bremstrahlung 
+c     *       at low energies using Seltzer's data
+
+c
+      record /epmedia/mediain  !  media
+      record /SmpCnst/ cnst  ! must be media.cnst
+c
+
+c
+      integer ws
+      parameter (ws = 10000)
+      real*8 work(ws), work2(ws)
+c        cp mediain into common area
+      media = mediain
+      call epwtBrCnstS(cnst)
+
+c            total x-sec.
+      if( cnst.BrTXTS  .gt. mxBrTXS) then
+         write(0,*) 'cnst.BrTXTS=',cnst.BrTXTS,
+     *  "> mxBrTXS=",  mxBrTXS
+         call cerrorMsg(
+     *     'too large total X-sec.table for Seltzer bresm', 0)
+      endif
+      call epCreBrTXTS(cnst, work, work2, cnst.BrTXTS)
+
+c           sampling table in A region
+      if( cnst.BrUszSA * cnst.BrES .gt. mxBrTblSA) then
+         write(0,*)
+     *  "cnst.BrUszSA * cnst.BrES =", cnst.BrUszSA,"*",
+     *  cnst.BrES, "=", cnst.BrUszSA*cnst.BrES,
+     *  ">  mxBrTblSA=", mxBrTblSA
+         call cerrorMsg('brem table for SA is too large', 0)
+      endif
+      call  epCreBrSA(cnst, work, cnst.BrUszSA, cnst.BrES)
+
+c           sampling table in B region
+      if( cnst.BrUszSB * cnst.BrES  .gt. mxBrTblSB) then
+         write(0,*)
+     *    "cnst.BrUszSB * cnst.BrES=",
+     *     cnst.BrUszSB, "*",  cnst.BrES, " =",
+     *    cnst.BrUszSB * cnst.BrES, "> mxBrTblSB=",  mxBrTblSB
+         call cerrorMsg('brem table for SB is too large', 0)
+      endif
+      call  epCreBrSB(cnst, work, cnst.BrUszSB, cnst.BrES)
+      end
+
+c     ****************************************
+      subroutine epCreBrTXTS(cnst,  erg, tbl, size)
+c     ****************************************
+      implicit none
+#include "Zmedia.h"
+#include "Zmass.h"
+#include "ZBPgene.h"
+
+      record /SmpCnst/ cnst  ! must be media.cnst
+      integer size
+      real*8  tbl(size), erg(size)
+
+      real*8  Ek, Ee,  vmax, vmin,  tcb, de
+      character*160 msg
+      integer i
+
+c   /////////////////////////
+c    continuation at 100 MeV Seltzer and partial screening
+c    formula. generally heavy materials are good
+c    low Z material has glictch of 10 -20  %
+c    At present no normalization is tried.
+c    To get the value below, uncomment the
+c    part of the  program below.
+c==================== at 1GeV
+cPb
+c Brem XS at E=  0.999990000000000        614937.362267548     
+c Brem XS at E=   1.00001000000000        624285.473828595    
+c
+cAl
+c  Brem XS at E=  0.999990000000000        21685.4116313612     
+c  Brem XS at E=   1.00001000000000        21679.3370821324   
+cBGO
+c  Brem XS at E=  0.999990000000000        157300.388762514     
+c  Brem XS at E=   1.00001000000000        159377.105885142    
+c
+cSi
+c  Brem XS at E=  0.999990000000000        24865.9911773002     
+c  Brem XS at E=   1.00001000000000        24834.9687550972    
+cAir
+c  Brem XS at E=  0.999990000000000        7770.07544354533     
+c  Brem XS at E=   1.00001000000000        7665.26824930834
+c
+c plastic Scinti
+c  Brem XS at E=  0.999990000000000        2924.89850986149     
+c  Brem XS at E=   1.00001000000000        2860.61100050295 
+c
+c Fe
+c  Brem XS at E=  0.999990000000000        78256.5221115459     
+c  Brem XS at E=   1.00001000000000        78104.3555432043 
+c W
+c  Brem XS at E=  0.999990000000000        509197.902670278     
+c  Brem XS at E=   1.00001000000000        515653.327859797 
+c Cu
+c  Brem XS at E=  0.999990000000000        95253.1157581748     
+c  Brem XS at E=   1.00001000000000        95604.5329845806
+C H2 gas
+c  Brem XS at E=  0.999990000000000        335.977047803700     
+c  Brem XS at E=   1.00001000000000        306.555938740378
+c
+c ===================== at 100 MeV
+c BGO
+c Brem XS at E=  9.999900000000000E-002  114622.885437669
+c Brem XS at E=  .100001000000000  115022.240288808
+c
+cPb
+c Brem XS at E=  9.999900000000000E-002  452171.630320046
+c Brem XS at E=  .100001000000000  455365.448006682
+c
+cH2 (gas)
+c Brem XS at E=  9.999900000000000E-002  268.026568486841
+c Brem XS at E=  .100001000000000  217.605740594913
+c
+cSi
+c Brem XS at E=  9.999900000000000E-002  18296.4484918632
+c Brem XS at E=  .100001000000000  17838.2578766329
+c
+cFe
+c Brem XS at E=  9.999900000000000E-002  57120.4530869126
+c Brem XS at E=  .100001000000000  56147.6825177278
+c
+cW
+c Brem XS at E=  9.999900000000000E-002  378705.118797284
+c Brem XS at E=  .100001000000000  380306.005877633
+c
+cAl
+c Brem XS at E=  9.999900000000000E-002  15981.7824199197
+c Brem XS at E=  .100001000000000  15567.2559021630
+c
+cpla Scinti
+c Brem XS at E=  9.999900000000000E-002  2197.66802947518
+c Brem XS at E=  .100001000000000  2043.99285184687
+c
+cCu
+c Brem XS at E=  9.999900000000000E-002  69520.4358663770
+c Brem XS at E=  .100001000000000  68777.3779982839
+c  ===========================
+c     continuation at 10 MeV case
+c BGO
+c  Brem XS at E=   9.99990000000000D-003   67272.8642710921     
+c  Brem XS at E=   1.00001000000000D-002   65514.8334236348   
+c H2(gas)
+c  Brem XS at E=   9.99990000000000D-003   124.067255033441     
+c  Brem XS at E=   1.00001000000000D-002   115.381548133051  
+c Si
+c  Brem XS at E=   9.99990000000000D-003   10152.6381914789     
+c  Brem XS at E=   1.00001000000000D-002   10003.6693393773   
+c Al  
+c  Brem XS at E=   9.99990000000000D-003   8834.05295739954     
+c  Brem XS at E=   1.00001000000000D-002   8717.92352096671   
+c Cu
+c  Brem XS at E=   9.99990000000000D-003   39683.8031823851     
+c  Brem XS at E=   1.00001000000000D-002   39003.4735041571    
+c plasticSCIN
+c  Brem XS at E=   9.99990000000000D-003   1151.25081712306     
+c  Brem XS at E=   1.00001000000000D-002   1121.94237263980 
+c W 
+c  Brem XS at E=   9.99990000000000D-003   222687.620819852     
+c  Brem XS at E=   1.00001000000000D-002   217007.840876563   
+c Pb  
+c  Brem XS at E=   9.99990000000000D-003   267092.652128783   
+c  Brem XS at E=   1.00001000000000D-002   259782.820635386   
+c
+      integer,save:: jjjj=1 ! make jjjj non zero if the values like above
+                     ! is not needed.
+      if(jjjj == 0) then
+         Ee = media.cnst.BrEemaxS * 0.99999d0
+         Eeme = Ee/masele
+         vmax = 1.d0 - masele/Ee
+c           Eg/Ee min
+         vmin = media.cnst.BrEgminS
+         call epBrgeneTX(vmin,  vmax,  tcb)
+         write(msg,*)
+     *     ' Brems XS (By Seltzer & Berger) at Ee=',Ee, tcb
+         call cerrorMsg(msg, 1)
+         Ee = media.cnst.BrEemaxS * 1.00001d0
+         Eeme = Ee/masele
+c         vmin= Eg/Ee min
+         vmin= media.cnst.BrEgminS
+         vmax = 1.d0 - masele/Ee
+         call epBrgeneTX(vmin,  vmax,  tcb)
+         write(msg,*) ' Brems XS (By formula) at Ee=',Ee, tcb
+         call cerrorMsg(msg, 1)
+         jjjj = 1
+      endif
+cc
+c
+c
+
+      write(msg,*) ' Matter=', media.name,
+     *  ': Computing the total Xsec of Seltzer Brems from Ee= ',
+     *    cnst.BrEeminS, ' GeV'
+      call cerrorMsg(msg, 1)
+      Ek = cnst.BrEeminS - masele  !  Ek
+
+      de = 10.d0**cnst.BrdETXS
+      do   i=1, size
+         Ee = Ek + masele
+         call epChkEndValSel(Ee, i, size)
+         Eeme = Ee/masele
+c         vmax=1.d0
+         vmax = 1.d0 - masele/Ee   !  Eg/Ee= (Ee-masele)/Ee = 1-masele/Ee
+         vmin= media.cnst.BrEgminS  ! Eg/Ee=1.e-4 
+         if(vmin .ge.  vmax) then
+            call cerrorMsg('Eg/E <= vmin', 0)
+         endif
+c         call eptotcbS(vmin,  vmax,  tcb)
+         call epBrgeneTX(vmin,  vmax,  tcb)
+         tbl(i) = tcb* media.mbtoPX0  ! prob. per radiation length.
+         erg(i) = Ek
+         Ek = Ek * de
+      enddo
+      write(msg, *) 'Table has been made up to  Ek=', Ek/de,' GeV'
+      call cerrorMsg(msg, 1)
+      write(msg, *) 'Seltzer Brems total X-sec. table upto Ek=',
+     *     Ek/de,' GeV'
+      call epwt1dTbl(msg, erg,  tbl, size, media.name)
+
+      end
+c     **********************************************
+      subroutine epCreBrSA(cnst, bla, sizeu,  sizee)
+      implicit none
+#include "Zmedia.h"
+#include "Zmass.h"
+#include "ZBPgene.h"
+
+      record /SmpCnst/ cnst  ! must be media.cnst
+      integer sizeu, sizee 
+      real*8  bla(sizeu,  sizee)
+
+      real*8 de1, Ek, Ee, vmin, vl, vr, u, tcb, vx, tcbx,
+     *  eps, v
+
+      external epBrgeneSolv
+      real*8  epBrgeneSolv
+
+      real*8  epBrSfs
+
+      character*160 msg
+      integer i, iu, j
+
+
+      common/upsic/upsi, vmax
+      real*8 vmax, upsi
+
+      data eps/1.d-5/
+
+
+      de1 = 10.d0**cnst.BrdES
+
+      Ee = cnst.BrEeminS    
+      Ek = Ee - masele
+      write(msg, *) ' Creating Seltzer Brem sampling table: Ek>=',
+     *    Ek
+      call cerrorMsg(msg, 1)
+      call cerrorMsg('for small Eg region',1)
+
+      do  i = 1, sizee
+         Ee = Ek + masele
+c           chech env value
+         call epChkEndValSel(Ee, i, sizee)
+
+         Eeme = Ee/masele
+c         vmax=1.d0
+         vmin= media.cnst.BrEgminS
+         vmax=1.d0 - masele/Ee
+         
+c         call eptotcbS(vmin, vmax, tcb)
+         call epBrgeneTX(vmin, vmax, tcb)
+         vl=vmin
+         vr=vmax
+         
+         u=cnst.BrUminSA
+         
+         do  iu=1, sizeu -1
+            
+            upsi=u*tcb
+c//////////////////
+c        write(0,*) ' vl vr=',vl, vr, ' iu=', iu, ' tcb=',tcb
+c//////
+c             v here obtained is Eg/Ee
+            call kbchop(epBrgeneSolv, vl, vr, eps, v, j)
+            
+            if(j.le.0) then
+               
+               write(0, *) ' cond, Ek, u=', j, Ek, u
+               do vx = vmin, vmax, (vmax-vmin)/100.d0
+c                  call eptotcbS(vx, vmax, tcbx)
+                  call epBrgeneTX(vx, vmax, tcbx)
+                  write(0, *) vx, tcbx
+               enddo
+               write(0,*) 'u upsi, vl, vr', u,
+     *              upsi, vl, vr,
+     *              ' vmin=', vmin, ' tcb=', tcb
+            endif
+            bla(iu,i)= log(v/vmin)/(1.-u)
+            u=u + cnst.BrdUSA
+            vr = v
+         enddo
+         bla(sizeu, i)=tcb/vmin/epBrSfs(vmin)
+         Ek =Ek* de1
+      enddo
+
+      call epwt2dTbl(
+     *  'Selzter Brems sampling table; log(v/vmin)/(1-u)',
+     *   bla, sizeu, sizee)
+      call cerrorMsg('the table has been created', 1)
+      end
+
+c     ***********************************************
+      subroutine epCreBrSB(cnst, blb, sizeu,  sizee)
+      implicit none
+#include "Zmedia.h"
+#include "Zmass.h"
+#include "ZBPgene.h"
+
+      record /SmpCnst/ cnst  ! must be media.cnst
+      integer sizeu, sizee 
+      real*8  blb(sizeu, sizee)
+
+      real*8 de1, Ek, Ee, vmin, vl, vr, u, tcb, 
+     *   eps, us, v
+
+      external epBrgeneSolv
+      real*8  epBrgeneSolv
+      real*8  epBrSfs
+
+      integer  iu, j, ie
+
+
+      common/upsic/upsi, vmax
+      real*8 vmax, upsi
+
+c      data eps/1.d-5/
+
+
+      call cerrorMsg(
+     * 'Creating brems sampling table by Seltzer data for',1)
+      call cerrorMsg(' large Eg ',1)
+
+
+      Ee = cnst.BrEeminS 
+      Ek = Ee - masele
+      de1 = 10.d0**cnst.BrdES
+      do ie = 1, sizee
+         Ee = Ek + masele
+
+         call epChkEndValSel(Ee, ie, sizee)
+
+         Eeme = Ee/masele
+c          vmax=1.d0
+         vmin=cnst.BrEgminS
+         vmax=1.d0- masele/Ee
+c          call eptotcbS(vmin, vmax, tcb)
+         call epBrgeneTX(vmin, vmax, tcb)
+         vl=vmin
+         vr=vmax
+         us=cnst.BrUminSB + cnst.BrdUSB
+         do   iu = 2,  sizeu
+            u=us**4
+            upsi=u*tcb
+            if(iu .le .6) then
+               eps = 1.d-7
+            else
+               eps = 1.d-5
+            endif
+            
+            call kbchop(epBrgeneSolv, vl, vr, eps, v, j)
+            if(j .le. 0) then
+               write(0,'('' Ek,u='',2g12.3)') Ek, u
+            endif
+            blb(iu,ie) = log(vmax/v)/u
+c/////
+c             write(*,*)
+c     *       "+++", sngl(E), sngl(us),sngl(u), sngl(v)
+c//////////////////
+            us=us + cnst.BrdUSB
+            vr = v
+         enddo
+         blb(1, ie) = tcb/vmax/epBrSfs(vmax)
+         Ek= Ek*de1
+       enddo
+       
+       call epwt2dTbl('Seltzer Brems sampling tbl in B; log(v/vmin)',
+     *  blb, sizeu, sizee)
+       call cerrorMsg('the table has been created', 1)
+       end
+
+      subroutine  epChkEndValSel(Ee, i, size)
+      implicit none
+#include "Zmedia.h"
+#include "Zmass.h"
+#include "ZBPgene.h"
+
+      real*8 Ee  ! in/out
+      integer i, size
+
+c            table end value should not exceed the region end value
+      if(i .eq. size) then 
+         if(Ee .ge. media.cnst.BrEemaxS) then
+            if(Ee .gt. media.cnst.BrEemaxS*1.0001d0) then
+               write(0,*) '*********** too large end value *** '
+               write(0,*) 'Ee=',Ee, 
+     *           '  > media.cnst.BrEemaxS*1.001d0=',
+     *           media.cnst.BrEemaxS*1.0001d0
+               stop
+            endif
+            Ee = media.cnst.BrEemaxS*0.999999999d0
+         endif
+      endif
+      end

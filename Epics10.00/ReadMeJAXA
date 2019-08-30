@@ -1,0 +1,80 @@
+prog/epModify.f90
+#if defined Solaris 
+==>
+#if defined (Solaris) || (jaxa)	 || (jaxaflat)
+
+
+Cosmos/cosmos/Zcondc.h
+jaxa, jaxaflat added for
+    MATHLOUSY 
+
+prog/epRange.f
+	parameter:: log10(..)
+MATHLOUSY is applied.
+	
+prog/Light/epLightStack.f
+	(jaxa) || (jaxaflat)
+    is used for private
+
+    sizeof cannot be used so
+	use loc funciton
+
+prog/Elemag/epdedxNone.f
+
+#if defined (Solaris) || (jaxa) || (jaxaflat)
+	use epModify,idmodiy=>id
+
+prog/KKLib
+kcubicEq.f90
+   complex(kind(0d0)),parameter::w(3) = (/(1.d0,0.d0), (-1.0d0,sq3\
+)/2.d0, (-1.0d0, -sq3)/2.d0 /)
+
+  -sq3 is not acceped.  (bug for complex case ?).
+  -(1.d0, sq3)/2.d0  is ok
+
+eprcnf.f
+   config file now can contain  
+   #debug on  
+   #debug off
+(later this is changed to debug--->print)
+Then, the  lines between these two lines (inclusive),
+are printed on stderr.
+The command must be lower character.
+
+#debug  xx  when xx is not 'on' or 'off', or ""(blank), the line
+	is regarged as comment.
+        any character after 'on' or 'off' are neglected.
+Besides #debug on/off, MsgLevel (in epicsfile) may be used.
+If it is set to 2, all input lines are printed. 
+accordingly  eprcnf is updated.
+
+AT JAXA
+With -g option, Epics can run. 
+
+But, with -O5, error (0 div) is detected in
+
+prog/Elemag/epSetPhotoE.f
+            epphotoE.f
+   intent(in), intent(out) is added for record
+but this does not solve.
+The error is due to that pe.cr becomes 0 in epphootE.
+Although it happend in epphotoE, pe.cr is set in
+epSetPhotoE so cppFCJaxa is updated to use
+-g for compilation of epSetPhotoE.f
+
+After this, 0 div disappeared.
+
+When 100 GeV/n Fe is put, with "dpmjet3"
+invalid floating operation happened in
+jaminbm_ which is in jam.
+(it seems rare; at 10 event generation; 26 min).
+By 10 GeV/n Fe, with "jam", no happining within 15 events
+    6  //                                       20
+
+ 
+
+when making load module
+-v must be dropped.
+
+
+

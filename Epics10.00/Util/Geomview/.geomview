@@ -1,0 +1,8 @@
+(progn
+	(bbox-draw world no)
+	(normalization world none)
+	(emodule-define "drawconfig" "./dispconfigbygeomv ../Work ../Work/config")
+)
+
+
+

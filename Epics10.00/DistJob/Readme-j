@@ -1,0 +1,208 @@
+Epicsを多数のワークステーションで分散実行させ、結果を回収するスクリプトの用法。
+
+必須の環境:  
+  1) パスワードの入力なしでrshがワークステーション間で使えること。
+
+  2) また、現在のスクリプトでは分散処理するワークステーションのいづれからも
+     同じホームが見えること。ワークステーションはおなじアーキテクチャである
+     こと．(NEXTSTEPのように見かけ上1つのバイナリがIntel, SUN, HP, Motorola
+     の異なるアーキテクチャで走るものならそれでも良い)．
+     データを回収するホストは1)の条件を満たしているだけで良い。
+
+  3) gwakが見えていること。 (スクリプトの動きがおかしかったらこれを疑う).
+  
+  4) "distjob" スクリプトは/usr/local/bin/tcshを仮定する．パスが異なるなら
+     DistJob/bin/distjobの1行目を変更する．cshは
+           set xx=$x:s/,//
+     のような処理を失敗する．
+
+準備
+  1) .rhostsを準備する。(使用する全てのW.Sのホスト名を列挙する)
+     各ホストにパスワードなしでrshでloginできることを確認する．
+  2) echoErr.cをコンパイルして、echoErrという実行ファイルを
+     DistJob/bin/中に作っておく。
+	cc -o echoErr echoErr.c
+  3) DistJob/Template/HostListを編集して使える可能性のある全
+     hostの名前を入れる。(現在修理中、などのhostで近未来に使え
+    そうなものも入れておく).
+--------以上は一度行えばあとは必要ないものである-------------
+  4) Templateをコピーして新たなディレクトリを作成する．
+      (仕事の内容を表す名前．仮にそれをMyJobとする．)
+  5) Epicsの実行モジュールと実行に必要なパラメータファイル
+     などを用意する。
+     file/directoryのパス名は絶対パス名にする必要がある．
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
+    (Digital UNIX Fortran, Absoft Fortran). ただしシステムに
+    よっては(Solaris, HP) ../Data/のように相対パス名を使える．
+
+     そうしたファイルは
+     epicsfile, detconfig and sepicsfile in FisrtInput.
+     MediaDir in epicsfile
+     TraceDir in epicsfile
+     Primaryfile in sepicsfile.
+     Other files you may give in your hook routine.
+
+  6) DistJobに入りsource addpathを実行して，DistJob/binが
+     コマンドサーチパスに入るようにする．これは毎回必要．
+     もちろん.chsrcに記述しても良い．
+  7) MyJobに移る．getalive > alive
+     (aliveは適当なファイル名。)
+     HostListを参照して、現在生きているhostのリストを作る。
+     ファイル名HostListは固定．
+  8) MyJob中のconfigを編集する．(configはdetectorの
+	コンフィギュレーションではなく、分散処理のコンフィギュレーション
+	を表すもの。混同しないこと。明示するため、execConfig, detConfig
+	のように区別することがある。)    頭のfieldで中身を判定するので
+	#を頭に一つ入れれば、あとは何を書いても無視される。
+	ファイルのパスはrshを使う性質上絶対パスが必要である。ただし、
+	ホームは ~ で表して良い。
+        alive:  6)で作ったファイルを指定。これは絶対パスではなく、単に
+	   ファイル名のみを書く。場所は従って、現ホルダ中にないといけない。
+	paramOut: 実行ジョブが使うパラメータの類いのファイルすべてはコピー
+		して保存される。コピーは$paramOut/$host/の下に作られる。
+		$hostはジョブが走るhost名である。コピーされるファイルは
+		次のような名前に固定される:
+		 input;  epics実行時に最初に与えるパラメータ。
+			各パラメータがどこにあるかを示すファイル。	
+		 epics; "input"に指定されている最初のファイル。 
+			 epics用のパラメータ。
+                 detConfig:"input"に指定されている2番目のファイル。
+			検出器の構成。
+	         execConfig: configファイル。
+    	         primary: primary のファイル。
+		 sepics:  sepics用のファイル。(event数などが書いてある).
+                 error: stderrの出力
+	datadir and datafile:   この2つがメイン出力データの場所を決める。
+		ホームか各hostの/tmpの中を指定する。directoryがなければ
+		自動的に作成する。データは $datadir/host/$datafile
+		という名前で保存される。
+	pipe1:  出力結果を書くときに圧縮などをするかどうかを
+		パイプとして指定す. たとえば、 | gzip  
+                | awk 'NF !=10 {print}' | gzip
+                のように多段でもよい．
+	append: すでに出力データファイルがあり、それに結果を継ぎ足し
+		たいなら、append  yes
+	------------------以下はデータ収集の際の指定---------
+	collector:  データを収集するhost名を与える。一般に
+		これはデータを作成したhost郡とは別のドメインに
+		あると思われるので必要十分なドメインをつける。
+		また、user名がcollect命令を発行するhostでのものと
+		異なる可能性もある。その際は、 -l darebei
+		のようにuser名を明示する。
+	meida:  データ収集するのがtapeかdiskかを指定する。
+		tapeなら /dev/nrst25などのtapeのデバイス番号。
+		diskなら./foo/datadirとか/Work/datadirとか 
+  		の絶対パス。~は使えない。./はホームを表す。
+		diskの場合はdirectoryであること。
+	obs:    tapeの場合の出力block size(バイト)
+	minsize;これ以下のバイト数の主データは、付随するパラメータ
+		とともに収集しない。ジョブがこけたときの対応用。
+	consecutive: mediaがdiskの時。yesならすべてのデータを
+		一つにまとめてセーブする。ファイル名は
+		$media/$datafileとなる。
+	epics:  0か1を与える。1なら収集する。disk: $media/epics
+	detconfig: 0 or 1. 1なら収集。disk: $media/detConfig
+	primary	:  0 or 1. 1なら収集。disk: $media/primary
+	execconfig:0 or 1. 1なら収集。disk: $media/exeConfig
+	sepcis:   0, 1 or 2. 1,2なら収集。
+		1の時 disk: $media/sepics
+		2の時 disk: $media/$host/sepics
+		(speicsはhostによって初期乱数が異なる).
+
+	        main dataは
+			consecutive yes==> $media/$datafile
+	                           no ===>$media/$host/$datafile
+	tape出力の時は
+		execConfig | epics | detConfig | primary |
+		sepics | main data | (sepics) | main data |
+		(sepics) | main data ...
+
+		のようになる。ただし、execconfigなどが0なら
+		対応する出力はない。また、sepicsが2の時は
+		(sepics)のデータも出力される。 | はファイル
+		マークを示す。
+
+	pipe2:  出力をパイプで圧縮するかどうか。そのパイプ処理を
+		示す。たとえば、 | gzip
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+スクリプトの使い方。
+MyJob中で
+
+  distjob config
+  ^^^^^^^^^^^^^^
+とする。configは上記で作ったconfigファイル．
+(以下同じ).  これで指定した全ホストでEpicsが走り出す。
+
+aliveファイル中の特定のホストのみを対象にしたいときは
+
+distjob config host1 hist2
+
+のようにホスト名を列挙する。
+
+
+ジョブを殺すには
+
+  killjob config  [host ...]
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+"host"を与えると,そのホストのみが対象になる。hostが"alive"中に
+なければ，(domain中に実際にhostがあっても)単に無視される
+以下すべてのコマンドでオプションとして[host host]があるものは、
+同様である。
+
+
+disk file( 各hostの $datadir/$host/$datafileの
+		$datafile)を消すのは
+
+
+  rmfile  config  [host ...]
+  ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+$datadirからのパスを消してしまうのは、
+
+  rmpath config [host  ...]
+  ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+現在走っているジョブをみるのは
+
+  seerunjob config  [host ...]
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+現在どれだけのファイルサイズになっているかをみるのは
+
+  seesize  config  [host ..]
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+上記2者を同時に行うのは，
+
+  how   config  [host..]
+  ^^^^^^^^^^^^^^^^^^^^^^
+
+stderrの出力を見るのは(Jobの正常異常終了などはこれで分かる)．
+
+  stderrの先頭は
+  logh  config  [host..]
+  ^^^^^^^^^^^^^^^^^^^^^
+
+  しっぽは
+  logt  config  [host..]
+  ^^^^^^^^^^^^^^^^^^^^^^
+
+全てのデータがそろったらそれを回収するのは
+
+  collect  config  [host  ...]
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+データファイルの先頭を見る。-nはheadコマンドに対するオプションン。
+
+  seehead  config  [-n] [host  ...]
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+データファイルの最後を見る。-nはtailコマンドに対するオプションン。
+
+  seetail  config  [-n] [host host ...]
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+以上。これ以外のコマンド(kesu, seeifdead, myps, myping, echoErr)
+は内部的に使われている。
+

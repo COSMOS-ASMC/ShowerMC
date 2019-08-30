@@ -1,0 +1,17 @@
+cgetBsin:  get |p x B | / p  = B x sin.   This may be used when computing
+          upsilon value of a given electron.
+cgUpsilon: g(upislon) for  total energy loss function of synchrotron
+           g function in Eq. 2.18.
+
+csyncTELoss: The total energy loss rate (GeV/m) of synchrotron radiation,
+	   as a function of Upsilon.
+
+ctXai:    Polynomial fit to Eq.3.3d of Erber. Used in pair creation.
+cupsilon: get upsilon value for a given electron as a function of 
+          electron and magnetic field.
+cegCrit: get critical energy (peak energy) of photons for syncrotron
+         radiation as a function of electron energy and upsilon.
+cy2zeta: Eq.2.8  get zeta as a function of y and upsilon.
+cx2zeta: approximate formula for zeta as a function of x and upsilon.
+         valid when x= Eg/Ee << 1.
+cxai:    get Xai = Eg/m * H/Hcr for pair creation.

@@ -1,0 +1,807 @@
+include  $(COSMOSTOP)/site.config
+
+
+EXTHDRS	      = $(COSMOSINC)/Zatmos.h \
+		$(COSMOSINC)/Zcmuint.h \
+		$(COSMOSINC)/Zcode.h \
+		$(COSMOSINC)/Zcondc.h \
+		$(COSMOSINC)/Zcoord.h \
+		$(COSMOSINC)/Zcoordtype.h \
+		$(COSMOSINC)/Zdirec.h \
+		$(COSMOSINC)/Zearth.h \
+		$(COSMOSINC)/Zelemagp.h \
+		$(COSMOSINC)/Zevhnp.h \
+		$(COSMOSINC)/Zevhnv.h \
+		$(COSMOSINC)/Zglobalc.h \
+		$(COSMOSINC)/Zheavyc.h \
+		$(COSMOSINC)/Zheavyp.h \
+		$(COSMOSINC)/Zincidentp.h \
+		$(COSMOSINC)/Zincidentv.h \
+		$(COSMOSINC)/Zlife.h \
+		$(COSMOSINC)/Zmagfield.h \
+		$(COSMOSINC)/Zmanagerp.h \
+		$(COSMOSINC)/Zmass.h \
+		$(COSMOSINC)/Zmaxdef.h \
+		$(COSMOSINC)/Zobs.h \
+		$(COSMOSINC)/Zobsp.h \
+		$(COSMOSINC)/Zobsv.h \
+		$(COSMOSINC)/Zpos.h \
+		$(COSMOSINC)/Zprimary.h \
+		$(COSMOSINC)/Zprimaryv.h \
+		$(COSMOSINC)/Zptcl.h \
+		$(COSMOSINC)/ZrigCut.h \
+		$(COSMOSINC)/ZsaveStruc.h \
+		$(COSMOSINC)/Zstackv.h \
+		$(COSMOSINC)/Zstdatmos.h \
+		$(COSMOSINC)/ZsubstRec.h \
+		$(COSMOSINC)/Ztrack.h \
+		$(COSMOSINC)/Ztrackp.h \
+		$(COSMOSINC)/Ztrackv.h \
+		$(COSMOSINC)/Zunionmap.h
+
+HDRS	      =
+
+
+MAKEFILE      = Makefile
+
+OBJS	      = c3DV2DDCos.o \
+		c4to3mom.o \
+		cdefByMagAndE.o \
+		ccompPathEnd.o \
+		cdecayLeng.o \
+		ce2p.o \
+		ceCent2sph.o \
+		cfinTracking.o \
+		cfixModel.o \
+		cgetBeta.o \
+		cgetMFP.o \
+		cgetRotMat3.o \
+		cgetZenith.o \
+		cgetctau.o \
+		cifDead.o \
+		cifXObsSite.o \
+		ciniSmpIntL.o \
+		ciniTracking.o \
+		cinitObs.o \
+		cinteElec.o \
+		cinteNEP.o \
+		cinteNuc.o \
+		cintePhoton.o \
+		cinteraction.o \
+		cmaxMovLen.o \
+		cmkIncident.o \
+		cmulScat.o \
+		cobservation.o \
+		cprObsSite.o \
+		cprintCoord.o \
+		cprintObs.o \
+		cputCerenkov.o \
+		cputTrInfo.o \
+		cresetDirec.o \
+		cresetMom.o \
+		csPrimAng.o \
+		csampEIntL.o \
+		csampGIntL.o \
+		csampNEPIntL.o \
+		cGetXsec.o \
+		cscalerProd.o \
+		csetCoord.o \
+		csetIntInf.o \
+		csetPos.o \
+		csph2eCent.o \
+		cstack.o \
+		ctracking.o \
+		ctransCoord2.o \
+		ctransVectZ.o \
+		ctransVectZx.o \
+		cvec2dcos.o \
+		cvecProd.o \
+		cxyz2det.o \
+		cxyz2prim.o \
+		cdet2xyzFE.o \
+		cxsSpecial.o
+PRINT	      = pr
+
+SHELL	      = /bin/sh
+
+SRCS	      = c3DV2DDCos.f \
+		c4to3mom.f \
+		cdefByMagAndE.f \
+		ccompPathEnd.f \
+		cdecayLeng.f \
+		ce2p.f \
+		ceCent2sph.f \
+		cfinTracking.f \
+		cfixModel.f \
+		cgetBeta.f \
+		cgetMFP.f \
+		cgetRotMat3.f \
+		cgetZenith.f \
+		cgetctau.f \
+		cifDead.f \
+		cifXObsSite.f \
+		ciniSmpIntL.f \
+		ciniTracking.f \
+		cinitObs.f \
+		cinteElec.f \
+		cinteNEP.f \
+		cinteNuc.f \
+		cintePhoton.f \
+		cinteraction.f \
+		cmaxMovLen.f \
+		cmkIncident.f \
+		cmulScat.f \
+		cobservation.f \
+		cprObsSite.f \
+		cprintCoord.f \
+		cprintObs.f \
+		cputCerenkov.f \
+		cputTrInfo.f \
+		cresetDirec.f \
+		cresetMom.f \
+		csPrimAng.f \
+		csampEIntL.f \
+		csampGIntL.f \
+		csampNEPIntL.f \
+		cGetXsec.f \
+		cscalerProd.f \
+		csetCoord.f \
+		csetIntInf.f \
+		csetPos.f \
+		csph2eCent.f \
+		cstack.f \
+		ctracking.f \
+		ctransCoord2.f \
+		ctransVectZ.f \
+		ctransVectZx.f \
+		cvec2dcos.f \
+		cvecProd.f \
+		cxyz2det.f \
+		cxyz2prim.f \
+		cdet2xyzFE.f \
+		cxsSpecial.f 
+SYSHDRS	      =
+
+all:
+	make	Checkdir $(LIBRARY) SeeSubDir "TARGET=$@"
+
+clean:
+	@rm -f $(OBJS) core  *~ a.out temp*.o 
+	make SeeSubDir "TARGET=$@"
+
+veryclean:
+	@rm -f $(OBJS) core  *~ a.out temp*.o temp*.f*
+	make SeeSubDir "TARGET=$@"
+
+
+clobber:
+	@rm -f $(OBJS) $(LIBRARY) core tags
+	make SeeSubDir "TARGET=$@"
+
+depend:
+	@mkmf -f $(MAKEFILE) ROOT=$(ROOT)
+	make SeeSubDir "TARGET=$@"
+
+echo:
+	@echo $(HDRS) $(SRCS)
+	make SeeSubDir "TARGET=$@"
+
+extract:
+	@ar x $(LIBRARY)
+
+
+index:
+	@ctags -wx $(HDRS) $(SRCS)
+	make SeeSubDir "TARGET=$@"
+
+install:	$(LIBRARY)
+		@echo "****" Installing $(LIBRARY) into $(DEST)
+		$(INSTALL) -f  $(DEST) $(LIBRARY)
+		@echo "****" Installing Template files into $(TEMPLATE)
+		cp -r  $(COSMOSTOP)/Data  $(COSMOSTOP)/Util *
+		 $(COSMOSTOP)/UserHook  $(COSMOSTOP)/Scrpt *
+		 $(COSMOSTOP)/Doc        $(TEMPLATE)/
+		cp $(COSMOSTOP)/site.config $(TEMPLATE)/
+		@echo "****" Installing header files into $(HEADER)
+		cp -r $(COSMOSTOP)/cosmos  $(HEADER)/
+		@echo "****" Installation ended.
+		@echo "****" Owner and group should be changed by hand
+
+print:
+	@$(PRINT) $(HDRS) $(SRCS)
+	make SeeSubDir "TARGET=$@"
+
+tags:           $(HDRS) $(SRCS)
+	@ctags $(HDRS) $(SRCS)
+	make SeeSubDir "TARGET=$@"
+
+
+Checkdir:
+	@( cd $(COSMOSTOP)/lib; if [ ! -d  $(ARCH) ]; then  mkdir $(ARCH); fi)
+
+
+
+SeeSubDir:
+	@for i in  * \
+	;do   \
+		if [ -d  $$i ] ; then \
+			(cd $$i; \
+			if [ -f Makefile  -a  $$i != Test \
+			-a $$i != Util -a $$i != UC  \
+	                -a $$i != Ana  -a $$i != Ceren \
+	                -a $$i != Data  -a $$i != cosmos \
+	                -a $$i != Misc  -a $$i != MuUg \
+	                -a $$i != Obso  -a $$i != TeX \
+	                -a $$i != lib  -a $$i != UserHook \
+	                -a $$i != Doc  -a $$i != Betterone \
+	                -a $$i != Scrpt -a $$i != NotForExport ] ; then \
+		            $(MAKE) $(TARGET) \
+			;fi) \
+		; fi \
+	done
+###
+$(LIBRARY)(c3DV2DDCos.o): $(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zunionmap.h
+$(LIBRARY)(c4to3mom.o): $(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h
+$(LIBRARY)(cdefByMagAndE.o): $(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Ztrackv.h \
+	$(COSMOSINC)/Zmaxdef.h 
+
+
+$(LIBRARY)(ccompPathEnd.o): $(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Ztrackv.h \
+	$(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Ztrackp.h \
+	$(COSMOSINC)/Zearth.h \
+	$(COSMOSINC)/Zcode.h \
+	$(COSMOSINC)/Zelemagp.h \
+	$(COSMOSINC)/ZsubstRec.h \
+	$(COSMOSINC)/Zobs.h \
+	$(COSMOSINC)/Zobsp.h
+$(LIBRARY)(cdecayLeng.o): $(COSMOSINC)/Zglobalc.h \
+	$(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Ztrackv.h \
+	$(COSMOSINC)/Zmaxdef.h
+$(LIBRARY)(ce2p.o): $(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h
+$(LIBRARY)(ceCent2sph.o): $(COSMOSINC)/Zglobalc.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zunionmap.h
+$(LIBRARY)(cfinTracking.o): $(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Ztrackp.h \
+	$(COSMOSINC)/Ztrackv.h \
+	$(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Zobs.h \
+	$(COSMOSINC)/Zobsp.h \
+	$(COSMOSINC)/Zobsv.h
+$(LIBRARY)(cfixModel.o): $(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zevhnp.h \
+	$(COSMOSINC)/Zevhnv.h \
+	$(COSMOSINC)/Zcode.h
+$(LIBRARY)(cgetBeta.o): $(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h
+$(LIBRARY)(cgetZenith.o): $(COSMOSINC)/ZsubstRec.h \
+	$(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h
+$(LIBRARY)(cgetctau.o): $(COSMOSINC)/Zglobalc.h \
+	$(COSMOSINC)/Zlife.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcode.h
+$(LIBRARY)(cifDead.o): $(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Zcode.h \
+	$(COSMOSINC)/Ztrackv.h \
+	$(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Ztrackp.h \
+	$(COSMOSINC)/Zobs.h \
+	$(COSMOSINC)/Zobsp.h
+$(LIBRARY)(cifXObsSite.o): $(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Ztrackp.h \
+	$(COSMOSINC)/Ztrackv.h \
+	$(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Zincidentv.h \
+	$(COSMOSINC)/Zobs.h \
+	$(COSMOSINC)/Zobsp.h \
+	$(COSMOSINC)/Zobsv.h \
+	$(COSMOSINC)/Zearth.h \
+	$(COSMOSINC)/Zcode.h
+$(LIBRARY)(ciniSmpIntL.o): $(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Ztrackv.h \
+	$(COSMOSINC)/Zmaxdef.h
+$(LIBRARY)(ciniTracking.o): $(COSMOSINC)/Zmanagerp.h \
+	$(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Ztrackp.h \
+	$(COSMOSINC)/Ztrackv.h \
+	$(COSMOSINC)/Zobs.h \
+	$(COSMOSINC)/Zobsp.h \
+	$(COSMOSINC)/Zobsv.h \
+	$(COSMOSINC)/Zatmos.h \
+	$(COSMOSINC)/Zincidentv.h \
+	$(COSMOSINC)/Zearth.h \
+	$(COSMOSINC)/Zcode.h \
+	$(COSMOSINC)/Zheavyc.h \
+	$(COSMOSINC)/Zheavyp.h \
+	$(COSMOSINC)/Zelemagp.h
+$(LIBRARY)(cinitObs.o): $(COSMOSINC)/Zglobalc.h \
+	$(COSMOSINC)/Ztrackp.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Zobs.h \
+	$(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Zobsp.h \
+	$(COSMOSINC)/Zobsv.h \
+	$(COSMOSINC)/Zearth.h \
+	$(COSMOSINC)/Zincidentp.h
+$(LIBRARY)(cinteElec.o): $(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Ztrackv.h \
+	$(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Zcode.h \
+	$(COSMOSINC)/Ztrackp.h \
+	$(COSMOSINC)/Zelemagp.h
+$(LIBRARY)(cinteNEP.o): $(COSMOSINC)/Zcode.h \
+	$(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Ztrackv.h \
+	$(COSMOSINC)/Zmaxdef.h
+$(LIBRARY)(cinteNuc.o): $(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Ztrackv.h \
+	$(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Ztrackp.h \
+	$(COSMOSINC)/Zcode.h \
+	$(COSMOSINC)/Zevhnp.h \
+	$(COSMOSINC)/Zevhnv.h \
+	$(COSMOSINC)/Zlife.h
+$(LIBRARY)(cintePhoton.o): $(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Ztrackv.h \
+	$(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Zcode.h \
+	$(COSMOSINC)/Zmass.h \
+	$(COSMOSINC)/Ztrackp.h
+$(LIBRARY)(cinteraction.o): $(COSMOSINC)/ZsubstRec.h \
+	$(COSMOSINC)/Zcode.h \
+	$(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Ztrackp.h \
+	$(COSMOSINC)/Ztrackv.h \
+	$(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Zincidentv.h
+$(LIBRARY)(cmaxMovLen.o): $(COSMOSINC)/Zcode.h \
+	$(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Ztrackp.h \
+	$(COSMOSINC)/Ztrackv.h \
+	$(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Zelemagp.h \
+	$(COSMOSINC)/Zstdatmos.h \
+	$(COSMOSINC)/Zearth.h
+$(LIBRARY)(cmkIncident.o): $(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Ztrackv.h \
+	$(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Zmanagerp.h \
+	$(COSMOSINC)/Zobs.h \
+	$(COSMOSINC)/Zobsp.h \
+	$(COSMOSINC)/Zglobalc.h \
+	$(COSMOSINC)/Ztrackp.h \
+	$(COSMOSINC)/Zobsv.h \
+	$(COSMOSINC)/Zincidentp.h \
+	$(COSMOSINC)/Zincidentv.h \
+	$(COSMOSINC)/Zearth.h \
+	$(COSMOSINC)/Zcode.h \
+	$(COSMOSINC)/ZrigCut.h
+$(LIBRARY)(cmulScat.o): $(COSMOSINC)/Zcode.h \
+	$(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Ztrackv.h \
+	$(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Zelemagp.h \
+	$(COSMOSINC)/Zstdatmos.h
+$(LIBRARY)(cobservation.o): $(COSMOSINC)/Zglobalc.h \
+	$(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Ztrackp.h \
+	$(COSMOSINC)/Ztrackv.h \
+	$(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Zobs.h \
+	$(COSMOSINC)/Zobsp.h \
+	$(COSMOSINC)/Zobsv.h
+$(LIBRARY)(cprObsSite.o): $(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zobs.h \
+	$(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Zobsp.h \
+	$(COSMOSINC)/Zobsv.h
+$(LIBRARY)(cprintCoord.o): $(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoordtype.h
+$(LIBRARY)(cprintObs.o): $(COSMOSINC)/Zglobalc.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Zobs.h \
+	$(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Zobsp.h \
+	$(COSMOSINC)/Zobsv.h
+$(LIBRARY)(cputCerenkov.o): $(COSMOSINC)/Zmanagerp.h \
+	$(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Ztrackp.h \
+	$(COSMOSINC)/Ztrackv.h \
+	$(COSMOSINC)/Zcode.h \
+	$(COSMOSINC)/Zmass.h \
+	$(COSMOSINC)/Zprimary.h \
+	$(COSMOSINC)/Zprimaryv.h \
+	$(COSMOSINC)/Zheavyp.h \
+	$(COSMOSINC)/Zincidentv.h
+$(LIBRARY)(cputTrInfo.o): $(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Ztrackp.h \
+	$(COSMOSINC)/Ztrackv.h \
+	$(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Zobs.h \
+	$(COSMOSINC)/Zobsv.h
+$(LIBRARY)(cresetDirec.o): $(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h
+$(LIBRARY)(cresetMom.o): $(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h
+$(LIBRARY)(csPrimAng.o): $(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zincidentp.h \
+	$(COSMOSINC)/Zglobalc.h \
+	$(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Zincidentv.h
+$(LIBRARY)(csampEIntL.o): $(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Ztrackp.h \
+	$(COSMOSINC)/Ztrackv.h \
+	$(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Zelemagp.h
+$(LIBRARY)(csampGIntL.o): $(COSMOSINC)/Zglobalc.h \
+	$(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Ztrackp.h \
+	$(COSMOSINC)/Ztrackv.h \
+	$(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Zelemagp.h
+$(LIBRARY)(csampNEPIntL.o): $(COSMOSINC)/Zglobalc.h \
+	$(COSMOSINC)/Zcode.h \
+	$(COSMOSINC)/Ztrackp.h \
+	$(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Ztrackv.h \
+	$(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Zheavyp.h \
+	$(COSMOSINC)/Zelemagp.h \
+	$(COSMOSINC)/Zevhnp.h \
+	$(COSMOSINC)/Zevhnv.h \
+	$(COSMOSINC)/Zcmuint.h
+$(LIBRARY)(cGetXsec.o): $(COSMOSINC)/Zcode.h \
+	$(COSMOSINC)/Zevhnp.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Ztrackp.h
+$(LIBRARY)(cscalerProd.o): $(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zunionmap.h
+$(LIBRARY)(csetCoord.o): $(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zearth.h \
+	$(COSMOSINC)/Zcoordtype.h
+$(LIBRARY)(csetIntInf.o): $(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Ztrackv.h \
+	$(COSMOSINC)/Zmaxdef.h
+$(LIBRARY)(csetPos.o): $(COSMOSINC)/Zobs.h \
+	$(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zearth.h
+$(LIBRARY)(csph2eCent.o): $(COSMOSINC)/Zglobalc.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zunionmap.h
+$(LIBRARY)(cstack.o): $(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Zstackv.h
+$(LIBRARY)(ctracking.o): $(COSMOSINC)/Zcode.h \
+	$(COSMOSINC)/Ztrack.h \
+	$(COSMOSINC)/Zcondc.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zdirec.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Ztrackv.h \
+	$(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Ztrackp.h \
+	$(COSMOSINC)/Zobs.h \
+	$(COSMOSINC)/Zobsp.h \
+	$(COSMOSINC)/Zobsv.h \
+	$(COSMOSINC)/Zincidentv.h \
+	$(COSMOSINC)/Zmanagerp.h \
+	$(COSMOSINC)/Zstackv.h \
+	$(COSMOSINC)/Zglobalc.h \
+	$(COSMOSINC)/Zearth.h
+$(LIBRARY)(ctransCoord2.o): $(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zunionmap.h
+$(LIBRARY)(ctransVectZ.o): $(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zunionmap.h
+$(LIBRARY)(ctransVectZx.o): $(COSMOSINC)/ZsaveStruc.h \
+	$(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zunionmap.h
+$(LIBRARY)(cvec2dcos.o): $(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zunionmap.h
+$(LIBRARY)(cvecProd.o): $(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zunionmap.h
+$(LIBRARY)(cxyz2det.o): $(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zobs.h \
+	$(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Zobsv.h
+$(LIBRARY)(cxyz2prim.o): $(COSMOSINC)/Zcoord.h \
+	$(COSMOSINC)/Zunionmap.h \
+	$(COSMOSINC)/Zobs.h \
+	$(COSMOSINC)/Zmaxdef.h \
+	$(COSMOSINC)/Zpos.h \
+	$(COSMOSINC)/Zmagfield.h \
+	$(COSMOSINC)/Zobsv.h
+$(LIBRARY)(cxsSpecial.o): $(COSMOSINC)/Zcode.h \
+	$(COSMOSINC)/Zptcl.h \
+	$(COSMOSINC)/Zevhnp.h 
+
+
+$(LIBRARY):         \
+               $(LIBRARY)(c3DV2DDCos.o) \
+               $(LIBRARY)(c4to3mom.o) \
+               $(LIBRARY)(cdefByMagAndE.o) \
+               $(LIBRARY)(ccompPathEnd.o) \
+               $(LIBRARY)(cdecayLeng.o) \
+               $(LIBRARY)(ce2p.o) \
+               $(LIBRARY)(ceCent2sph.o) \
+               $(LIBRARY)(cfinTracking.o) \
+               $(LIBRARY)(cfixModel.o) \
+               $(LIBRARY)(cgetBeta.o) \
+               $(LIBRARY)(cgetMFP.o) \
+               $(LIBRARY)(cgetRotMat3.o) \
+               $(LIBRARY)(cgetZenith.o) \
+               $(LIBRARY)(cgetctau.o) \
+               $(LIBRARY)(cifDead.o) \
+               $(LIBRARY)(cifXObsSite.o) \
+               $(LIBRARY)(ciniSmpIntL.o) \
+               $(LIBRARY)(ciniTracking.o) \
+               $(LIBRARY)(cinitObs.o) \
+               $(LIBRARY)(cinteElec.o) \
+               $(LIBRARY)(cinteNEP.o) \
+               $(LIBRARY)(cinteNuc.o) \
+               $(LIBRARY)(cintePhoton.o) \
+               $(LIBRARY)(cinteraction.o) \
+               $(LIBRARY)(cmaxMovLen.o) \
+               $(LIBRARY)(cmkIncident.o) \
+               $(LIBRARY)(cmulScat.o) \
+               $(LIBRARY)(cobservation.o) \
+               $(LIBRARY)(cprObsSite.o) \
+               $(LIBRARY)(cprintCoord.o) \
+               $(LIBRARY)(cprintObs.o) \
+               $(LIBRARY)(cputCerenkov.o) \
+               $(LIBRARY)(cputTrInfo.o) \
+               $(LIBRARY)(cresetDirec.o) \
+               $(LIBRARY)(cresetMom.o) \
+               $(LIBRARY)(csPrimAng.o) \
+               $(LIBRARY)(csampEIntL.o) \
+               $(LIBRARY)(csampGIntL.o) \
+               $(LIBRARY)(csampNEPIntL.o) \
+               $(LIBRARY)(cGetXsec.o) \
+               $(LIBRARY)(cscalerProd.o) \
+               $(LIBRARY)(csetCoord.o) \
+               $(LIBRARY)(csetIntInf.o) \
+               $(LIBRARY)(csetPos.o) \
+               $(LIBRARY)(csph2eCent.o) \
+               $(LIBRARY)(cstack.o) \
+               $(LIBRARY)(ctracking.o) \
+               $(LIBRARY)(ctransCoord2.o) \
+               $(LIBRARY)(ctransVectZ.o) \
+               $(LIBRARY)(ctransVectZx.o) \
+               $(LIBRARY)(cvec2dcos.o) \
+               $(LIBRARY)(cvecProd.o) \
+               $(LIBRARY)(cxyz2det.o) \
+               $(LIBRARY)(cxyz2prim.o) \
+	       $(LIBRARY)(cdet2xyzFE.o) \
+	       $(LIBRARY)(cxsSpecial.o)
+

@@ -1,0 +1,26 @@
+#!/bin/csh -f
+#  check if declaration comes after data statement
+#
+foreach f ($argv[*])
+	   if(-f $f) then
+	echo $f
+ 	awk 'substr($0, 1,1) != "c" && (  index($0, "subroutine")  ||  \
+            index($0, "function") ) {newpu = 0}      \
+	    $1 != "c" && $1 != "\!"  && index($0, "data") {  newpu = 1} \
+	    $1 != "c" && $1 != "\!"  && index($0, "real") { \
+	      if(newpu != 0) {print "--------error"} }   \
+	    $1 != "c" && $1 != "\!"  && index($0, "logical") { \
+	      if(newpu != 0) { print "--------error"}}   \
+	    $1 != "c" && $1 != "\!"  && index($0, "integer") { \
+	      if(newpu != 0) { print "--------error"}} \
+	    $1 != "c" && $1 != "\!"  && index($0, "complex") { \
+	      if(newpu != 0){ print "--------error"}} \
+	    $1 != "c" && $1 != "\!"  && index($0, "dimension") {  \
+	      if(newpu != 0){ print "--------error"}} \
+	    $1 != "c" && $1 != "\!"  && index($0, "record") {  \
+	      if(newpu != 0){ print "--------error"}}' 	 $f
+         endif
+end
+
+	
+

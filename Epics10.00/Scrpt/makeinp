@@ -1,0 +1,12 @@
+#!/bin/csh -f
+if( $#argv != 1 ) then
+	echo "Usage makeinp media_name"
+	exit
+endif
+
+echo "1 box  $1" > /tmp/$$config
+fordpmjetINP /tmp/$$config > /tmp/$1.inp$$
+awk '$6=="dpmjet" {$6=matter; printf("%-10s%10.2f%10.2f%10.2f%10.2f%20s%-8s\n",$1,$2,$3,$4,$5," ",$6);next}; \
+{print}' matter=$1 /tmp/$1.inp$$ > $1.inp
+rm /tmp/$$config
+rm /tmp/$1.inp$$

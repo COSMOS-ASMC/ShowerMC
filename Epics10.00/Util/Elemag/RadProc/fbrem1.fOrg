@@ -1,0 +1,340 @@
+c
+c    /usage/
+c                 f=zpart(z)       : inform z of matter
+c                 f=fbrem(v)       : brems prob./r.l.
+c                 f=fbremv(nn,v)   : nn-th derivative of v*f(v)
+c                 f=fpair(v)       : pair prob./r.l.
+c                 f=vmaxv(ee)      : max v for energy ee
+c
+c
+c    *** note ***   zpart must be called first and once
+c
+c
+      function fbrem(v)
+c
+c
+c         bremsung function per radiation length.  approximation j in
+c         koch & motz notation + correction at low energy
+c
+      common / bpcom /  al183z,e,ccz,emass,bcoef,fz ,z333
+c
+      fbrem=bigf(0,v)/al183z*bcorec(e)/v
+      return
+c
+c     ************
+      entry fbremv(nn,v)
+c     ************
+c
+c        gives n-th derivative of v*fbrem
+c
+      fbrem=bigf(nn,v)/al183z      *bcorec(e)
+      return
+c
+c     ************
+      entry fpair(v)
+c     ************
+c
+c        pair creation function  v=e/eg
+      fbrem=bigg(v)/al183z*pcorec(e)
+      return
+c
+c
+c     ************
+      entry vmaxv(ee)
+c     ************
+c
+c        gives max value of v for bremsung or pair creation
+c
+      fbrem=1.-emass/ee
+      return
+      end
+c     ****************************************************************
+c     *                                                              *
+c     *  bigf:  auxliary function for brems cross-section            *
+c     *  bigg:  //                    pair                           *
+c     *                                                              *
+c     ****************************************************************
+c
+c
+c
+      function bigf(n,v)
+c
+c
+c
+c        f-function in bremsung function
+c
+      common / bpcom /  al183z,e,ccz,emass,bcoef,fz ,z333
+c
+c        screening parameter
+      g=scrnfb(0,v)
+c
+      if(g.gt.2.) goto 100
+      t0=1.-v
+      t1=(1.+t0*t0)
+c        ccz=log(z)/3+f(z); f=coulomb corection function
+      t2=(0.25*smlf1(0,g)-ccz)
+      t3=(0.25*smlf2(0,g)-ccz)
+      tmp0=t1*t2-.6666666*t0*t3
+      if(n.ne.0) goto 10
+      bigf=tmp0
+      return
+c
+   10 continue
+      dgdv=scrnfb(1,v)
+      t4=.25* smlf1(1,g)
+      t5=.25*smlf2(1,g)
+      tmp1=-2.*t0*t2+t1*t4*dgdv+.66666666*(t3-t0*t5*dgdv)
+      if(n.ne.1) goto 20
+      bigf=tmp1
+      return
+c
+   20 continue
+      dgdv2=scrnfb(2,v)
+      dgdvs=dgdv*dgdv*.25
+      bigf=2.*t2-4.*t0*t4*dgdv+t1*(dgdv2*t4+dgdvs*smlf1(2,g) )+1.333333
+     1*t5*dgdv-.66666666*t0*(dgdv2*t5+dgdvs*smlf2(2,g)  )
+      return
+c
+c        almost no screening region
+c
+  100 continue
+      t0=1.-v
+      t1=t0*t0-.6666666*t0+1.
+      t2=alog(2.*e/emass*t0/v)-.5-cscrn(0,g)-fz
+      if(n.ne.0) goto 110
+      bigf=t1*t2
+      return
+c
+  110 continue
+      dgdv=scrnfb(1,v)
+      t3=-2.*t0+.666666
+      t4=-1./t0-1./v-dgdv*cscrn(1,g)
+      if(n.ne.1) goto 120
+      bigf=t3*t2+t1*t4
+      return
+c
+  120 continue
+      dgdv2=scrnfb(2,v)
+      t5=2.
+      t6=1./t0/t0+1./v/v-dgdv    *dgdv*cscrn(2,g)-dgdv2*cscrn(1,g)
+      bigf=t5*t2+2.*t3*t4+t1*t6
+      return
+c
+c     **********
+      entry bigg(v)
+c     **********
+c
+c     g-function in pair creation function
+c
+c        screening parameter
+c
+      g=scrnfp(v)
+      tmp=1.-v
+      if(g.gt.2.) goto 200
+      bigf=(v*v+tmp*tmp)*(.25*smlf1(0,g)-ccz)+.666666*v*tmp*(.25*
+     *  smlf2(0, g)-ccz)
+      return
+c
+c
+  200 continue
+      bigf=(v*v+tmp*tmp+.666666*v*tmp)*(alog(2.*e/emass*v*tmp)-.5-
+     *  cscrn(0,g)-fz   )
+      return
+      end
+c     ****************************************************************
+c     *                                                              *
+c     *  scrnfb:  to give screening parameter for brems              *
+c     *  scrnfp:  //                              pair               *
+c     *                                                              *
+c     ****************************************************************
+c
+c
+c
+      function     scrnfb(n,v)
+c
+c        gives screening parameter for brems e= in gev.
+c
+      common / bpcom /  al183z,e,ccz,emass,bcoef,fz ,z333
+c
+      tmp=0.0511/e/z333
+      if(n.ne.0) goto 2
+      scrnfb=tmp*v/(1.-v)
+      return
+c
+    2 continue
+      if(n.ne.1) goto 4
+      scrnfb=tmp/(1.-v)**2
+      return
+c
+    4 continue
+      scrnfb=tmp*2./(1.-v)**3
+      return
+c
+c     ************
+      entry scrnfp(v)
+c     ************
+c
+c        gives screening parameter for pair creation
+c
+      scrnfb=.0511/e/z333/v/(1.-v)
+      return
+      end
+c     ****************************************************************
+c     *                                                              *
+c     *  smlf1:  auxliary screening function for brems cross-section *
+c     *  smlf2:   //                                                 *
+c     *  bcorec: correction function for brems at low energies       *
+c     *  pcorec: //                      pair  //                    *
+c     *  cscrn:  screening function when g>2                         *
+c     *  zpart:  calculate z-dependent const                         *
+c     *                                                              *
+c     ****************************************************************
+c
+c
+c
+c
+      function smlf1(n,g)
+c
+c
+c
+c        screening function small f1(g)
+c
+      common / bpcom /  al183z,e,ccz,emass,bcoef,fz ,z333
+c
+      nn=n+1
+      if(g.gt.1.) goto 100
+      goto (10,20,30) ,nn
+c
+   10 continue
+      smlf1=((-1.046117*g+2.445063)*g-4.63689)*g+20.83794
+c     smlf1=(.625*g-3.24)*g+20.867
+      return
+c
+   20 continue
+      smlf1=1.25*g-3.24
+      return
+   30 continue
+      smlf1=1.25
+      return
+c
+c
+  100 continue
+      goto (110,120,130),nn
+c
+  110 continue
+      smlf1=19.052795-3.760637*alog(g+0.47155)
+c     smlf1=21.12-4.184*alog(g+.952)
+      return
+c
+  120 continue
+      smlf1=-4.184/(g+.952)
+      return
+c
+  130 continue
+      smlf1=4.184/(g+.952)**2
+      return
+c
+c
+c     ***********
+      entry smlf2(n,g)
+c     ***********
+c
+      nn=n+1
+      if(g.gt.1.) goto 100
+      goto (200,210,220),nn
+c
+  200 continue
+      smlf1=((1.49546*g-2.33405)*g-1.73269)*g+20.171278
+c     smlf1=(-.086*g-1.930)*g+20.209
+      return
+c
+  210 continue
+      smlf1=-0.172*g-1.930
+      return
+c
+  220 continue
+      smlf1=-0.172
+      return
+c
+c     ************
+      entry bcorec(ee)
+c     ************
+c
+c        bremsung coreection function at low energy
+c         ee=e
+c
+      smlf1=1.+bcoef/ee
+      return
+c
+c     ************
+      entry pcorec(ee)
+c     ************
+c
+c         paircreation correction function at low energy
+c       ee=e
+c
+      smlf1=1.+.4e-3/(ee-0.99e-3)
+      return
+c     ************
+      entry cscrn(n,g)
+c     ************
+c
+c        screening function when g.gt.2.
+c        approximation made by c(g)=.24/g+.36/g/g
+c
+      tmp=1./g
+      nn=n+1
+      goto (510,520,530),nn
+c
+  510 continue
+      smlf1=g**(-2.2)/(0.20322+2.11737*g**(-1.34562)  )
+      return
+c
+  520 continue
+      smlf1=(-2.*.36*tmp-.24)*tmp*tmp
+      return
+c
+  530 continue
+      smlf1=(6.*.36*tmp+2.*.24)*tmp*tmp*tmp
+      end
+c
+c     ************
+      subroutine  epBPZpart(atomicZ)
+c     ************
+      common / bpcom /  al183z,e,ccz,emass,bcoef,fz ,z333
+      integer atomicZ
+      real z
+
+      z = atomicZ
+
+      emass=.511e-3
+      z333=z**(1./3.)
+c        coulmb correction function f(z)
+      fz=ccorec(z)
+      ccz=alog(z)/3.+fz
+      al183z=alog(183./z333)
+c        used for bremsung correction at low energies
+      bcoef=1.53e-3*sqrt(z/137.)
+
+      end
+c     ****************************************************************
+c     *                                                              *
+c     *  ccorec: coulomb correction function f(z)                    *
+c     *                                                              *
+c     ****************************************************************
+c
+c
+c        coulomb correction function  a=z/137 ccorec=a**2 sigma(1/((n**
+c        +a**2) from n=1 to inf .  approx formula used.
+c
+c
+      function ccorec(z)
+c
+c
+      a=z/137.
+      a=a*a
+      ccorec=( ( (-0.002*a+0.0083)*a-0.0369)*a+0.20206+1./(1.+a)   )*a
+      return
+      end
+
+

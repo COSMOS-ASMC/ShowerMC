@@ -1,0 +1,14 @@
+(normalization world none)
+(bbox-draw world no)
+(look-recenter)
+(transform world world world rotate -1.57079632679 0 0)
+#(transform world world  world  rotate 0 0  -1.57079632679 )
+(look)
+(load "Array/loadarray")
+(transform world world world  scale 1.8 1.8 1.8  2)
+(transform world world world  translate  -2000 0 0  2 )
+(transform world world focus  rotate  0.15  0   0 2 )
+#    $GEOMVIEW  -c starter -wpos 720,486  $argv;
+
+
+

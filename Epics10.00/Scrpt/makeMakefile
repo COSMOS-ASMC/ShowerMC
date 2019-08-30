@@ -1,0 +1,21 @@
+#!/usr/local/bin/tcsh  -f
+#  Distribute Makefile which is created by using epimkmf -l and
+#  TemplateLib.mk
+#
+set dir="Ana Ceren Data  Misc MuUg Obso TeX lib UserHook Util UC Doc Test Betterone Scrpt Version DistJob epics Fig"
+
+foreach f (*)
+	if(-d $f) then
+		foreach g ($dir)
+		  if($g == $f:t) then
+			goto Next
+		  endif
+	        end
+		#  to be put make file
+		(cd $f; echo "now in $f"; rm -f Makefile ;\
+		 epimkmf -l; makeMakefile )
+#		set ff=`ls | grep "\.f"`;if($#ff != 0) epimkmf -l; makeMakefile )
+	        Next:
+	endif
+end
+

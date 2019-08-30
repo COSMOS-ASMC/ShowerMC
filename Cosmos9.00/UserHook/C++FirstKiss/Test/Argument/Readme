@@ -1,0 +1,5 @@
+ c++ test.cc testf.o `cat ifclib `
+
+Observation;
+
+extern "C" must not be used in common declaration

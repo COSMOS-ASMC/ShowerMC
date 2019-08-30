@@ -1,0 +1,67 @@
+This is a trial ModifyFile which is intended to spcify the quenching
+coefficients and / or minimum energies specific to some components.
+Quenching coeff. are normally given in the media file, and the
+minimum energies used in the tracking are given via epicsfile (or
+automatically determined).  If these treatments are not suitable
+for paticular components, we can use this file.  To specify the
+modification, config data for the component must contain a number
+in the modifer field like
+                   |<---this is modifier field. 
+5  box SCIN  0 2 0 1 / ....   modification by number 1 in this file
+6  box Pb    0 -2 0 0 /..     no modifiction
+7  box SCIN  0 2 0 1 /...     same modifiction  same as comp.5
+8  box SCIN  0 2 0 3 /....    modification by number 3 in this file
+                              The nubmer need not be consecutive
+                              but we should  avoid to use a large number
+                              in such a way that  1 3 5 10000
+
+
+
+Any comment can be placed before the ------ 
+line.  The data must be given after that although the lines starting with
+# or (a-z) or (A-Z)  are also regarded as comment. 
+Each data  line must start with a number which corresponds to the number
+in the modifier field of the component.  
+At present, two fields must be put with / at each end of the field.
+If there is no need to put one of them,  simply put / only.
+1)  Quehcning coeff.  
+For Talre's formula:
+         c1 c2  T /
+where c1 is (g/cm2)/GeV unit. c2 is a unitless number.
+In this case,
+ cf = (1.-c2)/(1.+(1.-c2)*c1*dEdx) + c2  is computed and cf is multiplied
+to dE/dx (GeV/(g/cm2)) to get effective dE/dx.
+
+For Log formula
+         c1 c2 c3 L /
+where c1 in (g/cm2)/GeV, c2 unitless number, c3 in (g/cm2)/GeV.
+In this case, cf is computed by
+   cf = (c3*dEdx)**( - c2*log(c1*dEdx))
+For Birks formula
+         c1 0  0  B /
+         c1 0 0 /
+c2, c3 are not used but mut be given as 0
+c1 in (g/cm2)/GeV
+cf = 1./(1. + c1 * dEdx)
+    
+2)  Minumum energies. format is
+   Egmin Eemin RecoilEmin  KEmin Enmin /
+
+where Egmin is the photon minimum energy 
+      Eemin is the elecron minimum energy(*** total energy***)
+      RecoilEmin is the knockon minimum energy above which random
+      sampling of knockon electrons is tried 
+      KEmin  minumum kinetic enrgy for charge particles (non electron).
+      Enmin  minumum kinetic  energy of nutrons.  default is 5 MeV.
+
+      If first 3 are to be modified, only first 3 may be put with /
+      For anti-particles and decayable particles, these minimum energies
+      are not directly applied.
+
+       quenching  coeff  /    Emin      /
+#      c1  c2        
+----------------------------------------------------
+# this is not reliable data
+1      1e4   0.2  T  /    10e-6  521e-6 10e-6   10e-6  5e-3           /
+2      0.8e4 0.15 T  /                   /
+

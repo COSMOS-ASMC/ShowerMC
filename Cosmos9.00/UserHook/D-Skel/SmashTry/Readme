@@ -1,0 +1,8 @@
+1)  edit setupenve.sh  (fix FLESHDIR, NCPU, MCPU,MARGIN, ENHANCE)
+2)  make 
+3)  bash
+4)  source ./setupenv.sh
+5)  ./smashSkelPCLinuxIFC
+
+
+

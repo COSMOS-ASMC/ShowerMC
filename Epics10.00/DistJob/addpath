@@ -1,0 +1,11 @@
+#!/bin/csh -f
+if( $?EPICSTOP == 0 ) then
+   cd ../
+   source ./Scrpt/sevi
+   cd DistJob
+endif
+set path = ($EPICSTOP/DistJob/bin $COSMOSTOP/DistJob/bin $path)
+
+
+
+

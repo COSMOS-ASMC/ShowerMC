@@ -1,0 +1,23 @@
+
+ chook.f (and chookASbyH2.f) is for
+generating AS by Heavy priamry using component showers.  You must prepare
+compoent showers.
+
+  *********************************
+  R E A D  the top part of chook.f 
+  *********************************
+
+chook.f chookASbyH2.f:
+
+   Use direct access file to read a component shower which is
+randomely selected among 200~300 showers.
+
+chook.fZhang chookASbyH2.fZhang:
+
+   Use sequential file to read component 200 ~300  showers ;
+all showers are read at once.  so that the array to read
+the showers are two dimentional; you have to modify
+ElecSizeComp(NdepthCompM) in ZASbyH.h and make it two dimensinal one;
+first dim. should be the number or showers.
+
+

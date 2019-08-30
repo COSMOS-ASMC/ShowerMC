@@ -1,0 +1,4 @@
+ua5nsd :  UA5 non-single diffractive data. at root s = 53, 200, 546, 900 GeV.
+          This should not be compared with simulation data of inelastic trigger.
+ua5inela: UA5 minimum bias data. at root s = 53, 200, 546, 900 GeV.
+          This may be compared with simulation data of inelastic trigger.

@@ -1,0 +1,82 @@
+Epics has been accepting special primary partilces (say, bunch of
+particles generated other applications or Gecol etc).  Such primary
+particles are put in a file of which name starts with "+", say 
++primary or  ../xxxx/yyy/+xyz etc. The file contains infomation
+at its top about what kind of partilce propeties are included
+in that file.  If, say, position info is missing in that file,
+position is suppplied according to "sepicsfile" specification.
+The file must be formatted (ascii) file. 
+
+Now Epics can accept a binary file which is spciefied by the file
+name with "-" at its top. However, it is a special one and you
+cannot use it for primaries you have specified by "+" so far.
+The "-" primary is  special for Light=22 case which uses the
+result of Light=21; Its format contains some different stuff
+than usual "+" case.   
+Normally you may specify "-" file name for the OutPrimaryFile
+in sepicsfile when Light=21.  With Light=22, you may specify
+that file name by 'PrimaryFile' in 'sepicsfile'.
+
+The output by Light=21 could be ascii (in that case 
+OutPrimaryFile must be "+" file), although the file size
+would become very large.
+
+
+
+  Light 
+  #----------------  
+  header of the first event
+  1ry info. 
+  edep: sum of dE in each comp.   cn dE
+  trailer                         cn= 0
+  cghPath  or dE cell   (1ry)   code, subcode, charge....
+   ...
+  trailer            (code=-1000, subcode=event #.... )
+  header of the 2nd event
+   ...
+
+
+ If Light=21;
+     at	ini of all events
+	open OutPrimaryFile
+	assign OutPrimEff= OutPrimaryFileNo
+	write header
+	open scratch file (with 16=IoScratch)
+     at ini of each event
+	rewind  IoScratch
+        assign OutPrimEff = IoScratch
+
+      track for Cerenkov is put always on OutPrimEff
+        when First interaction occurs.
+A)	   get incident info. and first interaction info.
+	   write event # and incident/first int. info
+	   on OutPrimaryFileNo
+	   rewind OutPrimEff 	    	   
+	   cp OutPrimEff data into OutPrimaryFileNo
+	   assign OutPrimEff to OutPrimaryFileNo
+        
+       at end of the event
+           judge if no interaction.
+	    if so, do A)
+           endif
+	   push enery deposit in cells on OutPrimEff
+	   write end mark   on OutPrimEff
+	   write  energy deposit in each comp. on OutPrimEff
+	   write end event mark
+
+	   
+If Light=22
+	at ini of all events
+	open PrimaryFile
+	read header
+    at ini of each event
+	read event # and inciden info. First col info.
+		
+	read path info. for Cerenkov and push in stack
+	read cell dE info. for Sciti. and push in stack
+	
+	read dE of each comp. 
+	start event generation: (light tracking).
+
+
+

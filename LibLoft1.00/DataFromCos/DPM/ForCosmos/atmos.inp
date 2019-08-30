@@ -1,0 +1,55 @@
+**********************************************************************
+* Example for run with variable projectile/target/energy.
+* It requires the file air.glb which has to be calculated in
+* a pre-processing step (see glauber-init.inp).
+**********************************************************************
+*
+* maximum projectile mass
+*
+PROJPAR        56.0      26
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7...
+*
+* possible targets
+*
+*
+* possible targets
+*
+EMULSION       14.0      7.0      78        16         8        21
+EMULSION       40.0     18.0       1
+
+*
+* maximum energy of interaction
+*
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7...
+ENERGY        1.d12
+*
+* read profile function data from pre-calculated file (atmos.GLB)
+*
+*GLAUB-PAR     1000.0      49.0       1.0     100.0                    atmos
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7...
+GLAUB-PAR       750      49.0       1.0     100.0                     atmos
+*      suppress message from Lund
+LUND-MSTU       12.0         0.0
+LUND-MSTU       11.0         0.0
+LUND-MSTU       127.0        0.0
+LUND-MSTU       122.0        0.0
+*
+* PHOJET-specific input
+*
+PHOINPUT
+PROCESS           1 0 1 1 1 1 1 1
+ENDINPUT
+*
+* output (particle multiplicities etc.)
+*
+* HISTOGRAM      101.0     102.0
+*
+* start of event generation
+*
+*           1 inela only; both--> 0  below 5; hadrin; defatul 0
+HADRIN             0       4.1
+START     1000000000       0.0
+STOP
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7...
+
+

@@ -1,0 +1,3 @@
+#!/bin/sh -f
+cat  $EPICSTOP/Version/version
+

@@ -1,0 +1,12 @@
+#name   Format    CdTe
+CdTe 	2
+#
+#  Elem	 rho(g/cm^3)	Gas/Solid(1/0)  refl.index   Birks C
+#  rho may be 6.20
+2         5.85		0                0          0 0 0
+# 	Z	A  	N
+	48	112.41	1
+	52	127.60	1
+
+#  ⟨Z/A⟩   I[eV]   a       k      x0    x1     Cbar  delta0
+  0.41665  539.3 0.2484  2.6665  0.0438  3.2836   5.9096 0.00

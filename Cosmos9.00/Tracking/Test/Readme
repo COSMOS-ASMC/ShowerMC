@@ -1,0 +1,10 @@
+Almost Obso
+
+to test cmagneticDef.f use geomagdefNew.mk
+and input f for a.out
+
+to test obsolete wrong one use geomagdefOld.mk
+and input t for a.out
+
+
+

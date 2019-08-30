@@ -1,0 +1,3 @@
+-L/usr/Intel/ifc8/lib -L/usr/lib -Bstatic -lifport -lifcoremt -limf -Bdynamic -lm -Bstatic -Bdynamic -lcxa -lunwind -Bdynamic -lpthread -Bstatic -lirc -Bdynamic -lc -Bstatic -lirc /usr/Intel/ifc8/lib/crtxn.o /usr/lib/crtn.o
+
+

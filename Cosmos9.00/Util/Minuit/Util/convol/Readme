@@ -1,0 +1,17 @@
+some distribution:  f(y)dy  with free parameters
+Gaussian distribuion:  g(z)dz  fixed mean and sigma
+x and y independent.
+Distribution of x: h(x)dx  where x=y+z.
+Fit h(x) to a number of data points (x, H(x))
+and get the parameres for f(y).
+
+
+Getting  h(x):
+
+h(x)dz= dx Integral delta(x- y-z) f(y)dy g(z)dz
+      = dx Itegral dy  f(y) g(x-y)
+      
+	   
+
+
+

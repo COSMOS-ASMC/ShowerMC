@@ -1,0 +1,26 @@
+#!/bin/bash
+if [ $# -ne 1 ]; then
+    cat <<EOF
+   dispconfigbygnup {h|noh}
+   h:  hidden mode        slow
+   noh:  no hidden mode  faster but ...
+EOF
+    exit
+fi
+if [ $1 != "h" ] && [ $1 != "noh" ]; then
+    echo arg $1 is invalid
+    exit
+fi
+arg=$1
+
+set pwd=`pwd`
+
+cd $EPICSTOP/Util/Gnuplot;   ./dispconfigbygnup $arg
+
+cd $pwd
+
+
+
+
+
+

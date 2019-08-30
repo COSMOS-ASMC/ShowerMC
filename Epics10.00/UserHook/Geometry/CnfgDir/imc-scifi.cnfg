@@ -1,0 +1,179 @@
+#
+# IMC SciFi
+#
+# 448 = 8 x 8 x 7
+#
+
+#subd sfx
+1 box   SciFi 0  2 0 / 0.002  0   0.002    0.096   44.8   0.096
+2 box   SciFi 0 -2 0 / 0      0   0        0.1     44.8   0.1 / 1
+3 box_w sp 0 0 0 / 0 0 0
+#end sfx
+
+#subd	sfx8
+1  box sp 0 0 0 / 0 0 0 0.8 44.8 0.01
+2  sfx sp 0 0 0 / 0 0 0.01
+3  sfx sp 0 0 0 / + = =
+4  sfx sp 0 0 0 / + = =
+5  sfx sp 0 0 0 / + = =
+6  sfx sp 0 0 0 / + = =
+7  sfx sp 0 0 0 / + = =
+8  sfx sp 0 0 0 / + = =
+9  sfx sp 0 0 0 / + = =
+10  box sp  0 0 0 / 0 0 +    0.8 44.8 0.01
+11  box_w sp   0 0 0 / 0 0 0
+#end  sfx8
+
+#subd sfx64
+1 sfx8 sp 0 0 0 / 0 0 0
+2 sfx8 sp  0 0 0 / + 0 0
+3 sfx8 sp 0 0 0 / + 0 0
+4 sfx8 sp 0 0 0 / + 0 0
+5 sfx8 sp 0 0 0 / + 0 0
+6 sfx8 sp 0 0 0 / + 0 0
+7 sfx8 sp 0 0 0 / + 0 0
+8 sfx8 sp 0 0 0 / + 0 0
+9 box_w sp 0 0 0 / 0 0 0
+#end sfx64
+
+#subd sfx1sheet
+1 sfx64 sp 0 0 0 / 0 0 0
+2 sfx64 sp  0 0 0 / + 0 0
+3 sfx64 sp 0 0 0 / + 0 0
+4 sfx64 sp 0 0 0 / + 0 0
+5 sfx64 sp 0 0 0 / + 0 0
+6 sfx64 sp 0 0 0 / + 0 0
+7 sfx64 sp 0 0 0 / + 0 0
+8 box_w sp 0 0 0 / 0 0 0
+#end sfx1sheet
+
+
+#subd sfy
+1 box   SciFi 0  2 0 / 0   0.002   0.002    44.8   0.096  0.096
+2 box   SciFi 0 -2 0 / 0   0       0        44.8   0.1    0.1 / 1
+3 box_w sp   0 0 0 / 0 0 0
+#end sfy
+
+#subd	sfy8
+1  box sp 0 0 0 / 0 0 0 44.8 0.8 0.01
+2  sfy sp 0 0 0 / 0 0 0.01
+3  sfy sp 0 0 0 / = + =
+4  sfy sp 0 0 0 / = + =
+5  sfy sp 0 0 0 / = + =
+6  sfy sp 0 0 0 / = + =
+7  sfy sp 0 0 0 / = + =
+8  sfy sp 0 0 0 / = + =
+9  sfy sp 0 0 0 / = + =
+10  box sp 0 0 0 / 0 0 + 44.8 0.8 0.01
+11  box_w sp   0 0 0 / 0 0 0
+#end  sfy8
+
+#subd sfy64
+1 sfy8 sp 0 0 0 / 0 0 0
+2 sfy8 sp  0 0 0 / 0 3.2 0
+3 sfy8 sp 0 0 0 / 0 6.4 0
+4 sfy8 sp 0 0 0 / 0 9.6 0
+5 sfy8 sp 0 0 0 / 0 12.8 0
+6 sfy8 sp 0 0 0 / 0 16.0 0
+7 sfy8 sp 0 0 0 / 0 19.2 0
+8 sfy8 sp 0 0 0 / 0 22.4 0
+9 box_w sp   0 0 0 / 0 0 0
+#end sfy64
+
+#subd sfy1sheet
+1 sfy64 sp 0 0 0 / 0 0 0
+2 sfy64 sp  0 0 0 / 0 3.2 0
+3 sfy64 sp 0 0 0 / 0 6.4 0
+4 sfy64 sp 0 0 0 / 0 9.6 0
+5 sfy64 sp 0 0 0 / 0 12.8 0
+6 sfy64 sp 0 0 0 / 0 16.0 0
+7 sfy64 sp 0 0 0 / 0 19.2 0
+8 box_w sp   0 0 0 / 0 0 0
+#end sfy1sheet
+
+
+#subd optx1unit
+1 horse SciFi 0 0 0  / 0 0 0  3.2 0.12 7.0    0.6 0.00   2.0 1.0  1 0 0 0 0 1
+2 horse SciFi 0 0 0 / 0 0 2.30  3.2 0.12 7.0    0.6 -1.30  2.0 1.0   1 0 0 0 0 1
+3 box SciFi 0 0 0 / 0.6 -7.5  0.0   2.0 0.5 2.0
+4 box_w sp   0 0 0 / 0 0 0
+#end optx1unit
+
+#subd opty1unit
+1 horse SciFi 0 0 0  / 0 3.2 0  3.2 0.12 7.0   0.6 0.00  2.0 1.0  0 -1 0 0 0 1
+2 horse SciFi 0 0 0 / 0 3.2 2.3  3.2 0.12 7.0   0.6 -1.30  2.0 1.0  0 -1 0 0 0 1
+3 box SciFi 0 0 0 / -7.5 0.6  0.0   0.5 2.0 2.0
+4 box_w sp   0 0 0 / 0 0 0
+#end opty1unit
+
+
+#subd optx14u
+1 optx1unit sp 0 0 0 / 0 0 0
+2 optx1unit sp  0 0 0 / + 0 0
+3 optx1unit sp 0 0 0 / + 0 0
+4 optx1unit sp 0 0 0 / + 0 0
+5 optx1unit sp 0 0 0 / + 0 0
+6 optx1unit sp 0 0 0 / + 0 0
+7 optx1unit sp 0 0 0 / + 0 0
+8 optx1unit sp 0 0 0 / + 0 0
+9 optx1unit sp 0 0 0 / + 0 0
+10 optx1unit sp 0 0 0 / + 0 0
+11 optx1unit sp 0 0 0 / + 0 0
+12 optx1unit sp 0 0 0 / + 0 0
+13 optx1unit sp 0 0 0 / + 0 0
+14 optx1unit sp 0 0 0 / + 0 0
+15 box_w sp   0 0 0 / 0 0 0
+#end optx14u
+
+#subd opty14u
+1 opty1unit sp 0 0 0 / 0 0 0
+2 opty1unit sp  0 0 0 / 0 3.2 0
+3 opty1unit sp 0 0 0 / 0 6.4 0
+4 opty1unit sp 0 0 0 / 0 9.6 0
+5 opty1unit sp 0 0 0 / 0 12.8 0
+6 opty1unit sp 0 0 0 / 0 16.0 0
+7 opty1unit sp 0 0 0 / 0 19.2 0
+8 opty1unit sp 0 0 0 / 0 22.4 0
+9 opty1unit sp 0 0 0 / 0 25.6 0
+10 opty1unit sp 0 0 0 / 0 28.8 0
+11 opty1unit sp 0 0 0 / 0 32.0 0
+12 opty1unit sp 0 0 0 / 0 35.2 0
+13 opty1unit sp 0 0 0 / 0 38.4 0
+14 opty1unit sp 0 0 0 / 0 41.6 0
+15 box_w sp   0 0 0 / 0 0 0
+#end opty14u
+
+
+
+#subd imc-scifi
+1 sfx1sheet sp  0 0 0 / 0 0 0
+2 sfy1sheet sp  0 0 0 / 0 0 0.14
+3 optx14u sp  0 0 0 / 0 0 0
+4 opty14u sp  0 0 0 / 0 0 0.14
+5 sfx1sheet sp  0 0 0 / 0 0 2.30
+6 sfy1sheet sp  0 0 0 / 0 0 2.44
+#
+7 sfx1sheet sp  0 0 0 / 0 0 4.60
+8 sfy1sheet sp  0 0 0 / 0 0 4.74
+9  optx14u sp  0 0 0 / 0 0 4.60
+10 opty14u sp  0 0 0 / 0 0 4.74
+11 sfx1sheet sp  0 0 0 / 0 0 6.90
+12 sfy1sheet sp  0 0 0 / 0 0 7.04
+#
+13 sfx1sheet sp  0 0 0 / 0 0 9.20
+14 sfy1sheet sp  0 0 0 / 0 0 9.34
+15 optx14u sp  0 0 0 / 0 0 9.20
+16 opty14u sp  0 0 0 / 0 0 9.34
+17 sfx1sheet sp  0 0 0 / 0 0 11.50
+18 sfy1sheet sp  0 0 0 / 0 0 11.64
+#
+19 sfx1sheet sp  0 0 0 / 0 0 13.80
+20 sfy1sheet sp  0 0 0 / 0 0 13.94
+21 optx14u sp  0 0 0 / 0 0 13.80
+22 opty14u sp  0 0 0 / 0 0 13.94
+23 sfx1sheet sp  0 0 0 / 0 0 16.10
+24 sfy1sheet sp  0 0 0 / 0 0 16.24
+#
+25 box_w sp 0 0 0 / 0 0 0
+#end imc-scifi
+

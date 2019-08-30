@@ -1,0 +1,32 @@
+C                                                                               
+C              ANY COMMENT LINES CAN BE WRITTEN BEFORE -------BELOW             
+C         EXCEPT FOR --... DATA CAN BE GIVEN BY FREE FORMAT.                    
+C         PAIRS OF (E, DIFF. FLUX) MUST BE GIVEN, AND AT THE END,               
+C         A PAIR OF (0., 1.E-37) MAY BE GIVEN.  THIS IS UNDERSTOOD              
+C         AS FIRST COMPONENT (PROTON IS THE FIRST ONE).                         
+C         IF ONLY (0., 1.E-37) IS GIVEN, THAT COMPONENT IS ASSUMED              
+C         NOT EXIST.  (EXAMPLE BELOW SHOWS THAT 2ND COMPONENT                   
+C         DOES NOT EXIST AND ONLY UP TO  3RD COMPONENT EXISTS).                 
+C              THE LAST DATA MUST BE /                                          
+C         COL 1  (-- SHOULD STARTS FROM THE 1ST COL.)                           
+C             -----------------------------------                               
+C                1., 1.E-5, 2., 5.E-6, 10., 1.E-7,  0., 1.E-37,                 
+C                0., 1.E-37,                                                    
+C                1., 1.E-6, 3., 4.E-7, 0., 1.E-37/                              
+C                                                                               
+    GAISSER FLUX GIVEN AT TOTAL ENERGY /NUCLEON                                 
+      REAL FLXP(13,2) / PROTON  ABOVE IS MIN , BELOW IS MAX                     
+     *802,318,126,42,12.8,3.8,1.12,.33,.098,.029,.0086,.0026,.00076,            
+     *134,133,61.,28,12.7,3.8,1.12,.33,.098,.029,.0086,.0026,.00076/            
+      REAL FLXA(13,2) / ALFA ABOVE IS MIN, BELOW MAX                            
+     *536,164,51,15.4,4.6,1.33,.4,.115,.034,.0098,.0028,.00076,.00023,          
+     *238,88.,39,15.4,4.6,1.33,.4,.115,.034,.0098,.0028,.00076,.00023/          
+-----------------------------------------------------------                     
+      1.062E-3, 802.,  2.232E-3, 318., 4.062E-3, 126.,  7.022E-3, 42.,          
+      11.66E-3, 12.8, 19.062E-3, 3.8,  30.762E-3, 1.12, 49.363E-3,.33,          
+      78.66E-3, .098, 125.06E-3, .029, 199.06E-3, .0086, 316.E-3,.0026,         
+      499.06E-3,.00076, 0., 1.E-37,                                             
+      1.062E-3, 134.,  2.232E-3,  41., 4.062E-3,12.75,  7.022E-3, 4.35,         
+      11.66E-3,  1.15,19.062E-3, 0.33, 30.762E-3, .1,49.363E-3,.0287,           
+      78.66E-3,.0085, 125.06E-3,.00245,199.06E-3,.0007, 316.E-3,.00019,         
+      499.06E-3,.0000575, 0., 1.E-37/                                           

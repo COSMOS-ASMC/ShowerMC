@@ -1,0 +1,8 @@
+
+make clean
+make 
+./showXsec$ARCH
+will do your business
+ 
+If you want to use an interaction model other than
+dpmjet3, modify the main.f

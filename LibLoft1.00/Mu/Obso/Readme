@@ -1,0 +1,12 @@
+Programs here are modified version in Epics/prog/Mu/;
+Media is fixed to be Air.
+External names are changed to be ep... to c....
+Data / consts read from  a file are changed to 
+be set in the program.
+
+Air in UC is the table made by Epics and used here
+to fix the consts.
+
+
+For initialization, cSetMu and cRdmuTab are called in cbeginRun.
+ 

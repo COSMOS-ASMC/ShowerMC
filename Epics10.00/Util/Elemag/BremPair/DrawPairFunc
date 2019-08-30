@@ -1,0 +1,47 @@
+#!/bin/csh -f
+echoErr  "This will create an executable, drawpair[1-3].out, which"
+echoErr  " writes dsigma/dx of pair production on standard output"
+echoErr  " as a function of y=(Ee-me)/(Eg-2me)  (> 0.5)"
+echoErr  "where:"
+echoErr  " x= Ee/Eg > 0.5 (higher energy one of pair)"
+echoErr  " You can choose an appropriated unit depending on your purpose" 
+echoErr  " "
+echoErr  "  Output from the executabl you are now making "
+echoErr  "  will depend on the next choice only when "
+echoErr  "  the energy region is  low: "
+echoErr  "  Eg < 150/Z**3 GeV (=rough value) "
+echoErr  "  At higher energies, you will get the same"
+echoErr  "  result indepenent of the choice "
+echoErr  " "
+echoErr " For low energy Pair-Creation, you must choose"
+echoErr "  1) Tsai's formula  "  
+echoErr "  2) Nelson's forumla "
+echoErr     or
+echoErr "  3) Corrected Messel and Crawford formula "
+echoErr " "
+echoErr "Enter 1,2, or 3"
+    set pair=$<
+echoErr "Your choise is" $pair
+	if(x$pair == x1 || x$pair == x2 || x$pair == x3) then
+	   echoErr " "
+        else		
+	   echoErr "It's invalid"
+	   exit 1
+        endif
+
+make -f DrawPairFunc$pair.mk
+if(-f drawpair$pair.out) then
+
+	echoErr " "
+	echoErr  drawpair$pair.out  has been made
+	echoErr "You may use this, say, as"
+	echoErr "drawpair$pair.out > /tmp/data "
+else
+    echoErr "executable drawpair$pair.out not yet made"
+    exit 1
+endif
+
+
+
+
+

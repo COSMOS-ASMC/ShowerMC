@@ -1,0 +1,81 @@
+ The data to be used is between  (don't drop # below, othewise error at runtime) 
+ #    $PARAM  $END
+ and 
+ #    $HPARAM $END
+ See comments after  
+ #    $HPARAM ~ $END.
+
+ IntModel = '"sibyll"'
+ IntModel = '"qgsjet1"'
+ IntModel = '"qgsjet2"'
+ IntModel = '"dpmjet3"'
+
+ $PARAM
+ DestEventNo = 10000, 20
+ InitRN = 3335431, -77663,
+
+ IntModel = '"dpmjet3"',
+ Trace = 0,
+ TraceDir = './'
+ SeedFile ='  '
+ $END
+
+ $HPARAM
+ UserHookc ='9  56  26  0   0   1.e6',
+            '9  40  18  0.  0   -1.e1',
+
+ UserHookr = -1 1 14000
+ UserHooki = 1 0
+ $END
+
+ DestEventNo: two integers. number of events to be generated. 2nd one is used.
+ InitRN:  two integers for random number seed. If 2nd one is negative, 
+          timer, hostname, process number will be used.
+ IntModel:  Interaction model
+ Trace :    if non zero, trace data will be put in TraceDir. The file name will be
+          trace1, trace2...  These can be visualized as tracks by  disptracebygeomv 
+          in  Util/Geomview/. For usage, just do ./disptracebygeomv  there.
+ TraceDir: where to put trace files.
+ SeedFile: don't touch.
+UserHookc: 
+       First line is to specify the projectile.  
+          code subcode charge px, py, pz  (GeV/c);  ptcl moves standard projectile
+          direction is +z direction. (code=9 for  heavy, subcode is A)
+          momentum is the total momentum (not /nucleon) (pz>0). 
+       Second line is for the target.
+          the same as projectile .  -z is the standard particle direction
+          (so normally  give negative pz for that). 
+          They could,  however, be different.
+       ***For large A suc as Pb-Pb at LHC energies by dpmjet:
+        change all NMXHKK=90000 to NMXHKK=200000 
+	in Import/DPM/dpmjet3.f  and Particle/Event/Interface/cdpmjet.f
+        and  make  in each directory. Don't forget to restore the values later.
+
+       Third line. usually may be absent. If exists, the three real values
+            show the collision point (x,y,z) in cm. If absent, no output for 
+            xyz. (You may give the position at Epics run thru sepicsfile).
+     ***If you want to change the projectile and target info event by event,
+	you may prepare an ascii file which containes  sets of such two (or 3) lines,
+	(without ') and give following two lines here.
+       UserHookc ='file 52  xyz', 'collision.dat'
+       where "file" must be given as it is, 52 is the number used to open/read
+       the file (logical number; so you may give a different number),
+       "xyz" must present only if you give the collision point info.
+       The second argument "collision.dat" is a file name in which you prepared
+       the projectile and target info. (so the name may be different).
+       Then event generation will continue until EOF is reached or DestEventNo
+       is reached.	
+UserHookr: Output is made for particles within certain range of angles relative to
+        the z-axis  The min and max of such angles are specified by direction cosines
+        relative to the z-axis. 
+       First two show such cosine values (min and max).
+       If want to select only those going +z direction, use 0., 1.0
+       3rd one is the length of the track to visualize the collision. 
+UserHooki:  First one: If non-zero, Energy to be given in the dpmjet.inp will be
+        shown as /nucleon energy (GeV). and the program run stops there.
+        If zero, program will generate events.
+
+       Second one: Output will contain one blank line at the end of each event.
+	 If second one is non-zero, there will be no blank line, if there is  
+         no particle to be written.
+

@@ -1,0 +1,69 @@
+#    tracefile         howtoslice   split  outtype
+'/tmp/yourid/trace1'     'profile'   t       2
+# chgsel  codesel
+ -1   0/
+#  conversion matrix
+ 1  0  0
+ 0  1  0
+ 0  0  1
+--------------------------
+
+ 0.610866585     -0.791733551      0.000000000
+ 0.728356973      0.561968021     -0.392030692
+ 0.310383852      0.239478450      0.919952138  
+
+
+The above data is:
+1st line:  tracefile  profile split outtype 
+2nd line:  chgsel   codesel
+3-5th line:  detector to primary system conversion matrix
+
+tracefile:   path to the tracefile 
+profile:     file to  specify how to slice in detail
+split : If t,   data at t1, t1+dt,.. are put into  different files.
+        If f,   all data are put into the same file. Different time data
+	are  separated by a balnk line.
+outtype: 1-->x y z code chg data is output.  file name will be *.dat
+         2-->skel data for Geomview is output. (split =f is prob. nonsense)
+	    file nemae will be *.skel
+	 3--> both of .dat and. .skel are output
+---
+chgsel  :   -1--> select all charge.  0-->select only neutral 1--> select only 
+		charged particls.
+codesel :   a max of 9 integers indicating particle code to be displayed.
+	 E.g  if 1 3/  gamma rays and muons are selected.  / is needed.
+	if  0/,  all particles are selected.
+---
+matrix:  Primary axis unit vector in Detctor system.
+         Used to convert (x,y) in det. system into primary system.
+	 To get this matrix, use Util/det2prim.f or det2prim2.f
+	 If you don't put a selection conditon by lateral spread (see 
+	 timeprofile), or primary is vertical,
+	 1 0 0
+	 0 1 0
+	 0 0 1
+ 	can be used.
+------
+
+output  data format.
+
+.skel files are understood by Geomview; see Geomview manual.
+
+.dat  files.  If split =t, one file contains data at a time:
+	x y z code chg
+        x y z code chg
+       .....
+
+If split=f,  a consecutive block of data separated by one 
+	blank line  indicates particles
+	at a time.
+	x y z code   chg
+	x y z code   chg
+        ...
+       blank line
+	x y z code   chg
+	x y z code   chg
+        ...
+       blank line
+...
+

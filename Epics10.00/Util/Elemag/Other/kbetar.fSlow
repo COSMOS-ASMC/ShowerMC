@@ -1,0 +1,51 @@
+cc          for test of kbetar generator
+          implicit none
+          real*8 a, b, x
+          integer i
+c          call cerrorMsg('Enter a, b', 1)
+c          read(*, *) a, b
+          a = 5
+          b = 2
+          do  i=1, 100000
+             call kbetar(a, b, x)
+c             write(*, *) sngl(x)
+          enddo
+          end
+
+        subroutine kbetar(a, b, x)
+        implicit none
+        real*8 a  ! input. see below
+        real*8 b  ! input. see below
+        real*8 x  ! output. sampled random variable
+
+c           generate a random variable x following beta function kernel
+c           i.e.  density function is x**(a-1)* (1-x)**(b-1)dx
+c
+c          both of a and b cannot be < 1.0
+c              if a and b unbalance largely, rejection rate will
+c              become large: (a=2, b=5--->1/6.6 is accepted
+c                             a=2.1,b=1.2-->30 % rejection)
+c        To sample  100000 variables, 4.226 sec is needed.
+c       (wiht a=1.5, b=2.5 with facom m780)
+c       this is sometimes faster than ksbeta for a class of a,b
+c       but has limitations.
+
+        real*8  u
+        integer ia, ib
+        if(a .lt. 1. .or. b .lt. 1.) then
+           write(*,*) ' kbetar cannot accept a<1 or b<1:'
+           write(*,*) ' a=',a, ' b=',b
+           stop 9999
+        endif
+        ia = a-1.
+        ib = b-1.
+        do  while(.true.)
+           call ksmpintbeta(ia, ib, x)
+c             rejection
+           call rndc(u)
+           if(u .lt. x**(a-ia)*(1.-x)**(b-ib)) then
+              goto 10
+           endif
+        enddo
+ 10     continue
+        end

@@ -1,0 +1,45 @@
+*  This is the prototype for EPICS. EMULSION part must be modified.
+*    This is the same one as in Cosmos/Util/DPM/.  
+*    Hadrin branch energy is set to be 4.1GeV and  moved to here. 2002.Mar.24
+*    Used by fordpmjet
+PROJPAR         56.0      26.0
+*
+* possible targets
+*
+EMULSION           1         1         1
+EMULSION          12         6         1
+EMULSION         207        82         1
+EMULSION          65         0         1
+EMULSION         823         0         1
+*
+* maximum energy of interaction
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7...
+ENERGY        4.0e6
+*
+* read profile function data from pre-calculated file (atmos.GLB)
+*                                     file name is fixed to be dpmjet.GLB
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7...
+GLAUB-PAR       750      49.0       1.0     100.0                     dpmjet
+*      suppress message from Lund
+LUND-MSTU       12.0         0.0
+LUND-MSTU       11.0         0.0
+LUND-MSTU       127.0        0.0
+LUND-MSTU       122.0        0.0
+*
+* PHOJET-specific input
+*
+PHOINPUT
+PROCESS           1 0 1 1 1 1 1 1
+ENDINPUT
+*       hadrin is used below 4.1 GeV
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7...
+HADRIN             0       4.1
+*
+* start of event generation
+*
+START     1000000000       0.0
+STOP
+
+
+
+

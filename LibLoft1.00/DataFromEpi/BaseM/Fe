@@ -1,0 +1,10 @@
+#name   Format    Iron
+Fe 	2
+#
+#  Elem	 rho(g/cm^3)	Gas/Solid(1/0)  refl.index Birks c
+
+1         7.86             0              0        0 0 0
+# 	Z	A  	N
+	26	55.8	1
+#  ⟨Z/A⟩   I[eV]   a       k      x0    x1     Cbar  delta0
+  0.466   286.0  0.1468  2.9632 -0.0012  3.1531  4.2911 0.12

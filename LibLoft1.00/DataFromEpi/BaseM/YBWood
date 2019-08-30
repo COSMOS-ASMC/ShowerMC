@@ -1,0 +1,11 @@
+#name   Format    YBWood
+# C6H10O5
+ YBWood 1
+#
+#  Elem	 rho(g/cm^3)	Gas/Solid(1/0)  refl.index Birks c
+
+3         0.615             0              0        0 0 0
+# 	Z	A  	N
+	1	1	10
+	6	12	6
+	8	16	5

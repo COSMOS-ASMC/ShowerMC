@@ -1,0 +1,98 @@
+include $(COSMOSTOP)/site.config
+#FC= ifc
+#FFLAGS= -w95 -Vaxlib -r8 -132
+#FFLAGS= -O3 -ip -wp_ipo -w -Vaxlib -tpp6 -r8
+
+#FC= g77
+#FFLAGS= -O6
+
+TOPDIR	= $(shell /bin/pwd)
+INCLUDE = $(TOPDIR)/include
+#LIBRARY = admin/libadmin.a simu/libsimu.a geophys/libgeophys.a \
+#	int-common/libintcommon.a math/libanmath.a
+LIBDPM = int-dpmjet3/libintdpmjet3.a
+LIBFLUKA = int-fluka/libintfluka.a
+LIBHKKM = int-hkkm/libinthkkm.a
+
+export FC
+export FFLAGS
+export TOPDIR
+export INCLUDE
+
+#all: libbuild atmnc3 #reformat-recordptl make-intflux
+all: libbuild 
+
+atmnc3: admin/atmnc3.f $(LIBRARY) $(LIBDPM) 
+	$(FC) $(FFLAGS) -o atmnc3 admin/atmnc3.f $(LIBRARY) $(LIBDPM)
+
+atmnc3-high: admin/atmnc3-high.f  $(LIBRARY) $(LIBDPM)
+	$(FC) $(FFLAGS) -o atmnc3-high admin/atmnc3-high.f $(LIBRARY) $(LIBDPM)
+
+atmnc3-allptl: allptl/atmnc3.f libbuid
+	make -C allptl atmnc3-allptl
+atmnc3-tikei-sk: tikei/atmnc3.f tikei/sk_map.f libbuild
+	make -C tikei atmnc3-tikei-sk
+atmnc3-tikei-grn: tikei/atmnc3.f tikei/grn_map.f libbuild
+	make -C tikei atmnc3-tikei-grn
+
+mk-resample-ratio: utils/mk-resample-ratio.f libbuild
+	make -C utils mk-resample-ratio
+reformat-recordptl: utils/reformat-recordptl.f libbuild
+	make -C utils reformat-recordptl
+sum-recordptl: utils/sum-recordptl.f libbuild
+	make -C utils sum-recordptl
+sum-recordptl-any: utils/sum-recordptl-any.f libbuild
+	make -C utils sum-recordptl-any
+sum-resample: utils/sum-resample.f libbuild
+	make -C utils sum-resample
+test-int: utils/test-int.f libbuild
+	make -C utils test-int
+passrate: utils/passrate-s.f libbuild
+	make -C utils passrate
+test-primary-sample: utils/test-primary-sample.f libbuild
+	make -C utils test-primary-sample
+
+offl-time: offl/offl-time.f libbuild
+	make -C offl offl-time
+offl-height: offl/offl-height.f libbuild
+	make -C offl offl-height
+offl-statis: offl/offl-statis.f libbuild
+	make -C offl offl-statis
+offl-impact: offl/offl-impact.f libbuild
+	make -C offl offl-impact
+
+sum-offl-time: offl/sum-offl-time.f libbuild
+	make -C offl sum-offl-time
+sum-offl-height: offl/sum-offl-height.f libbuild
+	make -C offl sum-offl-height
+sum-offl-impact: offl/sum-offl-impact.f libbuild
+	make -C offl sum-offl-impact
+
+libbuild :
+#	make -C admin libadmin.a
+#	make -C simu libsimu.a
+#	make -C geophys libgeophys.a
+#	make -C int-common libintcommon.a
+	make -C int-common 
+#	make -C math libanmath.a
+	make -C math 
+#	make -C int-dpmjet3 libintdpmjet3.a
+	make -C int-dpmjet3 
+#	make -C int-fluka   libintfluka.a
+#	make -C int-hkkm    libinthkkm.a
+#	make -C int-lund7   libintlund7.a
+
+clean:
+	make -C admin clean
+	make -C simu clean
+	make -C geophys clean
+	make -C int-common clean
+	make -C math clean
+	make -C int-dpmjet3 clean
+	make -C int-fluka   clean
+	make -C int-hkkm    clean
+	make -C int-lund7   clean
+	rm -f atmnc3 atmnc3-fluka atmnc3-hkkm atmnc3-lund7 sum-recordptl
+
+install : atmnc3 atmnc3-fluka atmnc3-hkkm atmnc3-lund7 sum-recordptl
+	cp atmnc3 atmnc3-fluka atmnc3-hkkm atmnc3-lund7 sum-recordptl /home/mhonda/bin 

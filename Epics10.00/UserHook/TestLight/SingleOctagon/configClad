@@ -1,0 +1,27 @@
+#  type  matter  c    de maxpath  / x y z  a  b c 
+-------------------------------------------------------------------
+
+#eq   a   30.0
+#eq   b   1.9d0
+#eq   c   2.d0
+#eq   d   0.19d0
+#eq   l   0.005d0     ! 50 micron meter 
+#eq   l2  0.010d0     ! 2l
+#eq   b1  1.910d0     ! b+2l    
+#eq   b2  1.920d0     ! b1+2l
+#eq   c1  2.010d0      ! c+2l
+#eq   c2  2.020d0      ! c1+2l
+#eq   d1  1.9292893218813452d-1     ! d1 = (l/cos45 +d cos45 -l)/cos45
+#eq   d2  1.9585786437626904d-1     ! d2 = (lcos45  +d1cos45 -l)/cos45
+
+#news new-1 octagon
+1   octagon  PWO 3  1102  0   / 0  0  0   a  b2    c2  d2 /2
+2   octagon  PWO 3  1102  0   / 0  l  l   a  b1    c1  d1 /3 
+3   octagon  PWO 3  3102  0   / 0  l2 l2  a  b      c  d
+-------------------------------------------------
+#  type  matter  c    de maxpath / x0   y0   z0   a  b  c
+#     1102: scini only with Light10.dat data
+#     2102: ceren //
+#     3102: both  
+
+

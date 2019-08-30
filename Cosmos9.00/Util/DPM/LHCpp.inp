@@ -1,0 +1,45 @@
+**********************************************************************
+* Example for pre-initialization of profile-function
+* (Here: Calculation of profile-functions for projectiles with mass
+*        56 (Fe) and lower and O, N, Ar targets in 4 energy
+*        log bins from 1.5 to 1.e5 GeV lab energy per nucleon)
+**********************************************************************
+*
+* maximum projectile mass
+*
+PROJPAR                                                               PROTON 
+TARPAR           1.0       1.0
+*
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7...
+ENERGY	     104.d8  
+* PHOJET-specific input
+*
+PHOINPUT
+PROCESS           1 0 1 1 1 1 1 1
+ENDINPUT
+*
+*   syout--> errorout for Jetset/pythia; no ouput from
+LUND-MSTU    12.0         0.0
+LUND-MSTU    11.0         0.0
+LUND-MSTU    127.0        0.0
+LUND-MSTU    122.0        0.0
+* PHOJET-specific input
+
+* write profile function data to file atmos.glb
+*          
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7...
+GLAUB-PAR    1000.0      49.0       1.0      -1.0                     LHC
+*
+* energy range for initialization of profile function data
+* (negative values: c.m.system, positive values: lab. system)
+*
+*      (Ebin+1)(Nproj+2)xNtaget <=1000
+*      Nt=3, Np= 18+(A=23,28,31,36,41,46,52,56)+2 =28
+*    Then, Ebin<= 1000/(3x28)-1 = 10
+*             E_min     E_max     # of bins
+GLAUB-INI   1.04d8  1.04001d8         1         1        1
+*  GLAUB-INI   0.5d0      500.         3
+*
+* START
+STOP
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7...

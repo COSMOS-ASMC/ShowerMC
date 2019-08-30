@@ -1,0 +1,2 @@
+awk 'END {for(i=0; i<280; i++){printf( "(snapshot focus ts%5.5d.ppm ppmscreen)\n (zoom c0 1.009951)\n",i)}}' /dev/null > doZoom
+

@@ -1,0 +1,7 @@
+ccomppathend.
+	if( length >0 ) then  <--moved to above
+
+....
+
+csampNEPIntL.  max(ke, eps) ; eps  is 1.e-8 no 1.d-8
+

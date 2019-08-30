@@ -1,0 +1,19 @@
+#!/bin/csh -f
+
+if( $#argv != 4 ) then
+    echo "Usage: mkframes  windowid frame_name number_of_frames sleeptime"
+    exit 1
+endif
+
+@ n = 0
+onintr fin
+while ( $n < $3 )
+   set file = `awk  'END {printf("%s%06d\n", frame, n)}' frame=$2  n=$n /dev/null`
+   echo $file
+   onintr -
+   import  -window $1 $FRAMEDIR/$file.jpeg
+   onintr fin
+   @ n++
+   sleep $4
+end
+fin:

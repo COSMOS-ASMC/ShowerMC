@@ -1,0 +1,9 @@
+
+NF > 1  && nc != 0 && $1 != "#" {++nc;for(i=2; i<=8; ++i) size[i-1,nc] += $i; dep[nc] = $1; ncsave=nc}
+NF > 1 && nc == 0 && $1 != "#" {++nc;for(i=2; i<=8; ++i)  size[i-1, nc] += $i; dep[nc] = $1; ++nev}
+nc==nl {nc=0}
+NF == 0 {nc = 0}
+END {print "# events ", nev; for(i=1; i<= ncsave; ++i){printf("%f  ", dep[i]*0.1); for(j=2;j<=8;++j) {printf("%f ", size[j-\
+1,i]/nev)} printf("\n")}}
+
+

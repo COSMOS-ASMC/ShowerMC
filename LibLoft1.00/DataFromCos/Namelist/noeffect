@@ -1,0 +1,114 @@
+ $PARAM
+ ASDepthList =  100 500  1000 2000  3000 4000 5000 6000 7000 8000 9000 
+
+ ASHeightList = 20*0.0d0
+
+ BaseTime = 10.0d0
+ Cont = F
+ ContFile =
+ '../Data/.contInfo                                                     '
+ CosZenith = (0.8d0,0.8d0)
+ Ddelta = 5.0d0
+ DeadLine =' '
+ DepthList = 5000 9000
+ DestEventNo = 200
+ DtGMT = 8.0d0
+ Freec = T
+ Generate ='as '
+ HeightList = 15*0.0d0
+ HeightOfInj = 100.d3
+ Hidden = F
+ IncMuonPolari = T
+ InitRN =   55321 3377
+ IntModel ='int1 '
+ Job =' '
+ KEminObs = 1.e30
+ LatitOfSite = 30.11d0
+ LongitOfSite = 90.53d0
+ LpmEffect = f
+ MinPhotoProdE = .15d0
+ ObsPlane = 1
+ PhotoProd = F
+ PrimaryFile =
+ '../Data/Primary/sync                               '
+ SeedFile =
+ '../Data/Seed                                                          '
+ SkeletonFile =
+ '../Data/SkeletonParam                                                 '
+ SourceDec = 30.0d0
+ ThinSampling = F
+ TimeStructure = f
+ Trace = 0
+ TraceDir =
+ '                                                                      '
+ WaitRatio = 0.001d0
+ Within = 99999
+ YearOfGeomag = 1995.5
+ Za1ry ='is '
+ $END
+ 
+ 
+ ------------------ Don`t worry about the following for normal applications
+ $HPARAM
+ AnihiE = 3.000000000000000d-02
+ BaseErg = 1000.0d0
+ BasePower = 1.0d0
+ BorderHeightH = .0d0
+ BorderHeightL = .0
+ Cekaon = .0d0
+ Ceneuc = .35d0
+ Cepic0 = .0d0
+ Charge2heavyG = 1 2 3 3 4 4 4 5 5 5 5 5 6 6 6 6 6 7 7 7 7 7 7 7 7 7
+ Code2heavyG = 0 0 0 0 0 1 0 0 0 2 3 4 5 6 7
+ Code2massN = 0 0 0 0 0 1 0 0 0 4 8 14 25 35 56
+ Deltkp = 8.000000000000000E-02
+ Deltpip = 8.000000000000000E-02
+ Deltpp = 8.000000000000000E-02
+ Ecrit = 7.600000000000000E-02
+ Efermi = 1.000000000000000E-02
+ Elund = 500.0
+ Es = 20.e-3
+ EthinRatio = 3.000000000000000E-04
+ EventNo = 0
+ EventsInTheRun = 0
+ ExactThick = F
+ FragmentTbl = 1.0 4.0 5.81 6.62 10.5 12.8 18.1 .0 .0 .61 .72 .77 1.17
+ 1.71 .0 .0 .11 .24 .21 .17 .24 .0 .0 .0 .17 .39 .2 .17 .0 .0 .0 .0 .16
+ .42 .22 .0 .0 .0 .0 .0 6.000000000000000E-02 .2 .0 .0 .0 .0 .0 .0 .17
+ Generate2 =' '
+ HeavyG2charge = 1 2 4 7 12 17 26
+ HeavyG2code = 6 10 11 12 13 14 15
+ HeavyG2massN = 1 4 8 14 25 35 56
+ HeavyG2symbol ='p ', 'Alfa', 'L ', 'CNO ', 'H ', 'VH ', 'Fe '
+ HowGeomag = 11
+ IncreaseXsec = 1.0
+ KEminObs2 = .0
+ Knockon = T
+ Kpicns = 7.700000000000000E-02
+ Kpilog = 6.200000000000000E-03
+ MagBrem = 0
+ MagPair = 0
+ MagBremEmin = 1.e9
+ MagPairEmin = 1.e30
+ MagChgDist = 30000.0
+ MagD = .0
+ MagE = .0
+ MagN = .0
+ MaxComptonE = 7.500000000000000E-02
+ MaxPhotoE = .0
+ Mudirp = 1.0
+ NoOfSites2 = 0
+ OffsetHeight = .0
+ PrevEventNo = 0
+ PtAvFrag = 5.000000000000000E-02
+ PtAvNonInteNuc = 5.000000000000000E-02
+ RatioToE0 = 1.000000000000000E-06
+ RecoilKineMinE = 2.500000000000000E-04
+ SeedFileDev = 22
+ TempDev = 11
+ TraceDev = 21
+ Truncc = 5.0
+ Truncn = 1.000000000000000E-02
+ Truncx = 2.0
+ X0 = 364.0
+ $END

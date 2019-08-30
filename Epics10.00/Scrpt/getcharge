@@ -1,0 +1,5 @@
+#  to get charged
+NF > 0 && $6 !=0 {print }
+NF == 0 {print}
+
+ 

@@ -1,0 +1,261 @@
+c     ****************************************************************
+c     *                                                              *
+c     * fbrem: brems prob/r.l.  with the Landau effect  
+c     *                                                              *
+c     ****************************************************************
+c
+c
+c     complete screening + landau effect.  vv=eg/e, ein gev. prob. in d
+c
+c
+c
+c
+      real*8 function fbrem(vv)
+      implicit none
+
+      real*8 vv
+c
+c
+      real*8 x0cm, x0g, s1, logs1, sconst
+      common /landuc/  x0cm, x0g, s1, logs1, sconst
+
+      real*8 e
+      common /landu1/e
+
+      real*8  er/0.001/
+      real*8  eps/0.001/
+      real*8 v, s, sbrem2, smigb, gzai, gmigdl, psimig
+
+      v=vv
+      if(v.eq.1.) go to 20
+      if(v.ne.0.) go to 10
+      fbrem=0.
+      return
+   20 continue
+      fbrem=(v*v+2.*(1.+(1.-v)*(1.-v)))/v/3.
+      return
+   10 continue
+      s=1.
+      s=sbrem2(v,e,s)
+      if(s.gt.1.) goto 20
+      s=smigb(v,e,s,er)
+   55 continue
+      fbrem=gzai(s)/v*(v*v*gmigdl(s,eps)+2.*(1.+(1.-v)*(1.-v))*
+     *  psimig(s, eps))/3.
+c
+c     note that as v-->0, gzai(s) becomes 2 and
+c     fbrem---> 2/v *( v*v*12pi*s**2 + 2*(1+(1-v)**2 )* 6 s) )/3
+c               where s---> sqrt( sconst*v/2/e/(1-v))
+c               so that fbrem--->8*sqrt(2*sconst/v/e)
+c
+      end
+c
+c
+c     ***********
+      real*8 function fpair(vv)
+      implicit none
+      real*8 vv
+c
+c
+      real*8 x0cm, x0g, s1, logs1, sconst
+      common /landuc/  x0cm, x0g, s1, logs1, sconst
+c
+      real*8 e
+      common /landu1/e
+
+      real*8 v, s, spair2, smigp, gzai, gmigdl, psimig
+
+      real*8  er/0.001/
+      real*8  eps/0.001/
+
+      v=vv
+      if(v. eq. 1. .or. v.eq.0.) go to 60
+      go to 100
+   60 continue
+      fpair = (1.+2.*(v*v+(1.-v)*(1.-v)))/3.
+      return
+  100 continue
+      s=1.
+      s=spair2(v,e,s)
+      if(s.gt.1.) go to 60
+      s=smigp(v,e,s,er)
+  105 continue
+      fpair= gzai(s)/3.*(gmigdl(s,eps)+2.*(v*v+(1.-v)*(1.-v))*
+     * psimig(s, eps) )
+      end
+c     ****************************************************************
+c     *                                                              *
+c     * smigb:  get root s, from recursive relation                  *
+c     *                                                              *
+c     ****************************************************************
+c
+c
+      real*8 function smigb(v,e,s,er)
+      implicit none
+      real*8 v, e, s, er
+c
+      real*8 ss, sbrem2
+c
+    5 continue
+      ss=sqrt(sbrem2(v,e,s))
+      if(abs((s-ss)/ss).lt.er) goto 10
+      s=ss
+      goto 5
+   10 continue
+      smigb=ss
+      end
+c
+c
+c     ***********
+      real*8 function smigp(v,e,s,er)
+      implicit none
+      real*8 v, e, s, er
+c     ***********
+c
+      real*8 ss, spair2
+c
+   15 continue
+      ss=sqrt(spair2(v,e,s))
+      if(abs((s-ss)/ss).lt.er) go to 20
+      s=ss
+      go to 15
+   20 continue
+      smigp = ss
+      end
+c     ****************************************************************
+c     *                                                              *
+c     * sbrem2:  auxliary function for brem with landau effect       *
+c     * spair2:  //                    pair                          *
+c     *                                                              *
+c     ****************************************************************
+c
+c
+      real*8 function sbrem2(v,e,s)
+      implicit none
+      real*8 v, e, s
+c
+      real*8 x0cm, x0g, s1, logs1, sconst
+      common /landuc/  x0cm, x0g, s1, logs1, sconst
+c
+      real*8 tmp,  gzai
+
+c
+      tmp=sconst*v
+      sbrem2=tmp/(1.-v)/e/gzai(s)
+      end
+
+      real*8 function spair2(v,e,s)
+      implicit none
+      real*8 v, e, s
+
+      real*8 x0cm, x0g, s1, logs1, sconst
+      common /landuc/  x0cm, x0g, s1, logs1, sconst
+      real*8 tmp,  gzai
+  
+      tmp=sconst/v
+      spair2=tmp/(1.-v)/e/gzai(s)
+      end
+c     ****************************************************************
+c     *                                                              *
+c     * gzai:  gzai function which appear in ladanu effect           *
+c     *                                                              *
+c     ****************************************************************
+c
+c
+      real*8 function gzai(s)
+      implicit none
+      real*8 s
+c
+c
+c     data s1/5.636e-4/,alogs1/-7.481/        for z=82;lead
+c
+c
+      real*8 x0cm, x0g, s1, logs1, sconst
+      common /landuc/  x0cm, x0g, s1, logs1, sconst
+c
+      real*8 e
+      common /landu1/e
+
+c
+      if(s.ge.1.) then
+        gzai=1.
+      elseif(s. gt. s1) then
+        gzai = log(s)/logs1+1.
+      else
+        gzai = 2.
+      endif
+      end
+c     ****************************************************************
+c     *                                                              *
+c     * gmigdl:  g(s) function which appear in landau effect         *
+c     * psimig:  pis(s) //                                           *
+c     *                                                              *
+c     ****************************************************************
+c
+c             .... psiim is needed.....
+c
+      real*8 function gmigdl(s,eps)
+      implicit none
+      real*8 s
+      real*8 eps
+      real*8 kpsiim
+c
+      real*8  pi12/37.699112d0/, pi6/18.849556d0/
+      gmigdl = (pi12*s-48.*s*s * kpsiim( s+0.5d0, s, 0, eps)) * s
+      end
+c     ************
+      real*8 function psimig(s,eps)
+      implicit none
+      real*8 s, eps
+c     ************
+c
+c
+      real*8 kpsiim
+      real*8   pi6/18.849556d0/
+      psimig = ((kpsiim(s,s,1,eps)*s*24.-pi6)*s+6.) *s
+      end
+c     ****************************************************************
+c     *                                                              *
+c     * zpart:  z-dependent part of brems and pair functions const   *
+c     *         with the landau effect                               *
+c     *                                                              *
+c     ****************************************************************
+c
+c      /usage/
+c          call  zpart(z,a,rho)
+c       z:  charge
+c       a:  mass no.
+c     rho:  density in g/cm**3
+c
+c
+      subroutine zpart(z,a, rho)
+      implicit none
+      real*8 z
+      real*8 a
+      real*8 rho
+
+c
+c
+c
+      real*8 x0cm, x0g, s1, logs1, sconst
+      common /landuc/  x0cm, x0g, s1, logs1, sconst
+
+c
+c        get r.l.
+c
+      call kradl(z, a, 1.d0,  1, rho,  x0cm, x0g)
+c
+      s1=    ( z**0.3333333/ 183 )**2
+      logs1 = log(s1)
+c        const in eq.60 of migdal's paper. phys. rev. vol 103 1956
+c         energy is in gev
+      sconst=( 1.37e3 ) **2  * x0cm  * 0.511e-3
+c
+c
+c      write(6,10) z, a, rho, x0cm, x0g, s1, alogs1, sconst
+   10 format('0*** constant used in landau effect'/
+     *  ' z=',f7.2, ' a=',f7.2, ' rho=', f7.2, ' x0=', f7.3, 'cm',
+     *  '=', f7.3,'g/cm**2', '  s1=',g9.3, ' ln(s1)=',g9.3,
+     *  '  const in eq.60 of migdal=', g9.3)
+c
+      end

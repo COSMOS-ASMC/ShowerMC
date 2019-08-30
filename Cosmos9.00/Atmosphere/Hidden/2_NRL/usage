@@ -1,0 +1,48 @@
+NRL model (NRLMSISE00): Time period and Location dependent atmosphere
+model developed by NRL (Naval Research Laboratory, USA)
+
+  If the current atmoshere model is "2: NRL", the user can control
+the model either by giving a data to "AtmosFile" or to "NRL_period"
+in the namelist &HParm.
+
+A)  If “AtmosFie"e is blank,
+    "NRL_period" is referred to specify a period over which the 
+average feature of the atmosphere is calculated.
+It must be given in the “param” file, otherwise, eor rr stop will be
+made. As the location, "LatitOfSite" and "LongitOfSite" in the namelist
+data are employed.
+
+   The format of "NRL_period" is:
+     NRL_period=day1, day2, hour1, hour2
+where day1 and day2 are integers (1∼365). 1 means Jan. 1 and 365
+Dec.31 (no leap year consideration). The period from day1 to day2 is
+the target period. If day1 > day2, it is assumed that the peirod
+straddles Dec.31 to Jan.1. The next hour1 and hour2 are also integers
+ranging 0 to 23 and spcify the hours in each day in the period.
+If hour1 > hour2, midnight (0) is included. For example, 
+     NRL_period = 335 60 21 3
+means roughly night time in Dec. to Feb.
+
+  The average is computed by sampling days and hours in the period: 
+For days, 7-day step sampling is made, but the day1 and day2 are
+always included. (So the last step may not be 7 but greater than 3).
+For hours, 4-hour step sampling is made but hour1 and hour2 are always
+included (the last step may not be 4 but greater than 2).   For
+NRL_period=1 36 0 23, we need a computation time of 4∼5 s.
+
+B) If “AtmosFile” is notlank:
+   "NRL_period" is neglected.  In this case, the file content must 
+be for the NRL model. The time period and location should be specified
+in the file.  If the location is not consistent with the 
+ "LatitOfSite" and "LongitOfSite" in the namelist, &Param, stop will
+be made.
+
+One example is seen in
+   $COSMOSTOP/Data/Atmos/NRLAtmos.d
+
+For further details, see a manual xxxxxx.pdf in ....
+
+
+
+
+ 

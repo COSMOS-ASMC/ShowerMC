@@ -1,0 +1,3791 @@
+c
+c  some examle of config data
+c #  box pb  c de maxp/ x0 y0 z0  a b c
+c #  box pb  c de maxp/ x0 y0 z0  a b c ax ay az bx by bz
+c # id=S1  box pb  c de maxp/ x0 y0 z0  a b c ax ay az bx by bz/contains  list
+c #  box pb  c de maxp/ x0 y0 z0  a b c/contains list
+c
+c # id=S2,layer1  cyl pb  c de maxp/ x0 y0 z0  r h
+c #  cyl pb  c de maxp/ x0 y0 z0  r h axisdir
+c #  cyl pb  c de maxp/ x0 y0 z0  r h axisdir/contains list
+c #  cyl pb  c de maxp/ x0 y0 z0  r h/contains list
+c
+c #  pipe pb c de maxp/ x0 y0 z0 ir or h
+c #  pipe pb c de maxp/ x0 y0 z0 ir or h axisdir
+c #  pipe pb c de maxp/ x0 y0 z0 ir or h axisdir/contains list
+c #  pipe pb c de maxp/ x0 y0 z0 ir or h/contains list
+c
+c #  world sp 0 0 0 / x0 y0 z0 a b c
+c
+c 
+
+
+       subroutine eprcnf(dsn)
+       implicit none
+#include  "ZepMaxdef.h"
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+#include  "ZepManager.h"
+c
+          character*(*) dsn
+c
+          character(MAX_STRUCCHR)::epparaphrase
+          character(MAX_STRUCCHR)::tempph
+
+          character*1024 datax, dataout
+          character*256 msg
+          integer icon, i, j, nthline, klena
+          integer incLevel
+          character*120 incfile
+          character*2 rep
+          logical eattail
+          character*1 HTab
+c                       file # of include file starts from lvloffset+1
+c                       max depth of inc is maxinc
+          integer maxinc, lvloffset, maxparam
+          parameter (maxinc=10, lvloffset=70, maxparam=9)
+          integer ionum(maxinc), incparamN(maxinc)
+
+          character*24 incparam(maxparam, maxinc)
+
+          save eattail, incLevel, ionum
+          integer::idpos
+
+          integer::uscl   ! under score location or max character pos
+
+
+c          next is for dpmjet file management. 
+c          dpmfiles for Epcis is assumed to be in the
+c          same directory as config file resides so
+c          extract the directory where the config file is.
+c          this must be called before cintModels is called.
+          call cfixPrefix(dsn)
+          call csetCosOrEpi('epics')
+
+          eattail  =  .false.
+          Incused = .false.
+          ExistID = .false.
+          subDwithID(:) = 0
+          nthline = 0
+          incLevel = 0
+          HTab = char(9)      
+c           include file nestable upto maxinc; file # from 71 to ...
+          do i = 1, maxinc
+             ionum(i) = lvloffset + i
+          enddo
+
+          call copenf(iowk, dsn, icon)
+          if(icon .ne. 0) then
+             call cerrorMsg('file not exist', 1)
+             call cerrorMsg(dsn, 0)
+          endif
+c              find separater
+          call afsep(iowk)
+          mode = 0
+          Nequates = 0
+          EqualF = -97531.d0
+          EqualFshort = -6321
+          PlusF =  -13579.d0
+          MinusF = -3.1415d3
+          wrtcom = 1
+c              clear counter
+          call  epclCnfCnt
+          call epiniparaph      ! clear paraphrase counter (only once)
+          NsubD = 0
+          cumsubdloc = 0
+c ((((((((((((((((
+          AttrCounter = 0
+          CnCounter = 0
+          do i = 1, maxCnArea
+             CnArea(i) = 0
+          enddo
+c ((((((((((((((((
+
+          coment = 0
+          icon=0
+c          *** until loop*** 
+          do while (icon .eq. 0)
+             nthline = nthline + 1
+             if(incLevel .eq. 0) then
+                read(iowk, '(a)') datax
+             else
+                datax = ' '
+                read(ionum(incLevel), '(a)', end=60) datax
+                do i = 1, incparamN(incLevel)
+                   rep = ' '
+                   write(rep,'("$",i1)') i
+                   call kgsub(rep, incparam(i, incLevel), datax,
+     *               dataout)
+                   datax = dataout
+                enddo
+             endif
+c               decompse into  field(only first ~80 char) without
+c               converting into lower case letter
+             call kgetField(datax(1:100), FieldAsItis, 50,  Nfield)
+             call c2lowerCase(datax, confdata)
+c               decompose into field(only first ~100 char), Nfield should
+c               be the same as for FieldAsItis
+             call kgetField(confdata(1:100), Field, 50, Nfield)
+             if(Nfield .eq. 0) goto 30
+             if(Field(1) .eq. '/*') then
+                coment = coment  +1 
+             elseif(Field(1) .eq. '*/') then
+                if(coment .eq. 0) then
+                   call cerrorMsg(
+     *            'No /* corresponding  to */ in config', 1)
+                   write(msg, *) ' The line nuber is ',nthline
+                   call cerrorMsg(msg, 0)
+                endif
+                coment = coment - 1
+                goto 30
+             endif
+             if(coment .gt. 0) then
+                goto 30
+             endif
+
+             if(Nfield .ge. 2 .and. Field(1) .eq. '#subd')  then
+                call eppDefSubd   ! #subd line
+             elseif(Nfield .ge. 2 .and. Field(1) .eq. '#end') then
+                call  eppEnd    !  #end line
+             elseif(Nfield .ge. 3 .and.( Field(1) .eq. '#eq' .or.
+     *        Field(1) .eq. '#feq' ) ) then
+                call eppEquate
+             elseif(Nfield .ge. 2 .and. Field(1) .eq. '#com') then
+                read(Field(2), *) wrtcom
+             elseif(Nfield .ge. 2 .and. Field(1) .eq. '#inc') then
+                 incLevel = incLevel + 1
+                 Incused = .true.
+                 if(incLevel .gt. maxinc) then
+                    call cerrorMsg(
+     *              '#inc nest is too deep; must be <20 ', 0)
+                 endif
+                 call cformFullPath(FieldAsItis(2), incfile)
+                 call copenf(ionum(incLevel), incfile, icon)
+                 if(icon .ne. 0) then
+                    call cerrorMsg('file not exist', 1)
+                    call cerrorMsg(incfile, 0)
+                 endif
+c                 save parameter
+
+                 if(  Nfield-2 .gt. maxparam) then
+                    call cerrorMsg('too many parameters for #inc',0)
+                 endif
+                 incparamN(incLevel) = Nfield-2                    
+                 do i = 1, incparamN(incLevel)
+                    incparam(i, incLevel) = ' '
+                    incparam(i, incLevel) = FieldAsItis(i+2)
+                 enddo
+                    
+                 goto 90
+             elseif(Nfield .ge. 3 .and. 
+     *            Field(1) .eq.  '#news') then
+                tempph = epparaphrase(Field(2))
+                if(tempph .eq. Field(2) ) then
+c                      new definition; depo
+                   call epparadepo(Field(2), FieldAsItis(3))
+                else
+                   call cerrorMsg(Field(2), 1)
+                   call cerrorMsg(' is defined more than once', 1)
+                   write(msg, *) 'The line number is ',nthline
+                   call cerrorMsg(msg, 1)
+                endif
+             elseif(confdata(2:10) .eq. '---------') then
+                call eppfsep   !     end of config  data
+                icon = 1
+             elseif(confdata(1:1) .eq. 'c'.or. confdata(1:1) .eq. '!'
+     *               .or. confdata(1:1) .eq. '#' 
+     *               .or. datax(1:5) .eq. '     '  ) then
+                call epsvcom(datax)
+             else
+                if( Det.nct .ge. ncmax) then
+                   write(msg, *) ' Too many components >',ncmax
+                   call cerrorMsg(msg, 0)
+                else
+                   Det.nct = Det.nct + 1
+                endif
+c               &&&&&
+c                Field(2) : keep capital lett.  
+c                so we replace it by FieldAsItis
+             
+c///////////                Field(2) = FieldAsItis(2)   /////////////
+
+                if( Field(2)(1:3) == "id=" ) then
+                   ExistID = .true.  ! at least one id= found
+                   ! obtain the 2nd field again (id could be be
+                   ! very long)
+                   idpos = index(confdata, "id=")  ! see lower case
+                   call kgetField(datax(idpos:), idis, 1, i)
+c                     erase id part       
+                   call  kgsub("id=", "", trim(idis), dataout)
+                   datax = dataout
+                   call c2lowerCase(datax, confdata)
+c                      shift Field as if no "id=" term 
+                   do i = 2, Nfield-1
+                      Field(i)=Field(i+1)
+                      FieldAsItIs(i)=FieldAsItIs(i+1)
+                   enddo
+                   Nfield = Nfield -1
+c                    erase "id=" part in idis
+                   call kgsub("id=", "", idis,  dataout)
+                   idis = dataout
+c                   call epprocIDins ! insert id's
+c                else
+c                   idis = " "
+                endif
+c              &&&&
+                Det.cmp(Det.nct).cn = Det.nct
+
+                Det.cmp(Det.nct).level = 0 ! (((((
+                Det.cmp(Det.nct).subdidx = 0 !^^^^^^
+                Det.cmp(Det.nct).fsubdc = 0 !^^^^^^
+c                  proces  for  one component def.
+                do i = 1, 9
+                   Det.cmp(Det.nct).direc(i) = 0.
+                enddo
+                Det.cmp(Det.nct).direc(1) = 1.d0
+                Det.cmp(Det.nct).direc(5) = 1.d0
+                Det.cmp(Det.nct).direc(9) = 1.d0
+c (((((((((((((
+c                do i = 1, maxattr
+c                   Det.cmp(Det.nct).vol(i) = 0.
+c                enddo
+c ))))))))))))
+                
+                if(Field(2)(1:3) .eq. 'box') then 
+                   call eprbox(Det.cmp(Det.nct))
+
+                elseif(Field(2)(1:3) .eq. 'cyl') then 
+                   call eprcyl(Det.cmp(Det.nct))
+
+                elseif(Field(2)(1:4) .eq. 'pipe') then 
+                   call eprpip(Det.cmp(Det.nct))
+
+                elseif(Field(2) .eq. 'prism' .or.
+     *                Field(2)(1:6) .eq. 'prism_') then 
+                   call eprprs(Det.cmp(Det.nct))
+
+                elseif(Field(2)(1:6) .eq. 'sphere') then 
+                   call eprsph(Det.cmp(Det.nct))
+
+                elseif(index(confdata, 'new-') .ne. 0) then
+                   tempph = epparaphrase(Field(2))
+                   if(tempph .eq. Field(2) ) then
+c                      this is new new-xx. new-xx is deposited
+                      call epparadepo(Field(2), Field(2))
+                   endif
+                   call eprNew(Det.cmp(Det.nct),Field(2))
+                else
+                   call epseeUnderScore(Field(2), uscl)
+                   tempph = epparaphrase(Field(2)(1:uscl))
+                   if(tempph(1:4) .eq. 'new-')  then
+                      call eprNew(Det.cmp(Det.nct), Field(2))
+                   else
+c                      see if the name is defined as a SubDetector 
+                      do  j = 1, NsubD
+                         if(SubDName(j) .eq. Field(2)) goto 20
+                      enddo
+c                           invalid comp. name
+                      call cerrorMsg('component name  error', 1)
+                      write(msg, *) 'It is in ',
+     *                nthline, '-th line which is:'
+                      call cerrorMsg(msg, 1)
+                      call cerrorMsg(confdata, 1)
+                      if(index(confdata, HTab) .gt. 0) then
+                         call cerrorMsg(
+     *                   'If only blanks are seen above, "Tab"', 1)
+                         call cerrorMsg(
+     *                   'in the line may be the criminal',0)
+                      endif
+c                    -----------------
+ 20                   continue
+
+                      if(SubDUsed .lt. maxSubDRef) then
+                         SubDUsed = SubDUsed + 1 ! SubDetctor counter
+                      else
+                         call cerrorMsg('too many ref. to sub det', 0)
+                      endif
+                      
+                      call eprIncSubD( Det.cmp(Det.nct) )
+                      
+                      PosInDet(SubDUsed) = Det.nct
+                      SubDNumb(SubDUsed) = j
+                      if(SubDUsed .eq. 1) then
+                         SumOffset(SubDUsed) =  SubD(j).nct -1
+                      else
+                         SumOffset(SubDUsed) =  SumOffset(SubDUsed-1)
+     *                        +  SubD(j).nct -1
+                      endif
+                   endif
+                endif
+c                     contain-contained relation
+                call epcontain(eattail)
+
+c                if(Det.cmp(Det.nct).struc .ne. 'box_w' .and.
+c     *             Det.cmp(Det.nct).struc .ne. 'sphere_w' ) then
+                if(index(Det.cmp(Det.nct).struc, '_w') .eq. 0) then
+c                      not world;  if  world,  neglect next
+c                     judge rotation 
+                   call eprotation(Det.cmp(Det.nct))
+                endif
+             endif
+ 30          continue
+             goto 90
+ 60          continue
+c               include end
+             close(ionum(incLevel))
+             incLevel = incLevel - 1 
+ 90          continue
+          enddo
+  100     continue
+          
+          close(iowk)
+c              ouput expanded config/count each comp.
+          call eprecount  ! count each struc. again
+c               reset world
+          if(Det.nworld .gt. 0) then
+             call epresetWorld
+          else
+             call epenvlpAll
+          endif
+c               set form such as form='mix','box' etc
+          call epsetform
+
+
+          if(MsgLevel .ge. 1) then
+             write(msg,*)
+     *       ' configuration has been read from '
+             call cerrorMsg(msg, 1)
+             call cerrorMsg(dsn, 1)
+             write(msg,*) ' :the # of components=',Det.nct
+             call cerrorMsg(msg, 1)
+c             if(Det.nbox .gt. 0) then
+c                write(msg,*) ' # of box=',Det.nbox
+c                call cerrorMsg(msg, 1)
+c             endif
+c             if(Det.ncyl .gt. 0) then
+c                write(msg,*) ' # of cylinder=',Det.ncyl
+c                call cerrorMsg(msg, 1)
+c             endif
+c             if(Det.npip .gt. 0) then
+c                write(msg,*) ' # of pipe=',Det.npip
+c                call cerrorMsg(msg, 1)
+c             endif
+c             if(Det.nprs .gt. 0) then
+c                write(msg,*) ' # of prism=',Det.nprs
+c                call cerrorMsg(msg, 1)
+c             endif
+c             if(Det.nsph .gt. 0) then
+c                write(msg, *) ' # of spheres=', Det.nsph
+c                call cerrorMsg(msg, 1)
+c             endif             
+             do i = 1, MaxNewStruc
+                if(Det.nnew(i) .gt. 0) then
+                   if(i .le. 9) then
+                      write(tempph , '("new-",i1)')  i
+                   else
+                      write(tempph , '("new-",i2)')  i
+                   endif
+                   write(msg, '(" # of ",a,"=", i5)')
+     *                  epparaphrase(tempph), Det.nnew(i)
+                   call cerrorMsg(msg, 1)
+                endif
+             enddo
+             if(Det.nworld .gt.  0)  then
+                write(msg, *) 'world defined=', Det.nworld
+                call cerrorMsg(msg, 1)
+             endif
+             do i= 1, Det.nct
+                if(Det.cmp(i).NPContainer .gt. 0) then
+                   write(msg, *)
+     *                  'Comp. ', i, ' is partially contained by',
+     *                  ' comp. ',
+c (((((((((((
+c     *                  (Det.cmp(i).PContained(j),
+c     *                  j=1, Det.cmp(i).NPContainer)
+     *                   ( CnArea( j+Det.cmp(i).PContained ),
+     *                     j=1, Det.cmp(i).NPContainer )
+c)))))))))))
+ccccc                   call cerrorMsg(msg, 1)
+                endif
+                if(Det.cmp(i).NContainer .gt. 0) then
+                   write(msg, *)
+     *                  'Number of components which contain comp ',i,
+     *                  '=', Det.cmp(i).NContainer
+ccccc                   call cerrorMsg(msg, 1)
+                endif
+             enddo
+          endif
+c              see if given matter is ready for sampling
+          call epgetMedia
+          if(eattail) then
+             msg='Self eating comp. exists; see *** line above'
+             call cerrorMsg(msg, 0)
+          endif
+c             adjust max path by referring to the thickness of each
+c             layer
+          call epresetMaxPath
+       end
+c     ********************
+      subroutine eppDefSubd
+       implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+c         process #subd  line
+
+
+       character*120 msg 
+       integer i
+       record /ep3Vec/  org, abc
+
+       if(mode .ne. 0 ) then
+          call cerrorMsg(confdata,  1)
+          call cerrorMsg('#subd  is nested; not permited', 0)
+       endif
+       mode =  1
+       do i = 1,  NsubD
+          if(SubDName(i) .eq. Field(2) ) then
+             msg = 'sub detector ' // Field(2) //
+     *             ' doubly defined'
+             call cerrorMsg(msg, 0)
+          endif
+       enddo
+       do  i = 1, NPreDefName
+          if(PreDefName(i) .eq. Field(2)) then
+             msg = 'sub detector ' // Field(2) //
+     *             ' has been used by Epics'
+             call cerrorMsg(msg, 0)
+          endif
+       enddo
+
+       if(NsubD .ge. maxSubD) then
+          call cerrorMsg(
+     *     ' MAX_SUBD in ZepMaxdef.h is too small',0)
+       endif
+ 
+       SubDName(NsubD +1) = Field(2)
+       return
+c      **************
+       entry  eppEnd
+c      **************
+c         process #end line
+       if(mode .ne. 1) then
+          call cerrorMsg('#end without #subd', 0) 
+       endif
+       if(Field(2) .ne. SubDName(NsubD+1)) then
+          call cerrorMsg(confdata,  1)
+          msg = Field(2) // ' should be '  // 
+     *       SubDName(NsubD+1)
+          call cerrorMsg(msg, 0)
+       endif
+c        examine if a subdetector is contained by another  comp.
+c        it must containe world at last.
+       call epexamSubd
+       if(Det.nworld .gt. 0) then
+c           set flag so that world contains the
+c           comp.
+          call epworld  
+       else
+c          msg = SubDName(NsubD+1) // ' subdetector has'
+c     *      // ' no world component at the end'
+c          call cerrorMsg(msg, 0)
+       endif
+
+c         +, = for count,de, maxpthl, attrib and  X,Y, Z pos. are processed
+       call epAttrb  ! + for attrib is processed
+       call epXpos
+       call epYpos
+       call epZpos
+
+       if(SubDUsed .gt. 0) then
+c          if the sub detector  includes other subdetctors,
+c          we need expand them
+          call epexpand(0)
+       endif
+       NsubD =  NsubD + 1
+       if( NsubD .gt. maxSubD ) then
+          call cerrorMsg('MAX_SUBD in ZepMaxdef.h is too small',0)
+       endif
+       SubD(NsubD).loc =  cumsubdloc 
+c          move the sub detector 
+
+c         renumber
+       do i = 1, Det.nct
+          Det.cmp(i).cn = i
+       enddo
+
+c         reset world, if any       
+       if(Det.nworld .gt. 0) then
+          call epresetWorld
+c              get x,y,z thickness
+          call epGetThick(Det.nct, XYZthick(NsubD) )
+       else
+          call epenvlpAll
+c          inquire the result
+          call epqcnf(org, abc)
+          XYZthick(NsubD) = abc
+       endif
+c
+       call epmvDet(Det,  SubdArea( SubD(NsubD).loc+1 ), SubD(NsubD))
+
+       mode = 0
+       call epclCnfCnt          ! clear counter
+       return
+c      *************
+       entry eppfsep
+c      *************
+       if(mode .ne.  0) then
+          msg ='#subd for '// SubDName(NsubD+1)
+     *         // ' is not completed'
+          call  cerrorMsg(msg, 0)
+       endif
+c       examine subdetector is contained by anohter comp., if so
+c       the last comp of the sub detector must be world.
+
+       call epexamSubd
+
+       call epadjPC
+       if(Det.nworld .gt. 0) then
+          call epworld  
+       endif
+c         +, = count,DE,maxpathl, for X,Y,Z pos. are processed
+       call  epAttrb
+       call  epXpos
+       call  epYpos
+       call  epZpos
+       if(SubDUsed .gt. 0) then
+c          if the detector  includes other subdetctors,
+c          we nee expand it
+          call epexpand(1)
+       endif
+       end
+c     ********************
+      subroutine eppEquate
+      implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+c         process #eq or #feq line
+       character*120 msg 
+       character*16 name
+       real*8 val
+       integer ival
+       integer i, icon, j
+ 
+       if(Nequates .eq. maxEq) then
+          call cerrorMsg('no more #eq can be used', 1)
+          write(msg,*)
+     *    ' Expand MAX_EQUATE=',maxEq, ' in ZepMaxdef.h'
+          call cerrorMsg(msg, 0)
+       endif
+c         check double definition
+       do i = 1, Nequates
+          if(Field(2) .eq. EqName(i)) then
+             if(Field(1) .eq. '#eq') then
+                write(msg, *) Field(2), ' is doubly defined'
+                call cerrorMsg(msg, 0)
+             else
+c                 should be #feq so overwrite previous value
+                j = i
+                goto 10
+             endif
+          endif
+       enddo
+       Nequates = Nequates + 1
+       EqName(Nequates) = Field(2)
+       j = Nequates 
+ 10    continue
+       read(Field(3), *) EqValue(j)
+       return
+c     ***********
+       entry epexamEq(name, val, icon)
+c         name: input. if name if found in EqValue, icon =0 
+c                      and val becomes correspoiding EqValue
+c         val:  output.
+c         icon: output
+       do i = 1, Nequates
+          if(EqName(i) .eq. name) then
+             val = EqValue(i)
+             icon = 0
+             return     ! ******
+          endif
+       enddo
+       icon = 1
+       return
+c     ***********
+       entry epexamEqI(name, ival, icon)
+c         name: input. if name is found in EqValue, icon =0 
+c                      and val becomes correspoiding EqValue
+c         ival:  output.
+c         icon: output
+       do i = 1, Nequates
+          if(EqName(i) .eq. name) then
+             ival = EqValue(i) + 0.00001
+             icon = 0
+             return     ! ******
+          endif
+       enddo
+       icon = 1
+       end
+c      ************
+       subroutine eperrEq(comp, fieldin)
+       implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+       record /Component/ comp 
+       character*(*) fieldin
+
+       character*128 msg
+       write(msg, *) comp.cn,'-th component has undefined variable'
+       call cerrorMsg(msg, 1)
+       write(msg, *) 'which is: ', fieldin
+       call cerrorMsg(msg, 0)
+       end
+c     ****************
+      subroutine epexamSubd
+      implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+c           see if a sub detector is contained by another
+c         component. if so , the last component of the
+c         sub detector must be a world. (if box, sphere
+c         it must be explicit; else implicit) 
+
+      character*120 msg
+
+      integer i, j, epIsSubD, k, m
+      do i = 1,  Det.nct
+         do j = 1, Det.cmp(i).NMatreska
+c(((((((((((((((((
+c           k = epIsSubD(  Det.cmp(i).Contains(j) )
+            k = epIsSubD( CnArea( Det.cmp(i).Contains+j) )
+c)))))))))))))))))
+           if( k .gt. 0) then
+c               a subdetector k is contained by i-th detector
+c               directly, so that k must have world at its end
+              m = SubD(k).nct
+c              if( SubD(k).cmp(m).struc .eq. 'box_w' .or.
+c     *           SubD(k).cmp(m).struc .eq. 'sphere_w' ) then
+c               if(index(SubD(k).cmp(m).struc, '_w') .ne. 0 ) then
+               if( index(SubdArea( SubD(k).loc+m).struc, '_w')
+     *               .ne. 0 ) then
+c                   world.
+c                o.k
+c      2000.4.9 ############
+c              elseif( SubD(k).cmp(m).struc(1:3) .eq. 'box' .or.
+c     *           SubD(k).cmp(m).struc(1:6) .eq. 'sphere' ) then
+c                 write(msg, *)' Subdetector=', SubDName(k),
+c     *                ' has no world in the last comp.'
+c                 call cerrorMsg(msg, 1)
+c                 call cerrorMsg(
+c     *           'Sub-detetctor to be contained by another comp.'//
+c     *           ' must have world in the last component', 1)
+c                 call cerrorMsg(
+c     *           'The last box or sphere must be world', 0)
+              else
+c                  the last one is not world; but it must
+c                  be implicitly world so that it must contain
+c                  at least one component, if the number of
+c                  components there is > 1
+                 if(m .gt. 1 .and. 
+c     *               SubD(k).cmp(m).NMatreska .eq. 0) then
+     *               SubdArea( SubD(k).loc+m ).NMatreska .eq. 0) then
+                    write(msg, *)' Subdetector=', SubDName(k),
+     *                ' has no implicit world in the last comp.'
+                    call cerrorMsg(msg, 1)
+                    call cerrorMsg(
+     *              'Sub-detetctor to be contained by another'//
+     *              ' comp. must have (implicit) world in the'//
+     *              ' last component', 0)
+                 elseif( m .gt. 1) then
+c                      issue warning message
+                    call cerrorMsg('********* Info *******',1)
+                    write(msg, *)
+     *              ' Confirm that  Subdetector=', SubDName(k),
+     *              ' has an implict world in the last comp.'
+                    call cerrorMsg(msg, 1)
+                 endif
+              endif
+           endif   
+        enddo
+      enddo
+      end
+c      ***********************
+       subroutine epresetMaxPath
+       use epModify
+       implicit none
+#include "ZepTrackv.h"
+#include "ZepTrackp.h"
+#include "Zcnfig.h"
+#include "Zmass.h"
+
+
+
+       record /ep3Vec/ vec
+       integer i, mediaindex
+       real(8):: mingram 
+       integer modi
+       logical usemodifier
+
+c         max path length allowable in r.l
+       do i = 1, Det.nct
+          mediaindex = Det.Cn2media(i)
+          if(Det.cmp(i).MaxPathL .eq.  0.) then
+c               we set a negative value to indicate it is by system
+             if(Det.cmp(i).matter .eq. 'sp' .or. 
+     *          Det.cmp(i).matter .eq. 'hollow' ) then
+                Det.cmp(i).MaxPathL = -10000.  
+             else
+                call epGetThick(i, vec)
+                if( min(vec.z,vec.x, vec.y)/Media(mediaindex).X0 *
+     *               Media(mediaindex).rhoc  .lt. 5.d-2) then
+c                        for very thin layer, we assume  such as
+c                        emulsion. no effective scattering. 
+c                        unless maxpath is specified.                  
+                   Det.cmp(i).MaxPathL= -1.e-2*Media(mediaindex).X0 /
+     *                 Media(mediaindex).rhoc
+                else
+                  Det.cmp(i).MaxPathL = 
+     *             - max(0.05d0 * min(vec.x, vec.y, vec.z),
+     *                    0.02d0*Media(mediaindex).X0/
+     *                 Media(mediaindex).rhoc )
+                endif
+             endif
+          else
+c            use given value (cm) as it is
+c
+          endif
+c             Emin business:  see if modification requested for Emin
+          modi = Det.cmp(i).modifier 
+c             see if ModifyFile existed
+          usemodifier = allocated(modify) .and. modi > 0
+          if( usemodifier ) then
+c               see if emin data was given
+             if( modi <= maxModifyNum ) then
+                usemodifier = IBITS(modify( modi )%kind, bitEmin, 1) > 0
+             else
+                write(0,*) ' modifier =', modi, ' in component #=',i
+                write(0,*) ' > that (=',maxModifyNum,
+     *             ') given in ModifyFile '
+                write(0,*) ' To run the program '
+                write(0,*) ' 1) correct data in modifier or ModifyFile'
+                write(0,*) ' or '
+                write(0,*) ' 2) give " " as ModifyFile to neglect all ',
+     *                     ' modifiers'
+                stop
+             endif
+          endif
+
+          if( usemodifier ) then 
+             Det.cmp(i).EminG = modify(modi)%Em%Egmin
+             Det.cmp(i).EminE = modify(modi)%Em%Eemin
+             Det.cmp(i).RecoilE =modify(modi)%Em%Recoilmin
+          else
+             if(AutoEmin >= 1) then
+c                          AutoEmin 
+c                        fix Emin by looking at min size in g/cm2
+c                 min(  max(   100* sqrt(minsize) keV , 10), 100))
+c     
+                mingram =  min(vec.x, vec.y,vec.z)*
+     *               Media(mediaindex).rho  
+                call epAutoEmin( mingram, Media(mediaindex), 
+     *          Det.cmp(i).EminG, Det.cmp(i).EminE, Det.cmp(i).RecoilE)
+             else
+                Det.cmp(i).EminG = EminGsave
+                Det.cmp(i).EminE = EminEsave
+                Det.cmp(i).RecoilE = RecoilEsave
+             endif
+          endif   
+c////////////////////////
+c          write(0,'(a, i3, a, 1p, g13.3, a, 1p,g13.3, a, 1p,g13.3)')
+c     *   'comp=',i, ' Eming=',Det.cmp(i).EminG, 'Emine=',
+c     *     Det.cmp(i).EminE, ' recoilE=',Det.cmp(i).RecoilE
+c///////
+       enddo
+       end
+
+c      ***********************
+       subroutine epresetWorld
+       implicit none
+#include "Zep3Vec.h"
+#include "Zcnfig.h"
+#include "ZepPos.h"
+
+
+       record /epPos/ org
+       record /ep3Vec/ abc
+       integer i  ! ((()))
+c
+c          if Det( or Det to be a sub detector)  includes world
+c        compute the actual world size here, and reset its size
+c
+c          cmopute envloping box
+       call epenvlpAll
+c          inquire the result
+       call epqcnf(org, abc)
+c
+       if(Det.cmp(Det.nct).struc .eq. 'box_w') then
+          Det.cmp(Det.nct).orgx = org.x
+          Det.cmp(Det.nct).orgy = org.y
+          Det.cmp(Det.nct).orgz = org.z
+c(((((((((((
+c          Det.cmp(Det.nct).vol(boxa) = abc.x
+c          Det.cmp(Det.nct).vol(boxb) = abc.y
+c          Det.cmp(Det.nct).vol(boxc) = abc.z
+          Volat(Det.cmp(Det.nct).vol+boxa) = abc.x
+          Volat(Det.cmp(Det.nct).vol+boxb) = abc.y
+          Volat(Det.cmp(Det.nct).vol+boxc) = abc.z
+c)))))))))))
+
+       elseif( Det.cmp(Det.nct).struc .eq. 'sphere_w' ) then
+          if(Volat( Det.cmp(Det.nct).vol + 1) .eq. 0.) then
+c                 world size not given. so set it here
+             Det.cmp(Det.nct).orgx = org.x + abc.x/2
+             Det.cmp(Det.nct).orgy = org.y + abc.y/2
+             Det.cmp(Det.nct).orgz = org.z + abc.z/2
+c(((((((((((((9
+c          Det.cmp(Det.nct).vol(sphr) =
+c     *    sqrt( abc.x**2 +  abc.y**2 +  abc.z**2 )/2.d0 
+             Volat( Det.cmp(Det.nct).vol+sphr ) =
+     *            sqrt( abc.x**2 +  abc.y**2 +  abc.z**2 )/2.d0 
+          else
+c           do nothing . respect original attribute
+          endif
+c))))))))))))
+       elseif( Det.cmp(Det.nct).struc .eq. 'cyl_w' ) then
+          if( Volat( Det.cmp(Det.nct).vol + 1) .eq. 0.) then
+             Det.cmp(Det.nct).orgx = org.x + abc.x/2
+             Det.cmp(Det.nct).orgy = org.y + abc.y/2
+             Det.cmp(Det.nct).orgz = org.z 
+c(((((((((((((
+c          Det.cmp(Det.nct).vol(cylr) =
+c     *    sqrt( abc.x**2 +  abc.y**2 )/2.d0 
+c          Det.cmp(Det.nct).vol(cylh) = abc.z
+             Volat( Det.cmp(Det.nct).vol+cylr ) =
+     *            sqrt( abc.x**2 +  abc.y**2 )/2.d0 
+             Volat( Det.cmp(Det.nct).vol+cylh ) = abc.z
+          endif
+c))))))))))))))
+       else
+          call cerrorMsg(Det.cmp(Det.nct).struc, 1)
+          call cerrorMsg(' is not suppored for world yet', 0)
+       endif
+c((((((((  1 level higher for comp. in  a world.
+       do i =1 , Det.nct - 1
+          Det.cmp(i).level = Det.cmp(i).level +1
+       enddo
+c))))))))
+       end
+c     *****************
+      subroutine epXpos
+       implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+#include  "ZepPos.h"
+c          X position is embeded. If = or + is
+c        included, they are replaced by an actual value
+       integer i, j,  epIsSubD
+       record /ep3Vec/ vec
+       record /epPos/  org
+
+       do i =1, (Det.nct-Det.nworld)
+          if(Det.cmp(i).orgx .eq. EqualF) then
+             if(i .eq. 1) then
+                call cerrorMsg(
+     *         '1st comp. must not have = in x-pos.',0)
+             else  ! previous one is any ?
+                Det.cmp(i).orgx = Det.cmp(i-1).orgx +
+     *                            Det.cmp(i).offsetx
+             endif
+          elseif(Det.cmp(i).orgx .eq. PlusF) then
+             if(i .eq. 1) then
+                call cerrorMsg(
+     *           '1st comp. must not have +',0)
+             elseif(epIsSubD(i-1) .gt. 0) then
+c                 previous one is sub detector
+                j = epIsSubD(i-1)   ! sub det. numb.
+                Det.cmp(i).orgx = Det.cmp(i-1).orgx +
+     *              XYZthick(j).x  + Det.cmp(i).offsetx
+             else
+                call epGetThick(i-1, vec) 
+                Det.cmp(i).orgx = Det.cmp(i-1).orgx + vec.x
+     *                            + Det.cmp(i).offsetx 
+             endif
+          elseif(Det.cmp(i).orgx .eq. MinusF) then
+             if(i .eq. 1) then
+                call cerrorMsg(
+     *           '1st comp. for origx must not have -',0)
+             else
+c                  the size of the current volume may be
+c                  obtained for limited case. so the
+c                  result may be strange in some cases.
+                call epqenvlper(i, org, vec)
+                Det.cmp(i).orgx = Det.cmp(i-1).orgx - vec.x
+     *                            + Det.cmp(i).offsetx 
+             endif
+          endif
+       enddo
+       end
+c     *****************
+      subroutine epYpos
+      implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+#include  "ZepPos.h"
+c          Y position is embeded. If = or + is
+c        included, they are replaced by an actual value
+       integer i, j,  epIsSubD
+       record /ep3Vec/ vec
+       record /epPos/  org
+
+       do i =1, (Det.nct-Det.nworld)
+          if(Det.cmp(i).orgy .eq. EqualF) then
+             if(i .eq. 1) then
+                call cerrorMsg(
+     *         '1st comp. must not have = in y-pos.',0)
+             else     ! previous one may be any ?
+                Det.cmp(i).orgy = Det.cmp(i-1).orgy +
+     *                            Det.cmp(i).offsety
+             endif
+          elseif(Det.cmp(i).orgy .eq. PlusF) then
+             if(i .eq. 1) then
+                call cerrorMsg(
+     *           '1st comp. must not have +',0)
+             elseif(epIsSubD(i-1) .gt. 0) then
+c                 previous one is sub detector
+                j = epIsSubD(i-1)   ! sub det. numb.
+                Det.cmp(i).orgy = Det.cmp(i-1).orgy +
+     *                             XYZthick(j).y 
+     *                          + Det.cmp(i).offsety
+             else           
+                call epGetThick(i-1, vec) 
+                Det.cmp(i).orgy = Det.cmp(i-1).orgy + vec.y
+     *                          + Det.cmp(i).offsety 
+             endif
+          elseif(Det.cmp(i).orgy .eq. MinusF) then
+             if(i .eq. 1) then
+                call cerrorMsg(
+     *           '1st comp. for origy must not have -',0)
+             else
+c                  the size of the current volume may be
+c                  obtained for limited case. so the
+c                  result may be strange in some cases.???
+c               ^^^^^^^^^
+                call epqenvlper(i, org, vec)
+                Det.cmp(i).orgy = Det.cmp(i-1).orgy - vec.y
+     *                            + Det.cmp(i).offsety 
+             endif
+          endif
+
+       enddo
+       end
+c     *****************
+      subroutine epZpos
+       implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+#include  "ZepPos.h"
+c          Z position is embeded. If = or + is
+c        included, they are replaced by an actual value
+       integer i, j,  epIsSubD
+       record /ep3Vec/ vec
+       record /epPos/  org
+
+       do i =1, (Det.nct-Det.nworld)
+          if(Det.cmp(i).orgz .eq. EqualF) then
+             if(i .eq. 1) then
+                call cerrorMsg(
+     *         '1st comp. must not have = in z-pos.',0)
+             else    ! previous one may be any ?
+                Det.cmp(i).orgz = Det.cmp(i-1).orgz +
+     *                            Det.cmp(i).offsetz
+             endif
+          elseif(Det.cmp(i).orgz .eq. PlusF) then
+             if(i .eq. 1) then
+                call cerrorMsg(
+     *           '1st comp. must not have +',0)
+             elseif(epIsSubD(i-1) .gt. 0) then
+c                 previous one is sub detector
+                j = epIsSubD(i-1)   ! sub det. numb.
+                Det.cmp(i).orgz = Det.cmp(i-1).orgz +
+     *                      XYZthick(j).z  + Det.cmp(i).offsetz
+             else
+                call epGetThick(i-1, vec) 
+                Det.cmp(i).orgz = Det.cmp(i-1).orgz + vec.z
+     *                            + Det.cmp(i).offsetz 
+             endif
+          elseif(Det.cmp(i).orgz .eq. MinusF) then
+             if(i .eq. 1) then
+                call cerrorMsg(
+     *           '1st comp. for origz must not have -',0)
+             else
+c                  the size of the current volume may be
+c                  obtained for limited case. so the
+c                  result may be strange in some cases.
+                call epqenvlper(i, org, vec)
+                Det.cmp(i).orgz = Det.cmp(i-1).orgz - vec.z
+     *                            + Det.cmp(i).offsetz
+             endif
+          endif
+       enddo
+       end
+c     *****************
+      subroutine epAttrb
+      implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+c       If = is in   attribute, replaced by actual value 
+c    This has been done in epAttrb1 already. (dangerous though)
+c     see Note above "call  epAttrb1"
+c
+       integer i, j, epIsSubD
+       character*120 msg
+       
+       do i =1, (Det.nct-Det.nworld)
+          if(Det.cmp(i).CountIO .eq. EqualFshort) then
+             if(i .eq. 1) then
+                call cerrorMsg(
+     *          '1st comp. must not have = in C field',0)
+             endif
+             Det.cmp(i).CountIO = Det.cmp(i-1).CountIO
+          endif
+          if(Det.cmp(i).CountDE .eq. EqualFshort) then
+             if(i .eq. 1) then
+                call cerrorMsg(
+     *          '1st comp. must not have = in DE field',0)
+             endif
+             Det.cmp(i).CountDE = Det.cmp(i-1).CountDE
+          endif
+          if(Det.cmp(i).MaxPathL .eq. EqualF) then
+             if(i .eq. 1) then
+                call cerrorMsg(
+     *          '1st comp. must not have = in MaxPathL field',0)
+             endif
+             Det.cmp(i).MaxPathL = Det.cmp(i-1).MaxPathL
+          endif
+          if(Det.cmp(i).modifier .eq. EqualFshort ) then
+             if(i .eq. 1) then
+                call cerrorMsg(
+     *          '1st comp. must not have = in modifere field',0)
+             endif
+             Det.cmp(i).modifier = Det.cmp(i-1).modifier
+          endif
+          if(Det.cmp(i).chno .eq. EqualFshort ) then
+             if(i .eq. 1) then
+                call cerrorMsg(
+     *          '1st comp. must not have = in chno field',0)
+             endif
+             Det.cmp(i).chno = Det.cmp(i-1).chno
+          endif
+c     
+          do j = 1, Det.cmp(i).Nattributes
+c(((((((((((
+             if(Volat( Det.cmp(i).vol+j) .eq. EqualF) then
+c)))))))))))
+                if(i .eq. 1) then
+                   call cerrorMsg(
+     *            '1st comp. must not have = in vol. attrb.',0)
+                elseif(epIsSubD(i-1) .gt. 0) then
+c                     previous one is sub detector; avoid use of = 
+                   write(msg, *)
+     *             ' previous comp of ', i, '-th comp. is sub-D' // 
+     *             ' avoid use of = in such case '                    
+                   call cerrorMsg(msg, 0)
+                else            ! previous is ordinary detector
+c((((((((((
+                  Volat( Det.cmp(i).vol+j) =Volat(Det.cmp(i-1).vol+j)
+     *                 + VolatEq(Det.cmp(i).vol+j)                 
+c))))))))))
+                endif
+             endif
+          enddo
+       enddo
+       end
+c     *****************
+      subroutine epAttrb1
+      implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+c       If = is in   attribut, replaced by actual value 
+c    see Note above the "call epAttrb1"
+
+       integer i, j, epIsSubD, k
+       character*120 msg
+
+      integer loc(maxiattr)
+      logical got
+
+      got = .false.
+
+      do i = Det.nct, Det.nct-Det.nworld
+         do j = 1, Det.cmp(i).Nattributes
+c(((((((((((
+            if(Volat( Det.cmp(i).vol+j) .eq. EqualF) then
+c)))))))))))
+               if(i .eq. 1) then
+                  call cerrorMsg(
+     *            '1st comp. must not have = in vol. attrb.',0)
+               elseif(epIsSubD(i-1) .gt. 0) then
+c                     previous one is sub detector; avoid use of = 
+                  write(msg, *)
+     *             ' previous comp of ', i, '-th comp. is sub-D' // 
+     *             ' avoid use of = in such case '                    
+                  call cerrorMsg(msg, 0)
+               else             ! previous is ordinary detector
+                  if(Det.cmp(i-1).struc .ne. Det.cmp(i).struc) then
+c                     structure is diff. from previous. cannot use
+c                     "=" notation.
+                     write(msg,*)
+     *               ' structure=', Det.cmp(i).struc, 
+     *               ' is diff. from previous one: ',
+     *               Det.cmp(i-1).struc
+                     call cerrorMsg(msg, 1)
+                     call cerrorMsg(
+     *               'so = notation for the attrib cannot be used',0)
+                  endif
+c((((((((((
+                  if(.not. got) then
+c                         correspondence 
+                     call epatloc(Det.cmp(Det.nct-1), loc)       
+                     got = .true.
+                  endif
+                  k = loc(j)  ! jth original value is at k
+                  Volat( Det.cmp(i).vol+j) =Volat(Det.cmp(i-1).vol+k)
+     *                 + VolatEq(Det.cmp(i).vol+j)                 
+c))))))))))
+               endif
+            endif
+         enddo
+       enddo
+       end
+
+      integer function epIsSubD(i)
+       implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+c       Is the i-th component a sub detector ?
+c       if yes, function gets the sub detector number
+c       else gets 0
+
+       integer i,  j
+
+c       do j = 1, NsubD
+       do j = 1, SubDUsed
+          if(PosInDet(j) .eq. i) then
+             epIsSubD = SubDNumb(j)
+             goto 10
+          endif
+       enddo
+       epIsSubD = 0
+ 10    continue
+       end
+
+      subroutine eprIncSubD(comp)
+       implicit none
+#include  "Zep3Vec.h"
+#include "Zcnfig.h"
+       record /Component/ comp 
+c            read a line including a sub detector 
+
+c              read part of the structure
+       call eprpst(comp,  0, 0, 1,  6)
+
+       end
+c      *****************
+       subroutine ep2actn(n, actn, subDx)
+       implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+c         given component number n is
+c         converted into actual component number
+c       ( this  is needed when sub detectors are
+c         included )
+       integer n     ! input.  component number in Det.
+       integer actn  ! output. component number when
+                     !         referred sub detector is 
+                     !         expanded.
+       integer subDx ! output. sub detector number  if n is one 
+                     !         of  PosInDet(1)
+                     !         ~ PosIndet(SubDUsed)
+                     !         else  0
+       integer j
+       
+
+       do j = SubDUsed, 1, -1
+c             see if n is >= j-th referred SubDector
+c             pos in Det config.
+
+          if(n  .gt. PosInDet(j)) then
+             subDx = 0
+             actn = n + SumOffset(j)
+             goto 10
+          elseif(n .eq. PosInDet(j)) then
+             subDx = SubDNumb(j)
+             actn = n + SumOffset(j)
+             goto 10
+          endif
+       enddo
+       subDx = 0
+       actn = n
+ 10    continue
+       end
+c         move included sub Det into Vcomp as a compoent.
+       subroutine  epexpand(final)
+       implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+
+       integer final  ! input.  0--> within subdetector
+                      !         1--> within detector
+c            expand included sub detectors
+c     Supose the current Det config. as follows
+c
+c     Det     Contains/PContains
+c      1     /6
+c      2     /3
+c      3     /5 11
+c      4     /10
+c      5 sub1           sub1  1 ~ n1
+c      6     
+c      7     /12
+c      8     /9
+c      9
+c     10  sub2          sub2  1 ~ n2 
+c     11
+c     ..
+c    This should be expanded as follows
+c
+c    1       /6 + n1 -1 
+c    2       /3
+c    3       /5 + n1 -1, 11 + n1-1 + n2 -1
+c    4       /10+ n1-1 + n2 -1
+c    5      expanded sub1
+c    6
+c   ..
+c    5+n1-1  last of sub1
+c    6+n1-1  
+c    7+n1-1  /12+n1-1 + n2-1
+c    8+n1-1  /9 +n1-1
+c    9+n1-1  /
+c   10+n1-1  expanded sub2
+c    ..
+c   10+n1-1+n2-1  last of sub2
+c   11+n1-1+n2-1 ..
+c   ..
+c          
+c     aux  variables
+c        
+c        SubDUsed  PosInDet    SubDNumb       SumOffset
+c          1           5          2  (sub1)      n1-1
+c          2           10         1  (sub2)      n1-1 +n2-1
+c
+c          ..
+c
+       integer n, m, subDx, subDy, j, i
+
+       integer cons, consr, pcon, nmat
+       logical firstcons, firstconsr, firstpcon
+       integer::idx 
+c ^^^^^^^^^^^^^^^
+       integer  subdidxc
+       save  subdidxc
+       subdidxc = 0
+c^^^^^^^^^^^^^^^^
+
+
+       do j = Det.nct, 1, -1
+
+          cons = Det.cmp(j).Contains
+          consr= Det.cmp(j).ContainsR
+          pcon = Det.cmp(j).PContained
+          nmat = Det.cmp(j).NMatreska
+
+          call ep2actn(j, n, subDx)
+          firstcons = .true.
+          firstpcon = .true.
+          firstconsr = .true.
+
+          if(subDx .ne. 0) then
+c              sub detector subDx is being included to
+c              Det.cmp(m); m= n - SubD(subDx).nct + 1
+             if(final == 0 ) then
+                idx = maxSubD +1
+             else
+                idx = NsubD + 1  ! NsubD is not yet updated so +1
+             endif
+             if( subDwithID(subDx) > 0 ) then
+c                      even if curent (sub)detector dose not
+c                  contain id=.., we must inherit ancestor
+                subdWithID(idx) = 1
+             endif
+c           ^^^^^^^^^^
+             if(final .ne. 0) then
+                subdidxc = subdidxc + 1   ! count subd in main body
+             endif
+c           ^^^^^^^^^^^
+             call epIncSubD(subdidxc,
+     *       j, subDx, n - SubD(subDx).nct +1)
+c                move comment pos
+             if(wrtcom .ne. 0 ) then
+                call epresetcom(j, n - SubD(subDx).nct +1)
+             endif
+          else
+c              move component
+             call epmvComp(j, n, Det.cmp(j), Det.cmp(n), 0, NotGiven)
+c             call epprocIDmv(j, n)
+c                  move comment pos.
+             if(wrtcom .ne. 0 ) then
+                call epresetcom(j, n)
+             endif
+c              other adjustment
+
+c             do i = 1, Det.cmp(j).NMatreska
+             do i = 1, nmat
+c((((((((((((((((((((((
+c                call ep2actn(Det.cmp(j).Contains(i), m, subDy)
+                call ep2actn( CnArea( cons+i ), m, subDy)
+ccc                Det.cmp(n).Contains(i) = m
+                if(firstcons) then
+                   Det.cmp(n).Contains = CnCounter
+                   firstcons = .false.
+                endif
+ccccc             CnArea( Det.cmp(n).Contains+i) = m
+                call epCnArea( m )
+c                Det.cmp(n).ContainsR(i) = 
+c     *            sign(m, Det.cmp(j).ContainsR(i))  ! this is next job
+c))))))))))))))))))))))
+             enddo
+
+cc             do i = 1, Det.cmp(j).NMatreska
+               do i = 1, nmat
+c((((((((((((((((((((((
+c                call ep2actn(Det.cmp(j).Contains(i), m, subDy)
+                call ep2actn(CnArea( cons+i ), m, subDy)
+c                Det.cmp(n).ContainsR(i) = 
+c     *            sign(m, Det.cmp(j).ContainsR(i))
+                if(firstconsr) then
+                   Det.cmp(n).ContainsR = CnCounter
+                   firstconsr = .false.
+                endif
+                call epCnArea( sign(m, 
+     *              CnArea( consr+i) ) )
+c))))))))))))))))))))))
+             enddo
+
+c
+             do i = 1, Det.cmp(j).NPContainer
+c(((((((((((((((((((((((
+                if(firstpcon) then
+                   Det.cmp(n).PContained = CnCounter
+                   firstpcon = .false.
+                endif
+c                call ep2actn(Det.cmp(j).PContained(i), m, subDy)
+c                Det.cmp(n).PContained(i) = m
+                call ep2actn(
+     *              CnArea( pcon+i ), m, subDy)
+                call epCnArea(m)
+c))))))))))))))))
+             enddo
+          endif
+       enddo
+c         reset Det.nct
+       call  ep2actn(Det.nct, j, i)
+       Det.nct = j
+       end
+c     **********8
+      subroutine epresetcom(j, n)
+      implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+      integer j,n    ! input comment of j-th component is moved to
+                     !       as for n-th comp.
+      integer i
+
+      do i = comcounter, 1, -1
+         if(comflag(i) .eq. j) then
+            comflag(i) = n
+         elseif(comflag(i) .lt. j) then
+            goto 10
+         endif
+      enddo
+ 10   continue
+      end
+c     *******************************
+      subroutine epIncSubD(subdidxc, orgPos, subDx, pos)
+      implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+c     ^^^^^^^^^^^^
+      integer subdidxc ! input.  incremental counter for subdetector
+                       !         in the final phase
+
+      integer orgPos  ! input.  pos in Det where the sub detector
+                      !         is referred.
+      integer subDx   ! input.  sub detector number to be 
+                      !         included
+      integer  pos    ! input.  Det.cmp(pos) is the first
+                      !         position where sub detector
+                      !         is to be moved.
+
+      integer offset, i, j, temp
+      record  /Component/Vcomp
+
+
+       offset = pos -1
+
+c         move included sub Det into Vcomp as a compoent.
+c
+       Vcomp = Det.cmp(orgPos)
+cccc       call epmvComp(orgPos, 0, Det.cmp(orgPos), Vcomp, 0)
+c
+c         
+       
+       j = pos -1
+c         expand sub detector
+       do i = 1, SubD(subDx).nct
+          j = j + 1
+c                move  one comp of sub det.
+c          call epmvComp(i, 0, SubD(subDx).cmp(i), Det.cmp(j), offset)
+          call epmvComp(i, 0, 
+     *    SubdArea( SubD(subDx).loc+i ),  Det.cmp(j), offset,
+     *     Vcomp.chno )
+c    ^^^^^^^^^^^
+          if( subdidxc .gt.  0) then
+             Det.cmp(j).subdidx = subDx
+             Det.cmp(j).fsubdc = subdidxc
+          endif
+          if(Vcomp.matter .ne. ' ' .and. 
+     *       Vcomp.matter .ne. 'sp') then
+c              replace all matter of the subdetector by this one
+             Det.cmp(j).matter = Vcomp.matter
+          endif
+c     ^^^^^^^^^^^
+c((((((((((
+cccc          Det.cmp(j).level = Det.cmp(j).level  + 1
+c))))))))))
+c           adjust  displacement: R0+ M^-1 r0 --> r0
+          call epnewDisp(Vcomp, Det.cmp(j))
+c           adjust  rotation matrix; mM --> m 
+c                         M             m
+          call epnewRot(Vcomp.direc, Det.cmp(j).direc)
+          Det.cmp(j).rotation =
+     *     Det.cmp(j).direc(1)  .ne. 1.d0
+     * .or.
+     *     Det.cmp(j).direc(5)  .ne. 1.d0
+     * .or.
+     *     Det.cmp(j).direc(9)  .ne. 1.d0
+
+cc wrong          Det.cmp(j).rotation = Vcomp.rotation 
+       enddo
+c           if  the last comp is world; _w is
+c         dropped now
+c       if(Det.cmp(j).struc(1:5) .eq. 'box_w') then
+c          Det.cmp(j).struc = 'box'
+c       elseif(Det.cmp(j).struc(1:8) .eq. 'sphere_w') then
+c          Det.cmp(j).struc = 'sphere'
+       temp =index(Det.cmp(j).struc, '_w')
+       if(temp .gt. 0) then
+          Det.cmp(j).struc = Det.cmp(j).struc(1:temp-1)
+       endif
+       end
+      subroutine epnewDisp(cmp1, cmp2)
+      implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+c         M = cmp1's rot matrix
+c         R0 = disp vec of cmp1
+c         r0 = disp vec of cmp2
+c      
+c         r0 <--  M^-1 r0 + R0 is obtained
+
+      record /Component/ cmp1, cmp2
+
+      real*8 x, y, z
+      
+      x =  cmp1.direc(1)* cmp2.orgx + 
+     *     cmp1.direc(4)* cmp2.orgy +
+     *     cmp1.direc(7)* cmp2.orgz
+
+      y =  cmp1.direc(2)* cmp2.orgx + 
+     *     cmp1.direc(5)* cmp2.orgy +
+     *     cmp1.direc(8)* cmp2.orgz
+
+
+      z =  cmp1.direc(3)* cmp2.orgx + 
+     *     cmp1.direc(6)* cmp2.orgy +
+     *     cmp1.direc(9)* cmp2.orgz
+
+       cmp2.orgx = cmp1.orgx  + x 
+       cmp2.orgy = cmp1.orgy  + y
+       cmp2.orgz = cmp1.orgz  + z
+      end
+      subroutine epnewRot(Ml, ms)
+      implicit none
+c         Ml 
+c         ms 
+c         ms <-- msMl is obtained
+c      
+      real*8 Ml(9), ms(9)
+      integer i
+      real*8  v(9)
+      call epmatmul(Ml, ms, v)     
+      do i = 1, 9
+         ms(i) = v(i)
+      enddo
+      end
+
+      subroutine eprecount
+      implicit none
+#include  "ZepMaxdef.h"
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+c            
+
+      character(MAX_STRUCCHR)::epparaphrase
+      character(MAX_STRUCCHR)::tempph
+
+      integer  i, j
+
+c      Det.nbox=0
+c      Det.ncyl=0
+c      Det.npip=0
+c      Det.nprs=0
+c      Det.nsph=0
+      Det.nworld = 0
+      do  i = 1, MaxNewStruc
+         Det.nnew(i) = 0
+      enddo
+      do  i = 1, Det.nct
+         Det.cmp(i).cn = i  ! renumber
+c         if(Det.cmp(i).struc(1:3) .eq. 'box') then
+c            Det.nbox = Det.nbox + 1
+c         elseif(Det.cmp(i).struc(1:3) .eq. 'cyl') then
+c            Det.ncyl = Det.ncyl + 1
+c         elseif(Det.cmp(i).struc(1:4) .eq. 'pipe') then
+c            Det.npip = Det.npip + 1
+c         elseif(Det.cmp(i).struc(1:5) .eq. 'prism') then
+c            Det.nprs = Det.nprs + 1
+c         elseif(Det.cmp(i).struc(1:6) .eq. 'sphere') then
+c            Det.nsph = Det.nsph + 1
+         if(Det.cmp(i).struc(1:4) .eq. 'new-' ) then
+            read(Det.cmp(i).struc(5:6), * ) j
+            Det.nnew(j) = Det.nnew(j) + 1
+         else
+            tempph = epparaphrase( Det.cmp(i).struc(1:8))
+            if(tempph(1:4) .eq. 'new-' ) then
+               read(tempph(5:6),   *) j
+               Det.nnew(j) = Det.nnew(j) + 1
+c            else
+c              call cerrorMsg('logical error; in recount',0)
+            endif
+         endif
+      enddo
+c      if(Det.cmp(Det.nct).struc .eq. 'box_w' .or.
+c     *     Det.cmp(Det.nct).struc .eq. 'sphere_w' ) then
+      if(index(Det.cmp(Det.nct).struc, '_w') .ne. 0) then
+         Det.nworld = 1
+      endif
+      end
+      subroutine epclCnfCnt
+      implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+c             clear total # of component counter
+      integer  i
+
+      Det.nct=0
+      comcounter = 0
+      comloc = 1
+c      Det.nbox=0
+c      Det.ncyl=0
+c      Det.npip=0
+c      Det.nprs=0
+c      Det.nsph=0
+      Det.nworld = 0
+c          clear the counter of parenet matreskas
+c          which partially /fully contain i-th comp.
+      do i = 1, ncmax
+         Det.cmp(i).NPContainer = 0
+         Det.cmp(i).NContainer = 0
+      enddo
+      SubDUsed = 0
+
+
+      end
+      subroutine epsvcom(cmnt)
+      implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+      character*(*) cmnt
+      if(wrtcom .ne.0) then
+         if(comcounter .lt. maxcom) then
+            comcounter = comcounter + 1
+            comarea(comcounter) = cmnt(1:80)
+            comflag(comcounter) = Det.nct + 1
+         else
+            call cerrorMsg('too many comment in config',1)
+         endif
+      endif
+      end
+c      
+      subroutine epmvDet(det1, comp, subdet)
+      implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+      record /Detector/ det1  ! input
+      record /Component/comp(*)  ! ouptut
+      record /SubDetector/ subdet  ! output
+
+      integer i
+c        move det1 into subdetector
+      
+      if(det1.nct + cumsubdloc .gt. ncmaxInSubD) then
+         call cerrorMsg(
+     *   'MAX_COMPONENT_IN_SUBD in ZepMaxdef.h is too small',0)
+      endif
+
+
+      do i = 1, det1.nct
+ccc         call epmvComp(i, 0, det1.cmp(i), det2.cmp(i),  0)
+c         det2.cmp(i) = det1.cmp(i)
+         comp(i) = det1.cmp(i)
+      enddo
+
+c      subd.nbox = det1.nbox
+c      subd.ncyl = det1.ncyl
+c      subd.npip = det1.npip
+c      subd.nprs = det1.nprs
+c      subd.nsph = det1.nsph
+
+      do i = 1, MaxNewStruc
+         subdet.nnew(i) = det1.nnew(i)
+      enddo
+      subdet.nworld = det1.nworld
+      subdet.nct = det1.nct
+      cumsubdloc = cumsubdloc + subdet.nct
+      end
+
+      subroutine epmvComp(n1, n2, cmp1, cmp2, offset, chno )
+      implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+      record /Component/ cmp1, cmp2
+      integer n1, n2  ! input. n1==n2 ==> *cmp1==*cmp2
+                      !   n1!=n2==> *cmp1 != *cmp2 even if cmp1.cn ==cmp2.cn
+      integer offset, j
+      integer chno    ! input. if this is not NotGiven, copied to cmp2
+      integer cons, consr, pcon
+
+      if(n1 .ne. n2) then
+         cmp2 = cmp1 
+         if(chno .ne. NotGiven) then
+            cmp2.chno = chno
+         endif
+      endif
+c         cmp2.orgx = cmp1.orgx
+c         cmp2.orgy = cmp1.orgy
+c         cmp2.orgz = cmp1.orgz
+c         do j = 1, maxattr
+c            cmp2.vol(j) = cmp1.vol(j)
+c         enddo
+c         do j = 1, 9
+c            cmp2.direc(j) = cmp1.direc(j)
+c         enddo
+c         cmp2.NMatreska = cmp1.NMatreska
+c         cmp2.NContainer = cmp1.NContainer
+c((((((((((((((((((((
+c
+c          save cmp1 index, so that even if cmp2==cmp1 
+c          we can move cmp1 safely.
+c
+         cons = cmp1.Contains
+         consr = cmp1.ContainsR
+         pcon = cmp1.PContained
+c
+         do j = 1, cmp1.NMatreska
+c            cmp2.Contains(j) =
+c     *         cmp1.Contains(j) + offset
+c            cmp2.ContainsR(j) =  sign(cmp2.Contains(j),
+c     *         cmp1.ContainsR(j)) 
+            if(j .eq. 1) then
+                cmp2.Contains = CnCounter
+             endif
+             call epCnArea( CnArea(cons +j ) + offset)
+         enddo
+         do j = 1, cmp1.NMatreska
+c            cmp2.ContainsR(j) =  sign(cmp2.Contains(j),
+c     *         cmp1.ContainsR(j)) 
+            if(j .eq. 1) then
+               cmp2.ContainsR =CnCounter
+            endif
+            call epCnArea(
+     *           sign(CnArea(cmp2.Contains+j), CnArea(consr+j)))
+         enddo
+c))))))))))))))))))))
+c         cmp2.NPContainer = cmp1.NPContainer
+         do j = 1, cmp1.NPContainer
+c(((((((((((((((((((
+c            cmp2.PContained(j) =
+c     *         cmp1.PContained(j) + offset
+            if(j .eq. 1 ) then
+               cmp2.PContained = CnCounter
+            endif
+            call epCnArea( CnArea( pcon+j ) + offset)
+c)))))))))))))
+         enddo
+c         cmp2.struc = cmp1.struc
+c         cmp2.strucNo = cmp1.strucNo
+c         cmp2.matter = cmp1.matter
+c         cmp2.rotation = cmp1.rotation
+c         do j = 1, MaxNewStruc
+c            cmp2.nnew(j) = cmp1.nnew(j)
+c         enddo
+      end
+
+      subroutine epadjPC
+      implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+c            adjust partially contained relation;
+c        if a component is contained by another one which is
+c        contaied by still other one, ..., and the first
+c        one is partially contained, all are assumed to be contained
+c        parially by the parent:
+      integer maxstack, maxpc
+      parameter (maxstack = 1000, maxpc=10000)
+      integer stack(maxstack), stackp
+      integer k2i(maxpc, 2), k2ic
+      integer used(maxpc), usedc
+c
+      integer i, j, k, m
+c          reset NPContainer
+      do i = 1, Det.nct
+         Det.cmp(i).NPContainer = 0
+      enddo
+      k2ic= 0
+      do i = 1, Det.nct - Det.nworld
+         do j = 1, Det.cmp(i).NMatreska
+c((((((((((((((((
+c            if(Det.cmp(i).ContainsR(j) .lt. 0) then
+c               k = - Det.cmp(i).ContainsR(j)
+            if(CnArea( Det.cmp(i).ContainsR+j ) .lt. 0) then
+               k = - CnArea( Det.cmp(i).ContainsR+j )
+c))))))))))))
+c                The following business could be done
+c                by recursive call very easily but
+c                we use stack method for wider compatibilty
+c
+               stackp = 1
+c                    put k in stack
+               stack(stackp) = k
+c                extrack from stack
+               do while(stackp .gt. 0)
+                  k = stack(stackp)
+                  stackp = stackp - 1
+c                    set parent i  in k-th comp
+                  Det.cmp(k).NPContainer =
+     *                  Det.cmp(k).NPContainer + 1
+c                  Det.cmp(k).PContained( Det.cmp(k).NPContainer )
+c     *               = i
+                  k2ic = k2ic + 1
+
+                  if(k2ic .gt. maxpc) then
+                     call cerrorMsg(
+     *              ' too many partially contained cmp', 0)
+                  endif
+                  used(k2ic) =0
+                  k2i(k2ic,1) = k
+                  k2i(k2ic,2) = i
+                  do m = 1, Det.cmp(k).NMatreska
+                     stackp = stackp + 1
+c(((((((((((
+c                     stack(stackp) = Det.cmp(k).ContainsR(m)
+                     stack(stackp) =CnArea(Det.cmp(k).ContainsR+m)
+c)))))))))))))
+                  enddo
+               enddo
+            endif
+         enddo
+      enddo
+      usedc = 0
+      do i = 1, k2ic
+         k = k2i(i, 1)
+         if(k .gt. 0) then
+            do j = 1, usedc
+               if(used(j) .eq.  k) goto 10
+            enddo
+c              k is not used yet
+            usedc = usedc + 1
+            used(usedc) = k
+            Det.cmp(k).PContained = CnCounter
+ 10         continue
+            do j = i, k2ic
+               if( k2i(j, 1) .eq. k ) then
+                  call epCnArea( k2i(j, 2))
+                  k2i(j, 1) = 0
+               endif
+            enddo
+         endif
+      enddo
+            
+      end
+      subroutine epworld
+      implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+      
+c          make the world to contain all  comp.      
+c           which are not contained by other 
+c           comp.
+c          partially contained one is not added in the
+c        list.
+c 
+      integer i, k, epIsSubD, j
+      character*200 msg
+
+
+c      if( (Det.cmp(Det.nct).struc .eq. 'box_w' .or. 
+c     *     Det.cmp(Det.nct).struc .eq. 'sphere_w') .and. 
+c     *     Det.nworld .eq. 1) then
+      if(index(Det.cmp(Det.nct).struc, '_w') .ne. 0 .and.
+     *     Det.nworld .eq. 1) then
+
+c             ok
+      else
+         call cerrorMsg(
+     *    'world must be the last only 1 component', 0)
+      endif
+
+      Det.cmp(Det.nct).Contains = -1
+      Det.cmp(Det.nct).ContainsR = -1
+      Det.cmp(Det.nct).NMatreska = 0
+
+      do i = 1,  Det.nct-1
+
+         if(Det.cmp(i).NContainer .eq. 0 ) then
+c     *        .or. Det.cmp(i).NPContainer .gt. 0) then
+c              i is not contained  by any other
+c              component 
+c              partially contained one is not included
+            Det.cmp(Det.nct).NMatreska =
+     *         Det.cmp(Det.nct).NMatreska + 1
+            k = Det.cmp(Det.nct).NMatreska
+c(((((((((((((((((((
+c            Det.cmp(Det.nct).Contains(k)
+c     *        = i
+c            Det.cmp(Det.nct).ContainsR(k)
+c     *        = i
+            if( Det.cmp(Det.nct).Contains .eq. -1) then
+c                  two can use  the same array point
+               Det.cmp(Det.nct).Contains =CnCounter
+               Det.cmp(Det.nct).ContainsR =CnCounter
+            endif
+
+            call epCnArea(i)
+c))))))))))))))))))
+c              now i is contained by the world
+            Det.cmp(i).NContainer = 1    ! since, no other comp. contains this, only world contain
+                                         !  this. so, 1 is o.k  
+c             check if i-th comp is sub detector; if so,
+c             the subdetector must also contain the world
+c             at its end (if it has only one comp., need not)
+            j = epIsSubD(i)   ! subD number
+            if( j .gt. 0 )  then
+c              i is subD.
+              if( SubD(j).nct .gt. 1) then  ! more than one comp. in subD
+                 if( SubD(j).nworld .gt. 0) then
+c                       o.k
+c                 elseif(SubD(j).cmp(SubD(j).nct).NMatreska .eq. 0) then
+                 elseif( 
+     *             SubdArea(SubD(j).loc+ SubD(j).nct ).NMatreska
+     *               .eq. 0) then
+c                         last one seems a simple component
+                    msg='subdetetor( '//SubDName(j)//') must have '
+     *      //'implicit or explicit world at its last since it is used '
+     *      //'by another (sub)Detctor with a world'
+                    call cerrorMsg(msg, 0)
+                 else
+c                      check if the last one is equivalent to world
+                    call episeqvWorld(
+     *                j, SubD(j), SubdArea( SubD(j).loc+1 ) )
+                 endif
+              endif
+           endif
+         endif 
+      enddo
+      end
+      subroutine episeqvWorld(n, subdin, comp)
+      implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+      integer n  ! input. subdetector number
+      record /SubDetector/ subdin   ! input. a subDetector
+      record /Component /comp(*)
+c
+c          examines if the last component is equivalent to
+c          a world
+c     
+      integer*2 numb(ncmaxInSubD)
+      
+      integer i, m, mt, j
+      character*100 msg
+      logical error
+
+      do i = 1, subdin.nct
+         numb(i) = 0
+      enddo
+      error = .false.
+      do i =1, subdin.nct
+         mt = comp(i).NMatreska 
+
+         if(mt .gt. 0) then
+c            m = subdin.cmp(i).Contains
+            m = comp(i).Contains
+            do j = 1, mt
+                numb(CnArea( m+j)) =1
+            enddo
+         endif
+      enddo
+      do i = 1, subdin.nct-1
+         if(numb(i) .eq. 0) then
+            write(msg, *) ' subdetector=',SubDName(n), 
+     *     ':  implicit world  dose not contain ', i, '-th',
+     *     ' component directoy or indirectory'
+           call  cerrorMsg(msg, 1)
+           error = .true.
+         endif
+      enddo
+      if(error) then
+         call cerrorMsg(
+     *    'Some implicit world in some subdetectors may not'
+     *   //' contain all its child', 1)
+         call cerrorMsg(' check the subdetector',0)
+      else
+         call cerrorMsg('All implicit worlds are O.K', 1)
+      endif
+      end
+      subroutine eprotation(comp)
+      implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+#include  "ZepDirec.h"
+
+      record /Component/ comp  ! input/output.
+      character*150 msg
+
+      record /epDirec/ wx, wy, wz
+
+      real*8 a, b, c, epgetSProd
+
+       comp.rotation =
+     *     comp.direc(1)  .ne. 1.d0
+     * .or.
+     *     comp.direc(5)  .ne. 1.d0
+     * .or.
+     *     comp.direc(9)  .ne. 1.d0
+
+      if(comp.rotation ) then
+c          check rotation matrix         
+         wx.x = comp.direc(1)
+         wx.y = comp.direc(2)
+         wx.z = comp.direc(3)
+
+         wy.x = comp.direc(4)
+         wy.y = comp.direc(5)
+         wy.z = comp.direc(6)
+
+         wz.x = comp.direc(7)
+         wz.y = comp.direc(8)
+         wz.z = comp.direc(9)
+
+         a = epgetSProd(wx, wx)
+         b = epgetSProd(wy, wy)
+         c = epgetSProd(wz, wz)
+
+
+         if(wx.x .eq. 1.d0 .and. wy.y  .eq.  1.d0) then
+c                    this wuold be inclined cylinder etc
+c              c should be 1.0
+            if(abs(c-1.d0) .gt. MaxErrDirCos) then
+               write(msg,*)' sum of direcos Z**2 for ',
+     *         Det.nct, '-th comp. is wrong=',c
+               call cerrorMsg(msg, 1)
+               write(msg, *) ' Zx,Zy,Zz=',
+     *         wz.x, wz.y, wz.z
+               call cerrorMsg(msg, 0)
+            else
+c                make a, b
+               if( wz.z  .eq. 1.d0) then
+                  comp.rotation = .false.
+               else
+c                          force to  have sum**2=1
+                  call epadjdir(comp.direc(7)) 
+c                         make wx, wy
+                  call epmakexy(comp.direc)
+               endif
+            endif
+         else
+            if(abs(a-1.d0) .gt. MaxErrDirCos .or.
+     *         abs(b-1.d0) .gt. MaxErrDirCos ) then
+               write(msg,*) ' sum dircos X**2=',a,
+     *         ' or  sum dircos Y**2=',b, ' for ',
+     *         Det.nct, '-th comp. wrong '
+               call cerrorMsg(msg, 1)
+               write(msg, *) ' Xx,Xy,Xz=', wx.x, wx.y, wx.z
+               call cerrorMsg(msg, 1)
+               write(msg,*)
+     *          ' Yx,Yy,Yz=', wy.x, wy.y, wy.z
+               call cerrorMsg(msg, 0)
+            elseif(abs( epgetSProd(wx, wy)) .gt.  EpsFor90) then
+               call cerrorMsg(
+     *         ' direc cos X, Y is not perpendicular',1)
+               write(msg,*) ' X*Y=',   epgetSProd(wx, wy)
+               call cerrorMsg(msg, 1)
+               write(msg, *) ' Xx,Xy,Xz=', wx.x, wx.y, wx.z
+               call cerrorMsg(msg, 1)
+               write(msg,*) ' Yx,Yy,Yzs=', wy.x, wy.y, wy.z
+               call cerrorMsg(msg, 0)
+            else
+               call epadjdir(comp.direc(1))
+               call epadjdir(comp.direc(4))
+c                   form Z direction
+               call epmakez(comp.direc(1))
+
+            endif
+         endif
+      endif
+      end
+c     ********************
+      real*8 function epgetSProd(a, b)
+      implicit none
+#include "ZepDirec.h"
+      record /epDirec/ a, b
+      epgetSProd = a.x*b.x + a.y*b.y + a.z*b.z
+      end
+
+      subroutine epadjdir(m)
+c         adjust direction cos so that its square sum
+c         be 1.0
+      implicit none
+      real*8 m(3)
+c         
+      real*8 sum
+
+      sum = m(1)**2 + m(2)**2 + m(3)**2
+      if(sum .ne. 0.d0) then
+         sum = sqrt(sum)
+         m(1) = m(1)/sum
+         m(2) = m(2)/sum
+         m(3) = m(3)/sum
+      else
+         m(1) = 1.
+         m(2) = 0.
+         m(3) = 0.
+      endif
+      end
+
+      subroutine epmakez(m)
+      implicit none
+      real*8 m(9)
+c           m(1-3) are  dire.cos of X'
+c           m(4-6) are  //          Y'
+c           m(7-9) //               Z'
+c        make Z'=X' x Y'
+c       Z'x = X'y Y'z     X'z  Y'y
+      m(7) = m(2)* m(6) - m(3)*m(5)
+c       Z'y = X'z Y'x     X'x  Y'z
+      m(8) = m(3)* m(4) - m(1)*m(6)
+c       Z'z = X'x Y'y     X'y  Y'x
+      m(9) = m(1)* m(5) - m(2)*m(4) 
+      end
+c     **********************
+      subroutine epmakexy(m)
+      implicit none
+      real*8 m(9)
+c         X' = Z' x z :  
+c        X'x = Z'y 1 -Z'z 0
+       m(1) = m(8)
+c        X'y = Z'z 0 - Z'x 1
+       m(2) = -m(7)
+c        X'z = Z'x 0 - Z'y 0
+       m(3) = 0.
+c           normalize
+       call epadjdir(m(1))
+c        Y' = Z' x X'
+c        Y'x = Z'y X'z - Z'z X'y   
+       m(4) = m(8)*m(3) - m(9)*m(2)
+c        Y'y = Z'z X'x - Z'x X'z   
+       m(5) = m(9)*m(1) - m(7)*m(3)
+c        Y'z = Z'x X'y - Z'y X'x   
+       m(6) = m(7)*m(2) - m(8)*m(1)
+       end
+       subroutine eprbox(comp)
+       implicit none
+#include  "ZepTrackv.h"
+#include  "Zcnfig.h"
+#include  "ZepManager.h"
+
+           integer  klena
+           character*80 msg
+
+           record /Component/ comp  ! input/output. where component data 
+                                    !      is to read in.
+c              read part of the structure
+           call eprpst(comp, 3, 3, 1, 6 )
+c           Det.nbox = Det.nbox+1
+           return
+c     ***************** cylinder
+      entry eprcyl(comp)
+c     ****************
+c              read part of the structure
+
+           call eprpst(comp, 2, 2, 7, 9)   ! 7,9 means only axis of cyl 
+c           Det.ncyl=Det.ncyl+1
+c              variants which is nothing but a rotation of 
+c              the canonical form
+c           call eprotation(comp)
+           if(index(confdata, 'cyl_z') .ne. 0 .or.
+     *        Field(2)(1:klena(Field(2))) .eq. 'cyl'  .or.
+     *        Field(2)(1:klena(Field(2))) .eq. 'cyl_w'   ) then
+c               this is canonical form; nothing to do
+           elseif(index(confdata, 'cyl_x') .ne. 0) then
+c
+c             canonical form is rotated by 90 deg around y
+
+c              call eprotdirec(comp, 2,  0) 
+           elseif(index(confdata,'cyl_y') .ne. 0) then
+c               
+c              call eprotdirec(comp, 3, 2)
+           else
+              write(msg,*) ' error structure=', confdata
+              call cerrorMsg(msg, 0)
+           endif
+           return
+c     ***************** pipe
+      entry eprpip(comp)
+c     ****************
+c              read part of the structure
+           call eprpst(comp, 3, 3, 7, 9)
+           if(index(confdata, 'pipe_z') .ne. 0 .or.
+     *        Field(2)(1:klena(Field(2))) .eq. 'pipe'     ) then
+c               this is canonical form; nothing to do
+           elseif(index(confdata, 'pipe_x') .ne. 0) then
+           elseif(index(confdata,'pipe_y') .ne. 0) then
+           else
+              write(msg,*) ' error structure=', confdata
+              call cerrorMsg(msg, 0)
+           endif
+
+           return
+c     ********************
+      entry eprsph(comp)
+c              read part of the structure
+           call eprpst(comp, 1, 1, 1, 1)
+c                this should be ... 1, 0, 0)  but it will 
+c          generate array boundary error, so put 1,1 
+c          they are neglected.
+
+c           Det.nsph = Det.nsph+1
+           return
+
+      end
+      subroutine eprotdirec(comp, j2, j1)
+       implicit none
+#include  "ZepTrackv.h"
+#include  "Zcnfig.h"
+#include  "ZepManager.h"
+       record /Component/ comp  ! input/ouput
+       integer j2, j1
+       integer i
+
+c        If the rotation matrix (direc) is  not a unit
+c       matrix, this has priority and M1,M2 is neglected.
+c        If it is the unit matrix, 
+c       it is changed to
+c       direc =  M2 x M1 where Mi is the rotation matrix
+c       for the anti-clockwise rotation around ji-th
+c       axis by 90 degrees.
+c       if ji=0, no rotaion.  ji=1 ==>  x axis, ji=2 ==> y,
+c                             ji=3 ==>  z axis.
+c
+ 
+
+       real*8 rmat(9, 4), M21(9)
+       real*8 o, u, mu
+       parameter(o=0.d0, u=1.d0, mu=-u)
+c        Solaris refuse to use data x/-u/ so that mu is used.
+       data  (rmat(i,2),i=1, 9)/   !  around x
+     *   u, o,  o,
+     *   o, o,  u,
+     *   o, mu, o/
+       data  (rmat(i,3), i=1, 9)/  !  around y
+     *   o, o, mu,
+     *   o, u, o,
+     *   u, o, o/
+       data  (rmat(i,4), i=1, 9)/   !  around z
+     *    o, u, o,
+     *   mu, o, o,
+     *    o, o, u/
+       data  (rmat(i,1), i=1, 9)/   !   unit matrix
+     *    u, o, o,
+     *    o, u, o,
+     *    o, o, u/
+
+
+
+       if(comp.direc(1) .eq. 1.d0 .and.
+     *    comp.direc(5) .eq. 1.d0 .and.
+     *    comp.direc(9) .eq. 1.d0 )  then
+c            M21= M2 x M1
+          call  epmatmul(rmat(1, j2+1),  rmat(1, j1+1),  M21)
+          do i= 1, 9
+             comp.direc(i) = M21(i)
+          enddo
+       endif
+       end
+      subroutine epirotdirec(comp, j2, j1)
+       implicit none
+#include  "ZepTrackv.h"
+#include  "Zcnfig.h"
+#include  "ZepManager.h"
+       record /Component/ comp  ! input/ouput
+       integer j2, j1
+       integer i
+c          Inverse of eprotdirec
+c        If the rotation matrix (direc) is  not a unit
+c       matrix, this has priority and M1,M2 is neglected.
+c        If it is the unit matrix, 
+c       it is changed to
+c       direc =  M2 x M1 where Mi is the rotation matrix
+c       for the anti-clockwise rotation around ji-th
+c       axis by 90 degrees.
+c       if ji=0, no rotaion.  ji=1 ==>  x axis, ji=2 ==> y,
+c                             ji=3 ==>  z axis.
+c
+ 
+
+       real*8 rmat(9, 4), M21(9)
+       real*8 o, u, mu
+       parameter(o=0.d0, u=-1.d0, mu=u)
+
+       data  (rmat(i,2),i=1, 9)/   !  around x
+     *   u, o,  o,
+     *   o, o,  u,
+     *   o, mu, o/
+       data  (rmat(i,3), i=1, 9)/  !  around y
+     *   o, o, mu,
+     *   o, u, o,
+     *   u, o, o/
+       data  (rmat(i,4), i=1, 9)/   !  around z
+     *    o, u, o,
+     *   mu, o, o,
+     *    o, o, u/
+       data  (rmat(i,1), i=1, 9)/   !   unit matrix
+     *    mu, o, o,
+     *    o, mu, o,
+     *    o, o, mu/
+
+
+
+       if(comp.direc(1) .eq. 1.d0 .and.
+     *    comp.direc(5) .eq. 1.d0 .and.
+     *    comp.direc(9) .eq. 1.d0 )  then
+c            M21= M2 x M1
+          call  epmatmul(rmat(1, j2+1),  rmat(1, j1+1),  M21)
+          do i= 1, 9
+             comp.direc(i) = M21(i)
+          enddo
+       endif
+       end
+       subroutine epmatmul(m1, m2, m3)
+       implicit none
+       real*8 m1(9), m2(9), m3(9)
+c           m3 = m2  x  m1
+c        m3 must not be  m1 or m2
+c
+       integer i, j, k
+       real*8 sum
+       do i = 1, 3   !  row
+          do j =1, 3  !  col.
+             sum = 0.
+             do k = 1, 3
+                sum = sum + m2( (i-1)*3 + k ) *
+     *                      m1( (j + (k-1)*3 ))
+             enddo
+             m3((i-1)*3 + j) = sum
+          enddo
+       enddo
+       end
+
+
+      subroutine eprpst(comp, nattr, mattr,  ndir1, ndir2)
+       implicit none
+#include  "ZepMaxdef.h"
+#include  "ZepTrackv.h"
+#include  "Zcnfig.h"
+#include  "ZepManager.h"
+c          process a part of config data; common to all 
+c          structures.
+c
+       record /Component/ comp  ! input/output.  
+       integer nattr  !  input.  number of volume attributes of this 
+                      !          structure
+       integer mattr  !  input. nattr + number of some values  dereived
+                      !        from the attributes and used later
+       integer ndir1, ndir2 ! input. ndir1-th to ndir2-th component of
+                            !  direction cosines which specify the
+                            !  volume orientation are read
+
+       integer ncn, l, klena, alen, l2
+       character*80 msg
+
+       character(MAX_STRUCCHR)::epparaphrase
+       character(MAX_STRUCCHR)::tempph
+
+       integer noldnames, i, icon, inttemp
+       parameter (noldnames=17)
+       character*8 translate(2, noldnames)
+       logical kalpha
+       real*8 realtemp
+       integer:: uscl
+c          names used in old version should be accepted as 
+c          new names: translation table
+       data translate/
+     *  'pb',         'Pb',
+     *  'air',        'Air',
+     *  'c',          'Carbon',
+     *  'h2o',        'H2O',
+     *  'al',         'Al',
+     *  'ar',         'Ar',
+     *  'bgo',        'BGO',
+     *  'csi',        'CsI',
+     *  'cu',         'Cu',
+     *  'fe',         'Fe',
+     *  'g5',         'G5',
+     *  'g10',        'Gten',
+     *  'w',          'W',
+     *  'scin',       'SCIN',
+     *  'lixe',       'LiXe',
+     *  'liar',       'LiAr',
+     *  'si',         'Si'/
+
+       if(nattr .gt. 0)  then
+          if(mattr .ge. nattr) then
+             call epAttribWatch(mattr, comp.vol)
+          else
+             call cerrorMsg('mattr < nattr for eprpst',0) 
+          endif
+       endif
+       comp.Nattributes = nattr
+       read(confdata, *) ncn
+       if(comp.cn .ne. ncn .and. .not. Incused ) then
+          write(msg, *) ' check comp. #=',ncn,
+     *         ' which should be', comp.cn
+          call cerrorMsg(msg, 1)
+          write(0,*) ' input line: ',confdata
+          stop
+       endif
+       l = index(confdata, '/')
+       if(l .eq. 0) then
+          write(msg, *) '/ is missing in',ncn,' line'
+          call cerrorMsg(msg, 0)
+       endif
+c        keep Upper/lower case as they are.
+       l = index(FieldAsItis(3), '*')
+       if(l .gt. 0) then
+c           Air*0.98 type;  0.98 specifies density calibration  factor
+c           =   (rho of this Air)/(rho of  Air without *)
+          comp.matter=  FieldAsItis(3)(1:l-1)
+          read(FieldAsItis(3)(l+1:klena(FieldAsItis(3))),*) comp.rhoc
+       else
+          comp.matter =
+     *      FieldAsItis(3)(1:klena(FieldAsItis(3)))
+          comp.rhoc = 1.0
+       endif
+
+c      ^^^^^^^^^^^^^^
+       if( comp.matter .eq. "0") then
+c             should be subdetector citation. use the same matter  as the
+c             definition
+c             format is like this:    1 qring 0 0 0 0 / 0 0 0.
+c             if format is like       1 qring Al 0 0 0 0 / 0 0 0
+c             all matter in the subdetector will be replaced by Al
+c             when it is expanded. However,
+c             if format is like       1 qring sp 0 0 0 0 / 0 0 0
+c             the original matter is kept. (same as the first case).
+
+          if(nattr .eq. 0) then   ! subdetector is called
+             comp.matter = " "
+          else
+             write(msg, *)
+     *        ' matterial must be given for ',comp.cn, '-th comp.'
+             write(*, '("data =", a)') confdata(1:klena(confdata))
+             call cerrorMsg(msg, 0)
+          endif
+       endif
+c      ^^^^^^^^^^      
+       comp.MaxPathL = 0.
+       comp.Modifier = 0
+       comp.chno = NotGiven
+c     4 box Pb c dE mp mo chno
+c     1  2  3  4 5  6   7  8 / 
+       if(Field(4) .eq. '=') then
+          comp.CountIO = EqualFshort
+       else
+          if(kalpha(Field(4))) then
+             call epexamEqI(Field(4), inttemp, icon)
+c             call epexamEqI(Field(4), comp.CountIO, icon)
+             comp.CountIO = inttemp
+             if(icon .ne. 0) then
+                call eperrEq(comp, Field(4))
+             endif
+          else
+             read(Field(4), *) comp.CountIO
+          endif
+       endif
+c     4 box Pb c dE mp mo chno
+c     1  2  3  4 5  6   7  8 / 
+       if(Field(5) .eq. '=') then
+          comp.CountDE = EqualFshort
+       else
+          if(kalpha(Field(5))) then
+c             call epexamEqI(Field(5), comp.CountDE, icon)
+             call epexamEqI(Field(5), inttemp, icon)
+             comp.CountDE = inttemp
+             if(icon .ne. 0) then
+                call eperrEq(comp, Field(5))
+             endif
+          else
+             read(Field(5), *) comp.CountDE
+          endif
+       endif
+c          up to countDE has been processed
+c     4 box Pb c dE mp mo chno
+c     1  2  3  4 5  6   7  8 / 
+c          4  5 6  7  8       4 5  6    4 5     4 5  6  7   4 5  6 
+c          c de mp mo ch /    c de /    c de/   c de mp /  c  de mp/
+c          4 5 6 7  8       4  5  6  7   
+c          c de mp mo /     c de mp mo/
+       if( index(Field(5), "/" ) > 0 ) then
+c               countDE/ type
+c         no  more maxpath, modifier, chno
+       elseif( Field(6) == '/' ) then
+c               countDE / type
+c             no more data
+       elseif(kalpha(Field(6) )) then
+c          call epexamEq(Field(6), comp.MaxPathL, icon)
+          call epexamEq(Field(6), realtemp, icon)
+          comp.MaxPathL = realtemp
+          if(icon .ne. 0) then
+             call eperrEq(comp, Field(6))
+          endif
+       elseif( Field(6) == "=" ) then
+          comp.MaxPathL = EqualF
+       else
+c                   may be  num or num/
+             read(Field(6), *) comp.MaxPathL
+       endif
+c     
+c          up to maxpath has been processed
+c     4 box Pb c dE mp mo chno
+c     1  2  3  4 5  6   7  8 / 
+       if( index( Field(6), '/')   > 0 ) then
+c             MaxPathL/ ; so no more data
+       elseif( Field(7) .eq.  '/' ) then
+c             MaxPathL given. but modifier not given
+       elseif( kalpha(Field(7)) ) then
+          call epexamEqI(Field(7), inttemp, icon)
+          comp.modifier = inttemp
+          if(icon .ne. 0) then
+             call eperrEq(comp, Field(7))
+          endif
+       elseif( Field(7) == '=' ) then
+          comp.modifier = EqualFshort
+       else
+          read( Field(7), *) comp.modifier
+       endif
+c     
+c          up to modifier has been processed
+c     4 box Pb c dE mp mo chno
+c     1  2  3  4 5  6   7  8 / 
+       if( index( Field(7), '/')   > 0 ) then
+c             modifier/ ; so no more data
+       elseif( Field(8) .eq.  '/' ) then
+c             modifiere given. but chno not given
+       elseif( kalpha(Field(8)) ) then
+          call epexamEqI(Field(8), inttemp, icon)
+          comp.chno = inttemp
+          if(icon .ne. 0) then
+             call eperrEq(comp, Field(8))
+          endif
+       elseif( Field(8) == '=' ) then
+          comp.chno = EqualFshort
+       else
+          read( Field(8), *) comp.chno
+       endif
+
+
+       comp.struc = Field(2)(1:klena(Field(2)))
+
+c           set number for the structure
+       do i = 1, NPreDefName
+          if(PreDefName(i)(1:klena(PreDefName(i))) .eq.
+     *         comp.struc(1:klena(PreDefName(i)))) then
+             comp.strucNo = i
+             goto 5
+          endif
+       enddo
+       if(comp.struc(1:4) .eq. 'new-' ) then
+          read(comp.struc(5:6), *) i
+          comp.strucNo = i + NPreDefName
+
+       else
+          call epseeUnderScore(comp.struc, uscl)
+           tempph=  epparaphrase(comp.struc(1:uscl))
+           if(tempph(1:4) .eq. 'new-' ) then
+              read(tempph(5:6),  *) i
+              comp.strucNo = i + NPreDefName
+           else
+              comp.strucNo = 0 ! not yet determined
+           endif
+       endif
+ 5     continue
+
+c
+
+c       if(comp.struc .eq. 'box_w'  .or.
+c     *      comp.struc .eq. 'sphere_w') then
+       if(index(comp.struc, '_w') .ne. 0) then
+          Det.nworld = Det.nworld + 1
+       endif
+c        for the compatibility of old config data which
+c        uses only small letters for media name, old
+c         names are translated into canonical form
+      do i = 1,  noldnames
+         if(translate(1,i) .eq. comp.matter) then
+            comp.matter = translate(2,i)
+            goto 10
+         endif
+      enddo
+ 10   continue
+
+      alen = klena(confdata)
+
+      l = index(confdata, '/')
+c
+      l2 = index(confdata(l+1:alen), '/')
+      if(l2 .eq. 0) then
+         confdata(alen+1:alen+2) = ' /'
+         alen = alen + 2
+      endif
+c           process orign, attrib and direction cos.
+      call epOrigDirec
+     *  (comp, nattr, ndir1, ndir2, confdata(l+1:alen))
+c     
+      if(comp.strucNo .gt. NPreDefName) then
+c          new-i structure; memorize the number of attrib
+         nattrib(comp.strucNo) = nattr  
+
+c             count such comp. with such a structure
+         Det.nnew(comp.strucNo - NPreDefName) =
+     *      Det.nnew(comp.strucNo - NPreDefName) + 1
+      endif
+      end
+c     **************************
+      subroutine epOrigDirec(comp, nattr, ndir1, ndir2, data)
+      implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+c
+c          process origin, attrib and direction cos part
+c
+c   data format:
+c            n  (number; 3, 3.0,  -3, -3.0 -3.0d3 etc); as it is
+c            a  (defined name)  replaced by it's value
+c            +      previous value + previous thickness
+c            ~      previous value - current thickness
+c           +n      previous value + previous thickness + n
+c           ~n      previous value - current thickness  + n
+c           +a      previous value + previous thickness + a
+c           ~a      previous value - current thickness  + a
+c           =       previous value   (=*1)
+c           =n      previous value + n   
+c           =a      previous value + a
+c           $i  (i integer > 0)    i-th comp.'s value
+c           *i                    (current - i)-th value
+c           $i:n            i-th value + n 
+c           $i:a            i-th value + a
+c           *i:n            (current -i)-th value + n
+c           *i:a            (current -i)-th value + a
+c
+       record /Component/ comp  ! input/output
+       integer nattr  !  input.  number of volume attributes of this 
+                      !          structure
+       integer ndir1, ndir2 ! input. ndir1-th to ndir2-th component of
+                            !  direction cosines which specify the
+                            !  volume orientation are read
+       character*(*) data   ! input orgx  origy orgz  {dirx  diry...} /
+
+       integer  klena
+
+
+       integer i, j, ix, alen, icon
+       logical kalpha
+
+       character*24 orgF(50)
+       integer norgF
+       integer lp
+       real*8 realtemp
+
+       lp = klena(data)
+
+       orgF(1) = ' '
+       orgF(2) = ' '
+       orgF(3) = ' '
+       norgF = 0
+c
+       call kgetField(data, orgF, 3,  norgF)
+
+c          suppose original data has " 0 0 0 xx yy zz... /"
+c
+c        find xxx pos in   xxx yyy zzz /
+c                                    0 0 0 xxx yyy zzz /
+      call kgetCpos(data, i)   !     i
+      call kgetBpos(data(i:lp),  j)  !   0  0  0 xxx yyy zzz /
+c                                         j
+      i = i + j -1
+      call kgetCpos(data(i:lp), j)   !   0  0  0 xxx yyy zzz /   
+c                                           j                                 
+      i = i + j - 1
+      call kgetBpos(data(i:lp), j) !    0  0  0 xxx yyy zzz /   
+c                                           j
+      i = i + j - 1
+      call kgetCpos(data(i:lp), j)  !   0  0  0   xxx yyy zzz /   
+c                                             j   
+      i = i + j - 1
+      call kgetBpos(data(i:lp), j) !    0  0  0   xxx yyy zzz /   
+c                                              j
+      i = i + j - 1
+      call kgetCpos(data(i:lp), j)  !   0  0  0   xxx yyy zzz /   
+c                                                 j
+      
+      ix = i + j - 1   ! ix is xxx pos in data;
+c                      or   /'s pos + 1 as in   0 0 0/
+      j = index(data(1:lp), '/')    ! since / exists, j !=0
+      if(j .eq. 0) then
+         call cerrorMsg(data, 1)
+         call cerrorMsg('above data has no /', 0)
+      endif
+
+      if(j .lt. ix) ix = j
+
+c        if origin part has =, +, treat them specially
+c       ------    origx 
+      comp.offsetx = 0.      
+      if(orgF(1)(1:1) .eq.  '=' ) then
+         if(klena( orgF(1)) .gt. 1 ) then
+            if( kalpha(orgF(1)(2:24)) ) then
+c               call epexamEq(orgF(1)(2:24), comp.offsetx, icon)
+               call epexamEq(orgF(1)(2:24), realtemp, icon)
+               comp.offsetx = realtemp
+               if(icon .ne. 0) then
+                  call eperrEq(comp, orgF(1)(2:24)) ! not come back
+               endif
+            else
+c                 read, say, 23 in   "=23".  "=/"
+               read( orgF(1)(2:24), *) comp.offsetx
+            endif
+         endif
+         comp.orgx = EqualF
+      elseif(orgF(1)(1:1) .eq.  '+' ) then
+         if(klena( orgF(1)) .gt. 1 ) then
+            if(kalpha( orgF(1)(2:24) )) then
+c               call epexamEq(orgF(1)(2:24), comp.offsetx, icon)
+               call epexamEq(orgF(1)(2:24), realtemp, icon)
+               comp.offsetx = realtemp
+               if(icon .ne. 0) then 
+                  call eperrEq(comp, orgF(1)(2:24)) ! not come back
+               endif
+            else
+c              read, say, 23 in   "+23".  "+/"
+               read( orgF(1)(2:24), *) comp.offsetx
+            endif
+         endif
+         comp.orgx = PlusF
+      elseif(orgF(1)(1:1) .eq.  '~' ) then
+         if(klena( orgF(1)) .gt. 1 ) then
+            if(kalpha( orgF(1)(2:24) )) then
+               call epexamEq(orgF(1)(2:24), realtemp, icon)
+               comp.offsetx = realtemp
+               if(icon .ne. 0) then 
+                  call eperrEq(comp, orgF(1)(2:24)) ! not come back
+               endif
+            else
+c              read, say, 23 in   "~23".  "~/" "~-34" 
+               read( orgF(1)(2:24), *) comp.offsetx
+            endif
+         endif
+         comp.orgx = MinusF
+      elseif(kalpha(orgF(1))) then
+         call epexamEq(orgF(1), comp.orgx, icon)
+         if(icon .ne. 0) then 
+            call eperrEq(comp, orgF(1)) ! not come back
+         endif
+      else
+         read(orgF(1), *) comp.orgx
+      endif
+c      -------    origy 
+      comp.offsety = 0.
+      if(orgF(2)(1:1) .eq.  '=') then
+         if(klena( orgF(2)) .gt. 1 ) then
+            if( kalpha(orgF(2)(2:24)) ) then
+c               call epexamEq(orgF(2)(2:24), comp.offsety, icon)
+               call epexamEq(orgF(2)(2:24), realtemp, icon)
+               comp.offsety = realtemp
+               if(icon .ne. 0) then
+                  call eperrEq(comp, orgF(2)(2:24)) ! not come back
+               endif
+            else
+               read( orgF(2)(2:24), *) comp.offsety
+            endif
+         endif
+         comp.orgy = EqualF
+      elseif(orgF(2)(1:1) .eq.  '+') then
+         if(klena( orgF(2)) .gt. 1 ) then
+            if(kalpha( orgF(2)(2:24) )) then
+c               call epexamEq(orgF(2)(2:24), comp.offsety, icon)
+               call epexamEq(orgF(2)(2:24), realtemp, icon)
+               comp.offsety = realtemp
+               if(icon .ne. 0) then 
+                  call eperrEq(comp, orgF(2)(2:24)) ! not come back
+               endif
+            else
+               read( orgF(2)(2:24), *) comp.offsety
+            endif
+         endif
+         comp.orgy = PlusF
+      elseif(orgF(2)(1:1) .eq.  '~' ) then
+         if(klena( orgF(2)) .gt. 1 ) then
+            if(kalpha( orgF(2)(2:24) )) then
+               call epexamEq(orgF(2)(2:24), realtemp, icon)
+               comp.offsety = realtemp
+               if(icon .ne. 0) then 
+                  call eperrEq(comp, orgF(2)(2:24)) ! not come back
+               endif
+            else
+c              read, say, 23 in   "~23".  "~/" "~-34" 
+               read( orgF(2)(2:24), *) comp.offsety
+            endif
+         endif
+         comp.orgy = MinusF
+      elseif(kalpha(orgF(2))) then
+         call epexamEq(orgF(2), comp.orgy, icon)
+         if(icon .ne. 0) then
+            call eperrEq(comp, orgF(2))  ! not come back
+         endif
+      else
+         read(orgF(2), *) comp.orgy
+      endif
+
+c       ------- origz 
+      comp.offsetz = 0.
+      if(orgF(3)(1:1) .eq.  '=' ) then
+         if(klena( orgF(3)) .gt. 1 ) then
+            if( kalpha(orgF(3)(2:24)) ) then
+c               call epexamEq(orgF(3)(2:24), comp.offsetz, icon)
+               call epexamEq(orgF(3)(2:24), realtemp, icon)
+               comp.offsetz = realtemp
+               if(icon .ne. 0) then
+                  call eperrEq(comp, orgF(3)(2:24)) ! not come back
+               endif
+            else
+               read( orgF(3)(2:24), *) comp.offsetz
+            endif
+         endif
+         comp.orgz = EqualF
+      elseif(orgF(3)(1:1) .eq. '+') then
+         if(klena( orgF(3)) .gt. 1 ) then
+            if(kalpha( orgF(3)(2:24) )) then
+c               call epexamEq(orgF(3)(2:24), comp.offsetz, icon)
+               call epexamEq(orgF(3)(2:24), realtemp, icon)
+               comp.offsetz = realtemp
+               if(icon .ne. 0) then 
+                  call eperrEq(comp, orgF(3)(2:24)) ! not come back
+               endif
+            else
+               read( orgF(3)(2:24), *) comp.offsetz
+            endif
+         endif
+         comp.orgz = PlusF
+      elseif(orgF(3)(1:1) .eq.  '~' ) then
+         if(klena( orgF(3)) .gt. 1 ) then
+            if(kalpha( orgF(3)(2:24) )) then
+               call epexamEq(orgF(3)(2:24), realtemp, icon)
+               comp.offsetz = realtemp
+               if(icon .ne. 0) then 
+                  call eperrEq(comp, orgF(3)(2:24)) ! not come back
+               endif
+            else
+c              read, say, 23 in   "~23".  "~" "~-34" 
+               read( orgF(3)(2:24), *) comp.offsetz
+            endif
+         endif
+         comp.orgz = MinusF
+      elseif(kalpha(orgF(3))) then
+         call epexamEq(orgF(3), comp.orgz, icon)
+         if(icon .ne. 0) then
+            call eperrEq(comp, orgF(3))  ! not come back
+         endif
+      else
+         read(orgF(3), *) comp.orgz
+      endif
+c  -------------------------------
+      alen = klena(data)
+
+      if(nattr .le. 0) then
+         call epgetDir(comp, data(ix:alen), ndir1, ndir2)
+c               read(data(ix:alen), *)
+c     *        (comp.direc(i), i = ndir1, ndir2)
+      else
+         call eprdVolattr(comp, ix, data, nattr, ndir1, ndir2)
+      endif
+      end
+c     *********************
+      subroutine eprdVolattr(comp, ix, data,  nattr, ndir1, ndir2)
+      implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+c
+c          process origin and direction cos part
+c
+       record /Component/ comp  ! input/output
+       character*(*) data   ! input vol-attr {dirx  diry...} /
+       integer ix   ! data(ix:*) is the data containing vol-attr.
+       integer nattr  !  input.  number of volume attributes of this 
+                      !          structure
+       integer ndir1, ndir2  ! direction cos pos.
+
+       character*100 msg
+       integer  klena, mattrb
+       logical kalpha
+
+       integer i, j, k, lp, icon, lenattr
+       real*8 realtemp
+
+       character*24 attrb(maxiattr)
+
+       
+       lp = klena(data)
+
+       do i = 1, nattr
+          attrb(i) = ' '
+       enddo
+       mattrb = 0
+c
+       call kgetField(data(ix:lp), attrb, nattr,  mattrb)
+       if( mattrb .gt. 0  .and. attrb(mattrb) .eq. '/') then
+          mattrb= mattrb -1
+       endif
+
+c       if(mattrb .lt. nattr  .and.
+c     *      ( comp.struc .eq. 'box_w' .or.
+c     *       comp.struc .eq. 'shpere_w' )) then
+       if(mattrb .lt. nattr  .and.
+     *      index(comp.struc, '_w') .ne. 0) then
+c               box_w 0 0 0/  0 0 0 type.
+c                skip reading attribute; set 0. for the frist attrib.
+          Volat( comp.vol + 1 ) = 0.
+          goto 10
+       elseif(mattrb .lt. nattr) then
+          write(msg,*)
+     *    comp.cn,'-th comp. has not enough attributs'
+          call cerrorMsg(msg, 0)
+       endif
+       
+c        see if vol attr has =
+       do i = 1, nattr
+c          if(index(attrb(i),  '+')  .gt. 0 ) then
+          if(attrb(i) .eq.  '+' ) then
+             write(msg,*)
+     *       comp.cn,'-th comp. has  + for vol attribute'
+             call cerrorMsg(msg, 1)
+             call cerrorMsg(
+     *          '"=" may be used but not "+" for vol. attr',0)
+          endif
+
+
+         if(attrb(i)(1:1) .eq.  '=') then
+            lenattr= klena( attrb(i) ) 
+            if( lenattr .gt. 1) then
+               if( kalpha(attrb(i)(2:lenattr) ) ) then    
+                  call epexamEq(attrb(i)(2:lenattr), realtemp, icon)
+                  if(icon .ne. 0) then
+                     call eperrEq(comp, attrb(i)(2:lenattr)) ! not come back
+                  endif
+                  VolatEq( comp.vol+i ) = realtemp
+               else
+c                   read, say, 23 in   "=23". 
+                  read(attrb(i)(2:lenattr), *) VolatEq(comp.vol+i ) 
+               endif
+            else
+               VolatEq(comp.vol+i ) = 0.
+            endif
+c((((((((
+            Volat( comp.vol+i ) = EqualF
+c))))))))
+         elseif(kalpha(attrb(i))) then
+c((((((((((
+            call epexamEq(attrb(i), Volat(comp.vol+i), icon)
+c)))))))))
+            if(icon .ne. 0) then
+               call eperrEq(comp, attrb(i))
+            endif
+         else
+c(((((((((((((
+            read(attrb(i), *) Volat(comp.vol+i)
+c))))))))))
+         endif
+       enddo
+c  -------------------------------
+c         skip nattr attributes in data. 
+c         get position of direction cos
+c         
+c        (if,  for nattr=3,  possible data is
+c             a b c  d1 d2 d3 ../
+c                or
+c             a b c /       or
+c             a b c/
+c        position should be next to "c"
+
+       j = ix
+       do i = 1, min(nattr, mattrb)
+          call kgetCpos(data(j:lp), k)   !   aaa  bbb  cccc
+                                         !   k
+          j = k + j -1                  !    j 
+          call kgetBpos(data(j:lp), k) !  aaa  bbb ccc
+                                       !     k
+          j = k + j -1                 !     j
+       enddo
+c          aaa bbb ccc
+c                     j   
+       call epgetDir(comp, data(j:lp), ndir1, ndir2)
+c       read(data(j:lp), *)
+c     *        (comp.direc(i), i = ndir1, ndir2)
+ 10    continue
+c         This is to replace "=" by it's corresponding
+c          value. If this is delayed, newvol could not
+c          be proccessed because usually, attribute values
+c          are checked just after this routine is called;
+c         The EqualF becomes the invalid value. So we must
+c         replace "=" here. But, we don't know the 
+c         previous value to be used as "=".  Therefore
+c         common values are directly used  in the next
+c         subroutine. This is not a recommended way.
+c         Danger !  If the attribute values are not
+c         checked inside the newvolume data processing
+c         routine, we can delay the replacement at
+c         epAttrb.
+
+       call epAttrb1
+       end
+c     ****************************  
+      subroutine epgetDir(comp, data, ndir1, ndir2)
+      implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+      record /Component/ comp   ! input/output
+      character*(*) data        ! input dirx  diry../
+      integer ndir1, ndir2
+      character*24 dirf(9)
+      integer nf, need, i, icon
+      character*128 msg
+      logical kalpha
+
+
+      call kgetField(data, dirf, 10, nf)
+      
+      need = ndir2 - ndir1 + 1  ! no. of field 
+
+      if(nf .eq. 1) then
+c          nothing to do; no direction cos.
+      elseif( dirf(1) .eq. '/') then
+c           nothing to do; no direction cos.
+      elseif(nf .ge. need) then
+         do i = 1, need
+            if(kalpha(dirf(i))) then
+               call epexamEq(dirf(i), comp.direc(ndir1+i-1), icon)
+               if(icon .ne. 0) then
+                  call eperrEq(comp, dirf(i))
+               endif
+            else
+               read(dirf(i), *) comp.direc(ndir1+i-1)
+            endif
+         enddo
+      elseif(nf .ge. need - 3) then
+c           2nd group is assumed to be default (0 1 0)
+c           so that read only first dir.
+         do i = 1, need -3
+            if(kalpha(dirf(i))) then
+               call epexamEq(dirf(i), comp.direc(ndir1+i-1), icon)
+               if(icon .ne. 0) then
+                  call eperrEq(comp, dirf(i))
+               endif
+            else
+               read(dirf(i), *) comp.direc(ndir1+i-1)
+            endif
+         enddo
+      else
+         call cerrorMsg(data, 1)
+         call cerrorMsg(
+     *   'above data has not enough direction cosines',1)
+         write(msg,*) 'for ',comp.cn, '-th component'
+         call cerrorMsg(msg, 1)
+         call cerrorMsg('OR: some attributes are missing',0)
+      endif
+      end
+c     ********************
+      subroutine epcontain(fatal)
+      implicit none
+#include  "ZepTrackv.h"
+#include  "Zcnfig.h"
+#include  "ZepManager.h"
+
+           integer klena, ldat
+c            see if 2nd /           
+       integer l1, l2, i
+       logical fatal
+       character*2 bq/'\\'/  ! solaris cannot use '\'
+
+
+c            get actual length of data
+       ldat = klena(confdata)
+c        find  first '/'  such as in 
+c         1 box pb  0 0 0/
+       l1=index(confdata, '/')
+c        find 2nd /
+       l2 = index(confdata(l1+1: ldat) , '/')
+c          clear matreska counter for nct-th comp.
+c (((((((((((((
+c       do i = 1, MaxMatreska
+c           Det.cmp(Det.nct).Contains(i) = 0
+c           Det.cmp(Det.nct).ContainsR(i) = 0
+c       enddo
+
+       Det.cmp(Det.nct).Contains =-1
+       Det.cmp(Det.nct).ContainsR =-1
+
+c ))))))))))))))
+       if(l2 .gt. 0) then
+c           there is /
+          if(confdata(ldat:ldat) .eq. bq(1:1)) then
+c                   there is cont lines. not supported yet
+             call cerrorMsg(
+     *        'continuation by \ not supported yet', 0) 
+          endif
+c              put / in the last pos.
+          confdata(ldat+1:ldat+1) = '/'
+c ((((((((((
+c          read(confdata(l1+l2+1:ldat +1), *)
+c     *    (Det.cmp(Det.nct).ContainsR(i), i=1, MaxMatreska)
+          read(confdata(l1+l2+1:ldat +1), *)
+     *    ( CnArea(i+CnCounter), i=1, maxCnArea-CnCounter)
+c ))))))))))))))))))
+       endif
+
+c   #        NMatreska ContainsR NContainer  PContained NPContainer
+c   1              0      0         0           0          0                  
+c   2  / 3 4       2      3 4       0           12         1
+c   3  / 5 6 7     3     5 6 7      1           12         1
+c   4              0      0         1           12         1
+c   5              0      0         1           12         1
+c   6              0      0         1           12         1 
+c   7              0      0         1           12         1
+c   8  / -9 -10    2    -9 -10      0           0          0
+c   9              0      0         1           8          1
+c  10              0      0         2          8 11        2
+c  11  / -10       1     -10        0           0          0           
+c  12  / -2        1      -2        0           0          0   
+c                    Contains=|ContainsR|
+
+       call epcontain1(Det.nct,  fatal)
+       end
+       subroutine epcontain1(n, fatal)
+      implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+      integer n  ! input.  n-th component is  being examined
+                 !    if  there is contain/pcontain  relation
+
+      logical fatal
+      integer i, j, k
+      character*100  msg
+
+c          count matreska
+
+       Det.cmp(n).NMatreska = 0
+c  (((((((((((
+       do i = 1, maxCnArea - CnCounter
+          if(CnArea( CnCounter+i ) .eq. 0) then
+             goto 10
+          endif
+          Det.cmp(n).NMatreska = Det.cmp(n).NMatreska  + 1
+       enddo
+ 10    continue
+       if(Det.cmp(n).NMatreska .gt. 0) then
+          Det.cmp(n).ContainsR = CnCounter
+       endif
+       CnCounter = CnCounter + Det.cmp(n).NMatreska 
+c  ))))))))))))))
+c  (((((((((((
+c       do i = 1, MaxMatreska
+
+       do i = 1, Det.cmp(n).NMatreska
+          if(i .eq. 1) then
+             Det.cmp(n).Contains = CnCounter
+          endif
+c          Det.cmp(n).Contains(i) =abs( Det.cmp(n).ContainsR(i))
+
+          call epCnArea( abs(CnArea( i+ Det.cmp(n).ContainsR)) )
+          if(CnArea(CnCounter) .eq. n) then
+c             cannot eat tail
+             fatal  = .true.
+             write(msg, *)
+     *            ' ***** comp. ', n, ' is eating self'
+             call cerrorMsg(msg, 1)
+          endif
+       enddo
+c))))))))))
+c ((((((((((
+c          elseif(  Det.cmp(n).Contains(i)
+c           if( CnArea(i + Det.cmp(n).NMatreshka+ CnCounter ) 
+c     *          .eq. n ) then
+c))))))))
+c          else
+c(((((((((((((
+c             Det.cmp(n).NMatreska =
+c     *          Det.cmp(n).NMatreska + 1
+c)))))))))))))
+c             if(Det.cmp(n).ContainsR(i) .lt. 0) then
+c((((((((((((((
+c              Det.cmp(j).PContained(k)
+c     *           = n
+
+c)))))))))))
+c
+c          next is to init cmp(j)'s PContained
+c
+       do i = 1, Det.cmp(n).NMatreska
+          if( CnArea(i+Det.cmp(n).ContainsR) .lt. 0 ) then
+c                  partially contained comp.
+             j =  CnArea( i+Det.cmp(n).Contains )
+             Det.cmp(j).PContained =  -1
+          endif
+       enddo
+
+
+       do i = 1, Det.cmp(n).NMatreska
+          if( CnArea(i+Det.cmp(n).ContainsR) .lt. 0 ) then
+c                  partially contained comp.
+c((((((((((((
+c                j =  Det.cmp(n).Contains(i)
+             j =  CnArea( i+Det.cmp(n).Contains )
+             if(Det.cmp(j).PContained .eq. -1) then
+                Det.cmp(j).PContained = CnCounter
+             endif
+c))))))))))
+c                  count no. of comp. which partially
+c                  contains j
+             Det.cmp(j).NPContainer = Det.cmp(j).NPContainer + 1
+c                  j's  parent matreska is Det.nct
+             k = Det.cmp(j).NPContainer
+             call epCnArea(n)
+c              Det.cmp(j).PContained(k)
+c     *           = n
+c              To  identify inner comp. and outer comp.
+c              Later,  NContainer(i)  = 0 meanas
+c              that the  i-th comp. is not contained in another one.
+           
+c             j = Det.cmp(n).Contains(i)
+             j = CnArea( Det.cmp(n).Contains + i)
+             Det.cmp(j).NContainer = Det.cmp(j).NContainer + 1
+          endif
+       enddo
+       end
+
+      subroutine epqcyl(rcyl)
+      implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+c        returns radius of the cylinder 
+c        when all comp. is cylinder of the
+c        same radius.
+      real*8  rcyl, rpipi, rpipo
+c((((((((((
+      rcyl = Volat( Det.cmp(1).vol+cylr)
+c)))))))
+      return
+c     **************
+      entry  epqpip(rpipi, rpipo)
+c         returns inner and outer    
+c         radius of the pipe when
+c         all comp. are the same pipe
+c(((((((((((((
+      rpipi = Volat( Det.cmp(1).vol+pipeir)
+      rpipo = Volat( Det.cmp(1).vol+pipeor)
+c))))))))))))
+      end
+c      character*200 x,  y
+c       x = 
+c     * ' 4 box sp 0 0 0 / .0000   .0000 .000000 / .00 .0 .0000000 '//
+c     *   ' 0.000 0.0000  .10000 15.0000 1.330000 .0000 / 1 2 3'
+c      call epcompZero(x,y)
+c      write(*, *) y
+c      end
+      subroutine epcompZero(x, y)
+      implicit none
+#include "Zep3Vec.h"
+#include "Zcnfig.h"
+      character*(*) x, y
+c          0.0000, .0000  1.0000 etc is
+c        compressed as 0  0  1. etc.
+c        but if it dose not have "."
+c        such action is diabled
+      integer maxp
+      parameter (maxp = 16)
+      character*20 pat(maxp)
+      character*30 f(maxiattr)
+      integer klena, i,j, nf, k
+
+      data pat/
+     * '0 ',
+     * '00 ',
+     * '000 ',
+     * '0000 ',
+     * '00000 ',
+     * '000000 ',
+     * '0000000 ',
+     * '00000000 ',
+     * '000000000 ',
+     * '0000000000 ',
+     * '00000000000 ',
+     * '000000000000 ',
+     * '0000000000000 ',
+     * '00000000000000 ', 
+     * '000000000000000 ',
+     * '0000000000000000 '/
+
+      call kgetField(x, f, maxiattr, nf)
+
+      do i = 1, nf
+         if(index( f(i), ".") .eq. 0) goto 10
+         do j =  maxp, 1, -1
+            k = index(f(i), pat(j)(1:(klena(pat(j))+1)) )
+            if(k .gt. 0) then
+               f(i)(k:klena(f(i))) = ' '
+               if(f(i) .eq. ' ') then
+                  f(i) = '0'
+               elseif(f(i) .eq. '-.') then
+                  f(i) = '0'
+               else
+                  k = klena(f(i))
+                  if(f(i)(k:k) .eq. '.') then
+                     f(i)(k:k) = ' '
+                     if(f(i) .eq. ' ') f(i) = '0'
+                  endif
+                  goto 10
+               endif
+            endif
+         enddo               
+ 10      continue
+      enddo
+      k = 0
+      y = ' '
+      do i = 1, nf
+         j =klena(f(i))
+         k = k + 1
+         y(k:k+j) = ' '// f(i)(1:j)
+
+         k = k + j 
+      enddo
+      end
+c     ***************************
+      subroutine epgetMedia
+      implicit none
+c        by looking at the configuration data, examine
+c     a file for a given matter is ready or not. Then
+c     if the file is ready, read it.  Count  number of
+c     different media.
+c
+#include "ZepTrackv.h"
+#include "Zcnfig.h"
+#include "ZepManager.h"
+      
+
+      character*30 msg
+      logical fatal
+      integer i, j, icon
+
+      character*8  missingMedia(Maxmedia)
+      integer  missing, k
+
+      character*24  tempc
+
+      missing = 0
+      MediaNo = 0
+
+      fatal = .false.
+
+      do i = 1,  Det.nct
+         do j = 1,  MediaNo
+            if(Det.cmp(i).matter .eq. Media(j).name) then
+c               aleady read
+c                i-th component has media index j.
+               Det.Cn2media(i) = j
+               goto 10
+            endif
+         enddo
+c            this is new matter
+         if(MediaNo .lt. Maxmedia) then
+            MediaNo = MediaNo + 1
+            j = MediaNo
+         else
+            write(msg, *) Maxmedia
+            call cerrorMsg(
+     *       'too many different media > '//msg, 0)
+         endif
+c            see if the matter file exists, and if exist, read it
+
+         tempc = Det.cmp(i).matter
+c            if we use Det.cmp(i).matter directly in below,
+c           the string length cannot be transmitted correctly.
+c           so that we replace it  by tempc which can  hold
+c           upto 24 characters. 
+         call eprdMFile(tempc, icon)
+         if(icon .ne. 0) then
+c            see if already appeared
+            do k = 1, missing
+               if(missingMedia(k) .eq. Det.cmp(i).matter) then
+                  goto 5
+               endif
+            enddo
+            missing = missing + 1
+            if(missing .le. Maxmedia) then
+               write(msg, *) 'Media file:',
+     *          Det.cmp(i).matter, ' not exist'
+               call cerrorMsg(msg, 1)
+               missingMedia(missing) = Det.cmp(i).matter
+            else
+               call cerrorMsg(
+     *              'Seems too many missing media names',1)
+               missing = Maxmedia
+            endif
+ 5          continue
+            
+            MediaNo = MediaNo - 1
+            fatal = .true.
+         else
+c                i-th component has media index j.
+            Det.Cn2media(i) = j
+!            call epLen2Emin(Media(j))   ! make table for Length vs E
+!                     E is minimum energy that can run Lenth
+         endif
+ 10      continue
+      enddo
+
+      if(fatal) then
+         call cerrorMsg(
+     *    'Media files shown above are missing in any of the'//
+     *    ' following directories: ',  1)
+         do i = 1, MaxMediaDir
+            if(MediaDir(i) .ne. ' ') then
+               call cerrorMsg(MediaDir(i), 1)
+            endif
+         enddo
+         call cerrorMsg('Fatal error, good bye', 0)
+      endif
+
+      NoOfMedia = MediaNo   ! memorize the # of media
+      call epRangeAlloc( NoOfMedia )  ! allocate memory for Range calc.
+      do i = 1, NoOfMedia
+         call epRangeMkTbl(Media(i), i)   ! make Range tbl for i-th media
+      enddo
+ 
+      end
+c    **********************
+      subroutine eprdMFile(name, icon)
+      use srimdata
+      implicit none
+#include "ZepTrackp.h"
+#include "ZepTrackv.h"
+#include "Zcnfig.h"
+#include "ZepManager.h"
+
+      character*(*) name  ! input. media file name
+                          ! Absoft Fortran cannot get correct length
+                          ! if *(*) is used and 
+                          !  call e...(Det.cmp(i).matter,   )
+                          
+ 
+      integer icon        ! outpu. 0, if file exists  and read
+                          !        1, if file does not exist
+
+      character*100 msg
+      character*150 mdpath
+      integer  i, result, klena, jcon
+
+      icon = 0
+      do i = 1, MaxMediaDir
+
+         if( klena(MediaDir(i)) .gt. 0 ) then
+            mdpath = ' '
+            mdpath = MediaDir(i)(1:klena(MediaDir(i)))
+     *            // '/'  //name(1:klena(name))
+c            write(0,*) ' path in rcnf=', mdpath
+c            write(0,*) ' klena(mdpath)=', klena(mdpath)
+c              NEXTSTEP absoft Compiler fails with absolute path 
+c              specification. reason unknown.
+            call copenf(iowk, mdpath, result)
+
+            if(result .eq. 0) then
+c              in the case  of  dir, result=0 and error will happen
+
+               call epReadTab(iowk, Media(MediaNo))
+c                 some  correction
+c                 knockon cut  energy; this has not been called
+c                 in ReadeTab.
+               call epStern(RecoilKEmin, Media(MediaNo))
+c                 prepare for Urban model
+               call epsetUrban(Media(MediaNo), Media(MediaNo).urb)
+c                  cross-section precalculation
+               call epixsec(Media(MediaNo))
+               icon =0 
+               close(iowk)
+c     
+c                   read XCOM file
+               call epReadXXsec( Media(MediaNo), jcon)
+c                  examin if there is SRIM data in the current
+c                  media dir v9.09
+
+               call epSrimChk(iowk, trim(MediaDir(i)),
+     *           trim(name),  Media(MediaNo).srim)
+
+               if(Media(MediaNo).name .ne. name ) then
+c                 file name and name  contained 
+c                 there conflict; issue warning ---> change to stop
+c                 from v7.25 
+c                  if(MsgLevel .ge. 1) then
+                     write(msg, *) ' ^^^^^ Warning: Media file:',
+     *               name, ' contains media name:',
+     *               Media(MediaNo).name
+                     call cerrorMsg(msg, 0)
+c                  endif
+               endif
+               goto 10
+            endif
+         endif
+      enddo
+c        name not exists
+      icon = 1
+ 10   continue
+      end
+c     *******************************
+      subroutine epqncp(numberOfComp)
+       implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+        integer numberOfComp  ! output.  No of Component defined.
+
+        numberOfComp = Det.nct
+      end
+c     ************************
+      subroutine epqmat(n, mat)
+      implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+      integer n
+      character*(*) mat  ! output
+      call epchkcmpn('epqmat', n)
+      mat = Det.cmp(n).matter
+      end
+      
+      subroutine epqSubdName(n, name)
+      implicit none
+#include "Zep3Vec.h"
+#include  "Zcnfig.h"
+      integer,intent(in)::n ! component number
+      character(len=16),intent(out)::name
+
+      integer::epIsSubD
+      integer j
+      j = epIsSubD(n)
+      if(j > 0 ) then
+         name = SubDName(j)
+      else
+         name = ' '
+      endif
+      end
+
+      subroutine epqmatrhoc(n, mat, lc, rhoc)
+      implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+      integer n
+c
+c          This returns  Air*0.9345 etc as mat if
+c          rhoc != 1.0  else  simply Air etc.
+c
+      character*(*) mat  ! output  length must be>15
+      integer lc  !  output. length of 'mat' content
+      real rhoc   !  rhoc. 1. or 0.9356 etc.
+
+      character*20 matterAndrhoc
+      integer klena
+      call epchkcmpn('epqmatrhoc', n)       
+      rhoc = Det.cmp(n).rhoc
+      if( rhoc .eq. 1.) then
+         matterAndrhoc =Det.cmp(n).matter
+      else
+         if(rhoc .ge. 0.01 .and. rhoc .lt. 10.0) then
+c                                      9.99999 0.01001
+            write(matterAndrhoc, "(a, a, f11.5)")
+     *        Det.cmp(n).matter(1:klena(Det.cmp(n).matter)),
+     *        "*",  Det.cmp(n).rhoc 
+         else
+            write(matterAndrhoc, "(a, a, 1p, g12.4)")
+     *        Det.cmp(n).matter(1:klena(Det.cmp(n).matter)),
+     *        "*",  Det.cmp(n).rhoc 
+         endif
+         call kseblk(matterAndrhoc, "&", lc)
+      endif
+c             compress if 2.030000E-5 etc to 2.03E-5
+      call epsup00E(matterAndrhoc)
+      call epsuplast0(matterAndrhoc)
+      lc = klena(matterAndrhoc)
+      mat = matterAndrhoc(1:lc)
+      end
+c     ************************
+      subroutine epqstruc(n, struc)
+      implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+      integer n
+      character*(*) struc  ! output
+      call epchkcmpn('epqstruc', n)
+      struc = Det.cmp(n).struc
+      end
+
+c     ************************
+      subroutine epqCount(n, countn, counte)
+      implicit none
+#include  "Zep3Vec.h"
+#include  "Zcnfig.h"
+      integer n
+      integer countn, counte
+      call epchkcmpn('epqCount', n)
+      countn = Det.cmp(n).CountIO
+      counte = Det.cmp(n).CountDE
+      end
+c     ***********************
+      subroutine epqorg(n, origin)
+      implicit none
+#include "Zep3Vec.h"
+#include "Zcnfig.h"
+#include "ZepPos.h"
+
+      integer n  ! input. component number
+      record /epPos/ origin  ! output. n-th comp.'s origin
+
+c         inqurire the origin of n-th comp.
+
+      call epchkcmpn('epqorg', n)
+      origin.x= Det.cmp(n).orgx
+      origin.y= Det.cmp(n).orgy
+      origin.z= Det.cmp(n).orgz
+      end
+c     ***************************
+      subroutine epchkcmpn(id, n)
+c        check n is valid comp. # or not
+      implicit none
+#include "Zep3Vec.h"
+#include "Zcnfig.h"
+
+      character*(*) id  ! input. id to be printed
+      integer n      !  input  comp. #
+
+      character*50 msg
+
+      if(n .le. 0 .or. n .gt. Det.nct) then
+         write(msg, *)
+     *   'comp.#=', n,' for ', id, ' is out of range'
+         call cerrorMsg(msg, 0)
+      endif
+      end
+c     *****************************
+      subroutine epqvolatr(n, na, vol)
+      implicit none
+#include "Zep3Vec.h"
+#include "Zcnfig.h"
+c          inquire vol. attr. of n-th comp.
+      integer n ! input. comp. number
+      integer na ! output. # of attrib.
+      real*8 vol(*)  ! output. at least na-dim.
+
+      integer loc(maxiattr)
+
+      integer i, j
+
+      call epchkcmpn('epqvolatr', n)
+      na = Det.cmp(n).Nattributes
+
+      call epatloc( Det.cmp(n), loc)
+      do i = 1, na
+c((((((((((((
+         j = loc(i)
+         vol(i) = Volat( Det.cmp(n).vol+j )
+c)))))))))
+      enddo
+      end
+c     *****************************
+      subroutine epqcmpdircos(n, dir)
+      implicit none
+#include "Zep3Vec.h"
+#include "Zcnfig.h"
+c          inquire vol. attr. of n-th comp.
+      integer n ! input. comp. number
+      real*8 dir(9)  ! output.  direction cos.
+
+      integer i
+
+      call epchkcmpn('epqcmpdircos', n)
+      do i = 1, 9
+         dir(i) = Det.cmp(n).direc(i)
+      enddo
+      end
+
+      subroutine epCnArea(cn)
+      implicit none
+#include "Zep3Vec.h"
+#include "Zcnfig.h"
+      integer cn  ! input.  component number to be stored.
+
+      character*80 msg
+
+      if(CnCounter .lt. maxCnArea) then
+         CnCounter = CnCounter + 1
+         CnArea(CnCounter) = cn
+      else
+         write(msg, *) 'MAX_CN_AREA in ZepMaxDef.h=',maxCnArea,
+     *     ' exhausted '
+         call cerrorMsg(msg, 0)
+      endif
+      end
+      subroutine epAttribWatch(n, vol)
+      implicit none
+#include "Zep3Vec.h"
+#include "Zcnfig.h"
+      integer n  ! input.  number of attributes to be used for
+                 !    a component to be treated
+      integer vol ! output.   Volat(vol+i) can be used for the
+                  !           i-th attribute of the component
+
+      
+      if(AttrCounter + n  .le.  maxattr ) then
+         vol =  AttrCounter
+         AttrCounter =  AttrCounter + n 
+      else
+         call cerrorMsg(
+     *   'too many attributes; enlarge MAX_ATTRIB in ZepMaxdef.h', 0)
+      endif
+      end
+
+      subroutine epnormvec(vec)
+      implicit none
+#include "Zep3Vec.h"
+      real*8 norm
+
+      record /ep3Vec/ vec
+
+      norm = sqrt(vec.x**2 + vec.y**2 + vec.z**2)
+      if(norm .eq. 0.) then
+         vec.x = 0.
+         vec.y = 0.
+         vec.z = 1.
+      else
+         vec.x = vec.x/norm
+         vec.y = vec.y/norm
+         vec.z = vec.z/norm
+      endif
+      end
+      subroutine epGetThick(n, vec)
+      implicit none
+#include "Zep3Vec.h"
+#include "Zcnfig.h"
+#include "ZepPos.h"
+
+      integer n    ! input.  comp. number
+      record /ep3Vec/ vec    !   output ; abc  of the
+                             !   enveloping box in world coord.
+
+
+      record /epPos/ posw, maxpos, org, orgx
+      record /ep3Vec/ abc
+
+      integer i, imx
+      real*8 dx(8), dy(8), dz(8)
+      data dx/0., 1., 0., 1., 0., 1., 0., 1./
+      data dy/0., 0., 1., 1., 0., 0., 1., 1./
+      data dz/0., 0., 0., 0., 1., 1., 1., 1./
+
+      call epqenvlper(n, org, abc)
+      if(NVTX .eq. 0) then
+         imx = 8
+      else
+         imx = NVTX
+      endif
+
+      do i = 1, imx
+         if(NVTX .eq. 0) then
+c             for all 8 corners of the box
+            posw.x = org.x + dx(i) * abc.x
+            posw.y = org.y + dy(i) * abc.y
+            posw.z = org.z + dz(i) * abc.z
+         else
+            posw.x = org.x +  VTXx(i) 
+            posw.y = org.y +  VTXy(i)
+            posw.z = org.z +  VTXz(i)
+         endif
+c             now posw is one of imx corners in world coord.
+         if(i .eq. 1) then
+            orgx = org
+            maxpos = posw
+         else
+            orgx.x = min(orgx.x, posw.x)
+            orgx.y = min(orgx.y, posw.y)
+            orgx.z = min(orgx.z, posw.z)
+c             get max pos in world coord.
+            maxpos.x = max(maxpos.x, posw.x)
+            maxpos.y = max(maxpos.y, posw.y)
+            maxpos.z = max(maxpos.z, posw.z)
+         endif
+      enddo
+      vec.x = maxpos.x - orgx.x
+      vec.y = maxpos.y - orgx.y
+      vec.z = maxpos.z - orgx.z
+      end
+      subroutine epseeUnderScore(sname, loc)
+      implicit none
+      character(*),intent(in)::sname  ! structure name
+      integer,intent(out):: loc ! if _ is used, loc+1  
+                    ! is the _ location in sname
+                    ! else length of sname 
+      loc = index(sname,"_")
+      if(loc > 0 ) then
+         if(loc < 2 ) then
+            write(0,*)
+     *      ' component shape error: wrong use of _ '
+            write(0,*) ' it is ', sname
+            stop
+         endif
+         loc = loc -1
+      else
+         loc = len(sname)
+      endif
+      end

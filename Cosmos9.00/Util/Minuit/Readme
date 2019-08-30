@@ -1,0 +1,4 @@
+1) make 
+here will create libraty for using Minuit.
+2) In some system, the c code (in unix) compilation may have
+   problem.  Watch message when the c code is compiled.

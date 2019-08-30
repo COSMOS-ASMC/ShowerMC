@@ -1,0 +1,2 @@
+ NF>0  {print $1, $2, zoff + zrev*$3; print $1+0.01, $2+0.01, zoff+zrev*($3+0.01); print " "}
+ NF==0 { print }

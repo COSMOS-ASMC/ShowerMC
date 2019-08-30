@@ -1,0 +1,76 @@
+##############################
+#
+#  File:     YBmoview.sm
+#  Created:  ¿å  2·î  6 01:37:30 JST 2002
+#  By:       StageManager v2.5
+#
+
+_smVersion 2.5 geomview 1.0
+
+Movie Untitled {
+Load  ./Array/arrayOnEarth.inst ./Array/groundOnEarth earth
+#Load  ./Array/mountainOnEarth ./Array/hutOnEarth ./Array/carOnEarth
+Load  ./Array/hutOnEarth ./Array/carOnEarth
+Transform \{Scale 1.5e-7\}
+Transform \{XY -$pi\}
+Transform \{YZ $pi/3.5\}
+Transform \{XY -$pi/4\}
+Pause 300
+Sequence \{ XY $pi/4\}   400
+Pause 400
+Sequence \{ Scale 10 \{-51071.5153 5520953.88 3201809.60\}\}  200
+Sequence \{ Scale 10 \{-51071.5153 5520953.88 3201809.60\}\}  300
+Load /tmp/ptcl21.vect /tmp/ptcl31.vect /tmp/ptcl41.vect /tmp/ptcl51.vect /tmp/ptcl61.vect
+Sequence \{ Scale 10 \{-51071.5153 5520953.88 3201809.60\}\}  400
+Sequence \{ YZ $pi/5. \{-51071.5153 5520953.88 3201809.60\}\}  200
+Sequence \{ Scale 10 \{-51071.5153 5520953.88 3201809.60\}\}  500
+Sequence \{ Scale 15 \{-51071.5153 5520953.88 3201809.60\}\}  700
+
+Sequence \{YZ $pi/6. \{-51071.5153 5520953.88 3201809.60\}\}  300
+Script for world \{
+  Sequence \{XY -$pi/10. \{-51071.5153 5520953.88 3201809.60\}\} 200
+\}
+Script for car \{
+   Sequence \{ Translate \{0.3 0 8\}\} 200  carOnEarth 
+\}
+Script action
+
+Script for car \{
+   Sequence \{ Translate \{1 0 20\}\} 200  carOnEarth 
+\}
+Script for world \{
+  Sequence \{Scale 0.001 \{-51071.5153 5520953.88 3201809.60\}\} 200
+\}
+Script action
+
+Sequence \{Scale 0.1 \{-51071.5153 5520953.88 3201809.60\}\} 300
+Load ./Array/space_station.off
+Sequence \{Scale 0.1 \{-51071.5153 5520953.88 3201809.60\}\} 300
+#Delete arrayOnEarth.inst carOnEarth hutOnEarth mountainOnEarth groundOnEarth
+Delete arrayOnEarth.inst carOnEarth hutOnEarth  groundOnEarth
+Load ./Array/space_shuttle.off
+
+Script for station \{
+Sequence \{ YZ $pi*2 \{-2000000 9000000 2900000\} \} 200 space_station.off
+\}
+Script for world \{ 
+Sequence \{XY -$pi/24 \{0 0 0\}\}  200
+\}
+Script action
+
+
+Script for station \{
+Sequence \{ YZ $pi*2 \{-2000000 9000000 2900000\} \} 200 space_station.off
+\}
+Script for shuttle \{
+Sequence \{Translate \{500000 2000000 2000000\}\}  200  space_shuttle.off
+\}
+Script for world \{
+Sequence \{XY -$pi/18 \{0 0 0\}\}  200
+\}
+Script action
+} {
+  {{10 forever {}} {1 1 1} {8 6 10 Cross2 Logarithmic 1 IPPPPP Full 10 1} {0 end 0 1}}
+  {1 0}
+  {{{scene-0 1}} {288 288 288 288 288x288 1 gif 256 90 1 ppm}}
+}

@@ -1,0 +1,194 @@
+
+ standard (A=1~56) (E0=4e17~1e21eV)
+ EthinRatio = 1.0e-7*A, 1.e5*(E0/1.e20eV),
+
+ InitRN = 852872656   236065
+
+ 12364319  -766629
+             4000  4250 4500 4750 5000 5250 5500 5750 6000 6250
+             6500  6750 7000 7250 7500 7750 8000 8250 8500 8750
+            9000  9250 9500 9750 10000
+ 12250 12500 12750 13000
+9435973     9083188
+9435973     9083188 
+852872656   908652360 
+ DepthList = 1000  1500 2000 2250 2500 2750 3000 3250 3500 3750 
+            9000  9250 9500 9750 10000
+            11500 11750 12000 12250 12500 12750 13000
+ $PARAM
+ ASHeightList = 0
+ Azimuth = (0., 360.0),
+ BaseTime = 10.0,
+ Cont = F,
+
+ ASDepthList = 1000  1500 2000 2250 2500 2750 3000 3250 3500 3750 
+             4000  4250 4500 4750 5000 5250 5500 5750 6000 6250
+             6500  6750 7000 7250 7500 7750 8000 8250 8500 8750
+            9000  9250 9500 9750 10000 10250 10500 10750 11000 
+
+
+ ContFile = ' ',
+ CosZenith = (0.70, 0.70)
+ CutOffFile = ' ',
+ Ddelta = 5.00,
+ DeadLine = ' ',
+ DepthList = 1000  1500 2000 2250 2500 2750 3000 3250 3500 3750 
+             4000  4250 4500 4750 5000 5250 5500 5750 6000 6250
+             6500  6750 7000 7250 7500 7750 8000 8250 8500 8750
+            9000  9250 9500 9750 10000 10250 10500 10750 11000 
+
+
+
+ DestEventNo = 10000, 1
+ DtGMT = 8.00,
+ Freec = T,
+ Generate ='as/em'
+ HeightList = 0,
+ HeightOfInj =100.e3,
+ Hidden = F,
+ IncMuonPolari = T,
+ InitRN = 543211   -9999777
+ IntModel = ' "dpmjet3" 80  "qgsjet2" '
+ Job = ' ',
+ KEminObs = 500.d-6,
+ LatitOfSite = 39.37,
+ LongitOfSite = -112.8
+ LpmEffect = t,
+ MinPhotoProdE = .150000005960464,
+ ObsPlane = 1,
+ OneDim = 0,
+ PhotoProd = t,
+ PrimaryFile = 'primary',
+ SeedFile = 'Seed/#2.seed'
+ SkeletonFile = ' '
+ SourceDec = 30.0,
+ ThinSampling = t,
+ TimeStructure = t,
+ Trace = 0,
+ TraceDir = './',
+ WaitRatio = 1.0,
+ Within = 99999,
+ YearOfGeomag = 2009.500,
+ Za1ry = 'cos ',
+
+ $END
+ 
+ 
+ ------------------ Don`t worry about the following for normal applications
+ $HPARAM
+ AnihiE = 2.999999932944774E-002,
+ BackAngLimit = -1.0,
+ BaseErg = 1000.0,
+ BasePower = 1.00,
+ BorderHeightH = .0,
+ BorderHeightL = .0
+ Cekaon = .0,
+ Ceneuc = .350,
+ Cepic0 = .0,
+ Charge2heavyG = 1, 2, 3, 3, 4, 4, 4, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+ Code2heavyG = 0, 0, 0, 0, 0, 1, 0, 0, 0, 2, 3, 4, 5, 6, 7,
+ Code2massN = 0, 0, 0, 0, 0, 1, 0, 0, 0, 4, 8, 14, 25, 35, 56,
+ Deltkp = 7.999999821186070E-002,
+ Deltpip = 7.999999821186070E-002,
+ Deltpp = 7.999999821186070E-002,
+ Eabsorb=255
+ Ecrit = 8.100000023841860E-002,
+ Efermi = 9.999999776482582E-003,
+ EndLevel = 0,
+ EndLevel2 = 0,
+ Es = 1.930000000000000E-002,
+ Eta2Pi0 = .200000002980232,
+ EthinRatio = 1.0e-4, 1.0e3,
+ EventNo = 0,
+ EventsInTheRun = 0,
+ ExactThick = f,
+ Excom2 = 1.e-3,
+ FragmentTbl = 1.00, 4.00, 5.80999994277954, 6.61999988555908, 10.500, 12.8000001907349, 18.1000003814697, .0, .0, .610000014305115, .720000028610229, .769999980926514, 1.16999995708466, 1.71000003814697, .0, .0, .109999999403954, .239999994635582, .209999993443489, .170000001788139, .239999994635582, .0, .0, .0, .170000001788139, .389999985694885, .200000002980232, .170000001788139, .0, .0, .0, .0, .159999996423721, .419999986886978, .219999998807907, .0, .0, .0, .0, .0, 5.999999865889550E-002, .200000002980232, .0, .0, .0, .0, .0, .0, .170000001788139,
+ Generate2 = ' ',
+ HeavyG2charge = 1, 2, 4, 7, 12, 17, 26,
+ HeavyG2code = 6, 10, 11, 12, 13, 14, 15,
+ HeavyG2massN = 1, 4, 8, 14, 25, 35, 56,
+ HeavyG2symbol = 'p ','Alfa','L ','CNO ','H ','VH ','Fe ',
+ HowGeomag = 11,
+ HowIntNuc = 1,
+ InclusiveFile = '../../Contrib/Inclusive/xdist.d ',
+ IncreaseXsec = 1.00,
+ KEminObs2 = .0,
+ Knockon = T,
+ Kpicns = 7.699999958276750E-002,
+ Kpilog = 6.200000178068880E-003,
+ LpmBremEmin = 100000000.00,
+ LpmPairEmin = 1000000000.0,
+ LundPara = 1, 2, 0, 0, 1, 0, 0, 0, 0, 0,
+ MagBrem = 2,
+ MagBremEmin = 300000000.00,
+ MagChgDist = 20000.00,
+ MagD = .0,
+ MagE = .0,
+ MagN = .0,
+ MagPair = 1,
+ MagPairEmin = 20000000000.00,
+ MaxComptonE = 7.500000298023223E-002,
+ MaxPhotoE = .0,
+ Moliere = -2,
+ MuBr = 3,
+ MuNI = 3,
+ MuPr = 3,
+ Mudirp = 1.00,
+ MulLow = 1,
+ NoOfSites2 = 0,
+ OffsetHeight = .0,
+ PathLimit = 130000000.00,
+ PrevEventNo = 0,
+ PtAvFrag = .0,
+ PtAvNonInteNuc = 5.000000074505810E-002,
+ RatioToE0 = 9.999999747378751E-006,
+ RecoilKineMinE = 2.500000118743630E-004,
+ Reverse = 0,
+ SeedFileDev = 22,
+
+ SucInt = 0,
+ SucPw = 1.50,
+ TempDev = 11,
+ TraceDev = 21,
+ Truncc = 5.00,
+ Truncn = 9.999999776482582E-003,
+ Truncx = 2.00,
+ UpsilonMin = 3.000000026077032E-003,
+ UserHookc = '30 /',
+     'f, f,  f /',
+    '/tibet/work/kasahara/CosmosData/Test/hL/#2'
+
+ UserHooki = 2, 2, 
+ UserHookr = 0.,
+ X0 = 364.00,
+ XaxisFromSouth = 361.00,
+ $END
+
+ 1st UserHookc; histdep index
+ 2nd UserHookc  is forhoto
+      read(input, *)  tkrtspec, tkarspec, tkweb
+ 3rd UserHookc 
+	file name for output
+	following is added 
+	  time histogram.  -t.hist  taken only at histdep depth
+	                         in each web sector  (taken if tkrtspec=T)
+          lateral //       -r.hist  //   take only at histdep depth
+	                     in each fai bin of web sector
+	                       (taken if tkarspec=T)
+
+          dEdx             .nrfai   taken at all layers (if tkweb is T)
+	  hybrid data      .hyb     taken at all layers (always taken)
+
+ UserHooki (1) = 1 ==> histogram --> ascii
+               = 2 ==> histogram --> binary output.
+	   (2) = 1 ==> t is reduced time in time histogram
+               = 2 ==> t is raw time in time histogram
+--------
+  42 is for time	 Histogram file number
+  43 is for lateral Histogram ouptut file number
+  44 is for .nrfai
+  45 is  for hybrid AS output file number 
+    as defined in Zprivate.f
+
+

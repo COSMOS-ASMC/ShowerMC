@@ -1,0 +1,22 @@
+N-A-A'.parm:  contains the number of nuclelon information when proj. mass  # is A
+              and target mass # is A' for a given # of  the total spectator nucleons
+
+1st col:  average # of free nucleons
+2nd col:  rms. of the#
+3rd col:  # of events
+4th col:  # of total spectator nucleons.
+
+For sampling, we may use Gassian with mean and rms given here.
+
+
+H-A-A'.parm:  contains the heavy ion information when projectile mass # is A
+              and target mass # is A' for a givne # of   the sepetator nucleons 
+	      except for nucleons going as free nucleons.
+1st col:  average # of  heavy ions (d,He3,He4)
+2nd col:  rms. of the #.  
+3rd col:  # of events 
+4th col:  # of spectators except for those going as nucleons. (actual # is within
+          +/- this number.
+
+For sampling of heavy ions, we can use Poisson distribution.
+ 

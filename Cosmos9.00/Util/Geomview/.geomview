@@ -1,0 +1,9 @@
+(progn
+	(bbox-draw world no)
+	(normalization world none)
+)
+
+
+
+
+

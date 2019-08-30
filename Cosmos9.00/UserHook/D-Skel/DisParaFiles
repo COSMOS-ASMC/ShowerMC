@@ -1,0 +1,6 @@
+FleshBasic/execSGEtemplate.sh
+FleshBasic/execSSHtemplate.sh
+FleshBasic/setupenv.sh
+FleshHist/execSGEtemplate.sh
+FleshHist/execSSHtemplate.sh
+FleshHist/setupenv.sh

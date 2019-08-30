@@ -1,0 +1,32 @@
+#!/bin/csh
+#      smash for FleshBasic or FleshHist
+setenv FLESHDIR     FleshHist
+
+#   number of cpu to be used in the distributed job : N
+setenv NCPU     50
+
+#    path to the binary skeleton file created by skeleton creation process
+#    in SkelFlesh. You may use completely different path 
+
+setenv SKELETON  ../$FLESHDIR/Skeleton
+
+#   directory to store smashed new  skeleton files to be created here
+#   ( N smashed skeleton files ).  You may use any path
+#   You must delete contents before smash proccess.
+
+setenv SKELDIR  ../$FLESHDIR/SkelDir
+
+#  base name of the smashed new skeleton files. 
+#   If it is "Skeleton", then,  Skeleton001, Skeleton002 ... will be  put
+#   in the  directory specified by SKELDIR
+
+setenv SKELNAME  Skeleton
+
+#  If given,  it is a path to the file which contains a list of hosts
+#  where distributed job will be performed.  The smash program
+#	will read the relative cpu power of each host from that file ;
+# 	partilces are	distributed so that the time for computation 
+#	be almost equal on every host.
+#	If not given, equal power is assumed.
+
+setenv HOSTLIST ../Host

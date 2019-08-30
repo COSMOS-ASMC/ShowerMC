@@ -1,0 +1,11 @@
+#name   Format    Al-alloy 2024 (Vol. Al:96.2%, Mg:2.4%, Cu:1.4%)
+Al2024     2
+#
+#  Elem  rho(g/cm^3)    Gas/Solid(1/0)   refl.index Birks C
+3         2.78         0                   0     0 0 0
+#       Z       A       N
+        13      26.98   9.62
+        12      24.31   0.24
+        29      63.55   0.14
+#  <Z/A>   I[eV]   a       k      x0    x1     Cbar  delta0
+ -100  -100.0 -100.0  -100.0 -100.0 -100.0 -100.0 -100.0

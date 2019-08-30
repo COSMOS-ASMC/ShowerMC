@@ -1,0 +1,45 @@
+CosmosPrev  gives good result
+Cosmos      bad
+
+1) Skeleton by CosmosPrev is fed to Cosmos;  good result
+2) Skeleton by Cosmos is fed to CosmosPrev;  bad result
+3) CosmosPrev/UserHook/SkelFlesh is copied to  Cosmos/UserHook/
+   use Cosmos/lib as it is.  bad
+4) CosmosPrev/UserHook/SkelFlesh is copied to  Cosmos/UserHook/
+   CosmosPrev/lib/PCLinuxIFC/   is copied to Cosmos/lib/PCLinuxIFC/
+   good
+-------
+5) To confirm azimuth angle dependence, Azimuth=( 0,0) is
+   tried at CosmosPrev. (lib is good one).
+   O.K 
+6) Once again 1) is tried.   lib is by Cosmos. SkelFlesh/Zprivate.h
+   is from CosmosPrev.
+  (diffrence is only the size of  NpMax; used one is larger  ).
+ 6-1: Sparam is not current one:   but OK
+ 6-2: Sparam is copied from CosmosPrev:   OK
+ 6-3: //              SkelFlesh is by Cosmsos; from Smash tried.
+       OK
+7)     Once more 2) is tried.   Every thing is by Cosmos
+     bad
+
+
+8)  copy SkelFlesh of CosmosPrev in Cosmos and do everything in Cosmos
+     bad (azimuth=0)
+9)  same but azimuth=280
+     bad.
+
+-------
+10) cinteraction.f in Cosmos is saved cinteraction.fCosmos
+   and cinteraction in CosmosPrev is copied instead.
+   It is recompiled. and SkelFlesh is executed.
+   (SkelFlesh is by Cosmos).
+ GOOD !!!
+
+
+ 
+
+
+
+
+
+  

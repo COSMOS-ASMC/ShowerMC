@@ -1,0 +1,335 @@
+c          test kpmnx
+c
+      real*8 x
+      integer m, n
+      real*8 kpmnxn
+      
+      read(*,*) m, n
+      
+      do x=-1.d0, 1.0000001d0, 0.01d0
+         write(*,*) m, n, x, kpmnxn(m, n, x)
+      enddo
+      end
+
+      include 'kgamma.f'
+cc            testing kpnx, kpmnx, kdpmnx, kdpnx, kdpmnxn, kpmnxn
+cc         kpnx:  Legendre polynomial
+cc         kpmnx:  Legendre polynomial p(m, n, x)
+cc        kdpmnx:  d p(m, n, x)/dx 
+cc         kdpnx:   m-th derivative of legendre function, kpnx
+cc             =       p(m,n,x)/(1-x**2)**(m/2)
+cc       kdpmnxn:  sqrt( em* (n-m)!/ (n+m)! ) * kdpmnx
+cc        kpmnxn:  sqrt( em* (n-m)!/(n+m)!  ) * kpmnx
+c      implicit none
+c      integer m, n
+c      real*8 x, y, y1, y2, z, kpmnx, kgamma
+c      real*8 kpnx, kdpmnx, kdpmnxn
+c      integer mv
+c      read(*, *) mv
+c      do  m=mv, mv
+cc
+c         do  n=1, 8
+c            do  x=-.996, 1., .004
+cc               y = kpmnx(m, n, x)
+cc               y1 = kgamma(dble(n-m)+1.d0)
+cc               y2 = kgamma(dble(n+m)+1.d0)
+cc               z =sqrt((2*n+1)/2.d0*y1/y2)*y
+cc                z = kpnx(n, x)
+cc                 z = kdpmnx(m, n, x)
+c                z = kdpmnxn(m, n, x)
+c                write(*, *) sngl(x), sngl(z)
+c            enddo
+c            write(*,*)
+c         enddo
+c      enddo
+c      end
+c*********************************************************************
+      real*8 function kpnx(n, x)
+      implicit none
+      real*8 x
+      integer n
+c           Legendre polinomial  (n>=0)
+      real*8 pim, pimm, pi
+      integer nc/0/, i
+c
+           if(n .eq. 0) then
+              kpnx=1.d0
+           elseif(n .eq. 1) then
+              kpnx=x
+           elseif(n .ge. 2) then
+              pim=x
+              pimm=1.d0
+              do   i=2, n
+                  pi=( (2*i-1)*x *pim - (i-1)*pimm )/i
+                  pimm=pim
+                  pim=pi
+              enddo
+              kpnx=pi
+           else
+              if(nc .lt. 20) then
+                 write(*,*) ' n=',n,' invalid for kpnx'
+                 nc=nc+1
+              endif
+              kpnx=1.d50
+           endif
+       end
+       real*8 function kpmnx(m, n, x)
+       implicit none
+       real*8 x
+       integer m, n
+c                compute p(m,n,x).  m,n>=0
+       real*8 kpnx, tmp, kdpnx
+       integer m2
+c
+           if(m .eq. 0) then
+               kpmnx=kpnx(n, x)
+           else
+               m2 = m/2
+               tmp = 1.d0 -x**2
+               if(m2*2 .eq. m) then
+                  kpmnx=kdpnx(m, n, x)*tmp**m2
+               else
+                  tmp=sqrt(tmp)
+                  kpmnx=kdpnx(m, n, x)* tmp**m
+               endif
+           endif
+       end
+       real*8 function kdpnx(m, n, x)
+       implicit none
+       real*8 x
+       integer m, n
+c             compute m-th derivative of legendre function, kpnx
+c             =       p(m,n,x)/(1-x**2)**(m/2)
+c
+       integer nc/0/
+       real*8 kpnx
+c
+           if(m .gt. n) then
+               kdpnx = 0.
+           elseif(m .eq. 0) then
+               kdpnx = kpnx(n, x)
+           elseif(m .lt. 1 .or. n .lt. 1) then
+               if(nc .lt. 20) then
+                   write(*,*) ' kdpnx. m=',m, ' n=',n,' invalid'
+                   nc=nc+1
+               endif
+               kdpnx=1.d50
+           elseif(n .eq. 1) then
+               if(m .eq. 1) then
+                   kdpnx=1.
+               endif
+           elseif(n .eq. 2) then
+               if(m .eq. 1) then
+                   kdpnx=3.d0*x
+               elseif(m .eq. 2) then
+                   kdpnx=3.d0
+               endif
+           elseif(n .eq. 3)then
+               if(m .eq. 1) then
+                   kdpnx=1.5d0*(5.d0*x*x-1.d0)
+               elseif(m .eq. 2) then
+                   kdpnx=15.d0*x
+               elseif(m .eq. 3) then
+                   kdpnx=15.d0
+               endif
+           elseif(n .eq. 4) then
+               if(m .eq. 1) then
+                   kdpnx=2.5d0*x*(7.d0*x**2-3.d0)
+               elseif(m .eq. 2) then
+                   kdpnx=7.5d0*(7.d0*x**2-1.d0)
+               elseif(m .eq. 3) then
+                   kdpnx=105.d0*x
+               elseif(m .eq. 4) then
+                   kdpnx=105.d0*(1.d0-x**2)
+               endif
+            elseif(n .eq. 5) then
+               if(m .eq. 1) then
+                   kdpnx=15.d0/8.d0*(21.d0*x**4-14.d0*x**2+1.d0)
+               elseif(m .eq. 2) then
+                   kdpnx=105.d0/2.d0*x*(3.d0*x**2-1.d0)
+               elseif(m .eq. 3) then
+                   kdpnx=105.d0/2.d0*(9.d0*x**2-1.d0)
+               elseif(m .eq. 4) then
+                   kdpnx=945.d0*x
+               elseif(m .eq. 5) then
+                   kdpnx=945.d0
+               endif
+            elseif(n .eq. 6) then
+               if(m .eq. 1) then
+                   kdpnx=21.d0/8.d0*x*(33.d0*x**4-30.d0*x**2+5.d0)
+               elseif(m .eq. 2) then
+                   kdpnx=105.d0/8.d0*(33.d0*x**4-18.d0*x**2 +1.d0)
+               elseif(m .eq. 3) then
+                   kdpnx=315.d0/2.d0*x*(11.d0*x**2-3.d0)
+               elseif(m .eq. 4) then
+                   kdpnx=945.d0/2.d0*(11.d0*x**2-1.d0)
+               elseif(m .eq. 5) then
+                   kdpnx=10395.d0*x
+               elseif(m  .eq. 6) then
+                   kdpnx=10395.d0
+               endif
+            elseif(n .eq. 7) then
+               if(m .eq. 1) then
+                   kdpnx=7.d0/16.d0*
+     *                (429.d0*x**6-495.d0*x**4+135.d0*x**2-5.d0)
+               elseif(m .eq. 2) then
+                   kdpnx=63.d0/8.d0
+     *                *x*(143.d0*x**4-110.d0*x**2 +15.d0)
+               elseif(m .eq. 3) then
+                   kdpnx=315.d0/8.d0*(143.d0*x**4-66.d0*x**2+3.d0)
+               elseif(m .eq. 4) then
+                   kdpnx=3465.d0/2.d0*x*(13.d0*x**2-3.d0)
+               elseif(m .eq. 5) then
+                   kdpnx=10395.d0/2.d0* (13.d0*x**2-1.d0)
+               elseif(m  .eq. 6) then
+                   kdpnx=135135.d0*x
+               elseif(m .eq. 7) then
+                   kdpnx=135135.d0
+               endif
+            elseif(n .eq. 8) then
+               if(m .eq. 1) then
+                   kdpnx=9.d0/16.d0*x*
+     *                  (715.d0*x**6-1001.d0*x**4+385.d0*x**2-35.d0)
+               elseif(m .eq. 2) then
+                   kdpnx=315.d0/16.d0*
+     *               (143.d0*x**6-143.d0*x**4 +33.d0*x**2 -1.d0)
+               elseif(m .eq. 3) then
+                   kdpnx=3465.d0/8.d0*x*(39.d0*x**4-26.d0*x**2+3.d0)
+               elseif(m .eq. 4) then
+                   kdpnx=10395.d0/8.d0*(65.d0*x**4-26.d0*x**2+1.d0)
+               elseif(m .eq. 5) then
+                   kdpnx=135135.d0/2.d0*x* (5.d0*x**2-1.d0)
+               elseif(m  .eq. 6) then
+                   kdpnx=135135.d0/2.d0* (15.d0*x**2-1.d0)
+               elseif(m .eq. 7) then
+                   kdpnx=2027025.d0*x
+               elseif(m .eq. 8) then
+                   kdpnx=2027025.d0
+               endif
+          else
+               if(nc .lt. 20) then
+                   write(*,*) ' kdpnx. m=',m, ' n=',n,' invalid'
+                   nc=nc+1
+               endif
+               kdpnx=1.d50
+          endif
+       end
+       real*8 function kpmnxn(m, n, x)
+       implicit none
+       real*8 x
+       integer m, n
+c               sqrt(em*(n-m)]/(n+m)])* kpmnx(m, n,x )
+       real*8 kpnorm, kpmnx
+            kpmnxn=kpnorm(m, n)* kpmnx(m, n, x)
+       end
+       real*8 function kpdpmnx(m, n, x)
+       implicit none
+       real*8 x
+       integer m, n
+c             compute  (1.-x**2) d kpmnx(m,n,x)/dx
+       integer nc/0/
+       real*8 kpmnx
+          if(n .ge. 2) then
+              kpdpmnx=(n+m)*kpmnx(m, n-1, x) - n*x*kpmnx(m, n, x)
+          elseif(n .ge. 0) then
+              kpdpmnx=(n+1)*x*kpmnx(m, n, x)- (n-m+1)*kpmnx(m, n+1, x)
+          else
+              if(nc .lt. 20) then
+                  write(*,*)' n=',n,' invalid for kpdpmnx'
+                  nc=nc+1
+              endif
+              kpdpmnx=1.d50
+          endif
+       end
+       real*8 function kdpmnx(m, n, x)
+       implicit none
+       real*8 x
+       integer m, n
+c             compute d kpmnx(m, n, x)/dx
+       real*8 tmp, tmp2, kdpnx
+       integer nc/0/
+          tmp=max((1.-x**2), 1.d-7)   ! to avoid inf. for some case.
+          if(m .ge. 2 .or. tmp .ne. 0.) then
+             if(m .eq. 2) then
+                tmp2=1.
+             else
+                tmp2=tmp**((m-2)/2.)
+             endif
+             if(n .ge. 2) then
+                 kdpmnx=( (n+m)* kdpnx(m, n-1, x)
+     *           - n*x* kdpnx(m, n, x) )*tmp2
+             elseif(n .eq. 1) then
+                 kdpmnx=( (n+1)*x* kdpnx(m, n, x)
+     *           - (n-m+1)* kdpnx(m, n+1, x) )*tmp2
+             elseif(n .eq. 0) then
+                 kdpmnx=0.d0
+             else
+                 if(nc .lt. 20)then
+                    write(*,*) ' n=',n, ' invalid for kdpmnx'
+                    nc=nc+1
+                 endif
+                 kdpmnx=1.d50
+             endif
+          elseif(m .gt. n) then
+             kdpmnx=0.d0
+          elseif(m .eq. 0) then
+             kdpmnx=kdpnx(1, n, x)
+          else
+             if(n .eq. 0) then
+                 kdpmnx = 0.d0
+             elseif(n .gt. 0) then
+                 if(mod(n, 2) .eq. 0) then
+                     kdpmnx=-1.d50
+                 else
+                     if(x .gt. 0.) then
+                         kdpmnx=-1.d50
+                     else
+                         kdpmnx=1.d50
+                     endif
+                 endif
+             else
+                 if(nc .lt. 20)then
+                    write(*,*) ' m,n=',m,n, ' invalid for kdpmnx'
+                    nc=nc+1
+                 endif
+                 kdpmnx=1.d50
+             endif
+          endif
+       end
+       real*8 function kdpmnxn(m, n, x)
+       implicit none
+       real*8 x
+       integer m, n
+c               sqrt( em *  (n-m)]/ (n+m)] ) * kdpmnx
+       real*8 kpnorm, kdpmnx
+              kdpmnxn=kpnorm(m, n)* kdpmnx(m,n,x)
+       end
+       real*8 function kdpnxn(m, n, x)
+       implicit none
+       real*8 x
+       integer m, n
+c               sqrt( em *  (n-m)]/ (n+m)] ) * kdpnx
+       real*8 kpnorm, kdpnx
+              kdpnxn= kpnorm(m, n)* kdpnx(m,n,x)
+       end
+       real*8 function kpnorm(m, n)
+       implicit none
+       integer m, n
+       real*8 pnorms, em, kgamma
+       save pnorms
+c
+       integer ms/-1/, ns/-1/
+c
+            if(m .eq. ms .and. n .eq. ns)then
+            elseif(m .gt. n) then
+                pnorms=0.d0
+            else
+              if(m .eq. 0)then
+                  em=1.d0
+              else
+                  em=2.d0
+              endif
+              pnorms=sqrt(em* kgamma(dble(n-m+1))/kgamma(dble(n+m+1)))
+            endif
+            kpnorm=pnorms
+       end

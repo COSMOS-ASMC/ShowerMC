@@ -1,0 +1,12 @@
+#name   Format    PbWO4
+PWOpdg     2
+#
+#  Elem  rho(g/cm^3)    Gas/Solid(1/0)   refl.index Birks C
+#   old PWO's rho ; 8.28. 8.30 is from PDG
+3         8.30         0                   2.00     0 0 0
+#       Z       A       N
+        82      207.2   1
+	74      183.92  1
+        8       16      4
+#  ⟨Z/A⟩   I[eV]   a       k      x0    x1     Cbar  delta0
+   0.41315 600.7 0.2276   3.00   0.4068 3.0023 5.8528  0.00

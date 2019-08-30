@@ -1,0 +1,64 @@
+ifclib  is used when linking c code with fortran.
+as
+ ` cat ifclib `
+ifclib may be 64 bit or 32 bit version.
+(as of 2007; it is 64 bit and a copy of ifclib64).
+
+To know whot ifclib is need, use
+ifort -v hellow.f
+where heellow.f is a simple program like
+      write(*,*) ' hello world'
+      end
+Then, you see output like
+
+Version 10.1
+/Loft1/Intel/ifce10.1/bin/fortcom    -D__INTEL_COMPILER=1010 -D_MT -D__ELF__
+-D__INTEL_COMPILER_BUILD_DATE=20080112 -D__unix__ -D__unix -D__linux__
+-D__linux -D__gnu_linux__ -Dunix -Dlinux -D__x86_64 -D__x86_64__
+-mGLOB_pack_sort_init_list -I. -I/Loft1/Intel/ifce10.1/include
+-I/Loft1/Intel/ifce10.1/substitute_headers
+-I/usr/lib64/gcc-lib/x86_64-suse-linux/3.3.5/include -I/usr/local/include
+-I/usr/include -I/usr/lib64/gcc-lib/x86_64-suse-linux/3.3.5/include
+"-fp_modspec fp_speculation_FAST" -O2 -mP1OPT_version=1010
+-mGLOB_source_language=GLOB_SOURCE_LANGUAGE_F90 -mGLOB_tune_for_fort
+-mGLOB_use_fort_dope_vector -mP2OPT_static_promotion
+-mP1OPT_print_version=FALSE -mP3OPT_use_mspp_call_convention
+-mCG_use_gas_got_workaround=F -mP2OPT_align_option_used=TRUE
+-mGLOB_options_string=-v -mGLOB_cxx_limited_range=FALSE -mP2OPT_eh_nirvana
+-mGLOB_diag_file=/tmp/ifortACm0XI.diag
+-mGLOB_as_output_backup_file_name=/tmp/ifortEhWMjXas_.s
+-mGLOB_machine_model=GLOB_MACHINE_MODEL_EFI2
+-mGLOB_fp_speculation=GLOB_FP_SPECULATION_FAST
+-mGLOB_extended_instructions=0x8 -mP2OPT_subs_out_of_bound=FALSE
+-mGLOB_ansi_alias -mIPOPT_ninl_user_level=2 -mIPOPT_args_in_regs=0
+-mPGOPTI_value_profile_use=T -mIPOPT_activate -mIPOPT_lite -mP2OPT_hlo_level=2
+-mP2OPT_hlo -mPAROPT_par_report=1 -mCG_emit_as_seg_grouping
+-mIPOPT_obj_output_file_name=/tmp/ifortACm0XI.o
+"-mGLOB_linker_version=2.15.94.0.2.2 20041220 (SuSE Linux)"
+-mP3OPT_asm_target=P3OPT_ASM_TARGET_GAS
+-mGLOB_obj_output_file=/tmp/ifortACm0XI.o
+-mGLOB_source_dialect=GLOB_SOURCE_DIALECT_FORTRAN
+-mP1OPT_source_file_name=HellowWorld.f HellowWorld.f
+ld    /usr/lib64/gcc-lib/x86_64-suse-linux/3.3.5/../../../../lib64/crt1.o
+/usr/lib64/gcc-lib/x86_64-suse-linux/3.3.5/../../../../lib64/crti.o
+/usr/lib64/gcc-lib/x86_64-suse-linux/3.3.5/crtbegin.o --eh-frame-hdr
+-dynamic-linker /lib64/ld-linux-x86-64.so.2 -o a.out
+/Loft1/Intel/ifce10.1/lib/for_main.o /tmp/ifortACm0XI.o
+-L/Loft1/Intel/ifce10.1/lib -L/usr/lib64/gcc-lib/x86_64-suse-linux/3.3.5/
+-L/usr/lib64/gcc-lib/x86_64-suse-linux/3.3.5/../../../../lib64 -Bstatic
+-lifport -lifcore -limf -lsvml -Bdynamic -lm -Bstatic -lipgo -lirc -Bdynamic
+-lc -lgcc_s -lgcc -Bstatic -lirc_s -Bdynamic -ldl -lc
+/usr/lib64/gcc-lib/x86_64-suse-linux/3.3.5/crtend.o
+/usr/lib64/gcc-lib/x86_64-suse-linux/3.3.5/../../../../lib64/crtn.o
+rm /tmp/iforto4uvOulibgcc
+
+
+From this output you may extract  next lines:
+
+-L/Loft1/Intel/ifce10.1/lib -L/usr/lib64/gcc-lib/x86_64-suse-linux/3.3.5/
+-L/usr/lib64/gcc-lib/x86_64-suse-linux/3.3.5/../../../../lib64 -Bstatic
+-lifport -lifcore -limf -lsvml -Bdynamic -lm -Bstatic -lipgo -lirc -Bdynamic
+-lc -lgcc_s -lgcc -Bstatic -lirc_s -Bdynamic -ldl -lc
+/usr/lib64/gcc-lib/x86_64-suse-linux/3.3.5/crtend.o
+/usr/lib64/gcc-lib/x86_64-suse-linux/3.3.5/../../../../lib64/crtn.o
+

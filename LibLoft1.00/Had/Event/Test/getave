@@ -1,0 +1,1 @@
+ awk '{++nev; nt+=$1; nc+=$2}; END{print nev, nt/nev, nc/nev}' /tmp/mul

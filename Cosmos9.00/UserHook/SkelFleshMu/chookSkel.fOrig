@@ -1,0 +1,626 @@
+#include "../cmain.f"
+#include "chookHybAS.f"
+#include "../ctemplCeren.f"
+c
+c  *************************************** hook for Beginning of a Run
+c  * At this moment, all (system-level) initialization for this run
+c  * has been ended.  After this routine is executed, the system goes into the
+c  * event creation loop.
+c  *
+      subroutine chookBgRun
+      implicit none
+#include "Zmanagerp.h"
+#include "Zprivate.h"
+
+      character*10  append
+      character*100 msg
+      logical  ex, opn
+      integer klena
+
+c            namelist output
+      call cwriteParam(ErrorOut, 0)
+c            primary information
+      call cprintPrim(ErrorOut)
+c            observation level information
+      call cprintObs(ErrorOut)
+
+
+      call cqUHooki(1, Mdev)      ! get skeleton memo dev #
+      call cqUHooki(2, Wdev)      ! get working disk dev #
+
+
+      call cqUHooki(3, NgMin)     ! get Nh min
+      call cqUHooki(4, NhMin)     ! get Ng min
+      call cqUHooki(5, Where)     ! where to check 
+
+      call cqUHookr(1, SumegMin)      ! sum E min
+      call cqUHookr(2, SumehMin)
+
+      
+
+      call cqUHookc(1, msg)       ! get file name for sekelton memo
+      call cgetfname(msg, Mskel)  ! add host name etc if needed
+      call cqUHookc(2, msg)       ! get file name for working
+      call cgetfname(msg, Wskel)  ! add host name etc if neededn
+      call cqUHookc(3, append)    ! append data, if Mskel already exists
+
+      write(msg, *) 'Skeleton is  judged at obs.pos=', Where
+      call cerrorMsg(msg, 1)
+      write(msg, *) ' Ngmin=',NgMin,
+     *     ' SumEGmin=',SumegMin/1000.,'TeV'
+      call cerrorMsg(msg, 1)
+      write(msg, *) ' Nhmin=',NhMin,
+     *    ' SumEHmin=',SumehMin/1000.,'TeV'
+      call cerrorMsg(msg, 1)
+
+c     
+      inquire(file=Mskel(1:klena(Mskel)), opened=opn, exist=ex)
+      if(opn) then
+         call cerrorMsg(Mskel, 1)
+         call cerrorMsg(' already opened: starange', 0)
+      elseif(ex .and.
+     *      append(1:klena(append)) .eq. 'append' ) then
+         open(Mdev, file=Mskel, form='unformatted',status='old')
+         call cerrorMsg('skeleton node info. will be appended', 1)
+c           skip to the end of file
+         do while( .true. )
+            read(Mdev, end=100)
+         enddo
+      else
+         if(ex .and.
+     *      append(1:klena(append)) .ne. 'append' ) then
+            call cerrorMsg(
+     *           'Old skeleton node info. file exists', 1)
+            call cerrorMsg(
+     *           'but node info. will NOT be appended', 1)
+         endif
+         open(Mdev, file=Mskel(1:klena(Mskel)), form='unformatted',
+     *       status='unknown')
+      endif
+
+ 100  continue
+
+      open(Wdev, file=Wskel(1:klena(Wskel)), form='unformatted',
+     *      status='unknown' )
+
+      Accepted = 0   ! counter;  accepted as skeleton 
+c
+      end
+
+
+c     *********************************** hook for Beginning of  1 event
+c     *  All system-level initialization for 1 event generation has been
+c     *  eneded at this moment.
+c     *  After this is executed, event generation starts.
+c     *
+      subroutine chookBgEvent
+      implicit none
+#include "Zprivate.h"
+#include "Ztrack.h"
+#include "Ztrackv.h"
+#include "Ztrackp.h"
+#include "Zobs.h"
+#include "Zobsp.h"
+#include "Zobsv.h"
+#include "Zcode.h"
+      
+      record /track/incident
+      record /coord /angle
+
+      real*8 svEasWait, svEthin, kepn
+
+      Np = 0
+      call cqIncident( incident, angle)
+      kepn = incident.p.fm.p(4)
+      if( incident.p.code .eq. kgnuc ) then
+         kepn = kepn/ incident.p.subcode
+      endif
+      Ethresh = kepn * WaitRatio
+
+      svEasWait = EasWait       ! for safety save
+      svEthin = Ethin           ! //
+      call csetEmin(Generate2, KEminObs2, Cutneg, Cuteg)
+      EasWait = svEasWait       ! restore
+      Ethin = svEthin
+
+      rewind  Wdev
+
+c     ===================================================
+
+
+c     ===================================================
+      end
+  
+
+c     ************************************ hook for observation
+c     *  One particel information is brought here by the system.
+c     *  All information of the particle is in aTrack
+c     *
+      subroutine chookObs(aTrack, id)
+c
+c     Note that every real variable is in double  precision so
+c     that you may output it in sigle precision to save the memory.
+c     In some cases it is essential to put it in sigle (say,
+c     for gnuplot).
+c 
+      implicit none
+#include "Zcode.h"
+#include "Ztrack.h"
+#include "Zprivate.h"
+      integer id  ! input.  1 ==> aTrack is going out from
+c                                 outer boundery.
+c                           2 ==> reached at an observation level
+c                           3 ==> reached at inner boundery.
+      record /track/ aTrack
+c
+c     For id =2, you need not output the z value, because it is always
+c     0 (within the computational accuracy).
+c
+c     ===================================================
+
+c     ===================================================
+      if( id .eq. 2 .and. aTrack.p.code .ne. kneumu .and.
+     *   aTrack.p.code .ne. kneue) then
+         Np = Np + 1
+         if( Np .gt. NpMax) then
+            call cerrorMsg(
+     *   '# of particles >NpMax in observation', 0)
+         endif
+         o(Np).where = aTrack.where
+         o(Np).code = aTrack.p.code
+         o(Np).subcode = aTrack.p.subcode
+         o(Np).charge = aTrack.p.charge
+         o(Np).atime = aTrack.t
+         o(Np).erg = aTrack.p.fm.p(4)
+         o(Np).mass = aTrack.p.mass
+         o(Np).x = aTrack.pos.xyz.r(1)
+         o(Np).y = aTrack.pos.xyz.r(2)
+         o(Np).wx =aTrack.vec.w.r(1)
+         o(Np).wy =aTrack.vec.w.r(2)
+         o(Np).wz =aTrack.vec.w.r(3)
+         o(Np).zenith = aTrack.vec.coszenith
+c     ===================================================
+
+c     ===================================================
+      endif
+c     ===================================================
+
+c     ===================================================
+      end
+
+c    *********************************** hook for end of 1 vent
+c    * At this moment, 1 event generation has been ended.
+c    *
+      subroutine chookEnEvent
+
+      implicit none
+#include "Ztrack.h"
+#include "Zcode.h"
+#include "Ztrackv.h"
+#include "Zobs.h"
+#include "Zobsp.h"
+#include "Zobsv.h"
+#include "Zmanagerp.h"
+#include "Zprivate.h"
+
+      integer i
+      real  sumeg, sumeh
+      logical memorize
+
+      integer ng, nh
+      
+      ng = 0
+      nh = 0
+
+      sumeg = 0
+      sumeh =0
+c         count sum Eg etc
+      do i = 1, Np
+         if(o(i).where .eq. Where) then
+            if(o(i).code .le. kelec) then
+               ng = ng + 1
+               sumeg = sumeg + o(i).erg
+            elseif( ( o(i).code .ge. kpion .and.
+     *                o(i).code .le. knuc )
+     *             .or.
+     *               o(i).code .eq. kgnuc) then
+               nh = nh + 1
+               sumeh = sumeh + o(i).erg
+            endif
+         endif
+      enddo
+
+c     ===================================================
+
+
+      memorize =(ng .ge. NgMin .and. sumeg .ge. SumegMin) .or.
+     *  ( nh .ge. NhMin .and. sumeh .ge. SumehMin)
+
+
+c     ===================================================
+      if(memorize) then
+         Accepted = Accepted + 1
+         call cwriteSeed        !  SeedFile
+c          flag for end of 1 event on working disk
+         write(Wdev)  -1, p
+         call cmemorize(Wdev, Mdev)     !  reocord this event
+      endif
+      end
+
+
+c     ********************************* hook for end of a run
+c     *  all events have been created or time lacks
+c     *
+      subroutine chookEnRun
+      implicit none
+#include "Zprivate.h"
+      character*100 msg
+c     =========================================
+
+
+c     =========================================
+      call cerrorMsg('++++++++++++', 1)
+      write(msg, '(i8, a)') Accepted,
+     *       ' events are memorized as skeleton'
+      call cerrorMsg(msg, 1)
+      call cerrorMsg('their  seeds are also memorized', 1)
+      call cerrorMsg('-----------',1)
+      call  cprintStatus   ! if don't like,  comment out
+      end
+c     ********************************* hook for trace
+c     *  This is called only when trace > 100
+c     *  User should manage the trace information here.
+c     *  If you use this, you may need some output for trace
+c     *  at the beginning of 1 event generatio and at the end of  1 event
+c     *  generation so that you can identfy each event.
+c     *
+c     *
+      subroutine chookTrace
+            implicit none
+
+#include  "Ztrack.h"
+#include  "Ztrackv.h"
+#include  "Ztrackp.h"
+#include  "Zobs.h"
+#include  "Zobsv.h"
+
+       real*4 h1,  h2
+c
+c    Every time a particle is moved in the atmosphere, this routine is called,
+c    if trace > 100
+c         For a one track segment,
+c     TrackBefMove  has  track information at the beginning of the segment.
+c     MoveTrack    has   track information at the end of the segment.
+c   
+c     You can know the  information a track contains in the 
+c     chookObs routine. (Note however, no conversion of coordinate
+c     has been done.  The values are in the Earth xyz system.)
+c     Besides quantities explained there, you can use, for a  given 'track'
+c
+c     atrack.pos.xyz.x, atrack.pos.xyz.y, atrack.pos.xyz.z    (x,y.z)
+c     atrack.pos.radiallen   (distance from the center of the earth)
+c     atrack.pos.depth       (vertical depth)
+c     atrack.pos.height      (vertical heigth from sea level)  
+c
+
+      h1 = TrackBefMove.pos.height- ObsSites(NoOfSites).pos.height
+      h2 = MovedTrack.pos.height - ObsSites(NoOfSites).pos.height
+
+      end
+c     ********************* this is the hook called when
+c       an electron made an interaction.
+c
+      subroutine chookEInt(never)
+      implicit none
+#include  "Zprivate.h"
+#include  "Ztrack.h"
+#include  "Ztrackv.h"
+#include  "Zcode.h"
+c  #include  "Ztrackp.h"
+      integer never             ! input & output
+c 
+c    If Job = 'newskel', input  "never" may be < 0,  and MovedTrack
+c    may not be an electron.
+c      never = -1 :  MovedTrack K.E becomes < KEminObs due to
+c                    energy loss during traveling.
+c      never = -2 :  The same as above, but the particle crosses an
+c                    observation depth, so the calling point to this
+c                    routine is different from the never = -1 case.
+c      never = -3 :  K.E >= KEminiObs.  The ptcl is observed at the
+c                    current deepest Obs. level. but at the flesh time
+c                    the deepest level will be more deep so that
+c                    this must be memorized.
+c
+c         For above cases, the product is only MovedTrack and 
+c         no particle is in PWork.
+c  Otherwise,
+c   MovedTrack is the electron that made interaction
+c   Pwork contains produced particles (normally gamma, but mayb  e).
+c   Nproduced has the number of particles in Pwork (normally 1)
+c   IntInfArray(ProcessNo) contains the type of interaction
+c        IntInfArray(ProcessNo).process will have one of
+c       'brems', 'mscat', 'bscat'  'anihi' or 'mbrem'
+c     
+      if(never .lt. 0) then
+         Nproduced = 1
+c           IBM user must modify next
+         Pwork(1) = MovedTrack.p
+      endif
+
+c         high energy parent at node might be used
+c        for hybrid AS generation if it is in some
+c        energy region.
+      if( MovedTrack.p.code .eq. kelec ) then
+         if( MovedTrack.asflag .eq. 0 ) then
+            if( MovedTrack.p.fm.p(4) .lt. Ethresh ) then
+               MovedTrack.asflag = -1
+            endif
+         endif
+      endif
+
+      call cmemoNode(Wdev, never)
+      
+      if(MovedTrack.asflag .eq. -1) then
+c            af flesh time, decendent should not be used to
+c            generae A.S
+         MovedTrack.asflag  = -2
+      endif
+
+ 10   continue
+      never = 0
+      end
+
+c     ********************* this is the hook called when
+c       a gamma ray made an interaction.
+c
+      subroutine chookGInt(never)
+      implicit none
+#include  "Zprivate.h"
+#include  "Ztrack.h"
+#include  "Ztrackv.h"
+c  #include  "Ztrackp.h"
+      
+      integer never   ! input & output
+      
+c         don't make never = 1, if you want to get
+c         information after a gamma ray made interaction
+c         if this is made non zero, this routine will never be called.
+c
+c   MovedTrack is the gamma that made interaction
+c   Pwork contains produced particles.
+c   Nproduced has the number of particles in Pwork
+c   IntInfArray(ProcessNo) contains the type of interaction
+c         IntInfArray(ProcessNo).process will have one of
+c        'pair', 'comp', 'photoe' 'photop' 'mpair'
+      call cmemoNode(Wdev, 1)
+      never = 0
+      end
+
+c     ********************* this is the hook called when
+c       non e-g particle made an interaction.
+c
+      subroutine chookNEPInt(never)
+      implicit none
+#include  "Zprivate.h"
+#include  "Ztrack.h"
+#include  "Ztrackv.h"
+#include  "Ztrackp.h"
+      
+      integer never   ! input & output
+
+
+c         don't make never = 1, if you want to get
+c         information after a non-e-g particle  made interaction
+c         if this is made non zero, this routine will never be called.
+c
+c   MovedTrack is the particle that made interaction
+c   Pwork contains produced particles.
+c   Nproduced has the number of particles in Pwork
+c   IntInfArray(ProcessNo) contains the type of interaction
+c
+
+      call cmemoNode(Wdev, 1)
+      never = 0
+      end
+
+      subroutine cmemoNode(dev, flag)
+      implicit none
+#include  "Zcode.h"
+#include  "Ztrack.h"
+#include  "Ztrackv.h"
+#include  "Ztrackp.h"
+#include  "Zprivate.h"
+c
+      integer dev  ! input. fortran logical dev. number for data write
+      integer flag ! input. If this is -3, high energy particles must
+                   !       also be memorized.
+c
+c
+c       memorize nodal information at interaction.
+c     
+c        \
+c         \  projectile    = MovedTrack
+c         /|\  produced particles.: Pwork(i), i=1~Nproduced
+c        / | \
+c
+c   From projectile, the track information is extracted
+c   From produced particles, only those of K.E< KEminObs is
+c   extracted and information needed for further tracking is 
+c   obtaned and memorized. The position information is common
+c   to all the children.
+c
+c   Track   information;   pos =
+c                                xyz = r(1~3), sys
+c                                radiallen, depth, height, colheight
+c                            t
+c                          vec  =
+c                                 w = r(1~3), sys
+c                                 coszenith
+c                          wgt
+c                         where
+c                        asflag 
+c
+c      Among these, we don't memorize 
+c         sys which is always 'xyz'
+c       radiallen: can be computed from height
+c         vec; children knows  their direction
+c         wgt: normally not needed, it should be 1 for skeleton making
+c              So thinsamping must not be used when making skeleton.
+c      asflab: should be always F, (assume for skeleton making, hybrid
+c              air shower is not requested)       
+c
+c   write  track info. of projectile
+c
+      integer i, nlow
+      real*8 ke
+
+c
+c
+      nlow = 0 
+      do i = 1, Nproduced
+         ke = Pwork(i).fm.p(4) - Pwork(i).mass 
+         if( ( Pwork(i).code .le. kelec .and. 
+     *       ke .ge.  Cuteg ) .or. 
+     *       ( Pwork(i).code .gt. kelec .and.          
+     *       ke .ge.  Cutneg ) ) then
+c              count low energy ptcls
+            if(flag .ne. -3) then
+               if( ke .lt.  KEminObs) then
+                  nlow = nlow + 1
+               endif
+            else
+c               all ptcl must be memorized
+               nlow = nlow + 1
+            endif
+         endif
+      enddo
+
+      if(nlow .eq. 0 )  return !  *************
+
+      p.posx = MovedTrack.pos.xyz.r(1)
+      p.posy = MovedTrack.pos.xyz.r(2)
+      p.posz = MovedTrack.pos.xyz.r(3)
+      p.depth = MovedTrack.pos.depth
+      p.height = MovedTrack.pos.height
+      if( MovedTrack.pos.colheight .gt. 1.e36) then
+         p.colHeight = 1.e36    ! no col. yet.
+      else
+         p.colHeight =  MovedTrack.pos.colheight
+      endif
+      p.atime = MovedTrack.t
+      p.where = MovedTrack.where
+      p.coszenith = MovedTrack.vec.coszenith
+      p.code = MovedTrack.p.code
+      p.erg  = MovedTrack.p.fm.p(4)
+      p.asflag = MovedTrack.asflag
+
+
+cc
+cc     *           p.posx, p.posy, p.posz, p.depth, p.height, 
+cc     *           p.colHeight, p.atime, p.where
+cc
+c       write particle info
+c           p(1~4)
+c           mass
+c           code
+c           subcode
+c           charge
+c 
+
+
+      write(dev) nlow, p
+
+
+      do i = 1, Nproduced
+         ke = Pwork(i).fm.p(4) - Pwork(i).mass 
+         if( ( Pwork(i).code .le. kelec .and. 
+     *       ke .ge.  Cuteg ) .or. 
+     *       ( Pwork(i).code .gt. kelec .and.          
+     *       ke .ge.  Cutneg ) ) then
+
+            if(flag .eq. -3 .or.  ke .lt. KEminObs) then
+               c.code = Pwork(i).code
+               c.subcode =  Pwork(i).subcode 
+               c.charge =  Pwork(i).charge
+               c.fm(1) = Pwork(i).fm.p(1)
+               c.fm(2) = Pwork(i).fm.p(2)
+               c.fm(3) = Pwork(i).fm.p(3)
+               c.fm(4) = Pwork(i).fm.p(4)
+               c.mass = Pwork(i).mass
+
+               write(dev) c
+            endif
+         endif
+      enddo
+      end
+
+c        
+      subroutine cmemorize(from, to)
+      implicit none
+#include  "Ztrack.h"
+#include  "Ztrackv.h"
+
+      integer from      !  working disk file 
+      integer to        !  permanent disk file where skeleton is sotered
+
+
+
+
+      integer num, cumnum, irevent(2)
+c      record /track/ incident
+c      record /coord/ angle
+
+
+      rewind from
+c          need not memorize, can be generated at flesh
+c      call cqIncident(incident, angle)      
+
+      call cqEventNo(num, cumnum)
+
+      call cqIniRn(irevent)   ! seed of the event
+
+      write(to) cumnum, num, irevent,  Zfirst
+      call cputHES(to)   ! put high energy showers.
+      
+      call cputNodInfo(from, to)  ! put nordal info.
+
+      end
+
+      subroutine cputHES(to)
+      implicit none
+#include "Zprivate.h"
+      integer to
+c
+c        write high energy sekeleton data into 'to'      
+c
+      integer i
+
+      write(to) Np
+
+      do i = 1, Np
+         write(to) o(i)
+      enddo
+
+      end
+
+      subroutine cputNodInfo(from, to)
+      implicit none
+#include "Zprivate.h"
+
+      integer from, to
+      
+      integer i, nlow
+
+      nlow = 1
+      do while ( nlow .ge. 0 )
+         read(from) nlow,  p
+         write(to)  nlow,  p
+         do i = 1, nlow
+            read(from) c
+            write(to) c
+         enddo
+      enddo
+
+      end
+
+

@@ -1,0 +1,15 @@
+epquery.f
+  epqCn2AliasMediaName.f
+is added to get alias name of media and true name.
+
+eprcnf.
+ module modAlias is added
+uncontained related subroutine
+  epProcAlias
+  epSeeIfAlias
+
+ZepMaxdef.h
+ is modified so that matter (media) length 8 
+ is defined  by MAX_MEDIANAMELENG
+
+Zcnfig.h is modified so as to use MAX_MEDIANAMELENG

@@ -1,0 +1,12 @@
+INST
+geom{ < "./Array/car.off" }
+
+ 
+#   convert to E-xyz system conversion
+
+transforms { 
+ TLIST
+< "./Array/matrix"}
+ }
+
+

@@ -1,0 +1,5 @@
+If new entry is made here, it must  be listed in cblkGene.h and cextGene.h.
+
+Programs referring to block data  must include cblkGene.h and cexGene.h
+but not each xxx.h
+

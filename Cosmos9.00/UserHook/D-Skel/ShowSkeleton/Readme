@@ -1,0 +1,17 @@
+This is special routine to get 
+code charge K.E(GeV) depth(g/cm2)
+of each sub-skeleton.  output is made
+in dat file in OutDir in ShowSkeleton.
+The job will  stop soon  when the data 
+is written.
+
+You may copy Skeletonxxx into SkelDir
+and submit job.
+
+ 
+
+1) arrange setupenv.sh. make primary file the same as Skeleton making time
+2) If needed, modify interface.f
+3) make clean; make
+4) ./setupevn.sh
+5) ../execflesh.sh sge (or ssh) 

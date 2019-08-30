@@ -1,0 +1,16 @@
+
+	I attached a modified version of the code (only epos-bas-199.f, 
+epos-ems-199.f, epos-xan-199.f and epos.inc are modified) which contains this 
+flag to indicate whether a collision is ND (typ=1), DD (typ=2) or SD (typ=3). 
+But it doesn't tell you whether it was projectile or target single 
+diffraction (it can be easily modified if you like). I change the 
+input-kasahara.optns file to have this "typ" at the end of the line 
+indicating the event number before the list of particles. I add this to the 
+example.f file too in case you would like to use it later.
+
+	But be careful, this is a "theoretical" definition. For instance, a ND or DD 
+event can look very similar at particle level. So please don't do the same 
+mistake as the CMS collaboration using some corrections to have NSD events 
+based on this kind of model information. You should use only hadron level 
+trigger for your data otherwise results are biased. This theoretical flag is 
+only good to have an idea of what happen in the code and is model dependent.

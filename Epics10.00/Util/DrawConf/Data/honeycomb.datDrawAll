@@ -1,0 +1,14 @@
+15 30 0.6
+only 1st line is the data. which is
+ nx ny  portion
+nx: if # of cells in "a" direction is > this, not all of cells 
+    in "a" direction may be drawn. 
+ny: if # of half-cells in "b" direction (about 2* nx)
+     > this, not all of cells in "b" direction may be drawn
+portion. the portion of cells to be drawn when the above condition
+	 is satified.
+    The cells of ( portion) * ( # of cells ) from the edge
+    ("a" or "b" direction) will be drawn  but 
+    other cells in the central  region is not drawn
+    (actually some simplified figure will be  seen).
+To draw all cells, simply make portion be > 0.5

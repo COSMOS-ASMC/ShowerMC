@@ -1,0 +1,8 @@
+BrowserHeight0 = 442;
+ViewerShelf0 = "~/f/epics";
+BrowserWidth0 = 458;
+BrowserView0 = Icon;
+BrowserRoot0 = /em/home01/kasahara/f/epics;
+BrowserShelfRows0 = 1;
+BrowserDir0 = /em/home01/kasahara/f/epics/src/prog/Sepics;
+BrowserTop0 = "542 742";

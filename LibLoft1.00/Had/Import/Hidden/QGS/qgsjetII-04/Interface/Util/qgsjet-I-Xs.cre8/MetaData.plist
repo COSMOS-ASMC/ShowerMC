@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>MetaData</key>
+	<dict>
+		<key>kMDItemCreator</key>
+		<string>Create</string>
+		<key>kMDItemNumberOfPages</key>
+		<integer>1</integer>
+		<key>kMDItemPageHeight</key>
+		<integer>842</integer>
+		<key>kMDItemPageWidth</key>
+		<integer>595</integer>
+		<key>kMDItemTextContent</key>
+		<string>qgsjet1 xsections
+14-1
+2-14
+56-2
+56-14
+14-14
+2-1
+Ap - At
+sigma
+Elab( GeV/n) 
+</string>
+	</dict>
+</dict>
+</plist>

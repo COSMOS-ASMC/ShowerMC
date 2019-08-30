@@ -1,0 +1,69 @@
+#!/bin/csh -f
+#
+####  fix the  following environmental variables as you like
+#
+#  working directroy where you want to save each frame
+#  final movie is made at the current directory.
+#
+
+setenv FRAMEDIR  /tmp
+
+########################################################
+if ( $#argv < 2 || $#argv > 3 ) then
+    echo "Usage: mkmovie movie_name maxlimit_number_of_frames [sleep_time]"
+    echo " You have to set the maxlimit_number_of_frames for safety to "
+    echo " avoid too many frames that may overflow the disk"
+    echo " (then you can sleep while making movie)".
+    echo " By ^c, You can stop the frame-making at any time before "
+    echo " reaching the limit. "
+    echo " sleep_time (in sec) may be 0 for nomal cases"
+    exit 1
+endif
+
+echo "click the window you wish to make the movie"
+
+xwininfo >& xwininfo$$
+
+
+set winid = `awk '$0 ~ "Window id" {print $4;exit}' xwininfo$$ `
+
+rm xwininfo$$
+
+if ( $#argv == 3 )  then
+    set sleept = $3
+else
+    set sleept = 0
+endif
+
+onintr fin
+mkframes   $winid $1 $2 $sleept
+
+
+#  modify the template parameter file  and store it 
+#  as parammovie
+fin:
+
+set noofframes = `ls  $FRAMEDIR/$1*.jpeg | wc -l`
+set no = `awk 'END {num = no-1 ; printf("%06d",num)}' no=$noofframes /dev/null `
+
+
+awk '$0 ~ "xxxxxx" {gsub("xxxxxx", name)};\
+     $0 ~ "yyyyyy" {gsub("yyyyyy", framedir)}; \
+     $0 ~ "zzzzzz" {gsub("zzzzzz", no)}; \
+     {print}' name=$1 framedir=$FRAMEDIR no=$no \
+     $COSMOSTOP/Util/Geomview/template_param_movie > parammovie 
+
+
+mpeg_encode   parammovie
+
+echo "***********************************************************"
+echo "A mpeg movie, " $1".mpg has been created in the current directory."
+echo "You might have created a number of frames in " $FRAMEDIR "."
+echo "The names of files are: " $1"[000000~"$no]".jpeg "
+echo "They may be deleted now."
+echo "Also you may delete 'parammoview' in the current directory"
+echo "You can see the movie by 'plaympeg' or 'mpeg_play' for example"
+echo "***********************************************************"
+
+
+

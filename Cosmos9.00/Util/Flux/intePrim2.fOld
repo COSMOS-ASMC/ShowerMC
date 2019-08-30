@@ -1,0 +1,30 @@
+      subroutine intePrim2(comp, i1, i2, ans)
+      implicit none
+#include "Zptcl.h"
+#include "Zprimary.h"
+c          primary flux at E       
+      record /component/comp
+      integer i1, i2
+      real*8 ans
+
+      real*8 sum, beta
+
+      integer i
+      sum = 0.
+
+      do i = i1, i2
+         beta=comp.beta(i)
+         if(beta .ne. 1.) then
+            sum = sum +
+     *           comp.flux(i)*comp.energy(i)
+     *           / (beta - 1.)
+     *           *( 1. -
+     *           (comp.energy(i+1)/comp.energy(i))**(1.-beta))
+         else
+            sum =
+     *           sum +  comp.flux(i)* comp.energy(i)
+     *           * log(comp.energy(i+1)/comp.energy(i))
+         endif
+      enddo
+      ans = sum 
+      end

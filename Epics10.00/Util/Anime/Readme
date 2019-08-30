@@ -1,0 +1,295 @@
+This animation section is to get time sliced data for displaying time development
+of cascade showers. 
+
+Note: If you don't need to see the time development of cascade but only  to 
+see the tracks as a whole, it's better to use disptracebygeomv in Util/Geomview;
+it uses vector data so that the picuture is not degraded however large you make 
+the window.
+
+The display routine is assumed to be Geomview.  For other applications. 
+particle locaion data at various sliced times might work.
+
+The procedure to display by Geomview  will be as follows:
+1) Make trace data
+2-a) Use drawconfig to display detector configuration.
+2-b) Prepare for display of the configuration by Geomview
+3) Slice the trace data at times t1,t1+dt, t1+2dt... and make
+        .skel files for Geomview display.
+4) Make 'loader' to load .skel files
+5) Invoke Geoview and make ppm files
+6) Convert ppm files to png to make a number of numbered  png files
+7) Make a movie from png files
+
+
+Details:
+
+1) The first step is to make trace data in your UserHook routine:
+	In epicsfile, 
+	set Trace  t 
+        set IoTrace 21  if only charged particle tracking is needed
+                   -21  if both charged and neutral particle tracking is needed
+	(You can choose charge/particle code later in the time-slice procedure, too).
+	Fix TraceDir to store trace data.
+	set TimeStruc  t.  This is essential.
+2) If you want to display detector configuration together with time  development 
+  of cascade shower,  you have to go to the Util directory to issue 
+	a)	make -f drawConfig.mk
+		./drawconfig  your_config_path
+	b) 	(cd Geomview; ./convconfig option)
+ 		where option may be nothing or  [-e|-a|-h][-i]
+
+		 If you use non  default directory  to store intermediate data, 
+		further specification is needed. (use -h to see the usage). 	
+
+          In stead of b), you may, of course, goto Util/Geomview and use
+	  ./dispconfigbygeomv to display config actually. This or b) will
+	 create some stuff in Util/Work/ for Geomview.
+	These a) and b) are needed only once for a given detector configuration.
+3) Generate time sliced data.  
+
+ Edit 'input' file. In this file you have to fix the following.
+        tracefile:  path to the trace file you created in 1).
+        profile:    a file name in which you have to specify how to time-slice the
+                trace data.
+        split: Normally put T.
+	       The coordiate values at time t1, t1+dt...
+               will be put in the files ts000001.skel, ts000002.skel...
+		for Geomview use.
+
+               If outtype's LSB  bit  is on,  ts00001.dat, ts000002.dat ...
+               will be created.  As for the numbering, see offset in 'profile').
+               If split is F, all time-sliced data is put in a one sinlge file;
+               a blank line is inserted between different time data.
+               The file name will be timesored.skel or timesorted.dat depending
+	        on outtype.
+       outtype: Normally use 2.
+		 Two bit data:
+                If LSB bit is on, output x, y, z, code, chg.
+                File name extension is ".dat".
+                If 2nd bit is on, output data for Geomoview.
+                File name extension is ".skel".
+----
+
+        chgsel: Normally put 1
+		 -1; no charge selection is applied.
+		0:  only  nuetral particles are selected
+		1:  only  charged particles are selected
+	codesel: Normally put 0/
+		 a max of  9 integers to select particles.  
+		 1 gamma, 2 electron, 3 muon, 4 pion, 5 kaon, 6 nucleon,
+		 7 electron neutrino, 8 muon neutrino, 9 heavy particle
+
+		For example, if you want to select  electron and gamma,
+		put 
+		1 2/
+		(last / is needed).  If you want to select oall particles,
+		simply give.
+		0/
+----
+        matrix:  normmaly put
+          1 0  0
+          0 1  0
+          0 0  1
+
+	This is to convert coordinate so that the (x,y) plane be
+	perpendicular to the incident direction and the origin be
+	the incident axis.
+	
+
+   b) Edit 'profile'. It looks like
+  #  t1   t2     dt  pixel  rmax   offset  maxppt  maxthin    outdir
+     0    65   0.05   0.02   0       0      0        1     '/tmp/yourid/cg1'
+     65   75   0.01   0.01   5     1000     0        1     '/tmp/yourid/cg2'
+     0    0      0      0    0       0      0        0     ' '
+
+	The all-zero line indicates 'end of input'; so in this example 
+	first two lines after the # line are the input data. 
+	t1: Normally put 0
+		 first time from which time-slice starts.  Time data in the trace
+		file is in the  last field; it is length/beta (cm) so t1, t2
+		are also in cm unit.
+	t2: Normally put ~1.5*detector length. (cm)
+		 last time at which time slice ends.
+	dt: Normmally put ~(t2-t1)/800
+		time slice is performed at t1, t1+dt, t1+2dt,...  (<=t2)
+	
+	pixel:  Normmalyy put dt~ dt/10
+		one pixel size at display time is assumed to correspond to
+		this.(cm).
+		This must be balanced with dt. Animation steps with dt bin
+		in time direction, so the pixel may be the same order as
+ 		dt.
+	rmax:   Noarmally put 0.
+		Suppose you want to display only core part precisely where
+		a huge number of particles is  expected, you may give a value
+	        to rmax; particles falling outside of rmax (cm) from
+		the shower axis is discarded.  If shower is inclined,
+		conversion matrix must be given.
+		If default 0 is given, no selection by the r is done.
+       offset:  Normally put 0
+		 If this is 0, the file name ts000001.skel etc will be used.
+                If this has some positive value, say, 1000, the file name will start
+                from ts001001.skel (ts001001.dat).
+       maxppt : Normmay put 0.
+		We slice the trace data at various times.  At a given time, 
+		the maximum  number of partiles storable in the memory is 
+	        limited by maxp in Zprivate2.h. If you want to decrease the 
+		maximum number of particles treatable less than  maxp, you may
+		set this. (Probably to reduece cpu time in the display).
+                If 0, default maxp is used.
+      maxthin:  Normmaly 1.
+		During time slicing, if the number of particles reaches maxpp
+		at a given time, we cannot store more data in the memory. 
+		At this moment, we try to thin the particles in dense area.
+		If several particles  are inside the one and the same pixel,
+		they will be displayed as a point so that we may leave
+		only 1 particle and may elminate others.  We call this thinning. 
+		 'maxthin'  will limit the number of such  trials.
+      outdir:   The directory to store output files. Must exit.
+
+
+	If you give 2 lines or more, the 2nd  line  will be processed after
+	the first line is processed (the input file is	rewind). 
+	The file name sequence is continuted folloiwng the first one.
+	All zero data means the end of input.
+
+    c)  Disable #define at the top of timeslice.f
+        make clean; make -f slice.mk
+        ./slice$(ARCH) < input
+
+        This will create timesliced data in the specified directory.
+        (.skel files).
+
+   Some details.
+          For the time slicing, we need a large memory arrays.
+        They are defined in Zprivate2.h.
+                n:  max number of times you can treat (t1, t1+dt,...).
+                maxp: max nubmer of particles at a time.
+        You cannot make these two as you want due to the limitaion imposed by
+        compliler and/or OS.  If t1,t1+dt,... exceeds n, the program try to
+        process the first n times, and after that, next n times are processed and
+        so on. (Rewinding of input file is needed for this).
+        If the particle number exceeds maxp, thinning is generally tried.
+        (see maxppt in "input").
+
+        Before 'make', you may fix site.config and
+        fix #define at the top of timeslice.f (diable or enalbe #define)
+
+        IF you define G95, site.config must be site.configMacXg95 implying
+         the use of gfortarn which permits largest arrays on Mac OSX.
+        (For this, you must 'make' in Cosmos/KKlib; one program there cannot be
+        compiled by gfortran so bypass it).
+        Similarly, g77 on Linux system may be tried. (Also you need 'make'
+        in  Cosmos/KKlib).
+        For other site.config, you may simply  disable #define.
+
+        make clean; make -f slice.mk (or sliceg95.mk or sliceg77.mk).
+        Execute
+        ./slice$(ARCH) < input
+4)   mkloader.csh  N1 N2 0 0 0 > dir/loader
+	
+	Make "loader"  for Geomview to load  .skel files created in the previous
+	process.  N1 and N2 are  first and last file .skel number in 'dir'
+        'dir' is  the 	directory where .skel files reside.
+	The name of "loader" may be arbitrary.
+	
+5) Then, invoke Geomview by
+
+        ./geomstarter.csh  dir  loader
+
+
+	We assume you have created a number of ".skel"  files.
+	The very basic way to use Geomview to display these data is to 
+	load them. One single skel file may be loaded and displayed
+	by, say,  (load ts00100.skel) in the command panel of Geomview.
+	There are two different ways of showing skel data: one is 
+	time development of particle tracks  and the other to show
+	only the front of the time development.
+     a) Front of time development.  This is less cpu intensive process
+	than track display.
+	The technique for this is to 
+	show two skel data (i.e, two time data), then  delete earlier
+        time data, and add next time data. Repeating these process 
+	will show the front of time development. If you show 3 time
+	data at first, and repeat  "delete the oldest data and add next time
+	data", then you will get some kind of residual image.
+	Such a sequence of commands for Geomview can be
+	generated  by using mkloader.csh script in Cosmos/Scrpt:
+          mkloader.csh  arguments > dir/loader
+        where arguments are 5 arguments explained below, 
+	dir is the directory where skel data are stored, and laoder
+	is an arbitray  file name to contain the commands. 
+	 The 5 arguments are: 
+         1:  start file number (for ts00010.skel, give 10)
+         2:  end   //          (for ts01000.skel, give 1000)
+         3:  frames to be shown togther for front display (normally 1). has
+	     meaning for front  display only.
+         4:  snapshot file number offset. If 0, snapshot files created will be
+             ts00010.ppm, ts00011.ppm...
+	     If this is 1000, ts01010.ppm, ts01011.ppm... etc.
+         5:  track or front only.  If 0, track display is assumed. 
+ 	     If 1, front display.
+6)  ppmtopng.csh dir
+	
+	This convert ppm files in 'dir' into 'png' files which may be used to
+	create a movie.
+
+7) Use QuickTime to make a movie from png files.   You may be able to make
+	a movie by the convert or ppmtompeg command, too.
+
+
+	About ppm file:  Geomview generate a ppm image  file by the snapshot command
+	(other formats are not appropriate for movie). 
+	 If we want to make a movie from  number of such image files,
+
+	ppm file may not be good for making a movie;
+	for example, for QuickTime on Mac OS X,  png, tga, gif,  jpeg etc
+	are candidates.
+ 
+	When all ppm files are ready, it's time to convert ppm files: You may be able
+	to use Netpbm commands.   ppmtopng.csh,  ppmtogif.csh, ppmtotga,  and
+	ppmtojpeg.csh are  prepared in the Cosmos/Scrpt dirctory. Usage is, e.g,
+		ppmtopng.csh  dir
+	where  dir is the  directory in which ppm files are stored.  
+	option. 
+
+	 For some ppm files, the total  resulant file size (bytes) is as follows:
+        Compression        png      gif       jpeg
+		0      80315858
+		9       3165948
+	   default      3378245   2772705    3868881
+
+        If colors included are surely less than 256, gif will be the best choice;
+	With s option as below, fast exection is possible.
+	     ppmtogif.csh dir  s   
+        's' may be omitted always, though bit slow if colors < 256.
+	 (must be omitted if colors >= 256).
+
+
+   b)  Track development movie.  To get such a movie, we display skel files
+	one by one in the time sequence order without removing any of them.
+	Since every time we add skel file, all data points are re-drawn, 
+	this is very cpu intensive process. Only a very small energy  cascade
+	can be shown as a real time movie so that snapshot must be taken to
+	make ppm files for later use. 
+	To make a loader command, use mkloader.csh as in 4-a)
+
+        In this case you must give 0 for the 5th argument.
+	After this, you can proceed as in 4-a).
+
+---------
+To change particle color, adjust colortab in this directory.
+It is basically the same as the one in the Geomview directory.
+
+You may sometimes need to issue a number of snapshot commands
+to take snapshots of, say, the rotaing detector before showing
+particle tracks.  To generate a number of snapshot commands for
+that, you may use gensnapcom.csh (in Cosmos/Scrpt).  
+Since a number of ppm files will be created by this command,
+you must give some offset number when using mkloader.csh command
+so that the ppm file corresponding to  ts00001.skel is, 
+for example, ts01001.ppm (not ts00001.ppm which may be 
+already used by a command  generated by gensnapcom.csh).
+
+
+

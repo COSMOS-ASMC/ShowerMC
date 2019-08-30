@@ -1,0 +1,48 @@
+
+c  Assume ncpu cpu's; For each cpu,  smashed skeleton files will be
+c
+c      skeleton001
+c        cumnum, num, ir, Zfirst
+c        Np
+c        observed ptcles 1
+c        observed ptcles 2
+c
+c        observed ptcles Np
+c        nlowp  
+c        track-1
+c        track-2
+c        ... 
+c        track-nlowp
+c     other skeleton file( skeleton002,...)
+c        cumnum, num, ir, Zfirst
+c        0
+c        nlowp  
+c        track-1
+c        track-2
+c        ...
+c        track-nlowp
+c        ....
+c
+c==============================================
+c
+c          skeleton
+         cumnum, num, ir, Zfirst
+         Np
+         oo_1
+	 oo_2
+         ..
+         oo_Np
+         nlow pp
+         cc_1
+	 cc_2
+	 ...
+	 cc_low
+         nlow pp
+         cc_1
+	 cc_2
+         ...
+	 cc_nlow
+         ..
+	 ..
+	 0  pp   ( pp.asflag=-1 )
+

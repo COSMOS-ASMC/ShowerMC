@@ -1,0 +1,7 @@
+#!/bin/csh 
+source .epos
+set lpath=$cwd
+echo $EPO
+cd $EPO
+make $*
+cd $lpath

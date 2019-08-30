@@ -1,0 +1,62 @@
+\documentclass[a4paper]{jarticle} 
+\usepackage[dvipdfmx]{color,graphicx}
+%\usepackage{nruby} %ルビ
+%\usepackage{shadow}  % 影付の四角枠
+%\usepackage{fancybox} % いろいろ凝った枠
+%\usepackage{longtable} %  ページを跨ぐ大きな表( Tabularもある )
+%\usepackage{mathrsfs}  %  花文字ローマ字他にもいろいろある
+%\usepackage{amsmath,amsthm,amssymb} % アメリカ数学会の記号など
+%\usepackage{ascmac}  %  角の丸い枠で複数行を囲む
+%\usepackage{multicolpar} % 対訳文のように左右に文を分けて書く
+%\usepackage{fancyvrb} % 書いてあるままの出力に対する周辺装飾
+%\usepackage{alltt}  % verbatimでは困るときに使える?
+%\usepackage{here}
+%\setlength{\textwidth}{15.5cm}  % テキストの幅を指定
+%\setlength{\textheight}{24cm}  % テキストの高さを指定
+\title{Xsection treatment}
+\author{The Author}
+\begin{document}
+ \maketitle
+ \begin{itemize}
+  \item  Consider a medium consisting of  $n-$elements.  E.g, PWO:
+	   Pb + W + 4O.  $n=3$.  
+  \item The $i-$th element is denoted by the suffix.
+	  An example is shown for PWO.   
+	
+	\begin{description}
+	 \item[$A_i$]:  Mass number of $i-$th element.
+		    element(i).A. For i=1,3, the value is    (207.2, 183.92, 16).
+		    The component is denoted by using ``.'',
+		    though  formal notation should use ``\%', like
+		    element(i)\%A.
+	 	 \item[$Z_i$]:  charge of the $i-$th element.
+	 element(i).Z)	    (82,74,8)
+	 \item[$N_i$]:  number of $i-$th element.
+If we follow the notation above, this should be
+		    element(i).No. But we use  No(i) like media\%No(i).
+		    (1,1,4) .    This is however,
+		    normalize to (1/6, 1/6, 2/3).  The original number
+		    is kept as .OrigNo(:)
+	 \item[$\sigma_i$]:  cross-section of  the $i-$th element,
+		    at a given energy and for a given projectile.  So this
+		    changes for each collision.
+                    For the PWO case,  $\sigma_1$ is the cross-section
+		    of
+		    Pb, $\sigma_2$  of W, $\sigma_3$ of O (not  of  4O).
+
+		    These are not kept as variables.
+		    
+	 \item[nsigma(i)]    $No(i) \sigma_i $.  These
+		    are
+		    used to sample the target among elements in a
+		    medium.
+	 \item[media.xs ] $\sum $nsigma(:).  This is used to
+		    sample the  MFP of the hadronic  collision  in the medium. 
+
+	\end{description}
+	
+
+    	
+ \end{itemize}
+
+\end{document}

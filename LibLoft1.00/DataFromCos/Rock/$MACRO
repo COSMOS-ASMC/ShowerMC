@@ -1,0 +1,73 @@
+C  Reply-To:  AURIEMMA@ROMA1.INFN.IT                                            
+C  Subject: Gran Sasso Rock overburden                                          
+C     Dear Dr. Kashara,                                                         
+C       thanck you for your fax of Jul. 25. I can answer your questions         
+C      upon the rock overburden of the G.S. Laboratory, but please keep         
+C      in mind that this are only preliminary data. We know from                
+C    satellites accurately, the thickness of the rock in almost any             
+C    direction, exception made for   65<phi<105 and 45<theta<75;                
+C    108<phi<105 end theta>60; 133<phi<148 and theta>70, where we have          
+C    no direct informations.  the following program gives the rock              
+C    thickness:                                                                 
+C           To convert phi into angle from the north (counterclockwise)         
+C you can apply the transformation    PHIPRIME=MOD(360.-PHI+128.4,360)          
+C and this should be the azimuth from the NP ( +x axis of the detector          
+C point phiprime=128.4 deg).  The liomits above are given in azimuth            
+C from the NP.  The above codes needs to read a file GSROCK.DAT, which          
+C I'm sending as separate mail.                                                 
+C                                                                               
+C                                                                               
+C                      C A U T I O N S                                          
+C I do not think that assuming a uniform density gives you a good result        
+C We are limited untill now by statistics, but the local variations             
+C seems to be of order of 5-10% on a grid of 10x10 deg**2.  However the         
+C best estimate of the density is 2.7+/-.05 gr/cm**3 Average Z=11.3 ;           
+C average Z/A=.4991 ; average Z**2/A=5.65 which is close to the values          
+C of world average limestone.  When I tryed to calculate energy loss            
+C using as inputs the average values I found a difference of about 8-10%        
+C from the correct values of dE/dx of the mixture.  With regular mail           
+C I'm sending a Memo that I wrote recently, which I think might be              
+C interesting to You.  We are still analisyng our multiple muons data. I        
+C put your name in our mailing list for preprints, and I'll appreciate          
+C you doing the same for me.                                                    
+C                         Regards         Giulio Auriemma                       
+C                                                                               
+     FUNCTION GSROCK (PHI, TET)                                                 
+C....    This function returns the depth (in m) of the Gran Sasso rock          
+C       in the direction                                                        
+C         tet = zenith angle (degrees)                                          
+C         phi = azimuth angle (degrees)                                         
+C         output in meters                                                      
+C   the phi azimuth angle is in the detector system                             
+C                                   ---------------                             
+C   phi = 0 points approximately south east                                     
+C                                                                               
+C   important     0 .le. tet .le. 80.                                           
+C                 0 .le. phi .le. 360.                                          
+C                                                                               
+C   there is no check in the program of the input ]                             
+C................................................................               
+        DIMENSION DEPTH(41,91)                                                  
+C                                                                               
+        OPEN(UNIT=10,FILE='GSROCK.DAT', STATUS='OLD',                           
+C                           ~~~~~~~~~~                                          
+        1         FORM='UNFORMATTED')                                           
+        READ(10)DEPTH                                                           
+C.....   phi = 0  in detector system  points approximately toward South East    
+C   phi in the rock system (data  values) points  East                          
+      fi = phi - 40.                                                            
+      if (fi .lt. 0.)  fi = 360. + fi                                           
+C....    bilinear interpolation in theta and phi                                
+C   the structure of the grid is `hard wired' in the code                       
+      jt = tet/2. + 1                                                           
+      jf = fi/4. + 1                                                            
+      d1 = depth (jt,   jf)                                                     
+      d2 = depth (jt+1, jf)                                                     
+      d3 = depth (jt,   jf+1)                                                   
+      d4 = depth (jt+1, jf+1)                                                   
+      t1 = 2.*(jt-1)                                                            
+      f1 = 4.*(jf-1)                                                            
+      r = (tet - t1)/2.                                                         
+      u = (fi  - f1)/4.                                                         
+      gsrock = (1.-r)*(1.-u)*d1 + r*(1.-u)*d2 + (1.-r)*u*d3 + r*u*d4            
+      end                                                                       

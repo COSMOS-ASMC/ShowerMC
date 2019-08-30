@@ -1,0 +1,1 @@
+awk 'BEGIN{sumc=0;sumf=0}; $1=="h" {if(sumc>0) print x,y,sumc,1;sumc=0; if(sumf>0) print x,y,sumf,2; sumc=0; sumf=0; x=$4;y=$5;next}; $NF>0 {if($3=="Cu")sumc+=$10; if($3=="Fe") sumf+=$10}' pantsout  > pants-xythick 

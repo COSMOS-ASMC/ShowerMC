@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>MetaData</key>
+	<dict>
+		<key>kMDItemCreator</key>
+		<string>Create</string>
+		<key>kMDItemNumberOfPages</key>
+		<integer>8</integer>
+		<key>kMDItemPageHeight</key>
+		<integer>595</integer>
+		<key>kMDItemPageWidth</key>
+		<integer>842</integer>
+		<key>kMDItemTextContent</key>
+		<string>0,836 r.l
+set size sq
+set palette rgbformulae 22,13,-31
+set view map
+splot "/tmp/thickness" w p ps 0.5 pt 5 lt palette
+
+if we use pos info in
+‘h’ line we get
+if InputP='u-&gt;sph2’ or ‘g-&gt;sph2’and InputA='fix’ with (DCInpX DCInpY DCinpZ)
+call getProjPos works and we can get position information on a
+plane perpendicular to the incident direction (x-y coord is
+on this plane; position is uniform on this plane). The output
+contains projp line.  So instead of using pos info in “h” line
+we may use projp info for material amount along the projection.
+
+ projp -18.280 33.372 34.600    
+h 1 1 -15.274 36.032 79.368 -0.500000000 -0.700000000 -0.509901951
+</string>
+	</dict>
+</dict>
+</plist>

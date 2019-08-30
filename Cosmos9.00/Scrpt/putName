@@ -1,0 +1,15 @@
+#!/bin/csh -f
+#    put variable names as namelist
+#------------------------
+	awk 'BEGIN { sep = "  "; N = 65; printf("     +")} \
+		{n = n + length($1) + 2  \
+		 if(n <= N) { printf("%s%s", sep, $1); sep = ", "} \
+		 else { printf("\n"); printf("     +"); n = length($1) + 2; \
+			printf("%s%s", sep, $1)} \
+		} \
+	     END {printf("\n")}'  -
+
+
+
+
+

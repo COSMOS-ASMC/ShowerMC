@@ -1,0 +1,22 @@
+#!/bin/tcsh -f
+if ( $#argv != 2 ) then
+   cat << EOF
+   Usage: showQuench  config   epicsfile
+    expand config and show quenching factor for each of the
+    components
+EOF
+exit
+endif
+
+set pwd=`pwd`
+
+
+cd $EPICSTOP/Util; make clean;make -f testCnf3.mk
+
+cd $pwd
+
+echo $1 > temp$$
+echo $2 >> temp$$
+$EPICSTOP/Util/a.out < temp$$
+rm temp$$
+

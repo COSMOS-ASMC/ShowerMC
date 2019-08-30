@@ -1,0 +1,27 @@
+include $(COSMOSTOP)/site.config
+
+FOBJECTS = int-crosssection.o int-engine.o int-initvarip.o int-decay.o int-energyloss.o
+
+int-crosssection.o : int-crosssection.f $(INCLUDE)/atmnc-particle-code.inc \
+	$(INCLUDE)/int-alphafact.inc
+	$(FC) $(FFLAGS) int-crosssection.f -c
+
+int-decay.o : int-decay.f $(INCLUDE)/atmnc-particle-code.inc
+	$(FC) $(FFLAGS) int-decay.f -c
+
+int-engine.o : int-engine.f $(INCLUDE)/atmnc-particle-code.inc
+	$(FC) $(FFLAGS) int-engine.f -c
+
+int-initvarip.o : int-initvarip.f $(INCLUDE)/atmnc-particle-code.inc
+	$(FC) $(FFLAGS) int-initvarip.f -c
+
+int-energyloss.o : int-energyloss.f $(INCLUDE)/atmnc-particle-code.inc
+	$(FC) $(FFLAGS) int-energyloss.f -c
+
+#libintcommon.a : $(FOBJECTS)
+#	ar r libintcommon.a $(FOBJECTS)
+$(LIBRARY) :  $(FOBJECTS)
+
+
+clean :
+	rm -f *.o *.a *.il

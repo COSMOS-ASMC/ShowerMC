@@ -1,0 +1,25 @@
+#   This is trial for making the thickness 0.836X0
+-------------------------------
+#news  new-1  ciecone
+#          pipe outer radius of after recombination chamber is 3.2cm
+#          pants are surrounded by marble of 40 cm length
+#          our detector is sorounded by Iron
+#subd   pants
+#      
+#      
+
+1  ciecone  Cu  0 0 0 / 4.0 0 1.2  7.03  7.03  50  4  3.1  235.3201 124.67983 / 2 3
+2  ciecone  hollow  0 0 0 / =  =  0  7.03  7.03  50  4  3.1  235.3201 124.67983
+3  cyl      hollow  0 0 0 / 8  0 50 3.1 1.2
+4  ciecone  Cu  0 0 0 / -4  0 1.2  7.03  7.03  50 -4.0 3.1  55.32017  304.67983 / 5 6
+5  ciecone  hollow 0 0 0 / = =   0 7.03  7.03 50  -4.0  3.1 55.32017  304.67983
+6  cyl  hollow  0 0 0 / -8  0 50 3.1 1.2
+# 7  cyl Fe 0 0 0 / 0 0 0 11.5 1.2 / 2 5   
+# figure tells 11.5 (phi=230). we have been using 11.0
+7  cyl Fe 0 0 0 / 0 0 0 11.0 1.2 / 2 5   
+8  cyl_w  sp 0 0 0 / 0 0 0
+#end  pants
+
+1  pants  sp   0 0 0 / 0 0 0
+2  box_w  sp  0 0 0 / 0 0  0
+-------------------------------

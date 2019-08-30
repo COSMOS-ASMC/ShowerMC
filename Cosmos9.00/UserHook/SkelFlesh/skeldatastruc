@@ -1,0 +1,28 @@
+   ----------event header-----------------
+cunum, num, ir, zfirst
+   ----------Observed H.E ptcl(>Ekmin);  Np prtls:strucuture /ob/
+Np
+where, code, subcode, charge, atime, erg,   
+mass, x, y, wx, wy, wz. zenith
+...
+
+..
+where ..                  
+   ------nodal info. record of low E prtcls and their parent 
+nlow, parentinfo
+childinfo
+...
+..
+childinfo
+-------------------next event--------------
+
+
+
+=============================
+---parentinfo  structure /parent/
+
+posx, posy, posz, depth, height, colHeighnt,
+atime, where, coszenith, code, erg, asflag
+
+----childinfo  structure /child/
+code, subcode, charge, fm(1),..(4), mass

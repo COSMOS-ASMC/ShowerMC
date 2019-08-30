@@ -1,0 +1,24 @@
+#!/bin/csh -f
+#
+if($#argv != 1) then
+	echo "Usage:  makeNL 1     for Znamelist1.h"
+	echo "        makeNL 2     for Znamelsit2.h"
+	exit 1
+endif
+#
+
+  if($argv[1] == 1) then
+	echo "c           This namelist data is frequently used."
+        echo "c           Some of them should be given mandatory."
+	echo ""
+	echo "        namelist /Param/" 
+  else 	
+	echo "c         This namelist data may be given only some"
+	echo "c         special purpose such as to see the scattering effect"
+	echo "c         by putting  Es = 0."
+	echo ""
+	echo "       namelist  /HParam/"
+  endif	
+  getName  $argv[1] | /usr/local/bin/sort | putName
+
+exit 0

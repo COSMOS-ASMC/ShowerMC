@@ -1,0 +1,47 @@
+#!/bin/csh -f
+if( $#argv < 2 || $#argv > 7 ) then
+	echo Usage: $0 first_event_number last_event_number \[view_ang1 view_ang2 pause_time1 pause_time2 path_to_trace_data\]
+	exit 1
+endif
+if( $#argv == 7 ) then
+	set tracepath = $7
+else
+	set tracepath = "/tmp/$USER"
+endif
+if( $#argv >= 3) then
+   set  view1 = $3
+endif
+if( $#argv >= 4 ) then
+   set view2 = $4
+endif
+if( $#argv >= 5 ) then
+	set a = $5
+	set b = $6
+else	
+	set a = -1
+	set b =  2
+endif
+
+@ ev = $1
+@ last = $2
+
+
+if( -f  $tracepath/gnuplotdata ) then
+	rm -f  $tracepath/gnuplotdata
+endif
+
+
+while ( $ev <= $last )
+        if( $?view1 || $?view2 ) then
+           echo "set view $view1,$view2,1,1"  >  $tracepath/gnuplotdata
+        endif
+        echo splot "'"$tracepath/trace$ev"'"  w l >> $tracepath/gnuplotdata
+        echo "pause $b" >> $tracepath/gnuplotdata
+        echo load '"drawearth"' >> $tracepath/gnuplotdata
+        echo "print $ev" >> $tracepath/gnuplotdata
+        echo "pause $a" >> $tracepath/gnuplotdata
+        echo " " >> $tracepath/gnuplotdata
+        gnuplot $tracepath/gnuplotdata
+        @ ev ++
+        rm -f  $tracepath/gnuplotdata
+end

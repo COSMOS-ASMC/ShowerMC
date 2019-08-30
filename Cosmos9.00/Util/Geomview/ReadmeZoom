@@ -1,0 +1,31 @@
+To make a movie of enlarging trace data, first show a maximum
+enlarged figure; then shrink the figure by reapating the
+comman (zoom c0 0.5)  or ...
+You may select a shirinked image at some point.  Then, you may
+count the number of shrinkage (say, 5). Then the that figure may
+be enlarged by a factor of 32 to get the last max size figufre.
+If you want to make a 280 steps by enlargeing ths smallest figure
+(each time enlargiment factor x).
+x = 10*(log10(32)/280)  = 1.01245
+
+To repeat 280 times the enlargement and store the figures (ppm files)
+by a command, you may modify the awkForZoom
+and get the awk command.  Execute it to store the result as doZoom
+
+Enter the command at Geomview window:
+(load "doZoom")
+
+The, 280 ppm files (ts00000.ppm to ts000279.ppm) will be created in
+this directory. 
+You may convert these ppm files to, say, tga files for making a movie.
+
+   ppmtotga.csh  ./
+
+The you will get ts00000.tga... ts000279.tga)
+To make a movie from this,
+
+  convert -delay 2.5  ts*.tga  mymovie.mpg
+
+(name of moview file; as you like).
+-delay 2.5 specifies the frames / s of the moview; 100/2.5=40 frames/s 
+

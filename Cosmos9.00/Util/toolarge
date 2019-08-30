@@ -1,0 +1,34 @@
+#!/bin/csh -f
+# set dir  = $1:h
+# echo $dir
+# set ex = `ls $dir/tempvect* | wc -l | awk '{print $1}'`
+set ex = `ls tempvect* | wc -l | awk '{print $1}'`
+echo $ex
+if(  $ex != "0" ) then
+#	rm -f $dir/tempvect*
+	rm -f tempvect*
+endif
+
+gawk 'NR>4 && NF==3' $1 | split -32000 - tempvect
+set color = `tail $1 | gawk 'NF==4 {print}'`
+echo $color
+@ n = 0
+set file = $1:r
+echo $file "file"
+foreach f(tempvect*)
+	@ n++
+	set c = `wc -l $f | awk '{print $1}' `
+	echo "VECT" > $file$n.vect
+	echo "1 $c 1" >> $file$n.vect
+	echo $c  >> $file$n.vect
+        echo " " >> $file$n.vect
+	echo "1" >> $file$n.vect
+        echo " " >> $file$n.vect
+	cat $f >> $file$n.vect
+	echo "  " >>$file$n.vect
+	echo $color  >>$file$n.vect
+	rm $f
+end
+
+	 
+	

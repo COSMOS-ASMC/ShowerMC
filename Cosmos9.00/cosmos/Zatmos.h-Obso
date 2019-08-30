@@ -1,0 +1,63 @@
+!  Zatmos.h is  OBSO
+!  see  modAtmosDef in Atmosphere/catmosDef.f90.
+#include "ZepMaxdef.h"
+!     for length to thickness conversion or v.v 
+!
+      integer maxl2t, maxnodes
+      real*8 LenStep, Hinf
+!         This is used when making table for 1-dim simulation. 
+!         The slant length for vertical height 0 to 100 km is
+!         divided by LenStep m steps.
+!         It can cover the slant length of about 1200 km for cos=0.
+!         When using the table,
+!         Non-integral point (i.e., values not in the table) is
+!         obtained by using interpolation using 3 integral points.
+!         (see cl2tTblA.f)
+!     maxnodes: maximum no. of nodes to express the atmosphere.
+      parameter (LenStep=1000.d0, maxl2t=1200.0d3/LenStep, 
+     *       maxnodes = 40)
+      parameter (Hinf = 1000.d3)
+      integer NumStep
+      real*8  Htop, Hbase, ThickTbl, LenTbl, CosTbl, HeightTbl,
+     *        Zsave, ThickSave
+     
+      common /Zatmosc/ ThickTbl(maxl2t), LenTbl(maxl2t), CosTbl(maxl2t),
+     *    HeightTbl(maxl2t), Htop, Hbase, Zsave, ThickSave, NumStep
+
+     
+      type atmosph 
+        sequence
+        real*8  z(maxnodes)
+        real*8  zi(maxnodes)
+        real*8  T(maxnodes)
+        real*8  P(maxnodes)
+        real*8  logP(maxnodes)
+        real*8  rho(maxnodes)
+        real*8  logrho(maxnodes)
+        real*8  logrhoi(maxnodes) 
+        real*8  H(maxnodes)
+        real*8  a(maxnodes)
+        real*8  b(maxnodes)
+        real*8  cumd(maxnodes)
+        real*8  logcumd(maxnodes)
+        real*8  logcumdi(maxnodes)
+        real*8  d0(maxnodes)
+        real*8  coefh2r(maxnodes,3)
+        real*8  coefh2T(maxnodes,3)
+        real*8  coefh2d(maxnodes,3)
+!        real*8  coefh2P(maxnodes,3)      
+        real*8  coefh2H(maxnodes,3)      
+!        real*8  coefr2h(maxnodes,3)      
+        real*8  coefd2r(maxnodes,3)  
+        real*8  coefd2h(maxnodes,3)      
+!     real*8  coefP2h(maxnodes,3)
+        integer:: node2media(maxnodes)
+        character(len=MAX_MEDIANAMELENG):: matter(maxnodes)
+        integer:: nodes
+
+      end type atmosph 
+
+      type(atmosph):: atmos
+
+      common /Zatmosc2/ atmos
+

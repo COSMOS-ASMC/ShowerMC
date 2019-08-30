@@ -1,0 +1,13 @@
+#name   Format    SiO2  main component of most of Glass; plate glass
+glass	2
+#
+#  Elem	 rho(g/cm^3)	Gas/Solid(1/0)   refl.index Birks C
+
+4         2.40		0          1.458     0 0 0
+# 	Z	A  	N
+	14	28.09	0.42
+	8	16	1
+	11	22.99	0.15
+	20	40.08	0.09
+#  ⟨Z/A⟩   I[eV]   a       k      x0    x1     Cbar  delta0
+ 0.49731 145.4  0.0768  3.5381  0.1237  3.0649  4.0602 0.00

@@ -1,0 +1,29 @@
+#AC_INIT(src/grv98.f)
+#AM_INIT_AUTOMAKE(pdflib,1.10)
+AC_INIT(jam, 1.136)
+AC_PREFIX_DEFAULT($HOME)
+AM_INIT_AUTOMAKE(dist-bzip2)
+AC_PREFIX_DEFAULT($HOME)
+AC_CONFIG_SRCDIR(src/jam.f)
+AC_CONFIG_MACRO_DIR([m4])
+
+AC_PROG_LIBTOOL
+
+prevCXX="$F77"
+AC_PROG_F77
+if test -n "$prevF77"; then F77="$prevF77"; fi
+AC_SUBST(FFLAGS)
+
+#
+# libtool
+#
+AC_SUBST(LOADLIB_FLAG)
+AC_SUBST(LOADLIB_LIB)
+AC_SUBST(LOADLIB_LDFLAGS)
+AC_CHECK_HEADER(ltdl.h,
+	LOADLIB_FLAG="-DUSE_LOADLIB"
+	LOADLIB_LIB="-lltdl"
+	LOADLIB_LDFLAGS="-export-dynamic")
+
+
+AC_OUTPUT(Makefile src/Makefile main/Makefile)

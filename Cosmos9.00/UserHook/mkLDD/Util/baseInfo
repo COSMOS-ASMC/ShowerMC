@@ -1,0 +1,6 @@
+fitter /TAMCDB/F/src/Minuit/Util/timeFit/timeFit  (r,t) fitting routine
+#                $ARCH is added after the exec progamname
+smooth  100  max smoothing number for LDD integral time hist (500 may be ok)
+reducedT yes give yes-->reduced time was used when making -t.hist else no
+maxage	2.0  if age> maxage, we skip gettting coef.for that shower.
+#            2 means no skip. 0.9 may be good for quick job. 

@@ -1,0 +1,74 @@
+0-a) An environmental variable GEOMVIEW must be fixed to show the
+   pass to the directory where the Geomview binary exists.
+
+   For example, 
+     setenv GEOMVIEW /usr/bin                            (prob. linux)
+   or
+     setenv GEOMVIEW /usr/local/Apps/Geomview.app        (prob. nextstep)           
+   etc.
+
+
+0-b) Fix the "vdir" in 'disptracebygeomv' in this directory.
+
+     (say to  /tmp; default)
+
+----------------------------
+
+1) To show  one spcific trace information (suppose it is /tmp/foo/trace1)
+ 
+  Use
+   ./disptracebygeomv  6  /tmp/foo/trace1
+or
+   ./disptracebygeomv  6  /tmp/foo/trace1 earth
+
+  (Second one will display the trace with the earth sphere; The north
+   pole is indicated by white colo and the longitude 0 by blue line and
+   the equator by red line).
+
+  This will create ptcl21.vect, ptcl31.vect,.. ptcl61.vect (some may be missing
+  if there is no such particle traktcs) in $vdir.  If 2 is given
+  instead of 6, only ptcl2.vect will be created.
+  (2 is for electrons, 3 muon,...  The max number you can give is 9 which is
+   for heavy particles (He, Li, ...). 
+
+  *** If one consecutive track has a large number of nodal points
+    (> 32000), it is decomposed into more than two files:
+	say, ptcl21.vect ptcl22.vect....  This may happen if
+        you want to display charged particle tracks propagating
+        at large distances from the earth.
+
+2) If you have many number of trace data, it may be better to use
+
+	./slide  2 5 /tmp/foo/ 
+or
+	./slideWithEarth  2 5 /tmp/foo/ 
+
+by which you can show  /tmp/foo/trace2 to /tmp/foo/trace5.
+The second one is for showing the earth sphere together.
+ 
+****Caution:
+   Before invoking Geomview, the current Geomview is killed in
+  'disptracebygeomv'. However, this will not be successfull sometimes.
+
+------------
+ The 'colormap' in this directory determines the default color of 
+  each particle code. Color can be changed within Geomview.
+
+------------
+ If you show traces of particles in the atmosphere, electron tracks
+ normally have the heaviest load and it may be difficult to manipulate
+ the display smoothly. In such a case, you may delete the electron tracks
+ once, and adjust the display, then again resume the electron tracks.
+
+
+++++++++++++++++++++
+
+This directory contains the following files.
+
+
+Readme             earth.mesh         second.awk         splitiftoolarge*
+colortab           equator.vect       slide*
+disptracebygeomv*  first.awk          slideWithEarth*
+earth              meridian.vect      split.awk
+
+If there are some others, they should be garbage to be deleted.

@@ -1,0 +1,114 @@
+$PARAM
+ ASDepthList = 6060.0 .0 .0 .0 .0 .0 .0 .0 .0 .0 .0 .0 .0 .0           
+ ASHeightList = .0 .0 .0 .0 .0 .0 .0 .0 .0 .0 .0 .0 .0 .0 .0 .0 .0 .0
+ .0 .0
+ BaseTime = 100.0
+ Cont = F
+ ContFile =
+ '../Data/.contInfo                                                     '
+ CosZenith = (0.5, 1.0)
+ Ddelta = 5.0
+ DeadLine =' '
+ DepthList = 6060.0 .0 .0 .0 .0 .0 .0 .0 .0 .0 .0 .0 .0 .0 .0
+ DestEventNo =200000
+ DtGMT = 8.0
+ Freec = T
+ Generate ='em'
+ HeightList = .0 .0 .0 .0 .0 .0 .0 .0 .0 .0 .0 .0 .0 .0 .0
+ HeightOfInj = 100000.0
+ Hidden = F
+ IncMuonPolari = T
+ InitRN = 1987220602 1770670917
+ IntModel ='int1 '
+ Job ='skeleton'
+ KEminObs = 1000.0
+ LatitOfSite = 30.11
+ LongitOfSite = 90.53
+ MinPhotoProdE = .15
+ ObsPlane = 1
+ OneDim = 0
+ PhotoProd = F
+ PrimaryFile =
+ '../Data/Primary/HD                                         '
+ SeedFile =
+ '../Data/Seed                                                          '
+ SkeletonFile =
+ '../Data/SkeletonParam                                                 '
+ SourceDec = 30.0
+ ThinSampling = F
+ TimeStructure = t
+ Trace = 0
+ TraceDir =
+ '../../sdata/saito                                                                      '
+ WaitRatio = 1.0
+ Within = 99999
+ YearOfGeomag = 1995.5
+ Za1ry ='is '
+ $END
+ 
+ 
+ ------------------ Don`t worry about the following for normal applications
+ $HPARAM
+ AnihiE = 3.000000000000000E-02
+ BackAngLimit = .0
+ BaseErg = 1000.0
+ BasePower = 1.0
+ BorderHeightH = .0
+ BorderHeightL = .0
+ Cekaon = .0
+ Ceneuc = .35
+ Cepic0 = .0
+ Charge2heavyG = 1 2 3 3 4 4 4 5 5 5 5 5 6 6 6 6 6 7 7 7 7 7 7 7 7 7
+ Code2heavyG = 0 0 0 0 0 1 0 0 0 2 3 4 5 6 7
+ Code2massN = 0 0 0 0 0 1 0 0 0 4 8 14 25 35 56
+ Deltkp = 8.000000000000000E-02
+ Deltpip = 8.000000000000000E-02
+ Deltpp = 8.000000000000000E-02
+ Ecrit = 7.600000000000000E-02
+ Efermi = 1.000000000000000E-02
+ Elund = 500.0
+ Es = 2.000000000000000E-02
+ EthinRatio = 3.000000000000000E-05
+ EventNo = 0
+ EventsInTheRun = 0
+ ExactThick = F
+ FragmentTbl = 1.0 4.0 5.81 6.62 10.5 12.8 18.1 .0 .0 .61 .72 .77 1.17
+ 1.71 .0 .0 .11 .24 .21 .17 .24 .0 .0 .0 .17 .39 .2 .17 .0 .0 .0 .0 .16
+ .42 .22 .0 .0 .0 .0 .0 6.000000000000000E-02 .2 .0 .0 .0 .0 .0 .0 .17
+ Generate2 =' '
+ HeavyG2charge = 1 2 4 7 12 17 26
+ HeavyG2code = 6 10 11 12 13 14 15
+ HeavyG2massN = 1 4 8 14 25 35 56
+ HeavyG2symbol ='p ', 'Alfa', 'L ', 'CNO ', 'H ', 'VH ', 'Fe '
+ HowGeomag = 11
+ IncreaseXsec = 1.0
+ KEminObs2 = .0
+ Knockon = T
+ Kpicns = 7.700000000000000E-02
+ Kpilog = 6.200000000000000E-03
+ MagBrem = 1
+ MagBremEmin = 300000000.0
+ MagChgDist = 30000.0
+ MagD = .0
+ MagE = .0
+ MagN = .0
+ MagPairEmin = 30000000000.0
+ MaxComptonE = 7.500000000000000E-02
+ MaxPhotoE = .0
+ Mudirp = 1.0
+ NoOfSites2 = 0
+ OffsetHeight = .0
+ PrevEventNo = 0
+ PtAvFrag = 5.000000000000000E-02
+ PtAvNonInteNuc = 5.000000000000000E-02
+ RatioToE0 = 1.000000000000000E-05
+ RecoilKineMinE = 2.500000000000000E-04
+ SeedFileDev = 22
+ TempDev = 11
+ TraceDev = 21
+ Truncc = 5.0
+ Truncn = 1.000000000000000E-02
+ Truncx = 2.0
+ UpsilonMin = 1.000000000000000E-03
+ X0 = 364.0
+ $END

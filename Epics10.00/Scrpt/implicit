@@ -1,0 +1,13 @@
+{if($1 == "subroutine") {print; print "       implicit none"}
+else if($1 == "function")  {print; print "       implicit none"}
+else if(index($1,"real") && $2 == "function")  {print; print "       implicit none"}
+else if(index($1,"integer") && $2 == "function")  {print; print "       implicit none"}
+else  {print}
+}
+
+
+
+
+
+
+

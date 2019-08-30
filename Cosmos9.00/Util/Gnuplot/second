@@ -1,0 +1,6 @@
+$1=="c---" && i==0 {++i; x=$0; gsub(/%2/, "%1", $0); $1="     "; print $0;next}
+$1=="c---" && i==1 {++i; y=$0; gsub(/%2/, "%1", $0); $1="        "; print $0;next}
+i==2 {print x; print y;print;  i=0; next}
+{print}
+
+

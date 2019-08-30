@@ -1,0 +1,309 @@
+c
+c    For example, if we want to express the atmosphere by a number of
+c    spherical shell, we need a lot of 'Air' with different density.
+c    Except for small changes due to the LPM effect (at energies < 10^17 eV)
+c    many constants are the same and sampling table can be used commonly.
+c    So we may define a few Air with different density, and many other 
+c    Air with different density can be treated simply changing some of the
+c    constants which depend on the density. Such constants are listed
+c    below.
+c
+c    density dependent quantity:
+c   
+c        media.X0
+c        media.wp
+c        media.nd
+c        media.gtocm
+c        media.mbtoPcm
+c        media.mbtoPcm2
+c        media.sh.c
+c        media.sh.x0
+c        media.sh.x1
+c        media.sh.sa
+c        media.sh.xa
+c        media.dEdxatp3m
+c        cnst.BremEemaxL
+c        cnst.BrEgminH
+c        cnst.BrEe1H
+c        cnst.BrLEe1H
+c        cnst.BrEe2H
+c        cnst.PairEgmaxL
+c        cnst.PrEg1H
+c        cnst.PrLEg1H
+c        cnst.PrEg2H
+c
+
+c     *******************************
+      subroutine epwtmedia(media)
+c       print some of basic media information(tbl, cnst are not
+c      included)
+c        should be called after epGetEffZA, epExpot
+c
+      implicit none
+#include "Zmedia.h"
+      record /epmedia/media
+
+      integer klena
+c
+c      to avoid that the output by DEC fortran is put "\n" for
+c      a long write(*,*), we use write(cline, *) and write(*,'(a)')
+c
+      cline = ' '
+      write(*,'(a,f7.2,a)') ' Excitation (Ionization) potential =',
+     * media.I*1.d9, ' eV'
+      write(cline, *) ' radation length=', media.X0, ' cm',
+     *       media.X0g, ' g/cm^2'
+      write(*, '(a)') cline(1:klena(cline))
+
+      write(cline,*)
+     *  ' <Aeff>=',  media.Aeff,  ' <Zeff=>',  media.Zeff, 
+     *           ' <Z2/A>= ', media.Z2byAeff
+      write(*, '(a)') cline(1:klena(cline))
+
+      write(cline,*) ' plasma energy=', media.wp,  ' GeV', 
+     *   ' no density=', media.nd, ' /cm^3'
+      write(*,'(a)') cline(1:klena(cline))
+
+      write(*,*) ' <Z2eff=>', media.Z2eff, ' <Z/A>=', media.ZbyAeff
+      write(*,*) 'Migdal s1=',  media.s1
+      write(*,*) ' Conversion factors:'
+      write(*,*) ' g/cm^2 to cm=', media.gtocm
+
+      write(cline,*) ' mb to /(g/cm2)=', media.mbtoPgrm,
+     * ' mb to /cm=', media.mbtoPcm, ' mb to /X0=', media.mbtoPX0
+      write(*, '(a)') cline(1:klena(cline))
+
+      write(*,*) ' If a comound is specified as an Atom, use the'
+      write(cline,*) ' following instead: ', 
+     * media.mbtoPgrm2, media.mbtoPcm2, media.mbtoPX02
+      write(*, '(a)') cline(1:klena(cline))
+
+      write(*,*) ' pi x Re**2 * N* Z /A *X0g  = 0.15 Z/A*X0g=',
+     *           media.basearea
+
+      write(cline, *)
+     * ' media.A, Z, Z^2=',media.A, media.Z, media.Z2
+      write(*, '(a)') cline(1:klena(cline))
+
+      write(*, *) 
+      write(*, *) ' **** Sternheimers consts'
+      write(cline, *)
+     * ' a, b, c =', media.sh.a, media.sh.b, media.sh.c
+      write(*, '(a)') cline(1:klena(cline))
+
+      write(*, *) ' x0, x1 =', media.sh.x0, media.sh.x1
+      write(*, *) ' sa=', media.sh.sa
+
+      write(cline, *) ' minimum dEdx_restricted=',media.dEdxatp3m,
+     *            ' GeV/(g/cm^2)  with Tcut=',media.sh.tcut, ' GeV'
+      write(*, '(a)') cline(1:klena(cline))
+
+      write(*, *) 
+      write(*, *) ' **** photoelectric consts'
+      write(cline, *)
+     *  'b0, b1, b2=', media.pe.b0, media.pe.b1, media.pe.b2
+      write(*, '(a)') cline(1:klena(cline))
+
+      write(cline, *)
+     * 'fa, a, p=', media.pe.fa, media.pe.a, media.pe.p
+      write(*, '(a)') cline(1:klena(cline))
+      write(*, *) 'l, ek=', media.pe.l, media.pe.ek
+      write(*, *)
+c          separator; when having read basic media later, skip next to
+c          this separator (*-format is no usable for compaq, dec)
+      write(*, '(a)') '#-#-#-#-#-#-#-#-#-#-#-#-'
+      end
+
+c     ******************************* 
+      subroutine epwt1dTbl(com, erg,  tbl, size, name)
+c           print  total cross section
+      implicit none
+      integer size
+      real*8 tbl(size), erg(size)
+      character*(*) name, com
+      integer klena
+
+      integer i
+
+      write(*, *)  name
+      write(*, '(a)' )  com(1:klena(com)) 
+      do i = 1, size
+         write(*, *) sngl(erg(i)), sngl( tbl(i) )
+      enddo
+      write(*,*)
+      end
+c     ******************************************
+      subroutine epwt2dTbl(com, tbl, sizeu,  sizee)
+c  
+      implicit none
+      integer sizeu,sizee
+      real*8 tbl(sizeu,  sizee)
+      character*(*) com
+      integer i, iu, klena
+
+      write(*, *) com(1:klena(com))
+
+      do i = 1, sizee
+         write(*, '(7f11.5)') ( tbl(iu, i), iu = 1, sizeu )
+         write(*, *)
+      enddo
+      write(*,*)
+      end
+c     ****************************
+      subroutine epwtBrCnstS(cnst)
+      implicit none
+#include  "ZbpSample.h"
+      record /SmpCnst/ cnst
+
+      integer klena
+
+      cline = ' '
+      write(*, *) 
+     * ' constant for Seltzer Brems sampling table '
+      write(cline, *) 
+     *  cnst.BrEeminS, cnst.BrEgminS, cnst.BrLEeminS,
+     *  cnst.BrEemaxS, 
+     *  cnst.BrUminSA, cnst.BrUmaxSA, cnst.BrTXTS,
+     *  cnst.BrdUSA, cnst.BrdETXS, cnst.BrdES, cnst.BrUminSB,
+     *  cnst.BrUmaxSB, cnst.BrdUSB,  cnst.BrES,
+     *  cnst.BrUszSA, cnst.BrUszSB
+      write(*, '(a)') cline(1:klena(cline))
+      write(*, *)
+      end
+
+c     ****************************
+      subroutine epwtBrCnst(cnst)
+      implicit none
+#include  "ZbpSample.h"
+      record /SmpCnst/ cnst
+
+      integer klena
+      
+      cline = ' '
+      write(*, *) 
+     * ' constant for Brems sampling table at low energies'
+      write(cline, *) cnst.CompScrE,
+     *  cnst.BremEgmin, cnst.BremEemin, cnst.BremLEemin,
+     *  cnst.BremEemaxL, cnst.BrScrE,
+     *  cnst.BremUminLA, cnst.BremUmaxLA, cnst.BremTXTL,
+     *  cnst.BremdULA, cnst.BremdETXL, cnst.BremdEL, cnst.BremUminLB,
+     *  cnst.BremUmaxLB, cnst.BremdULB,  cnst.BremEsize,
+     *  cnst.BremUszLA, cnst.BremUszLB
+      write(*, '(a)') cline(1:klena(cline))
+      write(*, *)
+      end
+c     ****************************
+      subroutine epwtBrCnstH(cnst)
+      implicit none
+#include  "ZbpSample.h"
+      record /SmpCnst/ cnst
+
+      integer klena
+      
+      cline = ' '
+
+      write(*, *) 
+     * ' constant for Brems sampling table at high energies'
+      write(cline, *)   cnst.BrEgminH, cnst.BrEe1H, cnst.BrLEe1H,
+     *   cnst.BrneH, cnst.BrdU1H, cnst.BrdEH,
+     *   cnst.BrEe2H, cnst.BrdU1H,  cnst.BrU1H,
+     *   cnst.BrU2H,  cnst.Brnu1H,  cnst.BrU3H,
+     *   cnst.BrU4H,  cnst.Brnu2H,  cnst.BrdVU2H,
+     *   cnst.BrdU2H, cnst.BrneH2,  cnst.BrdEH2,
+     *   cnst.BrEe2H2, cnst.BrPow
+      write(*,'(a)') cline(1:klena(cline))
+      write(*, *)
+
+      end
+c     ****************************
+      subroutine epwtPrCnst(cnst)
+      implicit none
+#include  "ZbpSample.h"
+      record /SmpCnst/ cnst
+
+      integer klena
+      
+      cline = ' '
+
+      write(*, *) 
+     * ' constant for Pair  sampling table at low energies'
+      write(cline, *)  cnst.PairEgmin, cnst.PairLEgmin,
+     * cnst.PairNonSc, cnst.PrScrE,
+     * cnst.PairEgmaxL,  cnst.PairTXTL, cnst.PairEsize,
+     * cnst.PairUminLA,  cnst.PairUmaxLA, cnst.PairUszLA,
+     * cnst.PairdULA, cnst.PairdETXL,  cnst.PairUminLB,
+     * cnst.PairUmaxLB, cnst.PairUszLB, cnst.PairdULB,
+     * cnst.PairdELA, cnst.PairdELB
+      write(*, '(a)') cline(1:klena(cline))
+      write(*, *)
+
+      end
+c     ****************************
+      subroutine epwtPrCnstH(cnst)
+      implicit none
+#include  "ZbpSample.h"
+      record /SmpCnst/ cnst
+
+      integer klena
+
+      cline = ' '
+      write(*, *) 'constant used in Pair cre. sampling with LPM'
+      write(cline, *)
+     *  cnst.PrEg1H, cnst.PrneH, cnst.PrdU1H, cnst.PrdEH,
+     *  cnst.PrU1H,  cnst.PrU2H, cnst.Prnu1H, cnst.PrLEg1H,
+     *  cnst.PrEg2H
+      write(*, '(a)') cline(1:klena(cline))
+      write(*, *)
+      end
+
+c     ****************************
+      subroutine epwtmuNCnst(cnst)
+      implicit none
+#include  "ZbpSample.h"
+      record /SmpCnst/ cnst
+
+      integer klena
+      cline = ' '
+
+      write(*, *) 'constant used in muon Nuc. int. sampling'
+      write(cline, *)
+     *   cnst.muNVmin,  cnst.muNdETX, cnst.muNdE,  cnst.muNEmin,
+     *   cnst.muNEmax,  cnst.muNdU,   cnst.muNUsize, cnst.muNEsize,
+     *   cnst.muNTXT, cnst.muNEmax1
+      write(*, '(a)') cline(1:klena(cline))
+      write(*, *)
+      end
+c     ****************************
+      subroutine epwtmuPrCnst(cnst)
+      implicit none
+#include  "ZbpSample.h"
+      record /SmpCnst/ cnst
+      
+      integer klena
+      cline = ' '
+      write(*, *) 'constant used in muon pair creation sampling'
+      write(cline, *)
+     *  cnst.muPrVmin, cnst.muPrdETX, cnst.muPrdE, cnst.muPrEmin,
+     *  cnst.muPrEmax, cnst.muPrdU, cnst.muPrUsize, cnst.muPrEsize,
+     *  cnst.muPrTXT, cnst.muPrEmax1
+      write(*, '(a)') cline(1:klena(cline))
+      write(*, *)
+      end
+c     ****************************
+      subroutine epwtmuBrCnst(cnst)
+      implicit none
+#include  "ZbpSample.h"
+      record /SmpCnst/ cnst
+      integer klena
+      cline = ' '
+      
+      write(*, *) 'constant used in muon Brems sampling'
+      write(cline, *)
+     *   cnst.muBrVmin, cnst.muBrdETX, cnst.muBrdE, cnst.muBrEmin,
+     *   cnst.muBrEmax,  cnst.muBrdU, cnst.muBrUsize, cnst.muBrEsize,
+     *   cnst.muBrTXT, cnst.muBrEmax1
+      write(*, '(a)') cline(1:klena(cline))
+      write(*, *)
+      end
+
+

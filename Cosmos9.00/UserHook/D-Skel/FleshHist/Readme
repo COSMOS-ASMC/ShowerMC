@@ -1,0 +1,6 @@
+1) arrange setupenv.sh. 
+2) bash (if your shell is not so)
+3) If needed, modify interface.f
+4) source ./setupevn.sh 
+5) make clean;make
+6) ../execflesh.sh sge (or ssh) 

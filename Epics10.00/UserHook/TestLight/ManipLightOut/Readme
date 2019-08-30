@@ -1,0 +1,8 @@
+output by Light=21 is now binary.  
+The programs here can be used for manipulating that output. E.g,
+  1)  selecting  specified events 
+  2)  reading binary data and showing in ascii,
+  3)  copyng selected events
+
+
+

@@ -1,0 +1,209 @@
+c         test compton
+c      implicit none
+c      real*8 eg, t, eg1, ee, cosg, cose
+c     
+c      integer i
+c      read(*, *) eg
+c      do i = 1,  10000
+c         call ccomptPath(eg, t)
+c         call ccomptEnergy(eg, eg1, ee)
+c         call ccomptAngle(cosg, cose)
+c         write(*, *) sngl(eg1), sngl(ee), sngl(cosg), sngl(cose)
+c      enddo
+c      end
+c     ****************************************************************
+c     *                                                              *
+c     *  compton scattering in air. E in gev. length in r.l          *
+c     *  (change of ccnst leads to other material)                   *
+c     *  ccomptPath:  samples path for compton scattering            *
+c     *  ccomptEnergy:  samples energy of compton electron            *
+c     *  ccomptAngle:  samples angle of compton scattering            *
+c     *                                                              *
+c     ****************************************************************
+c
+c
+c  /usage/
+c          call ccomptPath(eg, t)
+c          call ccomptEnergy(eg, eg1, ee)
+c          call ccomptAngle(cosg, cose)
+c
+c     eg:  gamma ray energy  GeV
+c      t:  sampled path  in radiation length
+c    eg1:  sampled gamma ray energy after scattering  GeV
+c     ee:  sampled electron energy   //   GeV
+c   cosg:  cos of scattered gamma ray to the incident direction
+c   cose:  cos of //        electron    //
+c
+c     ccomptEnergy must be called after ccomptPath.
+c     ccomptAngle must be called after ccomptEnergy.
+c
+c
+      subroutine ccomptPath(eg,t)
+      implicit none
+      real*8 eg, t, eg1,  cosg, cose, ee1, u1, u2, vl, r
+      real*8 vmin1, cose2
+
+      real*8  egc1, egc2, dugc, ugc1, ugc2, degcl
+      integer negc, nugc, i
+      
+c
+c     -----------------------------------------------------------
+c                      negc=log10(egc2/egc1)/degcl + 1(or 2)
+      parameter (degcl=1./4., egc1=.1e-3, egc2=100.e-3, negc=13,
+     * dugc=.05,
+     * ugc1=0., ugc2=1., nugc=(ugc2-ugc1+.0001)/dugc+1)
+c
+c     -----------------------------------------------------------
+c         log10 step= 0.250000
+c         log10 gamma energy boundary
+       real*8 egc1l/-4.000000/, egc2l/-1.000000/
+c
+c           uec2(j,i)=v
+c           from u= 0.0    to 1.0000 step= 0.0500
+c           from log10(e)=-4.000000 to -1.000000 step=  0.2500
+c           dim. of u and e=  21  13
+c
+      real*8 uec2( 273)
+c
+c         total cross-section of compton scattering /(radiation length)
+c
+c             tp* 3/8 /cconst= total cross section normalized
+c             by thomson cross section.
+c             cconst=3/8  * thomson * n0 * z/a * x0ing
+c
+      real*8  tp,  g,  ale, u, v, vmin
+
+      real*8 cconst/2.732/, emass/.511e-3/
+      real*8 egsv, eg1sv
+
+c
+c         energy of gamma=
+c       0.1000e-03  0.1778e-03  0.3162e-03  0.5623e-03  0.1000e-02
+c       0.1778e-02  0.3162e-02  0.5623e-02  0.1000e-01  0.1778e-01
+c       0.3162e-01  0.5623e-01  0.1000
+
+c
+      data ( uec2 (i),i=   1,  72)/
+     11.00000,0.99009,0.97964,0.96857,0.95682,0.94425,0.93084,0.91642,
+     20.90093,0.88431,0.86665,0.84820,0.82950,0.81116,0.79387,0.77792,
+     30.76352,0.75053,0.73882,0.72829,0.71871,1.00000,0.98497,0.96924,
+     40.95273,0.93534,0.91696,0.89746,0.87669,0.85452,0.83090,0.80582,
+     50.77949,0.75244,0.72556,0.69981,0.67600,0.65451,0.63534,0.61836,
+     60.60317,0.58962,1.00000,0.97812,0.95540,0.93178,0.90712,0.88133,
+     70.85427,0.82579,0.79576,0.76412,0.73086,0.69617,0.66060,0.62509,
+     80.59087,0.55913,0.53059,0.50537,0.48329,0.46393,0.44689,1.00000,
+     90.96921,0.93753,0.90486,0.87112,0.83620,0.80003,0.76251,0.72360/
+      data ( uec2 (i),i=  73, 144)/
+     10.68332,0.64179,0.59937,0.55672,0.51485,0.47502,0.43839,0.40568,
+     20.37708,0.35232,0.33094,0.31241,1.00000,0.95813,0.91535,0.87163,
+     30.82694,0.78128,0.73469,0.68723,0.63906,0.59044,0.54182,0.49379,
+     40.44721,0.40304,0.36225,0.32555,0.29328,0.26536,0.24144,0.22100,
+     50.20350,1.00000,0.94505,0.88931,0.83286,0.77585,0.71848,0.66103,
+     60.60387,0.54751,0.49255,0.43969,0.38971,0.34333,0.30117,0.26360,
+     70.23071,0.20235,0.17816,0.15764,0.14030,0.12563,1.00000,0.93057,
+     80.86061,0.79048,0.72063,0.65161,0.58413,0.51898,0.45699,0.39899,
+     90.34567,0.29753,0.25483,0.21755,0.18545,0.15812,0.13505,0.11569/
+      data ( uec2 (i),i= 145, 216)/
+     10.09951,0.08601,0.07476,1.00000,0.91535,0.83063,0.74661,0.66425,
+     20.58466,0.50905,0.43859,0.37423,0.31664,0.26606,0.22238,0.18519,
+     30.15388,0.12775,0.10608,0.08821,0.07351,0.06145,0.05156,0.04346,
+     41.00000,0.89991,0.80040,0.70286,0.60896,0.52053,0.43925,0.36642,
+     50.30270,0.24816,0.20228,0.16422,0.13298,0.10753,0.08691,0.07026,
+     60.05685,0.04608,0.03743,0.03048,0.02491,1.00000,0.88457,0.77054,
+     70.66017,0.55610,0.46087,0.37646,0.30386,0.24304,0.19312,0.15276,
+     80.12049,0.09487,0.07463,0.05870,0.04617,0.03634,0.02864,0.02260,
+     90.01787,0.01416,1.00000,0.86945,0.74131,0.61901,0.50627,0.40635/
+      data ( uec2 (i),i= 217, 273)/
+     10.32111,0.25081,0.19430,0.14971,0.11497,0.08811,0.06745,0.05160,
+     20.03948,0.03020,0.02312,0.01771,0.01358,0.01042,0.00801,1.00000,
+     30.85457,0.71280,0.57951,0.45972,0.35710,0.27298,0.20639,0.15494,
+     40.11583,0.08638,0.06432,0.04786,0.03560,0.02648,0.01970,0.01466,
+     50.01091,0.00813,0.00606,0.00452,1.00000,0.83992,0.68497,0.54172,
+     60.41646,0.31297,0.23148,0.16950,0.12338,0.08952,0.06483,0.04691,
+     70.03393,0.02453,0.01774,0.01283,0.00928,0.00671,0.00486,0.00352,
+     80.00255/
+c
+c
+
+      save egsv, eg1sv, g
+c
+      g  =eg/emass
+      if(g .lt. .1) then
+          tp=(  (5.2*g-2.)*g +1. )*2.66666*cconst
+      else
+          tp=(  (1. - (g+1.)*2/g**2)*log(g*2+1.) + .5 + 4./g -
+     *        1./(g*2+1.)**2/2 ) /g * cconst
+      endif
+c
+      call rndc(u)
+      t= - log(u)/tp
+      return
+c
+c
+c     ***********
+      entry ccomptEnergy(eg, eg1, ee1)
+c     ***********
+c
+c
+c        give phton and electron energy
+c
+c
+      if(eg .le. egc2 .and. eg .ge. egc1) then
+          ale=log10(eg)
+          call rndc(u)
+c         v=tdint4(uec2, nugc, negc, ugc1, egc1l, dugc, degcl, u, ale)
+          call k4ptdi(uec2, nugc, negc, nugc, ugc1, egc1l,
+     *    dugc, degcl, u, ale, v)
+      elseif(eg .gt. egc2) then
+c           very high energy.  vmin=small
+c           use (v + 1/v) dv  from vmin to 1
+          vmin=1./(g*2+1.)
+c           fix v or 1/v
+          vl=log(vmin)
+          r=.5/( .5 -vl )
+          call rndc(u)
+          if(u .lt. r) then
+               call rndc(u1)
+               call rndc(u2)
+               if(u1 .gt. u2) then
+                   v=u1
+               else
+                   v=u2
+               endif
+               if(v .lt. vmin) then
+                   v=vmin
+               endif
+          else
+               call rndc(u)
+               v=exp(u*vl)
+          endif
+      else
+c              very small energy; use v at egc1 and compress it
+          call rndc(u)
+c         v=tdint4(uec2, nugc, negc, ugc1, egc1l, dugc, degcl, u, egc1l)
+          call k4ptdi(uec2, nugc, negc, nugc, ugc1, egc1l,
+     *    dugc, degcl, u, egc1l,  v)
+          vmin1= 1./(1. + egc1/emass*2)
+          vmin=1./(g*2+1.)
+          v=(1.-v)/(1.-vmin1)*(vmin-1.) + 1.
+      endif
+      eg1=eg*v
+      ee1 = eg -eg1 + emass
+      egsv = eg
+      eg1sv = eg1
+      return
+
+c
+c     ***********
+      entry ccomptAngle(cosg, cose)
+c     ***********
+c
+c        give cos of phton and electron
+c
+      cosg=(1.d0/egsv - 1.d0/eg1sv) * emass + 1.d0
+c           tan(el)=cot(gm/2)/(1+g);
+c           cot(t/2)=  +-sqrt( (1+cos(t))/(1-cos(t)) ) so that
+      cose2=(1.d0-cosg) / (  1.d0-cosg +(1.d0+cosg)/(1.d0+g)**2 )
+c           electron angle is always 0 to 90 deg.
+      cose=sqrt(cose2)
+      end

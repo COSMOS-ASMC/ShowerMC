@@ -1,0 +1,14 @@
+
+c        &&&&& expasion  by KK
+c                      10       22+2=24       20    = 4800
+c           NSET0 = (NEBIN+1)*(NABIN+MAXOFF)*NBBIN <= MAXSET
+!c          
+cc      for air  NEBIN =4800/(24*3)-1 = 65  : enough large
+cc      proj: A=1,2,3...14,15, 21,27,33,39,45,51,56  --> 22 A's
+      PARAMETER (MAXSET=4800,
+     &           MAXBIN=50)
+      DIMENSION XSIG(MAXSET,6),XERR(MAXSET,6),BPROFL(MAXSET,KSITEB)
+      DIMENSION IABIN(MAXBIN),IBBIN(MAXBIN),XS(6),XE(6),
+     &          BPRO0(KSITEB),BPRO1(KSITEB),BPRO(KSITEB),
+     &          IAIDX(10)
+

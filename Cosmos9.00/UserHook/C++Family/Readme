@@ -1,0 +1,43 @@
+	make
+will use Makefile, which in turn.
+uses  icpc; it  is the intel c++ comiler.
+If  you want to use standard c++,
+	makd -f Makefilec++
+		
+
+----------------------
+
+c++ -c ../cmain.cc -I../../include
+c++ -c chookHybAS.cc -I../../include
+c++ -c ../ctemplCeren.cc -I../../include
+c++ -c chook.cc -I../../include
+
+ /lib/cpp -C -P -traditional -I$COSMOSINC ../cmymain.f > /tmp/cmymain.f
+ifc -c  /tmp/cmymain.f
+
+c++ cmain.o cmymain.o chook.o chookHybAS.o ctemplCeren.o -L$COSMOSTOP/lib/PCLinuxIFC -lcosmos `cat ifclib `
+
+IFC:
+ append _.
+ for lib, cc ...  ` cat ifclib `
+-----------
+	
+icrsrv: 
+In C code,
+ use  the same capital/small letter as in fortran.
+	but apend _ in each external name.
+
+use library 
+-L/usr/lib32/mips4/r10000 -L/usr/lib32/mips4 -L/usr/lib32 -dont_warn_unused -lfortran -lffio -lftn -lm
+
+
+--------------
+OS X absoft fortran
+In C code;
+use capital letter for external name without appending _
+
+use library;
+  -L/usr/local/Absoft/lib/ -lfio -lf77math
+
+-----------------
+

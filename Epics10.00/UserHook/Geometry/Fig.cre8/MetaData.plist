@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>MetaData</key>
+	<dict>
+		<key>kMDItemCreator</key>
+		<string>Create</string>
+		<key>kMDItemNumberOfPages</key>
+		<integer>1</integer>
+		<key>kMDItemPageHeight</key>
+		<integer>595</integer>
+		<key>kMDItemPageWidth</key>
+		<integer>842</integer>
+		<key>kMDItemTextContent</key>
+		<string>yyy is cumulative sum of xxx
+special parameters:  in sepicsfile
+
+epHooki  0  /  0-&gt; no blank suppress. 1-&gt; blank suppress
+epHooki  1 /   1-&gt;make pos world coord.   0-&gt; pos.  local coord. (for debug)
+
+output below by blank suppress mode
+seg. #
+incident direction cos. (world)
+incident pos. (always in world coord)
+# of segments
+event #
+header line
+h 1 48 5.7842 3.6941 0.0000 -4.469745199E-03 0.157395815 0.987525483
+1 9 SCIN 5.78421 3.69411 0.00000 5.77969 3.85350 0.999999 1.01263 1.04504 xxx yyy
+2 24 SCIN 5.77969 3.85350 1.00000 5.77516 4.01288 2.00000 1.01263 1.04503  xxx yyy
+3 8506 sp 5.77516 4.01288 2.00000 5.77063 4.17226 3.00000 1.01263 0.00000   xxx  yyy
+4 352 SciFi 5.77063 4.17226 3.00000 5.77018 4.18820 3.10000 0.101261 0.104502 xxx yyy
+…
+…
+46 8455 PWO 5.61584 9.62320 37.2000 5.60679 9.94197 39.2000 2.02526 16.7692 xxx yyy
+47 8474 PWO 5.60679 9.94197 39.2000 5.59773 10.2607 41.2000 2.02526 16.7692 xxx  yyy
+48 8499 PWO 5.59773 10.2607 41.2000 5.58868 10.5795 43.2000 2.02526 16.7692 xxx  yyy 
+
+com.#   media    seg. start pos                   seg. end pos                     seg.        seg.         seg.
+             name                default: world coord.                               length      gramage  r.l
+9
+8
+7
+6
+5
+4
+3
+2
+1
+segment
+</string>
+	</dict>
+</dict>
+</plist>

@@ -1,0 +1,33 @@
+#!/bin/tcsh -f
+#  1: concave
+#  2: outdir
+#  3: config file
+#  4: colormap
+####
+set  concave = $1
+shift
+set  file = $2:t
+set  media = $file:e 
+
+set  color = `gawk '$1==media {print $3, $4, $5, $6}' media=$media $3 `
+if( $#color == 0 ) then
+	echo "media"  $media " not found in colormap=" $3
+	echo "echo use red for that"
+	set color = `echo "1 0 0 1"`
+#                     ↑  set color = "1 0 0 1" is not usable
+endif
+
+echo "recognizing mesh/off of the component in config file: " $2
+
+
+gawk -f ./geomviewconfig1.awk concave=$concave  media=$media  c1=$color[1] c2=$color[2] c3=$color[3]  c4=$color[4]  $2 >> $1/allobj.list
+
+
+
+
+
+
+
+
+
+

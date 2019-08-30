@@ -1,0 +1,14 @@
+#!/bin/csh -f
+set pwd=`pwd`
+
+echo  " pwd is " $pwd
+
+cd $EPICSTOP/Util/Geomview;   ./dispconfigbygeomv $*
+
+cd $pwd
+
+
+
+
+
+

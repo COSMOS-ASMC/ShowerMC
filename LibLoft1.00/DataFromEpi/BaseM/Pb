@@ -1,0 +1,12 @@
+#name   Format    Lead
+Pb 	2
+#
+#  Elem	 rho(g/cm^3)	Gas/Solid(1/0)  refl.index Birks c
+
+1         11.35             0               0      0 0 0
+# 	Z	A  	N
+	82	207.2	1
+#  For format 2, we use values listed in literatue 
+#  if some are  not known, give -100 
+#  ⟨Z/A⟩   I[eV]   a       k      x0       x1     Cbar  delta0
+   0.39575 823.0 0.0936  3.1608  0.3776  3.8073  6.2018 0.14

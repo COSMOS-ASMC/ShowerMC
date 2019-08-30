@@ -1,0 +1,29 @@
+This is to test clorez:
+  make clean; make
+  will make test$ARCH  binary.
+to test  ./test$ARCH
+
+At execution
+give p= px,py,pz in some system.(in GeV)
+   which is assumed to be moving z diretion by
+   gb=(0,0,gbeta, beta)
+   g is changed from 1 to ~10^12. step 10^0.25.
+   (for proton, ~10^21 eV).
+    p is converted to po seen from the rest system.
+Then, po is converted to q in  original moving system.
+   using  gb=(0,0,-gbeta, -beta).
+q should be p.   The relative accuracy is computed.
+ like  (p-q)/p
+
+ clorez.f90 is made   24,Jun, 2016 and old one was
+ moved to clorez.fold
+ 
+put various pz   small to large ( positive and negative
+                 values.)
+		 
+
+old one:  accuracy is sometimes 13 digits.  In many  cases
+          ~16 digits.  poor accuray happens rather moderate
+	  g region.
+
+new new: is in clorez.f90.   accuracy is always ~16 digits.

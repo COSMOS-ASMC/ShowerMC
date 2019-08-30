@@ -1,0 +1,43 @@
+**********************************************************************
+* Example for a DTUNUC input file.
+* Uncomment the input-cards according to your requirements.
+*
+* Format: A10,6E10.0,A8
+*        (except for the section enclosed by "PHOINPUT" and "ENDINPUT"
+*         which is format-free)
+*         lines starting with "*" are comment lines
+**********************************************************************
+*
+* projectile / target
+* -------------------
+*PROJPAR          1.0	    1.0	
+PROJPAR          1.0	    1.0
+TARPAR           1.0        1.0
+*
+* energy of interaction
+* ---------------------
+ENERGY         1.045e8
+*
+*   syout--> errorout for Jetset/pythia; no ouput from 
+*      suppress message from Lund
+LUND-MSTU       12.0         0.0
+LUND-MSTU       11.0         0.0
+LUND-MSTU       127.0        0.0
+LUND-MSTU       122.0        0.0
+*
+* PHOJET-specific input
+*
+PHOINPUT
+PROCESS           1 0 1 1 1 1 1 1
+ENDINPUT
+*
+* Output
+* ------
+*   some default output (particle multiplicities etc.)
+* HISTOGRAM      101.0     102.0
+*
+* Start of event generation
+* -------------------------
+START      10000000.       0.0
+STOP
+*...+....1....+....2....+....3....+....4....+....5....+....6....+....7...

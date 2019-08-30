@@ -1,0 +1,56 @@
+# new version4 (Y.Akaike 2010.1.7)
+# with Vessel
+# new version3 (Y.Akaike 2009.10.20)
+# bgosp = 0.05
+# new version2 (Y.Akaike 2009.10.9)
+# add SIA
+# new version1 (Y.Akaike 2009.8.14)
+# SIA configuration is not set
+
+#  type  matter  c    de maxpath  / x y z  a  b c 
+-------------------------------------------------------------------
+
+#news	new-3  cap
+#news	new-4  ellips
+#  #news   new-1  angle
+
+#inc ConfigDir/def.cnfg
+#inc ConfigDir/frame.cnfg
+#inc ConfigDir/tasc.cnfg
+#inc ConfigDir/SF.cnfg
+#inc ConfigDir/anti.cnfg
+#inc ConfigDir/sia.cnfg
+#inc ConfigDir/detector.cnfg
+
+#subd  ves
+#  cap:  directrion cos 0 0 -1で反転させている
+#  
+1 cap  Al 3 0 0 / -4.9  11.4  37.12  74.42 74.82  50. 0 0 -1
+2 pipe Al 3 0 0 /   =     =   -18 50 50.4  8
+
+3 pipe Al 3 0 0 /  = = + 50 53.3  1.5
+4 pipe Al 3 0 0 / = = + 50 50.25 37.5
+5 pipe Al 3 0 0 / = = + 50 53.05 1.5
+
+6 pipe Al 3 0 0 / = = + 50 53.05 1.5
+7 pipe Al 3 0 0 / = = + 50 50.25 37.5
+8 pipe Al 3 0 0 / = = + 50 53.3  1.5
+
+9 ellips Al 0 0 0 / = = + 50.04 50.04 27.7 0 27.7 / 10
+10 ellips Air 0 0 0 / = = = 50 50 27.3 0 27.3
+#  本体:Cyl_wに含まれる。
+#  pipeの筒の内部に入っているので他のcomponent
+#  に含まれるという指定は不要。　
+11 detector sp 0 0 0 / 0 0 0
+12 Cyl_w sp 0 0 0 / 0 0 0 
+#end ves
+
+
+1 ves sp 0 0 0 / 0 0 0  
+2 box_w sp 0 0 0 / -85 -85 -40 170 170 80
+-------------------------------------------------
+75 box_w sp 0 0 0 / 0 0 0
+75 sphere_w sp 0 0 0 / worldOX worldOY worldOZ worldR
+
+2 box_w sp 0 0 0 / -85 -85 -40 170 170 80
+2 sphere_w sp 0 0 0 / worldOX worldOY 30.5 80

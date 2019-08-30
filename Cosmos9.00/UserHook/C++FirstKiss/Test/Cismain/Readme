@@ -1,0 +1,3 @@
+ifc -c mymain.f
+
+c++ hello.cc mymain.o  `cat ifclib`

@@ -1,0 +1,14 @@
+site.config  in this Cosmos
+Scrpt/cppFCSolaris  //
+
+Tracking/cfixModel.f
+   123456--> should be 5 digit; so 23456
+
+env HOST must be given.  -->export HOST=Solaris
+
+Zcondc.h
+  #undef MATHLOUSY    ---> used in Epics
+  #ifdef Solaris
+  #define MATHLOUSY
+  #endif  
+

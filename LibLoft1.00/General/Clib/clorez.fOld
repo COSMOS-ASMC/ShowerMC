@@ -1,0 +1,149 @@
+!c         testing clorez
+!      include 'cpxyzp.f'
+!      include 'cmkptc.f'
+!      include 'cpm2e.f' 
+! -----------------------
+!      implicit none
+!#include "Zptcl.h"
+!#include "Zcode.h"
+!
+!      type(ptcl):: p, po
+!      type(fmom)::  gb, gbi
+!      real*8  g
+!      integer i, j
+!      g=1.
+!      call cmkptc(knuc, 0, 1, p)
+!c
+!      p.fm.p(1)= 1.5d0
+!      p.fm.p(2)= -8.5d1
+!      p.fm.p(3)= -5.d2
+!      po = p
+!      write(0,*) ' enter px, py, pz'
+!      read(*,*)  p.fm.p(1), p.fm.p(2), p.fm.p(3)
+!      write(0,*) ' input=', p.fm.p(1), p.fm.p(2), p.fm.p(3)
+!      call cpm2e(p, p)
+!      gb.p(1)=0.     
+!      gb.p(2)=0.
+!      do  i=1, 50
+!           if(g  .lt. 1.d5) then
+!              gb.p(3)= g * sqrt(1.d0-1.d0/g/g)
+!           else
+!              gb.p(3) = g - 0.5d0/g -1.d0/8.d0/g/g/g
+!           endif
+!           gb.p(4)= g
+!           gbi.x=0.
+!           gbi.y=0.
+!           gbi.z=-gb.p(3)
+!           gbi.t=g
+!           call clorez( gb, p,  po)
+!c            
+!c           write(*, *) ' converted po',
+!c     *     po.fm.p(1), po.fm.p(2), po.fm.p(3), po.fm.p(4)
+!           call clorez( gbi, po,  po)
+!           write(*,*) g,
+!     *            ( ( p.fm.p(j), po.fm.p(j), 
+!     *             (p.fm.p(j)-po.fm.p(j))/p.fm.p(j)),j=3, 4)
+!     
+!           g=g*10.d0**0.25d0
+!
+!       enddo    
+!       end
+!
+!       **************************************************************
+!       *
+!       * clorez: Lorentz transformation in z direction.
+!       *         relative accuracy is better than 10 digts
+!       *
+!       **************************************************************
+!
+! /usage/  call clorez(gb, p,  po)
+!
+!        Suppose two systems K and K'.  K' is moving with a
+!        constant velocity relative to K (4 velocity is 
+!        in gb).  The axises in the both system are parallel.
+!        K' is moving along the direction of the z axis.
+!        (i.e., gb=(0, 0, gb(3), gamma)).
+!        p is a 4 momentum given in K'.  This routine
+!        transforms p into po seen from K.
+!    gb(4): Input. real*8 (g*beta, g) of K' system seen from K. 
+!     p(4): Input. real*8. 4  momentum of a ptcl in K'.
+!               p(1)=px', p(2)=py', p(3)=pz', p(4)=e'
+!    po(4): Outut.  real*8. 
+!           4 momentum seen from K.
+!           po(1)=px', po(2)=py', po(3)=pz,  po(4)=e  
+!           po can be the same array as p., po.mass is also copied.
+!
+       subroutine clorez(gb, p, po)
+         implicit none
+!----         include '../Zptcl.h'
+#include  "Zptcl.h"
+         type(fmom):: gb
+         type(ptcl)::  p, po
+
+         type(ptcl):: pin
+!
+         real*8 bpp, ex, g, ge
+         real*8 s, t
+         real*8 a, b
+         real*8 big/1.d2/, bigpz/1.d2/
+
+!          sqrt(1+a)/sqrt(1+b) = 1+ u(a, b) (upto 3rd order)
+         real*8 u, v
+
+         u(a,b)= ((a/16.d0 - 1.d0/8.d0)*a + 0.5d0)*a +
+     *       ((-5.d0*b/16.d0 +3.d0/8.d0)*b -0.5d0)*b 
+     *        - a*b/4.d0 + (a + 3.d0*b)*a*b/16.d0
+!          u(a, b) = (a - b)/2.d0 - a**2/8.d0 - a*b/4.d0
+!     *             +  3.d0*b**2/8.d0
+
+
+!          sqrt(1+a)sqrt(1+b)= 1 + v(a,b) (upto 3rd order)
+
+         v(a,b)= ((a/16.d0-1.d0/8.d0)*a + 0.5d0)*a +
+     *         ((b/16.d0 -1.d0/8.d0)*b + 0.5d0)*b 
+     *     +a*b/4.d0 - (a + b)*a*b/16.d0
+!          v(a, b)= (a+b)/2.d0  -(a**2 + b**2)/8.d0
+!     *            + a*b/4.d0
+!          v(a, b) = (a+b)/2.d0 -(a-b)**2/8.d0
+!
+         pin =p
+         po = pin
+
+         bpp = gb%p(3)*pin%fm%p(3)
+         g = gb%p(4)
+!     
+         ge = g*pin%fm%p(4)
+         ex =  ge+bpp
+         if(bpp .ge. 0.) then
+            po%fm%p(3) = g*pin%fm%p(3) + gb%p(3) * pin%fm%p(4)
+            po%fm%p(4) = ex
+         elseif(pin%fm%p(4) .lt. max(1.d2, 1.d2*p%mass)) then
+            po%fm%p(3) = g*pin%fm%p(3) + gb%p(3) * pin%fm%p(4)
+            po%fm%p(4) = ex
+         else
+            if(g .lt. big) then
+               po%fm%p(3) = g*pin%fm%p(3) + gb%p(3) * pin%fm%p(4)
+               po%fm%p(4) = ex
+            elseif(abs(pin%fm%p(3)) .lt. bigpz ) then
+               po%fm%p(3) = g*pin%fm%p(3) + gb%p(3) * pin%fm%p(4)
+               po%fm%p(4) = ex
+            else
+!                  transverse mass square/pz^2
+               t = (pin%fm%p(1)**2 + pin%fm%p(2)**2 + pin%mass**2)/
+     *              pin%fm%p(3)**2 !  this should be small
+               if(t .gt. 1.d-4) then
+                  po%fm%p(3) = g*pin%fm%p(3) + gb%p(3) * pin%fm%p(4)
+                  po%fm%p(4) = ex
+               else
+                  s = -1.d0/g/g
+                  ex = g*pin%fm%p(4) * (-u(s,t))
+                  po%fm%p(3) = g * pin%fm%p(3)*(-v(s, t))
+                  po%fm%p(4) = ex
+               endif
+            endif
+         endif
+       end
+
+
+
+

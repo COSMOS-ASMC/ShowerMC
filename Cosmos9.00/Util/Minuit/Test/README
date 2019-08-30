@@ -1,0 +1,33 @@
+18 June 2002
+
+Minuit expanded source files for Unix and Windows 32-bit systems.
+Directories:
+code: expanded Fortran files and intrac.c for Unix and intracw.c
+test: A Fortran test program and the output "test.out" obtained from an Intel
+	Redhat 7.2 Linux system with g77/gcc 2.96.
+
+
+Example build with Fortran compiler f77 and C compiler cc. If required, an
+archive library can be made with the ar command.
+
+cd code
+f77 -c code/*.f
+cc -c unix/intrac.c
+ar cr libmyminuit.a code/*.o unix/intrac.o
+
+Test:
+cd ../test
+f77 *.f ../libmyminuit.a
+a.out
+
+Windows, either by copying all the source files to Visual Studio or from the
+Fortran command prompt as follows.
+
+df -c code\*.f
+cl -c win32\intrac.c
+lib -out:myminuit.lib code\*.obj win32\intrac.obj
+
+Test:
+cd ..\test
+df *.f ..\myminuit.lib
+fcnk0

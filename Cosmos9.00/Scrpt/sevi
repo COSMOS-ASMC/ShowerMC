@@ -1,0 +1,9 @@
+#!/usr/bin/env    tcsh
+#   This is used to set COSMOSTOP and COSMOSINC at
+#   installation time (make, make install)
+#   Use this at Top directory as 
+#   source  Scrpt/SetEnv
+
+   setenv COSMOSTOP `pwd`
+   setenv COSMOSINC $COSMOSTOP/cosmos
+   setenv PATH	$COSMOSTOP/Scrpt:$PATH

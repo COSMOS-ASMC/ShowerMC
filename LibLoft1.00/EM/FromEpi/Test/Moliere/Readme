@@ -1,0 +1,57 @@
+1) To see Moliere reduced angle (squre) distribution function and
+   its ingredient, use epCompMolFunc.f90;  see  its top for compilation.
+2) To test  sampling of Moliere's reduced angle sampling, 
+   use testSampMolRedA.f90; see its top for compilation
+3) To see what sampling technique is used in Moliere's reduced angle
+   sampling, see test.f
+========= details
+1)
+ Let reduced angle be teta and x=teta^2; then the distribution function is
+   f(x) dx ={ f0(x) + f1(x)/B + f2(x)/B^2 } dx
+   f0= 2exp(-x)
+   f1= by epMolfunc1
+   f2= by epScotD2 (epMolfunc2 dose not work)
+ B is 3.5  ~  25;   normally around 10; given by another conditions.
+
+
+2)  Making a random sampling scheme for f(x)dx when B is given
+     
+       f1,f2 becomes negative in some region
+       f1 > 0 X1a= 0-0.3147  X1b= 3.247-inf
+       f2 > 0 X2a=0-0.3588   X2b=1.869-5.040  X2c=14.40-inf
+    strategy:
+2-1) Make integration of f0, f1, f2 in the entire region.
+     Let them F0, F1, F2
+2-2) Make integration of f1 in X1a and X1b (let them F1a and F2b, reps)
+     Make integration of f2 in X2a, X2b  and X2c (F2a, F2b, F2c)
+
+  At  sampling time,
+	Compute Ft= F0 + F1/B + F2/B^2
+	get uniform random number u
+	if(u < F0/Ft) then
+	   use f0
+        elseif( u< (F0+F1/B)/Ft ) then
+	   use f1
+           i.e,  get u
+           F1t = F1a + F1b
+	   if( u< F1a/F1t ) then
+	      use f1 in X1a
+           else
+              use f1 in X1b
+           endif	
+	else	
+	   use f2
+	   i.e, get u
+	   F2t = F2a + F2b + F2c
+           if( u< F2a/F2t) then
+	         use f2 in X2a
+           elseif( u< (F2a+F2b)/Ft) then
+	         use f2 in X2b
+           else
+	         use f2 in X2c
+           endif
+        endif	
+
+
+	
+ 

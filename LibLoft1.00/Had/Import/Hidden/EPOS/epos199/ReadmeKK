@@ -1,0 +1,8 @@
+edit input-kasahara.optns
+run by
+./epos  input-kasahara  2> err
+use
+  convEpos2PCLinuxIFC64 < z-input-kasahara.data > +primary
+for input data to Epics
+
+

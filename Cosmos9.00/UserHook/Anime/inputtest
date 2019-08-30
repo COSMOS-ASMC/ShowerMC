@@ -1,0 +1,81 @@
+'/tmp/kasahara/trace2' '/tmp/kasahara'  6001. 8000.  1.    1.0   t   t  2 0.5 30  200/
+ tracefile outputdir  mint, maxt, dt, pixel, dothin, split, outtype mulalpha
+ deltaN, maxppt
+
+tracefile:   path to the tracefile ; format is 
+	x y z t  code
+       .....
+
+outputdir:  dirctory where time sorted data file(s) are placed.
+	(ts00001.dat,... etc if split=t, else timesorted.dat is put)
+mint:  minimum time above which data is manipulated. (m. mint/c is
+	 actual time in s where c is the light velocity in m/s).
+maxt:  maximum time below //                      
+	   (m. maxt/c //                 ).
+dt:    unit step of the time (same unit as mint,maxt)
+pixel:  If two points are within this distance (m), they are supposed
+	 to be displayed in the same pixel.
+       (|r1 -r2|< pixel, (for r= (x,y,z)) )
+dothin: If t,  and if two or more points are judeged as being in the
+	 same pixel, only one is left and others are removed from
+	 the output. T is normally recomended.
+	If f, no thinning is tried.
+split:  If t, we will make files
+	 ts00001.dat,  ts00002.dat,...(outtype
+	LSB bit = on)
+	
+	or ts
+	 corresponding to time sliced data.
+        IF f, we will make only one file "timesorted.dat" where one
+	 time bin data to the other one
+	is separated by a blank.
+
+      data format is
+     x y z  code
+     x y z  code
+        ......
+
+for split date. For Non split data.  
+
+     x y z  code
+     x y z  code
+        ......
+        ......
+        ......
+    blank line
+     x y z  code
+     x y z  code
+        ......
+        ......
+        ......
+    blank line
+     x y z  code
+     x y z  code
+        ......
+
+outtype LSB bit 1--> output  x,y,z,code,chg;
+                0--> no output of above
+   		filename is  ts000001.dat etc or timesorted.dat
+        2nd bit 1--> output  skel file for Geomview 
+                0--> no output of above
+		filename is ts000001.skel or timesoreted.skel
+
+mulalpa   : alpha factor in colortab  is multiplied by this factor
+
+deltaN:   : If the number of  particles at a given time plane exceed
+	    maxppt(see below), thinning is tried according to dothin.  
+	    For a
+	    huge shower, thinning may not work at last.  In such a case, 
+	    a brute thinning is forced;  particles at the 
+	   central part of x, y, z are thinned by random probability of
+	   0.5.  The centeral part is defined to be the +/- deltaN/2
+	   from the central value of x, y,  z, respectively. 
+
+maxppt    :  max partcles per time.  maxp in Zprivate.f is the
+	     limit at each time plane, but if you want make it  less
+	     than that, you may give this.  Default is maxp
+	  (0 is converted to maxp).
+
+
+
+	   

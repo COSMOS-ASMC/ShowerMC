@@ -1,0 +1,40 @@
+1) testgeomag.f
+	To get one B=(Bx, By, Bz) in HV system for a given
+	year and given place.
+2) testgeomagMap.f
+  	To get |B| as a function of logitude and  latitude all over
+	the world.
+	This can be plotted by gnuplot by
+		splot "outputdata" w pm3d.
+	To see projected map,
+		set pm3d map
+		splot "data" 
+	To have different color assignment, use e.g,
+		set palette rgbformulae 22,13,-31
+	and use splot.
+	To plot on the Mercator map, limit the latitude within
+	(-80,80) (at most 85)  
+	  say by awk '$2<80 && $2>-80 || NF==0' B1900.dat > B1900-b.dat
+	and define 
+	       my(x) = log( tan(pi/4.+ x*pi/180./2))
+        in gnulot and use
+	splot "outputdata" u 1:(mx($2)):3
+	The inverse conversion is
+	lat(y) =( 2*atan(exp(y))-pi/2 )*180/pi where y is Mercator value.
+
+ Note:  Format with one blank line when changing x is essentail
+	x1 y z
+	x1 y z
+	...
+	x1 y z
+
+	x2 y z
+	x2 y z
+	...
+	x2 y z
+
+	x3 y z
+	x3 y z
+	...
+	x3 y z
+

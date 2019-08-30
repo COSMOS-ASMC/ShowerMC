@@ -1,0 +1,54 @@
+#include "ZsaveStruc.h"
+c       **************************************************************
+c       *
+c       * cbst0:  boost a partilce into the rest system of another
+c       *         particle
+c       *
+c       **************************************************************
+c
+c /usage/  call cbst0(init, gb, p,  po)
+c
+c        Suppose two particles given in the system K. 
+c        The Lorentz factor of particle 1 is given in K.
+c        4 momentum of particle 2 is also given in K.  This boosts
+c        particle 2 into  the rest frame of particle 1.
+c        The z axis of particle 1 is made to be the same one as
+c        it's momentum direction.
+c  init: integer.  Input.  If gb is the same as the previous call to this
+c        subroutine, give a value other than 1.  If gb is different
+c        from the previous call, use 1. 
+c    gb: structure /fmom/. Input. Lorentz factor of particle 1 in K.
+c    p:  structure /ptcl/. Input. particle 2
+c   po:  structure /ptcl/. Output. particle seen at the rest system
+c        of particle 1.
+c
+       subroutine cbst0(init, gb, p, po)
+         implicit none
+
+#include  "Zptcl.h"
+         record /fmom/ gb
+         record /ptcl/ p, po
+         integer init
+c
+         record /ptcl/ p2
+         record /fmom/ ig, p1
+#ifdef  USESAVE
+         save ig
+#endif
+c
+         p2 = p
+c          first rotate the z axis to coincide with
+c         gb and see p. 
+         call cirot3vec(init, gb, p.fm, p2.fm)
+         call cirot3vec(2, gb, gb, p1)
+         if(init .eq. 1) then
+            ig.p(1) = -p1.p(1)
+            ig.p(2) = -p1.p(2)
+            ig.p(3) = -p1.p(3)
+            ig.p(4) =  p1.p(4)
+         endif
+         po = p
+         call clorez(ig, p2, po)
+       end
+
+

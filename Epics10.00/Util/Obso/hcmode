@@ -1,0 +1,2 @@
+ NF>0 && $6 != 0 {print ; print $1+0.033, $2+0.033, zoff+zrev*($3+0.033); print " "}
+ NF==0 { print }

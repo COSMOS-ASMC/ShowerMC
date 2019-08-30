@@ -1,0 +1,22 @@
+#   This is trial for making the thickness 0.836X0
+-------------------------------
+#eq  ornew 11.5 
+#eq  offset 40.8
+#eq  pantsL  50
+#eq  sideL   48
+#eq  offset2 42           ! offset+1.2
+#news  new-1  ciecone
+#news  new-2  ccyl
+
+#subd   pants
+1  ciecone  Cu  0 0 0 / 4.0 0 1.2  7.03  7.03  pantsL  4  3.1  235.3201 124.67983 / 2 3
+2  ciecone  hollow  0 0 0 / =  =  0  7.03  7.03 pantsL  4  3.1  235.3201 124.67983
+3  cyl      hollow  0 0 0 / 8  0  pantsL  3.1 1.2
+#    wall part
+4 ccyl Cu 0 0 0 / 0 0 0  ornew  sideL 314.08 45.92 / 1
+5  cyl_w  sp 0 0 0 / 0 0 0
+#end  pants
+
+1  pants  sp   0 0 0 / 0 0 0
+2  box_w  sp  0 0 0 / 0 0  0
+-------------------------------

@@ -1,0 +1,9 @@
+set nohidden
+rev=`cat .Reverse`
+if(rev ==1 && $0+1 == 1) rep "<cat /tmp/$$USER/trace1" w l
+if(rev ==1 && $0+1 > 1) rep "<cat /tmp/$$USER/trace$0" w l
+if(rev ==-1 && $0+1 == 1) rep "<awk 'NF>0 {print $$1, $$2, zoff-$$3};NF==0{print}'  zoff=`cat .Revmax`   /tmp/$$USER/trace1 " w l
+if(rev ==-1 && $0+1 > 1)  rep "<awk 'NF>0 {print $$1, $$2, zoff-$$3};NF==0{print}'  zoff=`cat .Revmax`   /tmp/$$USER/trace$0" w l
+
+
+

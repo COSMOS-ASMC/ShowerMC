@@ -1,0 +1,18 @@
+#!/bin/csh -f
+cd $COSMOSTOP/UserHook
+if ( -e chook.f.Orig) then
+	mv chook.f.Orig chook.f
+endif
+if ( -e chookSample.f.Orig) then
+	mv chookSample.f.Orig  chookSample.f
+endif
+
+cd $COSMOSTOP/Data/Namelist
+if ( -e ParamDefault.Orig) then
+	mv ParamDefault.Orig ParamDefault
+endif	
+if ( -e paramSample.Orig) then
+	mv paramSample.Orig paramSample
+endif
+
+exit 0

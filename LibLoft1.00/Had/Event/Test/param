@@ -1,0 +1,154 @@
+You have to give data in $PARM and $HPARM below.
+ IntModel = '"incdpm3"',
+ IntModel = '"ad-hoc"',
+ IntModel = '"dpmjet3"',
+ IntModel = '"incdpm3"'
+ IntModel = '"qgsjet2"',
+
+ $PARAM
+ DestEventNo = 5000000, 10,
+ InitRN = 3335431, 55777663,
+ IntModel = '"dpmjet3"'
+
+ SeedFile ='  '
+ Trace = 0,
+ TraceDir = ' ',
+ $END
+
+ InclusiveFile='$LIBLOFT/Had/Import/DPM/Inclusive/inputdata',
+ $HPARAM
+
+ InclusiveFile='invalid',
+ UserHookc = 'f 6 -1 1 1.e8   1 1  f t', 
+             'dpmjet.inp',
+             '  '
+ UserHooki = 0, 0, 0, 0, 0, 0, 0, 0,
+ TraceDev = 31 
+ $END
+
+===================================================
+The first line in $HPARM is
+(roots/lab) code subcode charge  E(GeV) (A Z) cms  xbyp
+
+---------------------------------------------------
+
+DestEventNo: If two fields are given for DestEventNo,  2nd one is used.
+        This is the number of events to be generated.
+InitRN  :   Two initial random seeds.
+
+IntModel:  Specifies an interaction mdole. If '"dpmjet3"' is specified
+        you have to be cautios about the 2,3rd lines in $HPARM.
+
+       model name      K.E (GeV) region
+      ----------------------------
+       '"dpmjet3"'       >0.5 
+       '"fritiof7.02"'   >  9 
+      '"fritiof1.6"'   4 ~ 1000
+        '"nucrin"'       < 4.5
+       '"gheisha"'       < 1000 (always questionable)
+       '"ad-hoc"'        > 4
+       '"incdpm3"'	>0.2
+       '"qgsjet2"'	>>10 
+
+SeedFile:  If ' ', no seed is recoreded. If some name is given,
+       random number seed of each event is recorded in that file.
+	(You can specify SeedFileDev too in the 2nd namelist).
+
+Trace: If 0, numerical values of x, y, eta, pt,... etc are
+       written on stdout.  If non zero, output is made on 'trace1' for
+       event 1, 'trace2' for event2,... 
+       The 'trace1'  etc can be an input to gnuplot by which
+       you can see how  particles  are emerging from  the ineraction
+       point. Note the program dose not simulate tracking of 
+       particles, but for a given particle only a line is drawn
+       from the interaction point with direction given by the 
+       momentum of the particle. 
+       
+       The basic gnuplot command to see the tracks is
+	         set para
+	         splot 'trace1' w l
+      You can use Cosmos/Util/slide command to see the data
+      consecutively.  The format of the trace data is the same
+      as Cosmos Trace.
+
+  **** If you make Trace != 0, make the DestEventNo small *****
+
+
+TraceDri: Directory where files trace1, trace2,.. are generated.
+	If ' ', /tmp/$USER is assumed.  Another typical example is
+	a current directory, './'. See Trace above.
+
+The first line of the UserHookc:
+   roots:  If f, energy you give is assumed to be laboratry total   
+           energy of the projectile. If t, it is root s of the
+	   colliding particle (if projectile/target is nucleus,
+           cms is formed by the p-p system.)
+   code:   Particle code for the projectile. 
+   subcode: Its subcode.
+   charge:  Its charge.
+
+	     code     subcode    charge  
+	p      6        -1         1
+	pbar   6         1        -1      
+	n      6        -1         0 
+	pi+    4        -1         1
+	K+     5        -1         1
+	K0     5       +-4/5       0  (as  short/logn)
+	He etc 9         A         Z
+
+   energy:  The energy of the projectile or the root s of the 
+            colliding system.  
+       A:   target mass number(integer)
+       Z:   target charge    
+    cms: Now obsolete. f/t gives the same result.
+            If f,  output quantities are in the laboratory system
+            If t,  output quantities are in the CMS system.
+
+	    However, y and  eta are always in the CMS.
+    xbyp;   If f,  x is defined as the ratio of kinetic energy of
+            the produced particle to the kinetic energy of the 
+            projectile. If t, it is defined  as the z-component
+	    momentum ratio.
+
+The second line of the UserHookc;
+	This is used when IntModel ='"dpmjet3"'.  In this case, you can
+	test a case for which a preinitialized Glanuber data is available.
+
+	If ' ', the default Cosmos condiiton is applied. 
+	The target can be only one of O, N, Ar. 
+	The projectile max A is 56. You don't need worry about
+        other input data.  The maximum energy /(nucleon) is 10^12 GeV.
+
+	If 'xxx' is given, you have to prepare 'xxx.inp' data in this
+	directory.  This entry is primarily intended to test preinitialized
+        Glauber data in Epics/Data/Media/.  The prototype of the xxx.inp
+	is test.inp.   You can make xxx.inp by issuing
+
+	    makeinp  xxx
+
+	If the preinitialized Glauber data (Acrylic.GLB for example)
+	is not in Epics/Data/Media, you can specify the directory 
+	by the 3rd line (see next).
+
+	The maximum energy (/n) is 4x10^6 GeV for Epcis/Data/Media/*.GLB.
+
+
+The 3rd line of the UserHookc.
+	If this is given, it is assumed to be a directory where you
+	put the preinitialized Galuber data. 
+
+	**** You need the last "/" for the directory ***
+
+
+UserHooki = 0, 0, 0, 0, 0, 0, 0, 0
+     
+If non zero, denote instant decay of the following particles
+
+UserHooki:  1          2      3        4      5           6      7     8 
+         OmegaBaryon Dmeson  eta      gzai   lambda    lambdac  pi0  sigma
+
+          
+Note; eta cannot be controled well.  Except for ad-hoc, it will not
+      come out without decay.
+
+

@@ -1,0 +1,69 @@
+A) Gencol/
+   To see / generate hadronic interaction events.
+   See Readme there.
+B) Elemag/BremPair.
+   B-1) To make data for sampling ele-mag process (Brems/pair etc )
+       (also for muon:  brems, pair, hadronic interaction)
+   B-2) To test brems/pair sampling results and compare them
+        with the functions.
+   B-3) To draw only brem/pair functions at verious energies.
+   B-4) For other ele-mag process such as comption, see
+        subdirectory in Elemag/
+C) Anime/
+   To make animation of time development of cascade showers.
+D) TestNewVol/
+   When a new volume-shape is made, test can be done here.
+     
+
+1) DrawConf/drawConfig.f
+   Used to convert a 'config' to make stuff for display by
+   Geomview or Gnuplot.
+   The user may invoke the
+      drawconfig
+   command for a given "config_path" like
+     "drawconfig config_path".
+   This will prepare for the display.  Actual display is by the
+     dispconfigbygeomv or dispconfigbygnupl command.
+  ** special for honeycomb drawing.
+     To draw all of the honeycomb structure sometimes results
+     in error: too many vertexes in a component, and/or time consuming
+     job. So, in defalut, the central part of the honeycomb drawing is
+     simplified. The region for such central part can be controled
+     by Util/DrawConf/Data/honeycomb.dat.
+     
+     
+2) testCnf1.f
+   Used to expand a given config.  It is used by the command
+   expand "config_path" > output_file
+   
+3) testCnf2.f
+   This is used to show Emin for each config component.
+   (AutoEmin case).
+   You have to come here to use this;
+   you need config file and epicsfile.
+   It's better to make links like
+   (after  rm existing links)    
+     ln -s  config_in_target_place  config
+     ln -s  CnfgDir_in_target_placd  CnfgDir
+     (say, if "config" needs CnfgDir in target_palce)
+     ln -s  epicsfile_in_target_place  epicsfile
+
+  Then,
+  a) If config uses #news specifications, do
+       usenewvol config
+  b) make -f testCnf2.mk to  make "a.out"       
+  c) Then enter next 3 lines
+     ./a.out > outputfile     
+     config
+     epicsfile
+4) testCnf3.f
+   This is used to show quenching info.  for scintillators.
+   You have to come here to use this;
+   you need config file and epicsfile.
+   The same procedure for link, compilation and execution
+   as in 3), except for
+  make -f testCnf3.mk in stead of    make -f testCnf2.mk.
+  The output will have lines like below:
+    2309 6 box SCIN 1 2 0 0 / -19.2715 -22.5 0.7005 3.2 45 1
+    # quench info: T    8.00       0.360
+    

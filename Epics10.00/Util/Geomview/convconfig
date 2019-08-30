@@ -1,0 +1,141 @@
+#!/bin/tcsh -f
+#  this is to convert config data created by drawconfig for
+#  Geomview display
+#
+
+set colormap = ./colormap
+
+
+if( $#argv > 0 &&  "$1" == "-h" ) then
+        echo " "
+	echo "Usage: convconfig [-e|-a|-h][-s][-i] [outdir config1 config2 ...]"
+        echo "where"
+        echo " -h to display this message as you see now."
+        echo " -e to display config  by each component base."
+        echo "    If neither  -e or -a is given, only level 0~1 components are displayed"
+        echo " -a to display whole detector as one element "
+        echo " -s skip drawing off-file surface which may be drawn"
+        echo "    incorrectly by geomview(typically fpolygon case"
+        echo " -i to  display color index (correspondence betw media vs color)."
+	echo " outdir is the output directory (default /tmp/$USER/Work)"
+	echo " config* are config file such as config.Pb "
+	echo "    made by drawconfig in Util. Default is /tmp/$USER/Work/config.*"
+	echo "    xx of config.xx must be a media name"
+        echo " "
+	exit 0
+endif
+
+if ( $#argv > 0 && "$1" == "-e" ) then
+	set base = "comp"
+	shift
+else if(  $#argv > 0 && "$1" == "-a" ) then
+	set base = "all"
+	shift
+else  
+	set base = "lvl0"
+endif
+
+set concave = "ok"
+if ( $#argv> 0 && "$1" == "-s" ) then
+    set concave = "ng"
+    shift
+endif
+
+if ( $#argv > 0 && "$1" == "-i" ) then
+	set dispcolormap = "yes"
+	shift
+else
+	set dispcolormap = "no"
+endif
+
+if( $#argv > 0 ) then
+	set outdir = $1
+	shift
+else	
+	set outdir = /tmp/$USER/Work
+endif
+
+@ exist = ` ls * | gawk '$0 ~ /^temp/' | wc -l `
+if( $exist > 0 ) then
+	rm  -f temp*
+endif
+
+
+@ exist = ` ls $outdir/ | gawk '$0 ~ /\.mesh$/' | wc -l`
+
+if( $exist > 0 ) then
+   echo "There are $exist .mesh files in " $outdir
+   echo "They are being removed "
+   find $outdir -name '*.mesh' -print | xargs rm -f
+endif
+
+@ exist = ` ls $outdir/ | gawk '$0 ~ /\.off$/' | wc -l`
+if( $exist > 0 ) then
+   echo "There are $exist .off files in " $outdir
+   echo "They are being removed "
+   find $outdir -name '*.off' -print | xargs rm -f
+endif
+
+@ exist = ` ls $outdir/ | gawk '$0 ~ /\.list$/' | wc -l`
+
+if( $exist > 0 ) then
+   echo "There are $exist .list files in " $outdir
+   echo "They are being removed "
+   find $outdir -name '*.list' -print | xargs rm -f
+endif
+
+if( -f $outdir/allobj.list) then
+	rm $outdir/allobj.list
+endif
+
+echo "LIST" > $outdir/allobj.list
+
+#  for each config.xx; do next; store all objects in allobj.list
+echo "processing each config.XX file"
+@ nm = 0
+
+if( $#argv > 0 ) then
+	while ( $#argv > 0 ) 
+		@ n++
+		./dispconfigbygeomv2 $concave $outdir $1 $colormap
+	        ./showmediacolor2 $outdir $1 $colormap  $n
+		shift
+	end
+else
+
+	foreach f(`gawk 'NF>4 {gsub(/\"/,"");print $2}' /tmp/$USER/Work/gnu`)
+		set nl = `wc -l $f`
+		if( $nl[1] > 0 ) then
+			./dispconfigbygeomv2 $concave $outdir $f $colormap
+			@ n++
+			./showmediacolor2 $outdir $f $colormap $n
+		endif	
+	end	
+endif
+
+
+if( $base == "comp" ) then
+
+	echo "decomposing objects into each component file"
+	gawk -f ./geomviewconfig2.awk  outdir=$outdir $outdir/allobj.list
+	rm -f $outdir/allobj.list
+
+
+
+
+
+
+
+else if ( $base == "lvl0") then
+
+	echo "decomposing objects into level 0~1 subdetectors and components files"
+        gawk -f ./geomviewconfig3.awk  outdir=$outdir $outdir/allobj.list
+	rm -f $outdir/allobj.list
+endif
+
+ 
+
+
+
+
+

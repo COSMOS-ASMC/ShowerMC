@@ -1,0 +1,23 @@
+At very large x (=square of reduced angle), x follows 1/x^2.
+
+The fitting result and errors are as follows
+
+f1(x) = a(x/x1)**b
+x1 x2         a        b        error  %
+10 15  0.034895 -2.5653    mostly 0.2% max 0.8  
+
+
+15 25  0.01234 -2.31829    mostly <0.4 max 1.4
+ 
+
+25 50 0.003814 -2.1462     mostly < 0.2
+
+
+50 150 0.000868 -2.0598    mostly < 0.2 max 1
+
+f2(x)= a(x/x1)**b
+x1  x2    a           b     
+30  50  0.0005513  -2.5210  mostly  < 0.6  max 1.2
+50 150  0.0001508  -2.664467  mostly <0.5 (x<100)
+                            0.5~2.3  x>100; 
+                        not important       

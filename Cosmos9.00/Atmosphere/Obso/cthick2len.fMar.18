@@ -1,0 +1,186 @@
+c
+c     Thickness of air is converted into length.
+c     ****************************************
+      subroutine  cthick2len(z, cosz, tin, leng, t, jcut)
+c     ****************************************
+c
+c    z: input. real*8. current vertical height in m
+c  cosz:input. real*8. cos of the current zenith angle
+c   tin: input. real*8.  thickness of air to be travelled in kg/m2.
+c  leng: output. real*8. if jcut=0; length in m corresponding to tin (= t). 
+c       if jcut=1; lenght in m correslponding to t ( < tin)
+c t: output. real*8. if jcut=0, this becomes the same as tin
+c                       else  a shorter value than tin  (kg/m2).  This is
+c                       the thickness corresponding to leng (m).  
+c jcut: output. integer.  if 0, thickness tin is successfully converted into leng.
+c                         else, tin is too long. It is cut to a value 't'
+c                         so that the resultant accuracy of leng is high.
+c                         cut is made if tin is longer than the (current vertical depth)/5.
+c
+c
+      implicit none
+c----      include 'Zearth.h'
+#include  "Zearth.h"
+#include  "Zatmos.h"
+#include  "Ztrack.h"
+#include  "Ztrackp.h"
+#include  "Ztrackv.h"
+
+      real*8 z, cosz, tin, leng, t
+      integer jcut
+c
+      real*8 maxkgm2/100./
+
+      real*8 cvh2den, s, cnewcos, cnewh, zp, cosp
+      real*8 cutf/5./, cthick2h
+c       Method.
+c
+c       If we expess a heigh z in terms of the distance from the
+c    center of the earth, r = R + z (R: radius), and, the zenith angle
+c    cos, 
+c    r cos - r'cos' = s  (s is the distance between two points)
+c    r sin = r'sin'
+c    r^2 + s^2 -2rscos = r'^2
+c   Hence,
+c   z' = sqrt(r^2 + s^2 - 2rscos) - R
+c      = sqrt( (r-scos)^2 +s^2(1-cos^2) ) - R
+c      = h -s cos s^2(1-cos^2)/(r - scos)/2 + O(s^4)      
+c      = h - s cos + s^2(1-cos^2)/2/r + s^3/r^2/2 cos(1-cos^2) + O(s^4)
+c  The slant thickness in the length s is
+c   
+c     t = int[0,s](rho(s)ds
+c       = int[0,s](rho(z + f(s, z))ds
+c  where
+c      f(s, z) = -s cos + s^2(1-cos^2)/r/2 + s^3/r^2/2 cos(1-cos^2)
+c
+c    rho(z + f(s,z)) = rho(z) + rho'(z)f(s,z) + rho''(z)/2 f(s,z)^2
+c
+c  Taking upto s^3, the indefinit integral is
+c
+c   f1(s,z) =int(f(s,z)ds = -s^2/2 cos + s^3/r/6(1-cos^2) 
+c
+c   f2(s,z) =int(f^2)ds = s^3/3 cos^2
+c
+c 
+c
+      real*8 f1, f2, int1, int2,  rp  !  , clenbetween2h
+      real*8 cvh2denp, cvh2den2p, rho, rhop, d, cvh2thick
+      real*8 ct2lTA
+
+      real*8 nearv/0.5/, nearv2/0.99/, t1, t2
+      real*8 maxact
+      integer i, icon, iterate
+
+      f1(s) = -s**2/2*cosp + s**3/rp/6.d0 * (1.d0-cosp**2)
+c     *    +  s**4/rp/rp/8.d0*cosp*(1.d0-cosp**2)    ! negligible
+
+      f2(s) = s**3/3.d0 * cosp**2
+c     *     - s**4/4.d0/rp*cosp*(1.d0-cosp**2)   ! negligible
+
+c----------------------------------------------------------------------
+      if(UseTbl .and. z .lt. Htop ) then
+         maxact = 100.d3
+      elseif(abs(cosz) .gt. nearv) then
+         maxact = 20*maxkgm2 *(abs(cosz) - nearv) + maxkgm2
+      else
+         maxact = maxkgm2
+      endif
+      t = min(tin, maxact)
+      if(t .eq. maxact) then
+         jcut= 1
+      else
+         jcut = 0
+      endif
+
+      if(.not. (UseTbl .and. z .lt. Htop) .and. 
+     *    (abs(cosz) .lt. nearv) ) then
+c               max movable thickness
+         t = min(t, cvh2thick(z)/cutf/(abs(cosz) + .1) )
+         if(t .ne. tin) then
+           jcut =1
+        endif
+      endif
+c     
+      iterate =0   ! flag for later use. 
+
+      if(UseTbl .and. z .lt. Htop) then
+         leng = ct2lTA(z,  t)
+      elseif( abs(cosz) .gt. nearv ) then
+         t1 = cvh2thick(z)
+         t2 = t1 + cosz* t
+         if(t2 .le. 0.) then
+            t2 = t1/10.
+            t = (t2 - t1)/cosz
+            jcut = 1
+         endif
+         zp = cthick2h(t2)
+c         leng = clenbetween2h(z+Eradius, zp+Eradius, cosz)
+         call clenbetw2h(z+Eradius, zp+Eradius, cosz, leng, icon)
+         if(icon .ne. 0) then
+c            cannot reach to zp. This may happen if z is very large
+            iterate = 1
+         else
+            if(abs(cosz) .lt. nearv2) then
+c              correction by using  cos at middle of leng
+               cosp = cnewcos(z+Eradius, cosz, leng/2)
+               t2 = t1 + cosp * t
+               if(t2 .le. 0.) then
+c                   we shall move by real length rather than by thickness
+                  jcut = 1
+                  leng = leng/2
+                  zp = cnewh(z+Eradius, cosz, leng) - Eradius
+                  t2 = cvh2thick(zp)
+                  t =( t2 - t1 )/((cosz+cosp)/2)
+               else
+                  zp = cthick2h(t2)
+c                  leng = clenbetween2h(z+Eradius, zp+Eradius, cosz)
+                  call clenbetw2h(z+Eradius, zp+Eradius, cosz,
+     *                           leng, icon)
+                  if(icon .ne. 0) then
+                     iterate = 1
+                  endif
+               endif   
+            endif
+         endif
+      else         
+         iterate = 1
+      endif
+      
+      if( iterate .ne. 0) then
+         rho = cvh2den(z)
+         rhop = cvh2denp(z)
+c               at very high altitude,  rhop = 0
+         if(cosz .le. 0.d0 .or. rhop .eq. 0.)  then
+            s = t/rho           !  length if density is const.
+         else
+            d = rho**2 - 2* rhop *cosz * t
+            s = (rho -sqrt(d) )/ rhop/cosz
+         endif
+
+      
+         if(rhop .ne. 0.) then
+            do i=1,6
+c               get height and cos at s/2 ahead.
+               cosp = cnewcos(Eradius+z, cosz, s/2)
+               zp = cnewh(Eradius+z, cosz, s/2) - Eradius
+c                 write(0,*) " cosp =", cosp, " height at z-s/2*cos=",zp
+c                 once again
+c                s = t/cvh2den(zp)   !  length if density is const.
+c                 cosp = cnewcos(Eradius+z, cosz, s/2)
+c                zp = cnewh(Eradius+z, cosz, s/2) - Eradius
+c
+c               expand rho at zp, and get integrals of f and f^2
+c                 [ -s/2 to s/2] ds
+c
+               rp = zp + Eradius
+               int1 = f1(s/2) - f1(-s/2)
+               int2 = f2(s/2) - f2(-s/2)
+c                  get new s
+               s = (t - cvh2denp(zp)*int1 - cvh2den2p(zp)*int2/2)
+     *                 /  cvh2den(zp) 
+            enddo
+         endif
+         leng = s
+      endif
+      end
+

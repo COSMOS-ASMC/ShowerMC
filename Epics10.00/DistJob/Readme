@@ -1,0 +1,236 @@
+Scripts for running Epics on a group of workstations and collecting  results
+
+Mandatory conditions:
+ 1) "rsh" must be usable without the  password among the workstations.
+
+ 2) At present, the same home must be seen from those workstations.
+    The machine architecture should be the same (or an apparent 
+    one binary file can run on different machines as in NEXTSTEP
+    binaries on Intel, HP, SUN, Motorola).
+
+    The host which collects the results may not satisfy this condition. 
+
+ 3) gwak should be seen. (If the scripts act strange, you should suspect
+    your awk is not gawk).
+
+ 4) For the script "distjob", tcsh must be recognized as 
+    /usr/local/bin/tcsh (if the path is different, change the
+    first line of DistJob/bin/distjob).  csh will fail to process
+    the line such as   
+        set xx=$x:s/,//
+    so that 'distjob" must be run under tcsh. 
+
+Preparation
+  1) Prepare .rhosts so that you can login to the workstations by using
+     rsh without the password.
+  2) Compile echoErr.c in DistJob and make echoErr in DistJob/bin:
+	cc -o echoErr echoErr.c
+  3) Edit DistJob/Template/HostList and put all the host names of the
+     workstations that are usable. (You may put currently broken
+     or not installed stations which may become usable in near future).
+
+--------The above procedure may be done only once----------
+
+  4) Copy Template to a new directory (in DistJob) of which name represents
+     your job. (Let it be MyJob, for instance).
+  5) Make an Epics executable (=sepics) and related files needed for job
+     execution.  The standard place for that would be some directory under
+     UserHook.
+     You MUST BE VERY CAREFUL about the file/directory names: They must
+     be expressed in the absolute full path (Digital UNIX fortran; Absoft
+     Fortran). In some system (Solaris, HP), the relative path notation
+     such as ../Data/xxxx may be used.  
+   Such files are:
+     epicsfile, detconfig and sepicsfile in FisrtInput.
+     MediaDir in epicsfile
+     TraceDir in epicsfile
+     Primaryfile in sepicsfile.
+     Other files you may give in your hook routine.
+  6) Go to DistJob and do the following:
+      source addpath
+     so that DistJob/bin can be put into the command search path.
+     You may give the equivalent one in your .cshrc
+  7) Move to MyJob. Then, issue 
+      getalive > alive
+     (alive may be an appropriate file name).
+     This script will create currently alive host list in "alive"
+     The file name HostList is fixed.
+  8) Edit config in MyJob. (config here is different from the detector
+     configuration, but the one for the distributed job); To show it
+     clearly, execConfig and detConfig may be used sometimes.
+     The first field (column) is used to judge the content; if a #
+     is put in  the head of each line then the line is regarded as
+     a comment.
+  
+       The path to a file described in the config should be the absolute path
+     although you can use ~ to express your home.
+
+     alive: specify the file made at 6).  This need not be absolute, but
+           you may simply give the file name in the current folder.
+     paramOut:  The parameter files used by sepcics are duplicated and
+            saved in $paramOut/$host/, where $host is the host name on 
+            which the job runs.
+        The files are saved under the following names:
+		 input; FirstInput.
+		 epics; epicsfile
+                 detConfig:config file for the detector
+	         execConfig: config file for distjob.
+    	         primary: file to show the primary data
+		 sepics:  file for sepics in whcih number of events etc
+                          are given.
+                 error:  output for stderr.
+	datadir and datafile: These two determine where the main output
+                 is put.  Normally, you may give a directory in /tmp or
+                 in you home. If the specified directories are missing,
+                 they are automatically created. The data will be 
+                 stored in  $datadir/host/$datafile
+	pipe1:  If you want to put some pipe operations you may specify
+                here . For example,  
+                     | gzip
+                It can be more complex as
+                     | awk 'NF != 10 {print}' | gzip
+	append: If you want to append the ouput data to the existing data
+		put yes.
+
+	--------------the following  is for data collection ---------
+	collector:  The host name where you want to collect the data.
+               Generally this may be in  a different domain than the
+               ones used for sepcis run.  In such a case, you must
+               give a sufficient domian name. If different user names are
+               used in both domains, then
+                  -l john
+	       must be added to show the user name 'john'.
+	meida:  Speicify that the data is collected on a hard disk or
+               8mm tape.
+	       If a tape, the device may be specified  by, e.g,
+                   /dev/nrst25
+               If a hard disk, ./foo/datadir,  /Work/datadir etc
+               must be given.  ~ cannot be used here, but ./ can
+               be used to express your home.
+               This must be a directory.
+
+	obs:  The block size (bytes) for tape output.
+	minsize;If the main data size is less than this bytes, all
+              data (including parameter files) are not collected.
+	consecutive: Used when media is a hard disk. 
+             If yes, all the data is stored consecutively. The file
+	     name will be 
+                $media/$datafile.
+	epics: Give 0 or 1.  If 1, epcisfile is collected.
+                     In the case of disk: $media/epics
+	detconfig: Give 0 or 1. If 1 detConfig is collected.
+                     In the case of disk: $media/detConfig
+	primary	: Give  0 or 1. If 1 primary file is collected.
+                     In the case of disk: $media/primary
+	execconfig: Give 0 or 1. If 1 config for distjob is collected.
+                     In the case of disk: $media/exeConfig
+	sepcis:  Give  0, 1 or 2. If 1 or 2, sepcisfile is collected.
+                 In the case of disk:
+      		  1 -->   $media/sepics
+		  2 -->   $media/$host/sepics
+		(speicsfile will contain different random number seeds
+                 for different hosts).
+
+	        main data will be stored in
+			consecutive yes==> $media/$datafile
+	                           no ===>$media/$host/$datafile
+	In the case of tape,  output  sequence will be
+		execConfig | epics | detConfig | primary |
+		sepics | main data | (sepics) | main data |
+		(sepics) | main data ...
+             Note: if, for example, execconfig is 0, the corresponding    
+	        output will be omitted. If sepics is 2, (sepcis) shown
+                above will be put.  | indicates a file mark.
+
+	pipe2:  main output will be piped before it is put.
+                For example,
+                | gzip
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+How to use the scripts.
+
+In MyJob, issue
+
+     distjob config
+     ^^^^^^^^^^^^^^
+
+In what follows, "config" is the file created for distjob as above.
+The sepics job will start running on all hosts specified in "alive".
+
+If you want to specify some of the hosts given in "alive", issue
+
+     distjob config host1 host2 ...
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you want to kill the running jobs, issue
+
+
+     killjob config  [hosthost ...]
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 
+
+optional [host ...] will select the hosts in "alive".  If the
+optional host is not listed in "alive', it is disregarded even
+if the host really exists in the domain.  [host ...] in the
+following examples has the same meaning.
+
+To remove a data disk file in each host
+ ($datafile in $datadir/$host/$datafile)
+
+     rmfile  config  [host...]
+     ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To remove the path itself ($datadir)
+
+
+     rmpath config [host ...]
+     ^^^^^^^^^^^^^^^^^^^^^^^^
+
+
+To see the currently running jobs,
+
+     seerunjob config  [host ...]
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To see the data file size,
+
+
+     seesize  config  [host ..]
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To do the both of the above,
+
+     how   config  [host..]
+     ^^^^^^^^^^^^^^^^^^^^^^
+
+
+To see the stderr output (By this, you can verify that the
+job has started / terminated normally etc).
+
+
+     logh  config  [host..]    to see the head of stderr output
+     ^^^^^^^^^^^^^^^^^^^^^^
+
+     logt  config  [host..]    t see the tail of stderr output.
+     ^^^^^^^^^^^^^^^^^^^^^^ 
+
+To collect all the data,
+
+     collect  config  [host ...]
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To see the head of the data file on each host (-n is the
+option to the head command)
+
+     seehead  config  [-n] [host ..]
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+To see the tail of the data file on each host (-n is the
+option to the tail command)
+
+     seetail  config  [-n] [host ...]
+     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Other commands (kesu, seeifdead, myps, myping, echoErr) are
+used internally.
+
+

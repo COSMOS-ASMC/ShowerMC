@@ -1,0 +1,14 @@
+modification in EPOS	
+1)  epos-bas-3700.f
+ a)     common  HIPARNT for HIJING collides with the same
+     one in JAM (size is different) so it is comment out.
+ b)  HINT1 in that common  is used 3 times.--> comment out
+
+
+In  epos-sem-lhc-v3400.f
+3 varialbs are undefined and not used( coefxu1 etc)
+so they are commentout
+
+
+2)  eposlibList can be made by  getLibterm.sh
+    This is used to remove .o files from libcosmos.a

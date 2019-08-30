@@ -1,0 +1,6 @@
+	1MeV 0.01MeV 1e6 events
+      A           B          C
+real 0m0.114s   0m0.233s   0m0.216s
+user 0m0.095s   0m0.182s   0m0.191s
+sys  0m0.007s   0m0.009s   0m0.008s
+

@@ -1,0 +1,297 @@
+include  $(EPICSTOP)/site.config
+
+EXTHDRS	      = $(LIBLOFTINC)/Zep3Vec.h \
+		$(EPICSINC)/Zcnfig.h \
+		$(EPICSINC)/ZsepManager.h \
+		$(EPICSINC)/ZepTrackv.h \
+		$(LIBLOFTINC)/ZepTrackp.h  \
+		$(COSMOSINC)/Zcode.h  \
+		$(COSMOSINC)/Zptcl.h
+ 
+#		$(LIBLOFTINC)/Zmedia.h \
+
+HDRS	      =
+
+
+MAKEFILE      = Makefile
+
+OBJS	      =	epLightParamRead.o \
+		epLightchkE.o \
+		epLightCountDE.o  \
+		epLightUnpackCountDE.o  \
+		epLightGetCountDE.o \
+		epLightManipInp.o \
+		epLighti1ev.o \
+		epLightProc.o \
+		epLightPreUserde.o \
+		epLightStoreEdepo.o \
+		epLightNewComp.o \
+		epSetEmin.o  \
+		epLightScintiOnFly.o \
+		epLightScintiFromCell.o \
+		epLightwl2N.o \
+		epLightCerenkov.o \
+		epLightAtBndry.o \
+		epLightBox.o \
+		epLightOctagon.o \
+		epLightCyl.o \
+		epLightEcyl.o \
+		epLightE2wl.o \
+		epLightAtPop.o \
+		epLightAtSensor.o \
+		epLightStack.o \
+		epLightPushCells.o \
+		epLightWriteCPath.o \
+		epLightPC.o \
+		epLightPipe.o \
+		epLightPrism.o \
+		epLightNoOfSurf.o \
+		epLightAlloc.o \
+		epLightCrossSelfBoudary.o \
+		epLightCrossMatreshka.o \
+		epLightCrossPContainer.o \
+		epLightSeeNextComp.o \
+		epLightIO.o \
+		epLightIO2.o \
+		epqLightPreWLS.o \
+		epLightReadAFFile.o
+
+PRINT	      = pr
+
+SHELL	      = /bin/sh
+
+SRCS	      = epLightParamRead.f90  \
+		epLightchkE.f \
+		epLightCountDE.f \
+		epLightUnpackCountDE.f90  \
+		epLightGetCountDE.f90 \
+		epLightManipInp.f90 \
+		epLighti1ev.f90 \
+		epLightProc.f90 \
+		epLightPreUserde.f90 \
+		epLightStoreEdepo.f \
+		epLightNewComp.f \
+		epSetEmin.f \
+		epLightScintiOnFly.f \
+		epLightScintiFromCell.f \
+		epLightwl2N.f90 \
+		epLightCerenkov.f \
+		epLightAtBndry.f \
+		epLightBox.f \
+		epLightOctagon.f \
+		epLightCyl.f \
+		epLightEcyl.f \
+		epLightE2wl.f90 \
+		epLightAtPop.f \
+		epLightAtSensor.f \
+		epLightStack.f \
+		epLightPushCells.f \
+		epLightWriteCPath.f \
+		epLightPC.f \
+		epLightPipe.f \
+		epLightPrism.f \
+		epLightNoOfSurf.f90 \
+		epLightAlloc.f90 \
+		epLightCrossSelfBoudary.f \
+		epLightCrossMatreshka.f \
+		epLightCrossPContainer.f \
+		epLightSeeNextComp.f \
+		epLightIO.f \
+		epLightIO2.f \
+		epLightPreWLS.f \
+		epLightReadAFFile.f90
+
+SYSHDRS	      =
+
+all:
+	make	Checkdir $(LIBRARY) SeeSubDir "TARGET=$@"
+
+clean:
+	@rm -f $(OBJS) core  *~ a.out 
+	make SeeSubDir "TARGET=$@"
+
+veryclean:
+	@rm -f $(OBJS) core  *~ a.out temp*.f temp*.f90
+	make SeeSubDir "TARGET=$@"
+
+clobber:
+	@rm -f $(OBJS) $(LIBRARY) core tags
+	make SeeSubDir "TARGET=$@"
+
+depend:
+	@mkmf -f $(MAKEFILE) ROOT=$(ROOT)
+	make SeeSubDir "TARGET=$@"
+
+echo:
+	@echo $(HDRS) $(SRCS)
+	make SeeSubDir "TARGET=$@"
+
+extract:
+	@ar x $(LIBRARY)
+
+
+index:
+	@ctags -wx $(HDRS) $(SRCS)
+	make SeeSubDir "TARGET=$@"
+
+install:	$(LIBRARY)
+		@echo "****" Installing $(LIBRARY) into $(DEST)
+		$(INSTALL) -f  $(DEST) $(LIBRARY)
+		@echo "****" Installing Template files into $(TEMPLATE)
+		cp -r  $(EPICSTOP)/Data  $(EPICSTOP)/Util \
+		 $(EPICSTOP)/UserHook  $(EPICSTOP)/Scrpt  \
+		 $(EPICSTOP)/Doc        $(TEMPLATE)/
+		cp $(EPICSTOP)/site.config $(TEMPLATE)/
+		@echo "****" Installing header files into $(HEADER)
+		cp -r $(EPICSTOP)/epics  $(HEADER)/
+		@echo "****" Installation ended.
+		@echo "****" Owner and group should be changed by hand
+
+print:
+	@$(PRINT) $(HDRS) $(SRCS)
+	make SeeSubDir "TARGET=$@"
+
+tags:           $(HDRS) $(SRCS)
+	@ctags $(HDRS) $(SRCS)
+	make SeeSubDir "TARGET=$@"
+
+
+Checkdir:
+	@( cd $(EPICSTOP)/lib; if [ ! -d  $(ARCH) ]; then  mkdir $(ARCH); fi)
+
+
+SeeSubDir:
+	@for i in  * \
+	;do   \
+		if [ -d  $$i ] ; then \
+			(cd $$i; \
+			if [ -f Makefile  -a  $$i != Test \
+			-a $$i != Util -a $$i != UC  \
+	                -a $$i != Data  -a $$i != epics \
+	                -a $$i != Obso  -a $$i != TeX \
+	                -a $$i != lib  -a $$i != UserHook \
+	                -a $$i != Scrpt -a $$i != DistJob ] ; then \
+		            $(MAKE) $(TARGET) \
+			;fi) \
+		; fi \
+	done
+
+###
+$(LIBRARY)(epLightCountDE.o): $(EPICSINC)/Zcnfig.h \
+		$(LIBLOFTINC)/ZepTrackp.h \
+		$(EPICSINC)/ZepTrackv.h \
+		$(LIBLOFTINC)/Zep3Vec.h \
+		$(LIBLOFTINC)/Zmedia.h \
+		$(EPICSINC)/ZsepManager.h 
+$(LIBRARY)(epLightPreUserde.o): $(EPICSINC)/Zcnfig.h \
+		$(LIBLOFTINC)/ZepTrackp.h \
+		$(EPICSINC)/ZepTrackv.h \
+		$(EPICSINC)/ZsepManager.h 
+$(LIBRARY)(epLightStoreEdepo.o): $(EPICSINC)/Zcnfig.h \
+		$(LIBLOFTINC)/ZepTrackp.h \
+		$(EPICSINC)/ZepTrackv.h \
+		$(EPICSINC)/ZsepManager.h 
+$(LIBRARY)(epLightProc.o): $(EPICSINC)/Zcnfig.h \
+		$(LIBLOFTINC)/ZepTrackp.h \
+		$(EPICSINC)/ZepTrackv.h 
+$(LIBRARY)(epLightScintiOnFly.o): $(EPICSINC)/ZepTrackv.h   \
+		$(COSMOSINC)/Zcode.h \
+		$(COSMOSINC)/Zptcl.h \
+		$(LIBLOFTINC)/ZepTrackp.h \
+		$(EPICSINC)/Zcnfig.h \
+		$(EPICSINC)/ZsepManager.h
+
+$(LIBRARY)(epLightScintiFromCell.o): $(EPICSINC)/ZepTrackv.h   \
+		$(COSMOSINC)/Zcode.h \
+		$(COSMOSINC)/Zptcl.h \
+		$(LIBLOFTINC)/ZepTrackp.h \
+		$(EPICSINC)/Zcnfig.h \
+		$(EPICSINC)/ZsepManager.h
+
+$(LIBRARY)(epLightCerenkov.o): $(EPICSINC)/ZepTrackv.h   \
+		$(COSMOSINC)/Zcode.h \
+		$(COSMOSINC)/Zptcl.h \
+		$(LIBLOFTINC)/ZepTrackp.h \
+		$(EPICSINC)/Zcnfig.h \
+		$(EPICSINC)/ZsepManager.h
+
+$(LIBRARY)(epLightAtBndry.o): $(EPICSINC)/ZepTrackv.h   \
+		$(LIBLOFTINC)/ZepTrackp.h \
+		$(EPICSINC)/Zcnfig.h \
+		$(LIBLOFTINC)/ZepDirec.h 
+
+
+$(LIBRARY)(epLightNewComp.o): $(EPICSINC)/Zcnfig.h \
+		$(COSMOSINC)/Zcode.h  \
+		$(EPICSINC)/ZepTrackv.h \
+		$(LIBLOFTINC)/ZepTrackp.h 
+
+$(LIBRARY)(epSetEmin.o): $(EPICSINC)/Zcnfig.h \
+		$(EPICSINC)/ZepTrackv.h \
+		$(LIBLOFTINC)/ZepTrackp.h 
+
+$(LIBRARY)(epLightAtPop.o): $(COSMOSINC)/Zcode.h \
+		$(EPICSINC)/ZepTrackv.h 
+
+$(LIBRARY)(epLightStack.o):$(EPICSINC)/ZepTrackv.h \
+		$(LIBLOFTINC)/ZepTrackp.h \
+		$(LIBLOFTINC)/Zep3Vec.h \
+		$(EPICSINC)/Zcnfig.h
+
+$(LIBRARY)(epLightAtSensor.o):	$(EPICSINC)/ZepTrackv.h 
+
+$(LIBRARY)(epLightPC.o):$(EPICSINC)/ZepTrackv.h 
+
+$(LIBRARY)(epLightPipe.o):$(EPICSINC)/ZepTrackv.h \
+			$(LIBLOFTINC)/Zep3Vec.h \
+			$(EPICSINC)/Zcnfig.h \
+			$(LIBLOFTINC)/ZepPos.h
+
+$(LIBRARY)(epLightPrism.o):$(LIBLOFTINC)/Zep3Vec.h \
+			$(EPICSINC)/Zcnfig.h \
+			$(LIBLOFTINC)/ZepPos.h
+
+
+
+
+$(LIBRARY):  \
+	$(LIBRARY)(epLightCountDE.o)  \
+	$(LIBRARY)(epLightParamRead.o) \
+	$(LIBRARY)(epLightchkE.o)  \
+	$(LIBRARY)(epLightUnpackCountDE.o) \
+	$(LIBRARY)(epLightGetCountDE.o) \
+	$(LIBRARY)(epLightManipInp.o) \
+	$(LIBRARY)(epLighti1ev.o) \
+	$(LIBRARY)(epLightProc.o) \
+	$(LIBRARY)(epLightPreUserde.o) \
+	$(LIBRARY)(epLightStoreEdepo.o) \
+	$(LIBRARY)(epLightNewComp.o) \
+	$(LIBRARY)(epSetEmin.o) \
+	$(LIBRARY)(epLightScintiOnFly.o) \
+	$(LIBRARY)(epLightScintiFromCell.o) \
+	$(LIBRARY)(epLightwl2N.o) \
+	$(LIBRARY)(epLightCerenkov.o) \
+	$(LIBRARY)(epLightAtBndry.o) \
+	$(LIBRARY)(epLightBox.o) \
+	$(LIBRARY)(epLightOctagon.o) \
+	$(LIBRARY)(epLightCyl.o) \
+	$(LIBRARY)(epLightEcyl.o) \
+	$(LIBRARY)(epLightE2wl.o) \
+	$(LIBRARY)(epLightAtPop.o) \
+	$(LIBRARY)(epLightAtSensor.o) \
+	$(LIBRARY)(epLightStack.o) \
+	$(LIBRARY)(epLightPushCells.o) \
+	$(LIBRARY)(epLightWriteCPath.o) \
+	$(LIBRARY)(epLightPC.o) \
+	$(LIBRARY)(epLightPipe.o) \
+	$(LIBRARY)(epLightPrism.o) \
+	$(LIBRARY)(epLightNoOfSurf.o) \
+	$(LIBRARY)(epLightAlloc.o) \
+	$(LIBRARY)(epLightCrossSelfBoudary.o) \
+	$(LIBRARY)(epLightCrossMatreshka.o) \
+	$(LIBRARY)(epLightCrossPContainer.o) \
+	$(LIBRARY)(epLightSeeNextComp.o) \
+	$(LIBRARY)(epLightIO.o) \
+	$(LIBRARY)(epLightIO2.o) \
+	$(LIBRARY)(epLightPreWLS.o) \
+	$(LIBRARY)(epLightReadAFFile.o)

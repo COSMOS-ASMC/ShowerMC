@@ -1,0 +1,19 @@
+# ************************************************ 
+#     This table  has been made by using ../../../Data/BaseM/PVC 
+#     with Bremsstrahlung formula: # 1
+#     and  Pair creation  formula: # 2.
+#     2012年  1月 27日 金曜日 18:25:10 JST by  using
+#     version 9.10  
+#     host was yosui-desktop 
+# 
+#name  Format   PVC (Polyvinylchloride, CH2CHCl)
+PVC   2
+#
+#  Elem   rho(g/cm^3)  Gas/Solid(1/0)  refl.index  Birks  c
+    3      1.30           0              0       0 0 0
+#  Z  A  N
+  1   1     2
+  6  12.01  2
+  17 35.48  1
+# (Z/A)   I[eV]  a   k   x0   x1   Cbar   delta0
+0.51201   108.2   0.12438   3.2104   0.1559  2.9415   4.0532   0.00

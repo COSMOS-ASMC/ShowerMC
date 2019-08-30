@@ -1,0 +1,47 @@
+c   
+      program testxs
+      implicit none
+      integer incp, ia, iz
+      integer flag
+      real(8)::EMeV,  sigr, sigel, bmax
+      real(8)::ap, zp, ep  !  Ap Zp Ep
+      real(8)::at, zt
+      integer iargc
+      integer narg, ldat
+      character(20)::in
+
+
+      narg=iargc()
+      if( narg .ne. 5 ) then
+         write(0,*)
+     *    "Enter flag for phits or KK and  proj. (A,Z) and target (A,Z)"
+         write(0,*) ' eg for flag=1 and  n+56Fe:   1  1 0 56 26  '
+         write(0,*) ' flag: 1-->phits LaRC  2-->KK LaRC'
+         stop
+      endif
+      call getarg(1, in, ldat)
+      read(in, *) flag
+      call getarg(2, in, ldat)
+      read(in,*) ap
+      call getarg(3, in, ldat)
+      read(in,*) zp
+      call getarg(4, in, ldat)
+      read(in,*) at
+      call getarg(5, in, ldat)
+      read(in,*) zt
+      write(0,*) 'flag=', flag
+      write(0,*) '(A,Z)p =', ap, zp
+      write(0,*) '(A,Z)t =', at, zt
+
+      EMeV = 0.5
+      do while (EMeV < 1.e4)
+         ep = EMeV* ap
+         if(flag == 1) then
+            call nasa(ap,zp,ep,at,zt,sigr,sigel,bmax)
+         else
+            call  cnXsecNasa(ap,zp,ep,at,zt,sigr,sigel,bmax)
+         endif
+         write(*,'(1p, 4g12.4)') EMeV, sigr, sigel, bmax
+         EMeV = EMeV *10.**0.1
+      enddo
+      end program

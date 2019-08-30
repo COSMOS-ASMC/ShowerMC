@@ -1,0 +1,25 @@
+#
+#  TASC
+#
+
+#inc CnfgDir/tasc-post.cnfg
+#inc CnfgDir/tasc-panel.cnfg
+#inc CnfgDir/tasc-pwo.cnfg
+
+#subd tasc
+1 tasc-toppnl sp 0 0 0 / -21.30 -21.30 0.00
+2 tasc-post1 sp 0 0 0 /  -16.65 -16.65 0.20
+3 tasc-post2 sp 0 0 0 /   16.65 -16.65 0.20
+4 tasc-post3 sp 0 0 0 /   16.65  21.30 0.20
+5 tasc-post4 sp 0 0 0 /  -16.65  16.65 0.20
+#
+6 tasc-sd-pnl1 0 0 0 / -16.65 -21.30 0.20
+7 tasc-sd-pnl1 0 0 0 / -21.30  16.65 0.20    0 -1 0  1 0 0
+8 tasc-sd-pnl2 0 0 0 /  16.65  20.65 0.20   -1 0 0  0 -1 0
+9 tasc-sd-pnl2 0 0 0 /  20.65 -16.65 0.20    0 1 0  -1 0 0
+#
+10 tasc-in sp 0 0 0 / 0 0 0.20
+#
+11 box_w sp 0 0 0 / 0 0 0
+#end tasc
+

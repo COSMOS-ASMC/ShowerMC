@@ -1,0 +1,10 @@
+#name   Format    Brass(C2801P)
+Brass     2
+#
+#  Elem  rho(g/cm^3)    Gas/Solid(1/0)   refl.index Birks C
+2         8.43         0                   0     0 0 0
+#       Z       A       N
+        29      63.546   60
+        30      65.38    40
+#  ⟨Z/A⟩   I[eV]   a       k      x0    x1     Cbar  delta0
+ 0.45738  -100.0  -100.0   -100.0   -100.0 -100.0 -100.0  -100.0

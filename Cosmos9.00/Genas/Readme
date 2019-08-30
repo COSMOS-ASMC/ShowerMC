@@ -1,0 +1,13 @@
+This directory containes a subroutine package of GENAS.  This is to
+use the lateral distritution information supplied by GENAS.
+Also an interface routine with Cosmos is included.
+c        Changes from original GENAS       
+c          delete unused subroutines
+c          rndc --> rndcsng which calls rndc inside
+c          kintp3 ---> kintp3s
+c          k4ptdi --> k4ptdis
+c          kfrge -->  kfrges
+c          kgauss --> kgausss
+c          kmolu --->  modified to use kgetMolierU in Cosmos
+c
+c

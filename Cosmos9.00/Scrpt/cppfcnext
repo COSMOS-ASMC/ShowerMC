@@ -1,0 +1,16 @@
+#!/usr/local/bin/tcsh -f
+#  To invoke cpp and f77 (compile only)
+
+   foreach f ($argv)
+	if (-f $f) then
+		set src=$f:t
+#                             awk is for absoft fortran
+		/lib/cpp -P -C -traditional -I$COSMOSINC $f > ! /tmp/$src; f77  -c -S -C -k -N1 -N33 -N34 -s /tmp/$src
+#		rm /tmp/$src
+	endif	
+  end
+exit (0)
+
+
+
+

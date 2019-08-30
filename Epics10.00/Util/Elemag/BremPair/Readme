@@ -1,0 +1,80 @@
+1) To test brems sampling and compare it with the brems function,
+	make clean
+       ./testBremSamp.sh  media events E1 E2 step [LPMeffect Flpm logx func]
+ where
+	media: such as Fe BGO Air Air*0.1
+	events: # of events (samplings) for each energy
+	E1 E2: kinetic energy of electron; form E1 to at least E2
+	step:  log10 step of energy
+	LPMeffec: t or f for LPM effect; default is t
+  For more details, use the command without arguments.
+        ./testBremSamp.sh 
+
+   You can see gnuplot display for each energy.  The y-axis is prog/r.l 
+	 To see next graph,   click the window.
+	 To make it slide show, you may modify
+	  brems.gp:(pause mouse => pause 2 etc )
+   The command also save png figures in Work/ as brems1.png etc.
+   The size may be changed by modifying brems.gp (see it's last part)
+   **NOTE**
+   If PWO*0.5 type media is spcified, sampling will be done almost
+   safely, but the function drawn together with the sampled
+   histogram is not for that density but for the  original density.
+   
+   
+2) To test pair sampling and compare it with the pair funtion,
+	make clean
+        ./testPairSamp.sh  media events E1 E2 step [LPMeffect func]
+ where
+	media: such as Fe BGO Air ...
+	events: # of events (samplings) for ehac energy
+	E1 E2: kinetic energy of electron; form E1 to at least E2
+	step:  log10 step of energy
+	LPMeffect: t or f for LPM effect; default is t
+	func:  Pair func by Tsai-->1; by Nelson-->2(default is 2)
+   Others are the same as brems case.
+
+   Air*1.5 type specification: same as brems case.
+   
+3)  To draw brems functions for different energies in a page,
+        ./showBremFunc.sh  media func how E1 E2 step [norm
+           LPMeffect Flpm logx xmin linew linet ]
+    For details, use the command without arguments.
+
+4)  To draw pair functions for different energies in a page,
+    ./showPairFunc.sh  media  E1 E2 step [norm func]
+    For details, use the command without arguments.
+
+5) To create a sampling table for a given medium;
+	The basic media file such as Epics/Data/BaseM/Pb
+	must be prepared.
+	Then,
+	make clean
+	./CreateTab basic_media_table output_table_dir
+ where
+	basic_media_table: such as ../../../Data/BaseM/Pb
+	output_table_dir:  such as ../../../Data/Media
+  To test the result, use 1) and 2).
+
+6) To make a sampling table for a given  media without
+   vervose mode (i.e, use only defautl values).
+	make clean
+	./AutoCreateTab basic_media_table output_table_dir
+7) To make a sampling talbe for all media in some directory
+	do e.g,
+	make clean
+	bash (if your shell is not bash)
+
+        ./AutoCreateTab.sh  dir  
+
+         dir:   ouput directory such as /tmp/$USER/Media   
+
+8) To get total x-section (integrated x-section) of
+   Brems (integration of ds/dk from kmin to kmax~1)
+   use 
+       InteBrems.sh
+9) To get total x-section (integrated x-section) of
+   pair creation,  use
+       IntePair.sh
+
+

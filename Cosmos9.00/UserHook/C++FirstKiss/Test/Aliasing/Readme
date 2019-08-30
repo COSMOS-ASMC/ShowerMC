@@ -1,0 +1,11 @@
+ c++ test.cc testf.o `cat ifclib `
+
+Observation;
+
+extern "C" must not be used in common declaration
+
+
+#include in fortran for common inclusion must be
+moved to before the main otherwise the  values in
+the common blocks are not shared with C++ variables.
+

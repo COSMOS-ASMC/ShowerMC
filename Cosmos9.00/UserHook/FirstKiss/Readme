@@ -1,0 +1,93 @@
+2events 
+By  MacGfortran  no opt
+-rw-r--r--  1 kasahara  admin  1694303039  3 24 20:23 traceA
+-rw-r--r--  1 kasahara  admin  1614689466  3 24 21:16 traceB
+
+ output is on display.   
+  real	  5m37.193s
+  user	  5m17.545s
+  sys	  0m13.216s
+output is on HD
+  real	  4m26.518s
+  user	  4m19.124s
+  sys	  0m6.829s
+
+By MacIFort: -O3
+-rw-r--r--  1 kasahara  admin  1615112027  3 24 20:27 traceA
+-rw-r--r--  1 kasahara  admin  1502321299  3 24 20:29 traceB
+ output is on display.   
+real	  4m25.137s
+user	  3m4.481s
+sys	  1m16.900s
+ output is on  HD
+real	  3m57.515s
+user	  2m47.977s
+sys	  1m8.377s
+
+0) If you want to put your userhook (FirstKiss in this case)
+   in some arbitrary place you may do so by moving FirstKiss there.
+   For other userhook routines,  some may not be compiled
+   if they are moved to other places.  In that case,
+   change the first few lines as in the chook.f in FirstKiss/.
+   (i.e,
+  Old hook routine would look like
+   #include "../cmain.f"
+   #include "chookHybAS.f"
+   #include "../ctemplCeren.f"
+  These must be changed to
+   #include "cmain.f"
+   #include "chookHybAS.f"
+   #include "ctemplCeren.f"
+   )
+
+
+1) To make the executable, cosmos${ARCH}
+  make clean
+  make [ -f chook.mk ]
+
+2) If this is successful, then you can run it by
+
+  cosmos{$ARCH} < param
+
+This will show some output on the screen and put particle
+track info (trace) here. (trace1 and trace2).
+
+3) You can display the trace by
+    disptracebygeomv  trace1
+  etc
+  The command above needs geomview be installed (and the command
+  search path  must include $COSMOSTOP/Scrpt)
+  If you don't have geomview,  it's better to install it. Howver
+  you can display the trace by gnuplot.  For this you must goto
+   $COSMOSTOP/Util; "slide" there will work for display.
+
+
+  The format of the output is:
+
+  x y z code KE charge  time
+  x y z code KE charge  time
+  x y z code KE charge  time
+
+  x y z code KE charge  time
+  x y z code KE charge  time
+  x y z code KE charge  time
+  x y z code KE charge  time
+  x y z code KE charge  time
+...
+
+Two blank lines are to separate the segment of lines. 
+Consecutive data lines make one continuos track, though
+it may have zigzag shape.  code is the paticle code.
+1-gamma 2-electron 3-mu  4-pi  5-kaon 6-nucleon
+7-neue  8-neumu
+For further code definition, see $COSMOSTOP/cosmos/Zcode.h
+
+=============================
+In normal ran, you should put Trace=0
+To give random number seeds randomly, you must
+give a negative value to the 2nd of InitRN like:
+
+ InitRN = 1324008381  -1973133071
+
+
+

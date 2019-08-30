@@ -1,0 +1,120 @@
+c     ****************************************************************
+c     *                                                              *
+c     * dpdedxe:  gives -de/dx  (gev/(g/cm2) of   e-/e+
+c     *                                                              *
+c   Ala Messel & Crawfort.
+c       This gives very good results for Si detector results by
+c       Bak et al. (electrons single peak for Si 0.0032cm to 0.104cm)
+c       BUT, the cascade shower transitions are too small.
+c
+c
+c
+      subroutine epdedxe(sh,  aPtcl, dedt)
+      implicit none
+#include "Zstern.h"
+#include "Zptcl.h"
+#include "Zmass.h"
+
+      include "ZdEdxSpec.h"
+
+      record /sternh/sh    !  input. Sternheimer's consts
+      record /ptcl/ aPtcl  !  input. a Particle (e- or e+) 
+      real*8  dedt ! output.  dE/dt GeV/(g/cm^2)
+
+      real*8 emass
+      real*8 E, gi, Beta2, x, cb, g, T, eta, F, eps, y
+      real*8 dltx, wm, wlg
+
+
+      real*8 bbbeta2, lindbeta2, truebeta2
+      real*8 bbbeta, lindbeta
+      real*8 logbbbeta, loglindbeta
+      real*8 a, b, c, xx, gra
+      parameter (bbbeta = 0.1d0,  lindbeta = 0.01d0, gra=4.0d0/3.d0)
+      parameter (bbbeta2 = bbbeta**2, lindbeta2=lindbeta**2)
+      parameter (logbbbeta =-2.302585093E+00,
+     *           loglindbeta = -4.605170186E+00)
+      parameter (a = (1.+gra)/2.d0/(logbbbeta-loglindbeta),
+     *           b = 2*a*loglindbeta + 1.) 
+c
+
+      parameter (emass = masele*1000.d0)
+
+
+c       Energy, mass=emass  in MeV unit
+      E = aPtcl.fm.p(4)*1000.d0
+      g = E/emass
+      gi= 1.0d0/g
+      truebeta2= 1. - gi**2
+      if(truebeta2 .lt. bbbeta2) then
+         Beta2 = bbbeta2
+         wm = emass*Beta2/2
+         g = (1.+Beta2/2)
+         E = emass*g
+      else
+         Beta2 = truebeta2
+         wm=E- emass
+      endif
+c       x=log10(p/mc)
+      x=log10( g**2 - 1. ) / 2
+      cb=-sh.c
+c       define dltx = 4.605x - dlt
+      if(x .lt. sh.x0) then
+         dltx=4.605*x
+      elseif(x .lt. sh.x1) then
+         dltx=cb - (sh.x1-x)**3 * sh.sa
+      else
+         dltx=cb
+      endif
+
+
+      T = g -1.0
+      if(aPtcl.charge .eq. -1) then
+         eta = min(sh.w0/emass, T/2.0)
+         F = eta/(T-eta) + eta**2/g/g/2.0 +
+     *        (1.0+ (2*T+1)/g/g) * log((T-eta)/T)
+c////////////
+c            write(*,*) ' eta=',eta, ' T=',T, ' g=',g, ' w0=',sh.w0
+c///////////////
+         dedt=sh.a/Beta2 * (sh.b + log(emass*eta)+ F - Beta2 + dltx)
+      else
+         eta = min(sh.w0/emass, T)
+         eps = eta/T
+         y = 1.0/(g+1.0)
+         F = Beta2*( 12*(2.0-y*y)*eps 
+     *        - 6.0*(3.0 - 6.0*y+y*y - 2.0*y**3)*eps**2
+     *        + 4.0*(2.0 - 10.0*y + 16.0*y*y - 8.0*y*y*y )*eps**3 
+     *        -3*(1.0-6.0*y - 12.0*y*y -8.0*y**3)*eps**4)/12.0
+c////////////
+c            write(*,*) ' eta=',eta, ' T=',T, ' g=',g, ' w0=',sh.w0
+c///////////////
+         
+         dedt=sh.a/Beta2 *
+     *      ( sh.b + log(emass*eta)+ F +0.69315 -Beta2 + dltx)
+      endif
+
+      Tupper = eta*emass*1000.  ! in GeV. used in Urban
+
+      if(truebeta2 .lt. bbbeta2) then
+         c = log(dedt) + ( a* logbbbeta - b )*logbbbeta
+         if( truebeta2 .gt.  lindbeta2) then
+            xx = log( truebeta2 )/2.
+            dedt =exp( (-a*xx + b)*xx + c)
+         else
+            dedt = exp( (-a*loglindbeta + b)* loglindbeta + c) *
+     *           sqrt(truebeta2)/lindbeta
+         endif
+      endif
+c///////////////
+c      write(23,*) sngl( aPtcl.fm.p(4)  - aPtcl.mass), sngl(dedt),
+c     *      sngl(sqrt(truebeta2)), aPtcl.code, aPtcl.charge
+c
+c///////////////
+c          convert it to gev/(g/cm2)
+       dedt=dedt *1.d-3
+
+       end
+
+
+
+

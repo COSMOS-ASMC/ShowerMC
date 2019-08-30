@@ -1,0 +1,145 @@
+#!/bin/csh -f
+#      to creat sampling table for brems and pair creation
+# To make tables for all basic media in ../../../Data/BaseM 
+# use next at bash
+#   ./AutoCreateTab.sh  dir 
+# dir is to store created files.
+#
+if( $#argv != 2 ) then
+	echo "Usage: AutoCreateTab basic_media_table output_table_dir"
+	exit 1
+endif
+if( ! -f $1 )  then
+	echo $1 not exists
+	exit 1
+endif
+if( ! -d $2 ) then
+	echo directory $2 not exists
+	exit 1
+endif
+set dir_of_media=$1:h
+if( x$dir_of_media == x$2 ) then
+	echo The sampling table must be saved in a different
+        echo directory than the one in which  basic media exists
+	exit 1
+endif
+set lastname=$1:t
+
+echo "*********************************************************"
+echo "*                                                       *"
+echo "*  Creating a table for random sampling proccess        *"
+echo "*  of Bremsstralhung and pair creation.                 *"
+echo "*  You have the following choice                        *"
+echo "*  For Pair creation                                    *"
+echo "*     1) Tsai's formula   ***RECOMENDED***              *"
+echo "*     2) Nelson's formula                               *"
+echo "*     3) Formula used by Messel and Crawford with       *"
+echo "*        low energy correction                          *"
+echo "*  For Bremsstrahlung                                   *"
+echo "*     1) Tsai's formula                                 *"
+echo "*     2)                                                *"
+echo "*     3) Formula used by Messel and Crawford with       *"
+echo "*        low energy correction (also in Summary by      *"
+echo "*        Koh and Motz)                                  *"
+echo "*     -------------------------------------------       *"
+# echo -n "push return"
+#     set wait=$<
+echo "*                                                       *"
+echo "*  Note: At energies below 100 MeV, Seltzer & Berger's  *"
+echo "*        data is always used for bremsstrahlung.        *"
+echo "*        At energies below  8 MeV, Bethe-Heitler's      *"
+echo "*        original pair creation formula is modified     *"
+echo "*        and employed always for pair creation.         *"
+echo "*        At high energies (say, >100 MeV for Pb), the   *"
+echo "*        LPM effect is always taken into account        *"
+echo "*        using a sampling table created here.           *"
+echo "*        At very high energies, the LMP effect is       *"
+echo "*        managed by a rejection sampling method.        *"
+echo "*     -------------------------------------------       *"
+echo "*                                                       *"
+#  echo -n "push return"
+#    set wait=$<
+echo "*  For the difference among different formulas, see the *"
+echo "*  manual and some postscript figures.                  *"
+echo "*  Generally the difference is very small; some clear   *"
+echo "*  difference is seen in Nelson's formlua from the      *"
+echo "*  others for low Z and high Z materials.               *"
+echo " "
+echo  For Bremsstrahlung, you must choose
+echo "  1) Tsai's formula  "  
+echo     or
+echo "  3) Formula used by Messel and Crawford "
+echo "Enter 1) or 3)."
+echo " "
+     set brems=1
+echo "Your choice is" $brems
+     if( x$brems == x1 ||  x$brems == x3) then
+	echo " "
+     else
+	echo "It's invalid"
+	exit 1
+     endif		
+echo "For Pair creation, you must choose"
+echo " 1) Tsai's formula (RECOMENDED)"
+echo "  or"
+echo " 2) Nelson's formula "
+echo "  or"
+echo " 3) Messel & Crawford formula"
+echo " "
+echo "Enter 1,2, or 3"
+    set pair=1
+echo "Your choise is" $pair
+	if(x$pair == x1 || x$pair == x2 || x$pair == x3) then
+	   echo " "
+        else		
+	   echo "It's invalid"
+	   exit 1
+        endif
+
+#     put remark at the top; which cross-sections, date, by whom
+#    set  user=`finger | awk 'NR==2 {print $2, $3}'`
+    set  version=`epicsvn`
+    set  hostname=`hostname`
+    echo "# ************************************************ " > $2/$lastname
+    echo "#     This table  has been made by using $1 " >> $2/$lastname
+    echo "#     with Bremsstrahlung formula: # $brems"   >>$2/$lastname
+    echo "#     and  Pair creation  formula: # $pair."   >>$2/$lastname
+    echo "#     `date` by $USER using"                   >>$2/$lastname
+    echo "#     version $version  "                   >>$2/$lastname
+    echo "#     host was $hostname "                   >>$2/$lastname
+    echo "# "                                   >>$2/$lastname
+
+#     first make a copy of the basic media table
+
+cat  $1 >>  $2/$lastname
+
+make  -f  CreBrTab$brems.mk
+set how=-1
+if(-f brem$brems.out) then
+ echo $how  $1 |  ./brem$brems.out  >> $2/$lastname
+else	
+    echo "executable brem$brems.out not yet made"
+    exit 1
+endif
+
+
+
+
+make -f CrePrTab$pair.mk
+
+
+if(-f pair$pair.out) then
+   echo $1 | ./pair$pair.out  >> $2/$lastname
+else
+    echo "executable pair$pair not yet made"
+    exit 1
+endif
+
+cd ../XCOM
+./AutoCreateXCOMTab.csh  $1 $2
+#       protect
+#  chmod a-w $2/$lastname
+#   making tab for muons
+cd ../../Mu/MkTab
+./AutoCreatemuTab  $1 $2
+

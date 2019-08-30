@@ -1,0 +1,10 @@
+#name   Format    Silicon
+Si 	2
+#
+#  Elem	 rho(g/cm^3)	Gas/Solid(1/0)  refl.index   Birks C
+
+1         2.33		0                0          0 0 0
+# 	Z	A  	N
+	14	28.09	1
+#  ⟨Z/A⟩   I[eV]   a       k      x0    x1     Cbar  delta0
+0.4984	173.0  0.1492  3.2546  0.2015  2.8716  4.4355 0.14

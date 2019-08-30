@@ -1,0 +1,15 @@
+
+F77=gfortran ./configure --prefix=/home/myhome/
+
+or write the following in your .bashrc
+
+export F77="gfortran"
+export FFLAGS="-O3 -g"
+
+
+
+ aclocal
+ automake -a
+ autoconf
+ libtoolize
+

@@ -1,0 +1,27 @@
+#!/usr/local/bin/tcsh -f
+#   This is used to copy template files into users
+#   cosmos top directory.
+#   command should be issued from the top directory
+#   like  /usr/local/lib/cosmos/template/Scrpt/cptempl
+#
+#         get /usr/local/lib/cosmos/template/
+	set tmdir=$0:h:s/Scrpt//
+#	echo $tmdir
+	cp -r $tmdir/Data  ./
+	echo  " Data/ has been copied"
+#	cp -r $tmdir/Doc  ./
+#	echo  " Doc/ has been copied"
+	cp -r $tmdir/UserHook ./
+	echo  " UserHook/ has been copied"
+	cp -r $tmdir/Util ./
+	echo  " Util/ has been copied"
+	cp -r $tmdir/Scrpt ./
+	echo " Scrpt/  has been copied"
+	cp  $tmdir/site.config ./
+	echo  " site.config has been copied"
+	echo  " set up ended"
+ 
+
+
+
+

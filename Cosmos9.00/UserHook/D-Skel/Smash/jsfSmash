@@ -1,0 +1,16 @@
+jobclass=qb32s
+nodes=1
+inputfile=/dev/null
+outputfile=/dev/null
+errorfile=/bghome/sctasim/kasahara/Cosmos/UserHook/D-Skel/Smash/err
+workingdir=/bghome/sctasim/kasahara/Work
+executable=/bghome/sctasim/kasahara/Cosmos/UserHook/D-Skel/Smash/smashSkelKEKB
+environment="COSMOSTOP=/bghome/sctasim/kasahara/Cosmos";"NCPU=320";"MCPU=32";"MARGIN=0";"SKELETON=/bghome/sctasim/kasahara/Cosmos/UserHook/D-Skel/Smash/Skeleton";"SMSKELDIR=/bghome/sctasim/kasahara/Cosmos/UserHook/D-Skel/FleshHist/SmSkelDir";"SKELNAME=Skeleton";"HOSTLIST=/bghome/sctasim/kasahara/Cosmos/UserHook/D-Skel/Hosts";"THINHOSTLIST=/bghome/sctasim/kasahara/Cosmos/UserHook/D-Skel/ThinHosts"
+mode=co
+connection=mesh
+#mapfile=xxx
+
+
+
+
+

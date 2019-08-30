@@ -1,0 +1,176 @@
+      subroutine epCreMuNTab(mediain, cnst)
+      implicit none
+#include "Zmedia.h"
+#include "Zmass.h"
+#include "ZmuBPNgene.h"
+
+c     *                                                             
+c     *       create sampling table for nuclear interaction
+c     *       of muons 
+c
+      record /media/mediain  !  media
+      record /SmpCnst/ cnst  ! must be media.cnst
+c
+      integer ws, ws1, ws2
+      parameter (ws = 3000, ws1=500, ws2=500)
+      real*8 work(ws1, ws2),
+     * work1(ws),  work2(ws),  work3(ws), work4(ws)
+c        cp mediain into common area
+      media = mediain
+      call epwtmuNCnst(cnst)
+
+c            total x-sec.
+      if( cnst.muNTXT .gt. mxMuNTX) then
+         call cerrorMsg(
+     *     'too large total X-sec.table for mu nuc int', 0)
+      endif
+      call epCreMuNTXT(
+     *       cnst, work1, work2,  work3, work4, cnst.muNTXT)
+
+c           sampling table 
+      if( cnst.muNUsize * cnst.muNEsize .gt. mxMuNTbl ) then
+         call cerrorMsg('Too large Mu N-int table requested', 0)
+      endif
+      call  epCreMuN(cnst, work, cnst.muNUsize, cnst.muNEsize)
+
+      end
+
+c     ****************************************
+      subroutine epCreMuNTXT(
+     *       cnst, erg,  txs, tdEdx0, tdEdxt, size)
+c     ****************************************
+      implicit none
+#include "Zglobalc.h"
+#include "ZbasicCnst.h"
+#include "Zmedia.h"
+#include "Zmass.h"
+#include "ZmuBPNgene.h"
+
+
+      record /SmpCnst/ cnst  ! must be media.cnst
+      integer size
+      real*8  txs(size), erg(size), tdEdx0(size), tdEdxt(size)
+
+      real*8  xmax, xmin,  de, tprob
+      character*160 msg
+      integer i
+
+      real*8  dEdx0,  dEdxt
+
+
+
+      write(msg,*) ' Matter=', media.name,
+     *  ': Computing the total Xsec of Mu Nuclear Int. from E= ',
+     *    cnst.muNEmin, ' GeV'
+      call cerrorMsg(msg, 1)
+      Emu = cnst.muNEmin
+      de = 10.d0**cnst.muNdETX
+
+
+
+      do   i=1, size
+         xmin = max ( media.cnst.muNVmin, masrho/Emu)
+         xmax = 1.d0 - masmu/Emu
+         call eptotcmuN(xmin, xmax, tprob)
+         if(xmin .le. masrho/Emu) then
+            dEdx0 = 0.
+         else
+            call epmuElossN(masrho/Emu, xmin, dEdx0)
+         endif
+c          total loss
+         call epmuElossN(masrho/Emu, xmax, dEdxt)
+
+
+         erg(i) = Emu
+         txs(i) =tprob * media.mbtoPX0 ! prob/X0
+c            dE/dx(v<vmin)/Emu
+         tdEdx0(i) = dEdx0 * media.mbtoPgrm !  /(g/cm^2)
+c            dE/dx/(all v)/Emu
+         tdEdxt(i) = dEdxt * media.mbtoPgrm !  /(g/cm^2)
+
+         Emu = Emu * de
+      enddo
+      write(msg, *) 'Table has been made up to  Emu=',
+     *       Emu/de,' GeV'
+      call cerrorMsg(msg, 1)
+      write(msg, *) 'Muon Nuc. Int. total X-sec. table upto E=',
+     *     Emu/de,' GeV'
+      call epwt1dTbl(msg, erg, txs, size, media.name)
+
+      msg= 'dE/dx(v<vmin)/Emu by muon Nuc. int'
+      call epwt1dTbl(msg, erg, tdEdx0, size, media.name)
+
+      msg= 'dE/dx(v<vmax)/Emu by muon Nuc. int'
+      call epwt1dTbl(msg, erg, tdEdxt, size, media.name)
+      end
+
+c     **********************************************
+      subroutine epCreMuN(cnst, tbl, sizeu,  sizee)
+      implicit none
+#include "Zmedia.h"
+#include "Zmass.h"
+#include "ZmuBPNgene.h"
+
+      record /SmpCnst/ cnst  ! must be media.cnst
+      integer sizeu, sizee 
+      real*8  tbl(sizeu,  sizee)
+
+      real*8 de, vmin,   tcn,  tcnx,  v, dv, vmax
+      integer nvmax
+      parameter (nvmax=1000)
+      real*8 uv(nvmax), va(nvmax)
+
+
+      character*160 msg
+      integer i, j
+
+
+      de = 10.d0**cnst.muNdE
+
+      Emu = cnst.muNEmin    
+
+      write(msg, *)
+     *  ' Creating Mu Nuc. Int. sampling table  E>=',
+     *    cnst.muNEmin
+      call cerrorMsg(msg, 1)
+
+      dv = log10(1.000001d0/cnst.muNVmin)/(sizeu-1)
+
+      do  i = 1, sizee
+         vmax=1.d0 -  masmu/Emu
+         vmin = max(cnst.muNVmin,  masrho/Emu)
+         call eptotcmuN(vmin, vmax, tcn)
+         v = cnst.muNVmin
+         va(1) = log10(v)
+         uv(1) = 0.
+         do  j = 2, sizeu-1
+            v = v * dv
+            va(j) =log10(v)
+            if(v .le. vmin) then
+               uv(j) = 0.
+            elseif(v .ge. vmax) then
+               uv(j) = 1.0
+            else
+               call eptotcmuN(vmin, v, tcnx)
+               uv(j) = min(tcnx/tcn, 1.d0)
+            endif
+         enddo
+         va(sizeu) =log10( vmax )
+         uv(sizeu) = 1.0
+
+c        
+c         move v into  tble
+c
+         do  j = 1, sizeu
+            tbl(j, i) = va(j)
+         enddo
+      enddo
+      msg = 'non equistep u for muon nuc. int.  sampling tab'
+      call epwt1dTbl(msg, va, uv, sizeu, media.name)
+
+      call epwt2dTbl(
+     *  'muon nuc. int.  sampling table ',
+     *   tbl, sizeu, sizee)
+      call cerrorMsg('the table has been created', 1)
+
+      end

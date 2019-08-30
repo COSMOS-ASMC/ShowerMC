@@ -1,0 +1,13 @@
+#name   Format    Air; 78 % N, 21 % O  1 % Ar
+Air22 	2
+#   treated as 0.78N2+ 0.21O2+ Ar 
+#  Elem	 rho(g/cm^3)	Gas/Solid(1/0) refl.index               Birks corr.
+#                                     (for gas, (n-1)*10^6)
+
+3         4.440545e-04		  1    293                       0  0  0
+# 	Z	A  	N
+	7	14	1.56
+	8	16	.42
+	18	40	.01
+#  <Z/A>  I[eV]   a       k      x0    x1     Cbar  delta0
+ 0.49919   85.7  0.1091  3.3994  1.7418  4.2759  10.5961 0.00

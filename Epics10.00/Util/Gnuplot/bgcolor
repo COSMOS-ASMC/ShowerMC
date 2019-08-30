@@ -1,0 +1,10 @@
+#  first term must be #.  anoy  comment any data may be placed.
+#  first data of which raw does not start with # will be employed
+#  as color: 
+# lightslategray
+# midnightblue
+# darkblue
+# darkgray
+# darkcyan
+ darkslateblue
+# see:  https://www2.uni-hamburg.de/Wiss/FB/15/Sustainability/schneider/gnuplot/colors.htm

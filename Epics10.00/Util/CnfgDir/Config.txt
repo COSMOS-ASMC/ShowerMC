@@ -1,0 +1,29 @@
+-imcbox.cnfg
+  -chd.cnfg
+  -chd-member.cnfg
+  -pmt-plate.cnfg
+  -imc-w.cnfg
+  -imc-honey.cnfg
+    -chd-subst.cnfg
+    -imc-s2ndupr.cnfg
+    -imc-s2ndlwr.cnfg
+    -imc-s3rdlwr.cnfg
+    -imc-s1stlwr.cnfg
+    -imc-s1stupr.cnfg
+  -imc-scifi.cnfg
+  -imc-scifi2.cnfg
+  -imc-corner.cnfg
+  -imc-top.cnfg
+  -imc-side1.cnfg
+  -imc-side2.cnfg
+  -imc-back.cnfg
+
+
+-tasc.cnfg
+  -imc-panel.cnfg
+  -tasc-post.cnfg
+  -tasc-panel.cnfg
+  -tasc-pwo.cnfg
+
+-imcboxv.cnfg (for viewer)
+

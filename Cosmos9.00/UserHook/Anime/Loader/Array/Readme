@@ -1,0 +1,7 @@
+meshlist.tar.gz  is not used now.  It is created from 
+Epics/UserHook/TibetArray.   The config there can be used
+as Epics input but for Geomview it is not efficient display.
+Coresspondigly, some part of disptarcebygeomv is
+changed (no need to unpack meshlist.tar.gz)
+
+

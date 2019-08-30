@@ -1,0 +1,3 @@
+LIST  { < "./Array/array.inst" } 
+LIST  { < "./Array/ground" } 
+

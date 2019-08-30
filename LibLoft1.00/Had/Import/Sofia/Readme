@@ -1,0 +1,30 @@
+The following COMMONs are the common to sibyll2.1.f 
+(Those with * have  different size; those with o have the same size)
+***But even if the size is the same, Sofia use implicit double precison
+for real variable, while sibyll use single precison
+so the actual size is different.
+
+To avoid double definition with different size,
+
+we change  S_ --> SS_ for the next in Sofia.
+
+o      COMMON /S_CHP/  S_LIFE(49), ICHP(49), ISTR(49), IBAR(49)
+o      COMMON /S_CPSPL/ CCHIK(3,6:14)
+o      COMMON /S_CQDIS/ PPT0 (33),ptflag
+o      COMMON /S_CZDIS/ FA, FB0
+o      COMMON /S_CZDISs/ FAs1, fAs2
+o      COMMON /S_CZLEAD/ CLEAD, FLEAD
+o       COMMON /S_MASS1/ AM(49), AM2(49)
+*      COMMON /S_PLIST1/ LLIST1(2000)
+*       COMMON /S_RUN/ SQS, S, Q2MIN, XMIN, ZMIN, kb, kt, a1, a2, Nproc
+?       COMMON /S_PLIST/ P(2000,5), LLIST(2000), NP, Ideb
+
+
+Sofia uses some of subroutines / functins defined in Sibyll
+To avoid double definition, all Sofia codes is contained inside
+module "modsofia", except for block data which must be
+put outside of module.
+A varialbe "pl" in gamma_h confilict function pl, so
+explicit real(8)::pl is inserted.
+Interface/csofia.f now use "use modsofia"
+

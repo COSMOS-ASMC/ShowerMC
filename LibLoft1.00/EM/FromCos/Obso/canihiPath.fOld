@@ -1,0 +1,106 @@
+c      
+c     implicit none
+c     real*8 e, path, cos1, cos2, e1, e2
+c     integer  i
+c     read(*, *) e
+c     do i =1 , 10000
+c        call canihiPath(e, path)
+c        call canihiEnergy(e, e1, e2)
+c        call canihiAngle(cos1, cos2)
+c        write(*, *) sngl(path), sngl(e1), sngl(e2), sngl(cos1),
+c    *             sngl(cos2)
+c     enddo
+c     end
+c     ****************************************************************
+c     *
+c     * canihiPath: samples e+ annihilaion path in r.l
+c     * canihiEnergy: //      energy of 2 gammas
+c     * canihiAngle: //      angle of  2 gammas
+c     *
+c     ************************ tested 87.02.13 ***********************
+c
+c   /usage/  call canihiPath(e, path)
+c
+c   --input--
+c    e: positron total energy in gev
+c   -- output --
+c path: sampled path in r.l
+c  eg1: produced gamma energy of higher one.
+c  eg2: //                       lower one.
+c
+c cos1: cos of eg1
+c cos2: cos of eg2
+c
+c  **** note ***
+c            before calling canihiEnergy, canihiPath must be called and
+c            befroe calling canihiAngle, canihiEnergy must be called.
+c
+c            constm=.03*z/a*x0inkgpm2
+c
+c            in  $elmag must have been fixed beforehand.
+c
+       subroutine canihiPath(ein, path)
+       implicit none
+       real*8 ein, path
+       real*8 eg1, eg2
+       real*8 eg1i, eg2i, cos1, cos2, sints, sint
+       real*8 tp, g, csc, g2m, srg2m, u, gc, bc, egs
+       real*8 constm/5.475/
+       real*8 emass/.511e-3/
+
+       save  eg1i, eg2i, egs, u
+c
+       g=ein/emass
+       if(g .gt. 1.000001) then
+           if(g .gt. 2.5 .and. g .lt. 25.) then
+c                 approx within 1%
+              csc=(((((0.9382535e-07*g-.8791180e-05)*g+0.3338919e-03)*g
+     *          -.6609205e-02)*g
+     *          +0.7308900e-01)*g-.4516664)*g+ 1.534200
+           elseif(g .lt. 2.5) then
+               g2m=g**2-1.
+               srg2m=sqrt(g2m)
+               csc=( ((g+4.)*g+1.)/g2m * log(g+srg2m) - (g+3.)/srg2m)
+     *         /(g+1.)
+           else
+               csc=1.6* g**(-7./9.)
+           endif
+           tp =csc * constm /2
+           call rndc(u)
+           path=-log(u) / tp
+       else
+           path=1.e-8
+       endif
+       return
+c
+c      ************
+       entry canihiEnergy(ein, eg1, eg2)
+c      ************
+c
+       g=ein/emass
+       gc=sqrt( (g+1.)/2 )
+       bc=sqrt((g-1.)/(g+1.))
+       egs=emass*gc
+       call rndc(u)
+       eg1i=gc*egs*(1.+ bc*u)
+c      eg2=gc*egs*(1.- bc*u)
+       eg2i=max(ein - eg1i+emass, 1.d-4)
+       eg1=eg1i
+       eg2=eg2i
+       return
+c
+c      ************
+       entry canihiAngle(cos1, cos2)
+c      ************
+c
+
+
+       sints=sqrt(1.d0-u**2)
+       sint= egs*sints/eg1i
+       cos1=sqrt(1.d0 - sint**2)
+       sint= egs*sints/eg2i
+       cos2=sqrt(1.d0 - sint**2)
+       if(eg2i .lt. emass) then
+         cos2=-cos2
+       endif
+       end

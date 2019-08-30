@@ -1,0 +1,362 @@
+!  test program is in prog/Light/Test/listAndPointer.f90
+!  see to of the test prog.
+
+!      call epiniIdentify
+!      call epinsertItem(id, comp)
+!      .....
+!      call epid2cnList(id, pcomp, n)
+!      call epcn2idList(cn, ids, n)
+!  When config data is read, cn2idList and id2cnList are made
+!  to be available. The use may access only these two pointer
+!  arrays. 
+!           cn2idList(i)
+!           i          cn id(:)                                nid
+!           1           5 TT33                                 1  
+!           2          22 S1          trigger     layer1       3
+!           3          23 S2                                   1     
+!           4          34 S1          layer1                   2
+!           5          66 TT33                                 1
+!           6          90 S1                                   1
+! -----------------------------------------
+!          id2cnList(i)
+!           i id                    cn(:)                         ncn
+!           1 S1                    22          34          90     3
+!           2 S2                    23                             1
+!           3 TT33                   5          66                 2
+!           4 layer1                22          34                 2
+!           5 trigger               22                             1
+!
+!  
+module  epidentify
+  integer,parameter::idlen=12
+  type idlist
+     !id may be such as  layer1 trigger S1 S2 pmt APD1 pd22 anti
+     
+         ! sideanti scifix1 scifiy2 trigscintiA trigscinitB
+         !  
+     character(len=idlen)   :: id
+     integer             :: compNO
+     type(idlist), pointer :: next
+  end type idlist
+  type(idlist), pointer :: entrance, new, p
+  type(idlist), pointer :: entrancecn,  newcn, pcn
+  type cnVsId
+     integer::cn    ! comp. #
+     integer::nid   ! # of id's belonging to this copm.
+     character(len=idlen),pointer::id(:) !  : = 1, nid
+  end type cnVsId
+
+  type idVsCn
+     character(len=idlen),pointer::id  ! id
+     integer::ncn                      ! # of cn belonging to this id
+     integer,pointer::cn(:)            ! : = 1, ncn
+  end type idVsCn
+
+  character(len=idlen),pointer::allid(:)
+  integer,pointer::allcn(:)
+
+  type(idVsCn),pointer::id2cnList(:)
+  integer :: id2cnListSize      !  size of id2cnList
+
+  type(cnVsId),pointer::cn2idList(:)
+  integer :: cn2idListSize
+
+contains
+
+subroutine epinsertItem(id, comp)
+  implicit  none
+  character(len=idlen),intent(in)::id
+  integer,intent(in)::comp  ! component # associated to the id
+
+  allocate(new)
+
+  p => entrance
+  do while( associated(p%next))            
+     if( id  < p%next%id ) exit       
+!     if( comp < p%next%compNo ) exit       
+     p => p%next
+  end do
+  new = idlist(id, comp, p%next)         
+  p%next => new                        
+!   entrance  next0    next1    next2
+!     ??       apd          pd      S1
+!     ??        20          12        3  
+!   next0     next1       next2    null
+!-------------
+!   if (id,comp)=(aa,15);  exit with p=entrance.  new=(aa, 15,next0)
+!                                               entrance%next=new
+!   
+!   if (id,comp)=(b,17);   exit with p=next0.  new=(aa, 15,next1)
+!   if (id,comp)=(S2,24);  exit with p=null.  new=(S2, 24, null)
+
+  allocate(newcn)   ! for cn sorted
+
+  pcn => entrancecn
+  do while( associated(pcn%next))            
+     if( comp < pcn%next%compNo ) exit       
+     pcn => pcn%next
+  end do
+  newcn = idlist(id, comp, pcn%next)         
+  pcn%next => newcn                        
+
+end subroutine epinsertItem
+
+subroutine epiniIdentify
+  implicit none
+  allocate(entrance)
+  nullify(entrance%next)   
+
+  allocate(entrancecn)
+  nullify(entrancecn%next)   
+end subroutine epiniIdentify
+
+!     count # of components with given id
+!     and return the # and component list
+subroutine epid2cnList(id, pcomp, n)
+  implicit none
+  character(len=idlen),intent(in)::id
+  integer,intent(out), pointer::pcomp(:)   ! comp # list
+  integer,intent(out):: n           !  # of comp.
+!    how many list with give ID
+  n = 0
+  p => entrance%next
+  do while( associated(p) )     
+     if(p%id == id) then
+        n = n + 1
+     endif
+     p => p%next
+  end do
+
+!      allocate pcomp
+  if(n> 0) then
+     allocate( pcomp(1:n) )  
+     n = 0
+     p => entrance%next
+     do while( associated(p) )     
+        if(p%id == id) then
+           n = n + 1
+           pcomp(n) = p%compNo
+        endif
+        p => p%next
+     end do
+  endif
+end subroutine epid2cnList
+!     count # of ID with given comp#
+!     and return the # and ID list
+subroutine epcn2idList(cn, ids, n)
+  implicit none
+  integer,intent(in):: cn  ! comp. #
+  character(len=idlen),intent(out), pointer::ids(:)   ! id list
+  integer,intent(out):: n           !  # of id's
+
+  n = 0
+  pcn => entrancecn%next
+  do while( associated(pcn) )     
+     if(pcn%compNo == cn) then
+        n = n + 1
+     endif
+     pcn => pcn%next
+  end do
+
+!      allocate ids
+  if(n> 0) then
+     allocate( ids(1:n) )
+     n = 0
+     pcn => entrancecn%next
+     do while( associated(pcn) )     
+        if(pcn%compNo == cn) then
+           n = n + 1
+           ids(n) = pcn%id
+        endif
+        pcn => pcn%next
+     end do
+  endif
+end subroutine epcn2idList
+
+subroutine epgetAllid(m)
+  implicit none
+  integer,intent(out):: m  ! possible  max number
+  m = 0
+  if(.not. associated(allid)) then
+     p => entrance%next
+     do while( associated(p) )     
+        m = m + 1
+        p => p%next
+     end do
+     allocate( allid(m) )
+
+     m = 0
+     p => entrance%next
+     do while( associated(p) )     
+        m = m + 1
+        allid(m) = p%id
+!     write(0,*) ' allid(m)=', allid(m)
+        p => p%next
+     end do
+  else
+     m = size(allid)
+  endif
+end subroutine epgetAllid
+
+subroutine epgetAllcn(m)
+  implicit none
+  integer,intent(out):: m  ! possible  max number
+  m = 0
+  if(.not. associated(allcn)) then
+     pcn => entrancecn%next
+     do while( associated(pcn) )     
+        m = m + 1
+        pcn => pcn%next
+     end do
+     allocate( allcn(m) )
+
+     m = 0
+     pcn => entrancecn%next
+     do while( associated(pcn) )     
+        m = m + 1
+        allcn(m) = pcn%compNo
+!     write(0,*) ' allcn(m)=', allcn(m)
+        pcn => pcn%next
+     end do
+  else
+     m = size(allcn)
+  endif
+end subroutine epgetAllcn
+
+!   get list of ID
+subroutine epgetIdList(pid, n)
+  implicit none
+  character(len=idlen),intent(out), pointer::pid(:)   
+  integer,intent(out):: n           !  # of diff. id's 
+!    how many diff. id
+
+  character(len=idlen),pointer::idx
+  integer:: m, i
+  !        a a b b b c d e e f 
+  
+  call epgetAllid(m)
+  
+  if( m > 0 ) then
+     n = 1
+     i = n+1
+     idx => allid(n)
+     do while (i <= m )
+        if( idx /= allid(i) ) then
+           n = n + 1
+           idx => allid(i)
+           allid(n) = idx
+        endif
+        i = i + 1
+     enddo
+  else
+     n= 0
+  endif
+
+
+  if(n> 0) then
+     allocate( pid(1:n) )
+     pid(1:n) = allid(1:n)
+     deallocate( allid )
+     allocate( allid(1:n) )
+     allid(:) =  pid(:)
+  endif
+end subroutine epgetIdList
+
+!   get list of cn
+subroutine epgetCnList(pcn, n)
+  implicit none
+  integer,intent(out), pointer::pcn(:)   
+  integer,intent(out):: n           !  # of diff. cn's
+!    how many diff. cn
+
+  integer,pointer::idx
+  integer:: m, i
+  !        a a b b b c d e e f 
+  
+  call epgetAllcn(m)
+
+  if( m > 0 ) then
+     n = 1
+     i = n+1
+     idx => allcn(n)
+     do while (i <= m )
+        if( idx /= allcn(i) ) then
+           n = n + 1
+           idx => allcn(i)
+           allcn(n) = idx
+        endif
+        i = i + 1
+     enddo
+  else
+     n= 0
+  endif
+
+
+  if(n> 0) then
+     allocate( pcn(1:n) )
+     pcn(1:n) = allcn(1:n)
+     deallocate( allcn )
+     allocate( allcn(1:n) )
+     allcn(:)=pcn(:)
+  endif
+end subroutine epgetCnList
+
+
+subroutine epgetIdVsCn
+  implicit none
+!   get all ID list and cn's for each of the ID
+!   id2cnList(i)%id    id
+!   id2cnList(i)%ncn   # of cn with this id
+!   id2cnList(i)%cn(j). j = 1, ncn
+!   i=1,n (n= id2cnListSize)
+
+
+  character(len=idlen),pointer::pid(:)
+  integer:: m, i
+  integer,pointer:: cns(:)         ! cn list
+
+  integer::n 
+
+  call epgetIdList(pid, n)  
+
+  allocate(id2cnList(1:n))
+  do i = 1, n
+     call epid2cnList(pid(i), cns, m)
+     allocate(id2cnList(i)%cn(1:m))
+     id2cnList(i)%id => pid(i)
+     id2cnList(i)%ncn = m
+     id2cnList(i)%cn(:) = cns(:)
+  enddo
+  id2cnListSize = n
+end subroutine epgetIdVsCn
+
+subroutine epgetNoVsId
+  implicit none
+!   get all comp. # list and id's for each of the comp.
+!   cn2idList(i)%cn      comp. # 
+!   cn2idList(i)%nid    # of id's
+!   cn2idList(i)%id(j). j = 1, nid, i=1,n (n=cn2idListSize)
+
+
+  integer :: n           !  # of diff. cn's
+
+
+  integer,pointer::pcn(:)
+  integer:: m, i
+  character(len=idlen), pointer::ids(:)   ! id list  
+
+  call epgetCnList(pcn, n)  
+
+  allocate(cn2idList(1:n))
+  do i = 1, n
+     call epcn2idList(pcn(i), ids, m)
+     allocate(cn2idList(i)%id(1:m))
+     cn2idList(i)%cn=pcn(i)
+     cn2idList(i)%nid = m
+     cn2idList(i)%id(:) = ids(:)
+  enddo
+  cn2idListSize = n
+end subroutine epgetNoVsId
+
+
+end module epidentify

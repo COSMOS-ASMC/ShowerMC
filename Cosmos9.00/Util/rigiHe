@@ -1,0 +1,33 @@
+#
+# The next is an example of a complex composition at low energy
+#  This is a plausble example.  The unit of flux is
+#   /(m2 sec sr Gev)
+#  proton data upto 100 GeV is by BESS
+#-----------------------------------------------------------
+  'iso 3 2'  'GeV'    'rig'  'd'      0   /
+	1.0	50
+	1.5	40
+	2.	26
+	3.	12
+	5.	4.8
+	10.	1.
+	20.	.2
+	50.	.02
+	100.	3.7e-3
+	200.	5.e-4
+        400.    7.7e-5   
+        2.e3    9.98e-7
+        20.e3   1.99e-9
+       200.e3  3.97e-12
+       400.e3   6.1e-13
+       800.e3  8.46e-14
+      8000.e3   8.46e-17
+      8.e8      5.3e-23
+         0        0
+
+
+
+
+
+
+

@@ -1,0 +1,42 @@
+#!/bin/tcsh -f
+
+set colormap = ./colormap
+
+
+if( $#argv > 0 &&  "$1" == "-h" ) then
+        echo " "
+	echo "Usage: dispconfigbygeomv [-e|-a|-h][-s][-i] [outdir config1 config2 ...]"
+        echo "where"
+        echo " -h to display this message as you see now."
+        echo " -e to display config  by each component base."
+        echo " -a to display all-in-one " 
+        echo "    If -e  or -a is not given, only level 0~1 components are displayed"
+	echo " -s skip drawing some planer surface (for fpolygon; since"
+        echo "    if the surface is concave angle, geomview fails"
+	echo "    to draw it correctly (alpha!=1 will save the problem)"
+        echo " -i to  display color index (correspondence betw media vs color)."
+	echo " outdir is the output directory (default /tmp/$USER/Work)"
+	echo " config* are config file such as config.Pb "
+	echo "    made by drawconfig in Util. Default is /tmp/$USER/Work/config.*"
+	echo "    xx of config.xx must be a media name"
+        echo " "
+	exit 0
+endif
+
+source ./convconfig   $argv
+
+
+if( $dispcolormap == "yes" ) then
+	$GEOMVIEW  $outdir/mediatext   &
+endif
+
+ 
+$GEOMVIEW  `find $outdir -name '*.list' -print `
+
+
+
+
+
+
+
+

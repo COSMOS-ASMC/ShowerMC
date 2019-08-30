@@ -1,0 +1,18 @@
+       block data epblkemg
+#include  "Zepdef.h"
+#include  "Zepprm.h"
+#include  "Zelmag.h"
+          data amass(kelec)/.511e-3/, amass(kgamma)/0./,
+     *         amass(kpion)/pimass/, amass(kmuon)/amumas/,
+     *         amass(kkon)/akmass/, amass(knuc)/anmass/,
+     *         amass(kneue)/0./, amass(kneumu)/0./
+
+c                    -- for $elmag --
+      data    scorec/.true./,  lcorec/.true./,  escb/10./, 
+     *    Es/20.e-3/,
+     *    escp/10./,   emass/0.511e-3/, IncGp/0/, emass2/1.022e-3/,
+     *    Molier/.true./, usees/.false./, x0/1./
+
+c        x0 may be needed when 1st pos. is on space; it is used move
+c        ptcl in space.
+       end

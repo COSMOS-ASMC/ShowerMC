@@ -1,0 +1,49 @@
+1) make -f Moller.mk will create a.out
+  ./a.out > output
+  will create a table of 
+    prob, Eep, (Er-masele)/(Ee-masele), cose, cosr, path
+    prob is xs /r.l
+    Eep  is energy of e after scat.
+    (Er-..)/(Ee ..);  kinetic energy ratio of incident and knock on
+    cose:  scattered e's cos
+    cosr:  knock-on  e's cos
+    path: sampled random path length in r.l
+2) make -f Moller2.mk will create a.out
+    ./a.out > output
+    will create a table of 
+     v,  func, func*media.sh.a/((g-1)*masele)/beta^2
+　where
+    v = Er/Ee (in K.E). Ee is fixed
+    func= ds/dv in some unit
+   func*...  ds/dv in unit of /(g/cm2)
+
+3) make -f Bhabha.mk will create a.out
+   ./a.out  > output
+ will create a table like 1)
+
+4) make -f Bhabha2.mk will create a.out
+   ./a.out > output
+   will create a table, similar to 2) but
+   func and func2 appear
+    v,  func, func2,  func*media.sh.a/((g-1)*masele)/(1.-1./g/g),
+            func2*media.sh.a/((g-1)*masele)/(1.-1./g/g)
+
+   func is popular in many literature
+   func2 is not so but by  Rohrlich & Carlso,  
+            Phys.Rev.vol.93, No.1 (1954) p.38 
+   They look different, but numerically give the same results.
+5) make -f Moller3.mk
+   ./a.out > ofile
+ table  is   
+ w, prob, tx, txg
+
+   where 
+    w is Tcut (GeV)
+    prob: /r.l
+    tx:  xs in some unit
+    txg:  xs /r.l (should be the same as prob).
+
+6) make -f Bhabha3.mk
+   same as Moller3.mk  for electron
+
+	    

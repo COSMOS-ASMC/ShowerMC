@@ -1,0 +1,150 @@
+JAM:update note
+
+  jam1.136   Sep. 18 2009
+bug fix: when maxium impact parameter is greater than 90, it was automatically
+set min. bias collision, which means that the input value of bmax was
+changed inside the code. In this version, this option was eliminated.
+
+  jam1.135   Sep. 18 2009
+  bug fix: beam particle k0, kbar0, n0, pi0, xi0 did not work.
+
+  jam1.134   Sep. 14 2009
+  bug fix: when one use targ='207:112', one got error.
+
+  jam1.133   Aug. 11 2009
+  bug fix: when one wanted to do pA collision, input did not work correctly.
+
+  jam1.132   Mar. 14 2008
+  change gfort.f for gcc4.3
+
+  jam1.13   Oct. 14 2007
+  add gfortran.f for gcc4.
+change jam.f because it did not work with gcc4
+
+  jam1.11   Jan. 21 2007
+bug fix for kaon weak decay after simulation.
+
+  jam1.10   Jan. 19 2007
+   bug fix
+o mstc(42) works.
+o additive quark cross section for meson-meson.
+
+  jam1.09   Jul. 19 2005
+  o bug fix by A. Ohnishi (taken from jam version jam1.02h-HK.).
+Anisotropic resonance decay routine (jamrdec in jamdec.f) is modified
+to avoid artificial generation of v2.
+o bug fix in jamana.f at subroutine jamfile.
+
+
+jam1.08   Apr. 9 2005
+bug fix for mstc(61)=0: option for isotrophic resonance decay
+was not isotropic for delta baryons.
+
+jam1.07   Apr. 4 2005
+bug fix pointed out by A. Ohnishi(Hokudai)
+fnkick() fnkick2()
+
+jam1.06   Oct. 21 2004
+bug fix: mstc(42)=0 option (weak decay after simulation) works now.
+
+jam1.015   Oct. 11 2004
+all pythia subroutine, function and commonblock names are changed.
+
+jam1.014   Oct. 10 2004
+o fname(8) is now used to specify the directory of the output files.
+o some common blcok names and functions which conflict with
+the pythia program have been changed. I will change all subroutine
+names later.
+
+jam1.012   Sep. 16 2003
+ bug fix pointed out by T.Tabaru(RIKEN)
+ for the generation of soft pt kick.  pt kick was generated
+ randomly from the prepared tables, but it was not smooth enough.
+
+jam1.011.00   Jul. 17 2003
+  bug fix in subroutine jamwidm in jamdec.f
+  after version 1.009.28  pointed by Ryotaro Muto (Kyoto)
+  decays were forbiden when resonance pole mass is less than the sum
+  of daughter particles in the case of momentum dependent decay width.
+  For example, a0/f0 -> KK channels.
+
+jam1.010.01   Feb. 23 2002
+bug fix in jamsoft.f, jamhard.f,jamhij.f  pointed out by Tsuguchika TABARU
+  <The result has not been changed in this bug.>
+ The information which contains in indd() was wrong. So one gets
+wrong information in each string decay in the case that one of decay
+products is anit-baryon.  In the case of hard scattering, this
+bug is still not removed. If one wants to know the information
+for each collision and decay, please ignore partons in the
+information. 
+jamhij.f
+    call jamerrm(30,'(hifun:) This number already used'//code)
+--> call jamerrm(30,0,'(hifun:) This number already used'//code)
+
+jam1.010.00   Jan. 04 2002
+bug fix in jamdec.f pointed out by Tsuguchika TABARU
+      totwid1   = totwid / paru(3)
+-->
+      totwid   = totwid / paru(3)
+(older version < jam1.009.24 is ok)
+
+jam1.009.29   Jan. 10 2001
+ bug fix  in jamhij.f at entry vegas2(fxn,avgi,sd,chi2a)
+
+7     continue
+        xi(nd,j)=one
+ --->
+        xi(nd,j)=one
+7     continue
+ 
+
+jam1.009.28   Aug. 31 2000
+ 1. add dummy subroutine jamanaus to be able to analyze something
+    at each collision and decay by users.
+
+jam1.009.27   Apr. 21 2000
+ 1. update particle data: short lived particles do not decay as a default.
+ 2. slight modification of code to handle option 'user'.
+    To know how to use the option frame="user", main program of main_blz.f
+    and mainu.f would be useful.
+ 3. update jam.tex to explain how to use frame='user'.
+
+jam1.009.26   Apr. 2000
+ 1.  Add new option 'user' for input variable frame.  This allows for user
+     specified phase space data for the initial condition of cascading.
+     If frame='user', you have to fill the following common bock.
+      common/jamevnt1/r(5,mxv),p(5,mxv),v(5,mxv),k(11,mxv)
+      common/jamevnt2/nv,nbary,nmeson
+      common/jamjet1/vq(10,mxv),kq(2,mxv)
+
+ 2.  add function  'jamflav' that gives baron number or flavour content
+      of particles.
+ 3.  bug fix: no effect on random number seed when input file is used
+
+
+o jam1009k
+
+11/19, 1999
+1)
+subr. jamcross  (jamcross.f)
+c....Calculate resonance cross sections.
+        emrf=0d0   <---- add
+        if(srt.le.3.0d0)
+     $    call jamxbw2(srt,pr,kf1,kf2,kc1,kc2,iz1,iz2,sigres,emrf,msel)
+
+2)
+ subr. cputime (g77.f, unix.f, sun.f)
+     save  cptime1
+->   save  stime,cptime1
+
+subr.jamcmbs1 (jamcross.f)
+3)      sigr=0d0  added
+
+
+o 1009j: Correct mistakes in jamcmps(jam.f) (Nov.5, 1999).
+           in order to be able to use input file on g77 compiler.
+
+o 1009i: Correct mistakes in JAM manual (Oct.25, 1999).
+
+
+

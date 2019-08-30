@@ -1,0 +1,41 @@
+Although version # is 1.141, changes in 1.142 have been adapted.
+
+pdfset--> pjpdfset    (confilict with dpmjet3)
+structm--> pjstructm  (// )
+ifrkfc--> ifrkfcpj  (conflict with Fritiof)
+
+ln -s $LIBLOFT/Had/Import/Jam/src/jam1.inc jam1.inc
+ln -s $LIBLOFT/Had/Import/Jam/src/jam2.inc jam2.inc
+
+include jam1.inc -->  #include "jam1.inc"
+include jam2.inc -->  #include "jam1.inc"
+in jamcoll.f
+   comment out 'call jamanacl(2)'  (3 points)
+in jamhij.f
+   parton ---> jmparton (4 points)
+
+
+1) $LIBLOFT/Had/Import/Jam is linked to jamxxx/src/
+2) gfortran.f is modifed:
+   time calculation part dose nothing.
+   random number part is changed to call rndc
+3) The file names are changed to avoid 
+   confilict  with NewFritiof:  
+   pyjet.f   -> jampyjet.f
+   pysigh.f  -> jampysigh.f
+   pythia.f  -> jampythia.f
+4) vnibook.f is not used so it was moved to
+   Test/
+5) Makefile is constructed following the one 
+   in Gheisha.  jamdat.f is not included in
+   Makefile. 
+6) jam1.inc and jam2.inc are put in Cosmos/cosmos
+   (the same one must remain here)
+7) jamdat.f is copied to Cosmos/cosmos/
+   and "include" statment in it (2 parts),
+   are modified as:
+   #include "jam1.inc"
+   #include "jam2.inc"
+   This is for enabling  block data statement.
+   See next
+8) For block data treatment, see Test/ReadmyKK

@@ -1,0 +1,55 @@
+#   This is trial for making the thickness 0.836X0
+#   For that we must use +1.20183 instead of +1.2  in ciecone z shift part (2nd line)
+#   but we used 1.2.  if +1.20183, we must correct offset2 (and offset ?)
+-------------------------------
+#eq  ornew 11.5 
+#eq  offset 40.8
+#eq  pantsL  50
+#eq  sideL   48
+#eq  offset2 42           ! offset+1.2
+#news  new-1  ciecone
+#news  new-2  ccyl
+## #eq   teta 55.3201716532636950773d0
+#eq   teta 55.32017
+## #eq   pi2Mteta 304.679828346736304923d0
+#eq   pi2Mteta 304.6798
+##   #eq   piMteta  124.679828346736304923d0
+#eq   piMteta  124.6798
+## #eq   piPteta  235.320171653263695077d0
+#eq   piPteta  235.3201
+#subd   pants
+1  pipe     Cu  0 0 0 / 0   0   0 11.0  ornew  offset
+2  ciecone  Cu  0 0 0 / 4.0 0 +1.2  7.03  7.03  pantsL  4  3.1  piPteta  piMteta / 3 4
+3  ciecone  hollow  0 0 0 / =  =  offset  7.03  7.03 pantsL  4  3.1  piPteta pIMteta
+4  cyl      hollow  0 0 0 / 8  0   + 3.1 1.2
+#   side wall part
+5 ccyl Cu 0 0 0 / 0 0 offset  ornew  sideL 314.08 45.92 / 2
+
+#    counter part
+6  ciecone  Cu  0 0 0 / -4  0 offset2 7.03  7.03 pantsL -4.0 3.1  teta pi2Mteta / 7 8
+7  ciecone  hollow 0 0 0 / = = offset 7.03  7.03 pantsL  -4.0  3.1 teta pi2Mteta
+8 cyl  hollow  0 0 0 / -8  0 + 3.1 1.2
+#      side wall
+9  ccyl Cu 0 0 0 / 0 0 offset ornew sideL  134.08 225.92/ 6
+10  cyl Cu 0 0 0 / 0 0 =  ornew 1.2 / 3 7
+#11 cyl  sp 0 0 0 0 / 0 0 0 16.2635 92 / 1 2 3 5 6 7 9 10
+11 cyl_w  sp 0 0 0 0 / 0 0 0 16.2635 92 /  2 3 6  7 
+#end  pants
+#   5 and 9 cotains 2 and 6 but not completely
+#   2 and 6 contains 3 and 7 but not compelely
+#   so they must be contained other larger volume which is
+#   11. It  is normally world but it explicitly specifies
+#   the size and what it contains (If it were a world,
+#   the present system will miss 2 3 6 7, since they are
+#   misunderstood as being contained by the world via 5,9
+#   (and via 2 and 6).
+#   In future system, specification for cotainment of such
+#   component should be written as 
+#   by  / *2, / *3,   / *6   etc
+#   so that world will not miss to contain them.
+
+1  pants  sp   0 0 0 / 0 0 0 
+2  sphere_w  sp  0 0 0 / 0 0  0
+-------------------------------
+
+2  box_w  sp  0 0 0 / 0 0  0

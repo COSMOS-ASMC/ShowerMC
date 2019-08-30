@@ -1,0 +1,6 @@
+#  to get specified event by ev=xx
+NF > 0 && $7 == ev {aev=1; print }
+NF > 0 && $7 != ev && aev == 1 {exit}
+NF == 0 {print}
+
+ 

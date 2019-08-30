@@ -1,0 +1,130 @@
+This is pTeX, Version 3.141592-p3.1.10 (utf8) (Web2C 7.5.4) (format=platex-euc 2006.12.25)  28 SEP 2009 16:21
+**jam.tex
+(./jam.tex
+pLaTeX2e <2006/01/04>+0 (based on LaTeX2e <2003/12/01> patch level 0)
+(/usr/local/share/texmf/tex/latex/base/article.cls
+Document Class: article 2001/04/21 v1.4e Standard LaTeX document class
+(/usr/local/share/texmf/tex/latex/base/size10.clo
+File: size10.clo 2001/04/21 v1.4e Standard LaTeX file (size option)
+)
+\c@part=\count81
+\c@section=\count82
+\c@subsection=\count83
+\c@subsubsection=\count84
+\c@paragraph=\count85
+\c@subparagraph=\count86
+\c@figure=\count87
+\c@table=\count88
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen118
+)
+\c@enumct=\count89
+\captivewidth=\skip43
+\tablinsep=\skip44
+\halfpagewid=\skip45
+ (./jam.aux)
+\openout1 = `jam.aux'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 202.
+LaTeX Font Info:    ... okay on input line 202.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 202.
+LaTeX Font Info:    ... okay on input line 202.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 202.
+LaTeX Font Info:    ... okay on input line 202.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 202.
+LaTeX Font Info:    ... okay on input line 202.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 202.
+LaTeX Font Info:    ... okay on input line 202.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 202.
+LaTeX Font Info:    ... okay on input line 202.
+LaTeX Font Info:    Checking defaults for JY1/mc/m/n on input line 202.
+LaTeX Font Info:    ... okay on input line 202.
+LaTeX Font Info:    Checking defaults for JT1/mc/m/n on input line 202.
+LaTeX Font Info:    ... okay on input line 202.
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <17.28> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 224.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <17.28> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 224.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <12> on input line 224.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <8> on input line 224.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <6> on input line 224.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <5> on input line 224.
+
+
+LaTeX Font Warning: Font shape `JT1/mc/m/it' undefined
+(Font)              using `JT1/mc/m/n' instead on input line 224.
+
+
+LaTeX Font Warning: Font shape `JY1/mc/m/it' undefined
+(Font)              using `JY1/mc/m/n' instead on input line 224.
+
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <9> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 226.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <9> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 226.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <9> on input line 233.
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <14.4> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 249.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <14.4> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 249.
+
+LaTeX Font Warning: Font shape `JT1/gt/m/it' undefined
+(Font)              using `JT1/gt/m/n' instead on input line 251.
+
+
+LaTeX Font Warning: Font shape `JY1/gt/m/it' undefined
+(Font)              using `JY1/gt/m/n' instead on input line 251.
+
+[1
+
+]
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <12> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 328.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <12> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 328.
+LaTeX Font Info:    External font `cmex10' loaded for size
+(Font)              <7> on input line 354.
+ [2] [3] [4] [5] [6] [7]
+LaTeX Font Info:    Font shape `JT1/mc/bx/n' in size <10> not available
+(Font)              Font shape `JT1/gt/m/n' tried instead on input line 1106.
+LaTeX Font Info:    Font shape `JY1/mc/bx/n' in size <10> not available
+(Font)              Font shape `JY1/gt/m/n' tried instead on input line 1106.
+ [8] [9] [10] [11] [12] [13] [14] [15] [16] [17]
+[18] [19] [20] [21]
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 2555
+.
+ (/usr/local/share/texmf/tex/latex/base/omscmr.fd
+File: omscmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 2555.
+
+ [22]
+[23] [24] [25] [26] [27] [28] [29] [30]
+Underfull \hbox (badness 10000) in paragraph at lines 3356--3358
+[]\OT1/cmr/m/n/10 Koji Ni-ita, the graphic soft-ware \OT1/cmr/m/it/10 an-gel \O
+T1/cmr/m/n/10 can be ob-tained from the re-quest on e-mail: \OT1/cmr/m/it/10 ni
+-
+ []
+
+[31] [32] (./jam.aux)
+
+LaTeX Font Warning: Some font shapes were not available, defaults substituted.
+
+ ) 
+Here is how much of TeX's memory you used:
+ 486 strings out of 94689
+ 4551 string characters out of 1170012
+ 130337 words of memory out of 1000000
+ 3812 multiletter control sequences out of 10000+50000
+ 20643 words of font info for 79 fonts, out of 500000 for 2000
+ 566 hyphenation exceptions out of 1000
+ 30i,11n,19p,194b,425s stack positions out of 1500i,500n,5000p,200000b,5000s
+
+Output written on jam.dvi (32 pages, 176196 bytes).

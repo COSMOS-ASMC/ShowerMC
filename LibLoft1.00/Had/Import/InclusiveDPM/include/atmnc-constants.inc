@@ -1,0 +1,5 @@
+      parameter (Rearth = 6378.140d3)
+      parameter (pi = 3.14159265358979324d0)
+      parameter (deg2rad = pi/180)
+      parameter (rad2deg = 180.d0/pi)
+      parameter (c = 2.99792458d8)

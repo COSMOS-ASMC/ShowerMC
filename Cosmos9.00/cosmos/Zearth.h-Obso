@@ -1,0 +1,11 @@
+!         earth defining parameter
+       real*8 Eradius,     !  radius in m
+     *        Eecen2,      !  squared of the ecentricity 
+     *        Eone_ecen2,  !  1 - ecen2
+     *        Maxheight,   !  max height with some air. m
+     *        Minheight    !  min height without soil. m   
+
+!
+       parameter (Eradius = 6378136.0d0, Eecen2= 0.006694470d0,
+     *       Eone_ecen2 = 1.d0 - Eecen2, Maxheight=220.d3, 
+     *       Minheight = -500.d0)

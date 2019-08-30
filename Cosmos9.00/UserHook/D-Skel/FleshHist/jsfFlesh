@@ -1,0 +1,10 @@
+jobclass=qb32a
+inputfile=/dev/null
+outputfile=/dev/null
+errorfile=/bghome/sctasim/kasahara/Cosmos/UserHook/D-Skel/FleshHist/ErrDir/err
+workingdir=/bghome/sctasim/kasahara/Work
+executable=/bghome/sctasim/kasahara/Cosmos/UserHook/D-Skel/FleshHist/fleshKEKB
+environment="COSMOSTOP=/bghome/sctasim/kasahara/Cosmos";"HOST=bg";"HISTDEP=29/";"INDIVDEP=13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34/";"OUTPUT=f,f";"BINW=2";"OUTDIR=/bgwork0/sctasim/kasahara/FDD1";"EXECID=qgsjet2p17cos1.0";"NCPU=320";"MCPU=32";"MARGIN=0";"SMSKELDIR=/bghome/sctasim/kasahara/Cosmos/UserHook/D-Skel/FleshHist/SmSkelDir";"HOSTLIST=/bghome/sctasim/kasahara/Cosmos/UserHook/D-Skel/Hosts";"THINHOSTLIST=/bghome/sctasim/kasahara/Cosmos/UserHook/D-Skel/ThinHosts";"SeeLowdE=no";"KeepWeight=no";"LIMIT=20000,20000,20000,15000";"PARAMPATH=/bghome/sctasim/kasahara/Cosmos/UserHook/D-Skel/FleshHist/Sparam"
+mode=co
+connection=mesh
+#mapfile=xxx

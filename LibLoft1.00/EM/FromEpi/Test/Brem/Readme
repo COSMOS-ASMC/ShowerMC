@@ -1,0 +1,36 @@
+cat inptemp 
+     ev#    B  Ek1MeV    t for output   (Eg MeV)
+    1000000 2  1  Eg  t /
+for Eg in `echo 0.001 0.01 0.1 0.2 0.5 0.8 0.9 0.95 0.98` ; do   cat /tmp/1-$Eg-B.dat | histo 0 0.002 1e6 > 1-$Eg-B.hist; done
+
+for Eg in `echo 0.001 0.01 0.1 0.2 0.5 0.8 0.9 0.95 0.98` ; do   cat /tmp/1-$Eg-B.dat | histo 0 0.002 1e6 > 1-$Eg-B.hist; done
+
+
+cat inptemp
+  1000000 3  0.5   Eg  t /
+
+or Eg in `echo 0.001 0.01 0.1 0.2 0.4 0.45 0.48` ; do     sed -e s/Eg/$Eg/
+inptemp > inp;        ./testBrem < inp > /tmp/0.5-$Eg-C.dat;     done
+
+for Eg in `echo 0.001 0.01 0.1 0.2 0.4 0.45 0.48` ; do    cat  /tmp/0.5-$Eg-A.dat | histo 0 0.002 1e6 > 0.5-$Eg-A.hist;
+> done
+
+
+
+
+inptemp 1000000 3  0.2   Eg  t /
+
+for Eg in `echo 0.001 0.01 0.1 0.15 0.18 0.19 0.195` ; do     sed -e s/Eg/$Eg/  inptemp > inp;  ./testBrem < inp > /tmp/0.2-$Eg-B.dat;     done
+
+
+
+
+Tsai: Model C.   Ek > 0.4 MeV needed.
+
+for Eg in `echo 0.001 0.01 0.05 0.08 0.09 0.095` ; do     sed -e s/Eg/$Eg/  inptemp > inp;  ./testBrem < inp > /tmp/0.1-$Eg-B.dat;     done
+
+
+for Eg in `echo 0.001 0.01 0.1 0.5 0.6 0.65 0.68` ; do     sed -e s/Eg/$Eg/  inptemp > inp;  ./testBrem < inp > /tmp/0.7-$Eg-C.dat;     done
+
+
+for Eg in `echo 0.001 0.01 0.1 1  1.5 1.9 1.98` ; do     sed -e s/Eg/$Eg/  inptemp > inp;  ./testBrem < inp > /tmp/2-$Eg-C.dat;     done

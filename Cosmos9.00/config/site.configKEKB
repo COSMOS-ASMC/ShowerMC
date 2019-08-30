@@ -1,0 +1,73 @@
+ARCH          = KEKB
+
+#  for nomal archiver option
+ARCHVOPT       = -rv 
+AR = /usr/bin/ar             #archiver:  for HP. f option works by native archiver
+
+#LDFLAGS       =    -qhot	# non-HP
+LDFLAGS       =	 -qarch=440d -qtune=440  -L/bgl/BlueLight/ppcfloor/bglsys/lib -lkek.rts -lbgl_perfctr.rts -lmpich.rts -lmsglayer.rts -lrts.rts -ldevices.rts 
+# non-HP
+
+LD            = blrts_xlf90        # sun4 etc
+#LD	= fort77              # HP9000
+#  for #directive 
+DFLAGS        = -D$(ARCH)
+INCHEADER     = -I$(COSMOSINC) -I/bgl/BlueLight/ppcfloor/bglsys/include/
+
+FFLAGS       =  $(DFLAGS) $(INCHEADER)		#  non-HP
+CFLAGS       =  $(DFLAGS) 
+
+FC	= $(COSMOSTOP)/Scrpt/cppFCKEKB	#   IBM
+################probably you need not change until next '##########' line
+#
+LIBLOC        = $(COSMOSTOP)/lib/$(ARCH)
+LIBNAME       = cosmos
+CLIBNAME       = lib$(LIBNAME).a
+
+LIBRARY	      = $(LIBLOC)/$(CLIBNAME)
+
+INSTALL	      = /etc/install
+
+
+
+##########################################################
+#  Following is used only when 'make install' and when creating 
+#  a complete executable "cosmos"  (DEST is used in the latter case)
+#  After make install, you may need to execute ranlib
+#  chmod, chwon, in some system.
+#############################################make install spec.
+#    where to copy the library.  
+#    if DEST directory not exist, you must make it by hand
+#    before 'make install'
+
+#DEST          = /usr/local/lib/$(ARCH)
+DEST	= $(LIBLOC)
+#DEST          = /tmp/$(ARCH)
+
+
+#   where to copy  header files by 'make install'
+#   if the directory not exist, you must make by hand before 'make install'
+
+HEADER     = /usr/local/include
+#HEADER     = /tmp/include
+
+#    where you copy some template files by 'make install'
+#   if the directroy not exist, you must make by hand before 'make install'
+
+TEMPLATE  = /usr/local/lib/$(LIBNAME)/template
+#TEMPLATE  = /tmp/template
+
+##############################################make install spec end
+#   archiver suffix rule
+#
+.f.a:
+	$(FC) -c $(FFLAGS) $<
+	$(AR) $(ARCHVOPT) $@ $*.o
+	rm -f $*.o
+
+.c.a:
+	$(FC) -c $(FFLAGS) $<
+	$(AR) $(ARCHVOPT) $@ $*.o
+	rm -f $*.o
+
+	

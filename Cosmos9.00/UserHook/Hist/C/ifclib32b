@@ -1,0 +1,5 @@
+-L/Loft1/Intel/ifc/lib -L/usr/lib -Bstatic  -lifport -lifcoremt -limf  -lm
+ -lcxa -lunwind  -lpthread  -lirc  -lc -lirc 
+
+
+ 

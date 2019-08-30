@@ -1,0 +1,23 @@
+This is test file for ModifyFile
+any comment before ---------
+
+
+-----------------------------------------
+entry #
+ 1  /     SCIN comp. 1,3 
+       Quench  a b  T
+       quenching factor is  (1-b)/(1 + (1-b)*a*|dE/dx|) + b
+       a is g/cm2/(GeV)  b is the un-quenched fraction.
+      10^-3 g/cm2/MeV = 10^-3 g/cm2 /(10^-3 GeV) = 1 g/cm2/GeV
+ Quench  8.   0.35  T /
+   Quench  4   0.09  5.6  L /
+   Quench  10   0  0  B /
+ Emin   40.d-6 551d-6 50d-6 /
+
+ 2 /   W
+ Emin  80.d-6 650d-6 80.d-6 20000d-6 20000d-6 /
+
+   next is thick pwo
+ 3 /  SCIN  comp. 5
+   Quench 0.9  0.14  T /
+ Emin  130d-6 641d-6   100.d-6 /

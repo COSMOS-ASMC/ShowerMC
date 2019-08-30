@@ -1,0 +1,21 @@
+modification in EPOS	
+1)  epos-bas-199.f
+ a)     common  HIPARNT for HIJING collides with the same
+     one in JAM (size is different) so it is comment out.
+ b)  HINT1 in that common  is used two times.--> comment out
+2) epos-uti-199.f
+   character*20 text --> character*(*) text  (at 2 pos.)
+   character*40 text --> character*(*) text  (at 1 pos.)
+
+3) epos-bas-199lhc.f
+      character*40 text --> character*(*) text  (at 6 pos.)
+
+4)  epos-qsh-lhc-v3400.f
+1     n=n+1
+      write(ifmt,2) n
+2     format(5x,i2,'-th order contribution')
+  i2-->i3
+
+In  epos-sem-lhc-v3400.f
+3 varialbs are undefined and not used( coefxu1 etc)
+so they are commentout

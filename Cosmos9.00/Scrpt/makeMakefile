@@ -1,0 +1,21 @@
+#!/usr/local/bin/tcsh  -f
+#  Distribute Makefile which is created by using cosmkmf -l and
+#  TemplateLib.mk
+#
+set dir="Ana Ceren Data  Misc MuUg Obso TeX lib UserHook Util UC Doc Test Betterone Scrpt Version DistJob cosmos Contrib include"
+
+foreach f (*)
+	if(-d $f) then
+		foreach g ($dir)
+		  if($g == $f:t) then
+			goto Next
+		  endif
+	        end
+		#  to be put make file
+		(cd $f; echo "now in $f"; rm -f Makefile ;\
+		 cosmkmf -l; makeMakefile )
+#		set ff=`ls | grep "\.f"`;if($#ff != 0) cosmkmf -l; makeMakefile )
+	        Next:
+	endif
+end
+

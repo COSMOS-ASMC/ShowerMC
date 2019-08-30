@@ -1,0 +1,31 @@
+#!/bin/csh
+set work=/tmp/$USER/Work
+if ( $#argv != 1) then
+	echo "Usage: drawconfig  configpass"
+	exit 1
+endif
+set pwd=`pwd`
+
+echo  " pwd is " $pwd
+mkdir -p $work
+
+echo $pwd/$1 > $work/.configrc
+source $EPICSTOP/Scrpt/setarch
+#if( ! -f ./drawconfig$ARCH )  then
+   cd $EPICSTOP/Util/DrawConf;  
+   make -f drawConfig.mk
+#endif
+ ./drawconfig$ARCH   
+
+cd $pwd
+cat <<EOF
+ Now to see detector configuration,  you may use 
+        dispconfigbygeomv  (recomended) 
+ or
+        dispconfigbygnup   (slow )
+EOF
+
+
+
+
+

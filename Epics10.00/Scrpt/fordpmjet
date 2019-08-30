@@ -1,0 +1,90 @@
+#!/bin/csh -f
+#    sort and awk must be gnusort and gnuawk
+#   if the script said you should set an alias, see
+#   the lines down to "-----------" below
+if( $#argv != 1 && $#argv != 2 && $#argv != 4 ) then
+    cat<<EOF
+    Usage: fordpmjet config [mediadir] [GLBfile INPfile]
+      where 
+        config: is the filename containing the detector configuration
+                and (is assumed to be in the pwd<--bef.9.15.) 
+        mediadir: directory where media files such as Pb.GLB are placed
+                the default is $EPICSTOP/Data/Media
+        GLBfile: The name of the Glaubar file to be created which
+                 corresponds to the  medias in config.
+                 The defualt is  dpmjet.GLB and is put in PWD
+        INPfile: .inp file to be created for dpmjet.  The default is dpmjet.inp
+EOF
+  exit
+endif
+set awkex = `which awk ` 
+if( x$awkex  == "x" )  then
+	echo "set awk as an alias of gnu awk in Scrpt/fordpmjet"
+	exit 1
+endif
+set sortex = `which sort`
+if( x$sortex == "x" ) then
+	echo "set sort as an alias of gnu sort in Scrpt/fordpmjet"
+	exit 1
+endif
+
+# --------------------------
+if( $#argv == 2 || $#argv == 4  ) then
+  set GLBdir=$2
+else
+  set GLBdir=$EPICSTOP/Data/Media
+endif
+if( $#argv == 4 ) then
+    set GLBfile=$3
+    set INPfile=$4
+else
+    set GLBfile=dpmjet.GLB
+    set INPfile=dpmjet.inp
+endif
+set configpath = $1:h
+  #   /tmp/xy/abc.x --> /tmp/xy
+  #   ./a.x -->  .
+  #   abc-->  abc
+  #   ../../abc.x -->  ../..
+if ( $configpath == $1 ) then
+    # ! config file name itself
+  set configpath = .
+endif
+#         see $GLBdir/Pb.GLB to judge that .GLB is upto Fe or Pb
+set inpnum = `awk '(NR==4 || NR==5) && index($1,":") > 0 {print NR-3;exit}' $GLBdir/Pb.GLB`
+if( $inpnum == 2 ) then
+    set msg="The files created are usable for projectiles upto Pb"
+else    
+    set msg="The files created are usable for projectiles upto Fe"
+endif    
+
+set incex = `awk '$1 ~ "#inc" {print "inc"; exit}' $1`
+if( x$incex == "x" ) then
+    echo "$1  is a simple config file"
+    awk '$3 != "world" {if( $3=="sp2" ) $3="sp";print }' $1 > temp.cnfg_remove
+    (source $EPICSTOP/Scrpt/fordpmjetGLB temp.cnfg_remove $GLBdir) > ${configpath}/$GLBfile
+    echo $GLBfile "has been created"
+    ($EPICSTOP/Scrpt/fordpmjetINP temp.cnfg_remove $inpnum ) > ${configpath}/$INPfile
+    echo $INPfile "has been created"
+else
+#  include file exists so use testConfig in Util
+    echo "$1  has #inc so we need a bit of time"
+    set cnfgpath = "`pwd`/$1"
+    (cd $EPICSTOP/Util; rm -f temp.cnfg_remove;  rm -f a.out;  make -f testCnf1.mk;  echo "$cnfgpath" |  ./a.out > temp.cnfg_remove)
+#          next line is needed to skip to that place in fordpmGLB /fordpmINP
+    echo "-----------------------------------" > temp$$.cnfg
+      # $4:  SCIN etc.  $2 level    
+#           next one dose not work for awk version 3.1.5 (older ones are ok); 
+#       [a-z][A-Z] dose not recognize [A-Z]; so we use now [a-zA-Z]
+#    awk '$1~/[0-9]+/ && $4~/[a-z][A-Z]?*/ {if($4=="world") next; if($4=="sp2") $4="sp";$2=""; print}' $EPICSTOP/Util/temp.cnfg_remove >> temp$$.cnfg
+    awk '$1~/[0-9]+/ && $4~/[a-zA-Z]?*/ {if($4=="world") next; if($4=="sp2") $4="sp"; $2=""; print}' $EPICSTOP/Util/temp.cnfg_remove >> temp$$.cnfg
+
+    (source $EPICSTOP/Scrpt/fordpmjetGLB temp$$.cnfg $GLBdir) > ${configpath}/$GLBfile
+    echo $GLBfile "has been created"
+    ($EPICSTOP/Scrpt/fordpmjetINP temp$$.cnfg $inpnum) > ${configpath}/$INPfile
+    echo $INPfile "has been created"
+   rm -f temp$$.cnfg
+endif
+echo "they were put in " ${configpath}/
+echo $msg
+rm -f $EPICSTOP/Util/temp.cnfg_remove

@@ -1,0 +1,73 @@
+Stuffs here are to test how the subroutines to deal with
+a new volume-shape underconstruction.
+
+Example: use
+A)  testNewVol.f
+
+   "config" file which gives a "sqtccl". 
+1)   Standard routines for sqtccl must be ready
+   and put in prog/NewVol and registered in
+   Makefile.  Also, make should have done
+   without error. (For sqtccl, this has been
+   done already).
+2) usenewvol  config (if not yet done)
+
+3) make -f testNewVol.mk  to make a.out
+
+4) ./a.out > outputfile   
+5)    Then, enter "config" to specify the config file.
+6)  /
+   For the default. For a non default case, see 7)
+Then, outputfile  will have a nubmer of lines like
+  0.320768505   -1.81139994    0.651029110           1
+  1.54095125     0.00000000    0.378301561           1
+  1.86989129    -3.23109841    8.08304399E-02        0
+  ...
+
+In each line, first 3 show the (x,y,z) of a crossing point
+of a line with the boundary of the volume; the line is
+drawn from a random point placed outside (last term 1)
+or in side  (last term 0) of the volume with a random direction.
+The points will show a figure like PointsOnboundary.png
+(blue for inside; red outside;Z <- Z+1.5 is used)
+
+7) As an example of non default case, assume in/out test
+is selected.  In this case we will get output like
+
+3.13529158      -3.98952365       1.05389309        1           2
+2.09776568      -7.22074175       1.02343333        1           2
+1.49279261      -2.22841311      0.750308692        0           1
+2.59566379      -4.12865305      0.831804454        1           2
+
+3 terms are (x,y,z) followed by an integer 0 or 1: 0 means
+  the point is jugded as inside, and 1 outside. next integer (1 or 2)
+  indicates component # the point is in.  Outside case gives
+  a number (# of components + 1). In side case gives the
+  component #.  In this case, only one component is given for test,
+  so  two integer combination should be only
+  0  1
+  and
+  1  2.
+
+If we plot outside points, it will be like fig. OutsidePoints.png
+No points should exist inside of the volume.
+
+
+B) testNewVol2.f
+ This case is for detailed investigation when a line from
+a  given point with  given direction cosines has a
+problem of getting a  crossing point with the  volume.
+
+We must prepare   point x,y,z values and direction
+cosines  beside the config.
+The example is for octagon which is indicated
+by
+ call epsoctagon(Det%cmp(Cn), cTrack%pos, icon).
+
+This is to test that a given point is inside or
+not.
+After that boundary serach is tried moving the
+point by order of epsilon.
+
+ 
+

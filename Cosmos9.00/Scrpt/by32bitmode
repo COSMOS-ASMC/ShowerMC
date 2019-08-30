@@ -1,0 +1,3 @@
+#!/bin/tcsh
+# change ifort  to 32 bit mode on tasim501
+  source  /Loft1/Intel/ifort/ifortvars.csh ia32

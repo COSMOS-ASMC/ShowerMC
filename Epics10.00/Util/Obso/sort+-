@@ -1,0 +1,33 @@
+set nohidden
+if($0+1==1) rep "<awk -f e+mode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace1" w l     3
+if($0+1 > 1) rep "<awk -f e+mode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace$0" w l   3
+if($0+1==1) rep "<awk -f e-mode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace1" w l     1
+if($0+1 > 1) rep "<awk -f e-mode zoff=`cat .Revmax` zrev=`cat .Reverse`  /tmp/$$USER/trace$0" w l   1
+
+if($0+1==1) rep "<awk -f mu+mode zoff=`cat .Revmax` zrev=`cat .Reverse`  /tmp/$$USER/trace1" w l    2  
+if($0+1 > 1) rep "<awk -f mu+mode zoff=`cat .Revmax` zrev=`cat .Reverse`  /tmp/$$USER/trace$0" w l  2
+
+if($0+1==1) rep "<awk -f pi+mode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace1" w l    2
+if($0+1 > 1) rep "<awk -f pi+mode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace$0" w l  2
+
+if($0+1==1) rep "<awk -f k+mode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace1" w l     2
+if($0+1 > 1) rep "<awk -f k+mode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace$0" w l   2
+
+if($0+1==1) rep "<awk -f p+mode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace1" w l     4
+if($0+1 > 1) rep "<awk -f p+mode zoff=`cat .Revmax` zrev=`cat .Reverse`  /tmp/$$USER/trace$0" w l   4
+
+
+if($0+1==1) rep "<awk -f mu-mode zoff=`cat .Revmax` zrev=`cat .Reverse`  /tmp/$$USER/trace1" w l    5
+if($0+1 > 1) rep "<awk -f mu-mode zoff=`cat .Revmax` zrev=`cat .Reverse`  /tmp/$$USER/trace$0" w l  5
+
+if($0+1==1) rep "<awk -f pi-mode zoff=`cat .Revmax` zrev=`cat .Reverse`  /tmp/$$USER/trace1" w l    5
+if($0+1 > 1) rep "<awk -f pi-mode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace$0" w l  5
+
+if($0+1==1) rep "<awk -f k-mode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace1" w l     5
+if($0+1 > 1) rep "<awk -f k-mode zoff=`cat .Revmax` zrev=`cat .Reverse` /tmp/$$USER/trace$0" w l   5
+
+if($0+1==1) rep "<awk -f p-mode zoff=`cat .Revmax` zrev=`cat .Reverse`  /tmp/$$USER/trace1" w l     6 
+if($0+1 > 1) rep "<awk -f p-mode zoff=`cat .Revmax` zrev=`cat .Reverse`  /tmp/$$USER/trace$0" w l   6
+
+
+

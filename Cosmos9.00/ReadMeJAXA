@@ -1,0 +1,176 @@
+cosmos comilation  f90jxflat -Hefsux
+real   50 min
+
+compilation:  f90jx  -Hefs
+real    26m50.526s
+user    5m46.632s
+sys     12m1.965s
+
+
+Fe 30 GeV. dpmjet3
+  dpmjet3 init takes very long time.
+2events generation with trace; same IR
+          maja        LHCf2      LHCf
+real    52m22.720s   1m10.890s
+	52m38.765s   1m6.080s
+        58m37.451s   1m9.771s
+user    52m14.746s   0m53.594s 
+        52m35.512s   0m50.886s
+        58m29.234s   0m52.781s
+sys     0m5.384s     0m17.044s  
+        0m5.877s     0m14.911s
+        0m2.654s     0m16.680s
+
+
+   no trace  
+real    51m33.481s   0m25.008s
+        48m2.660s    0m25.275s
+        54m28.028s
+	45m41.618s
+user    51m28.014s   0m24.795s
+        47m59.175s   0m25.064s
+        54m24.157s
+	45m39.705s
+sys     0m3.079s     0m0.147s
+        0m3.123s     0m0.144s
+        0m2.596s
+	0m1.304s
+Trace size: 
+    230843776        261738948
+    256545012        275208708
+                     246879132
+                     260674644
+stdout size
+    4745733          5240955
+    4826147
+EPOS: epos-xan-lhc-v3700.f
+	 write( ),J...
+   , should be omitted.
+
+Import/Hidden/NUCFRG/Interface/csampNucFrag.f 
+   IsNaN not useable.  comment out (4 places)
+	(already it should not be needed)
+
+cdefByMagAndE.f  
+	"," was missing in each line;  correct one is
+         write(0,*)
+     *    "and prepare cmyEfield subroutine in your apps.",
+     *    "Interface is cmyEfield(aTrack,Efout); see",
+     *    "manual or cEfield0 in Cosmos/Module"
+
+cfixModel.f
+	stop 123456==> stop 23456  (must be 5 digit or less)
+
+
+rnd.f
+	call rnd1u(u,1), rnd2u(u,1)  is complained because
+	     rnd1u assumes array for u
+        so 
+	real(8)::u1(1)
+	call rnd1u(u1,1)
+	u = u1 is used
+
+
+HOST or HOSTNAME is not given.  so set it to something
+
+cosmos/Zcmain.h
+   comment out
+	 call  mydummy
+	 call myPhitsDummy
+
+
+cGetXsec.f   changed for 0 divide
+
+csampGintL.f    
+          result of  cxrayp:   xs =0  is avoided
+
+cinitObs.f
+c////////////
+  kcelei( ..   height undef)
+
+ctransVectZx.f
+      dir2 = temp ==> undefined temp.  
+	       so temp.sys = dir1.sys is put before it.
+
+cinteNuc.f
+	debug output bef and after
+	   call chAcol
+  are removed.
+
+
+phojet.f
+	KACC.. = 0 is moved before pho_eveini
+
+Util/Gencol.
+	Gencol.mk
+	  at top $(EPICSTOP) --> $(COSMOSTOP)
+	Gencol.f
+	  omit #include "ZepTrack.h"
+	  activate #include "Zptcl.h"
+
+Bertin:
+	bert.f    0/0 happens when out(12)=0.
+	(at around line #1000) 
+	if out(12)== 0, next is forced.
+         ppmda = 1.0
+         ppnda = 1.0
+         ppnna = 1.0
+
+Import/DPM.
+	dpmjet3.f  and pythia6115.f
+	flaating erro 
+	  In DT_INUCAS of dpmjet3
+        0 division error happens 
+        In PYZDIS  aroung line 35709~ 
+        avoided by compiling with -g.
+aftet this, IntModel "dpmjet3" works fine.
+
+
+
+Import/Sofia
+	jetset74dp.f
+	in LUKFDI  0 divide. but position is not well
+	know.
+  ==>	-g option compile.
+		
+After this, '"phits" 2 "dpmjet3"' works fine
+
+ Import/Jam
+	same as pythia in DPM.
+	jampyjet.f has same problem.
+        0 divided in  pjzdis.
+
+ Improt/QGS qgsjetII-04
+   A floating division exception was detected.
+ error occurs at qgprox_  line 11696. but this is fake.
+ could not pin-point the location.
+  So the qgprox part is separated as qgprox.f
+  and compiled with -g option. (-->cppFCJaxa)
+
+
+After above modification, for 1000TeV Fe withmin 50TeVmin,
+run,error happend.
+ An invalid floating point operation exception was detected.
+ error occurs at qghot_   line 12061
+
+So aghot is moved to qgprox.
+
+
+
+ Import/EPOS
+  epos-int-lhc-v3700.f
+  exp overflow for single pre. (exp(x) x > 88.77 )
+ !!!    yrmaxi=yrmaxi*log(exp(yradpi/yradmx)+amctot-1.)     
+--->    yrmaxi=yrmaxi*log(exp(dble(yradpi/yradmx))+amctot-1.)     
+
+there are  other exp. and the same was applied.
+ 
+above correction OK
+
+
+jwe0013i-e A floating division exception was detected.
+ error occurs at psahot_  line 824 loc 000000010089c248 offset 0000000000003d08 
+ psahot_      at loc
+
+-g option compile
+

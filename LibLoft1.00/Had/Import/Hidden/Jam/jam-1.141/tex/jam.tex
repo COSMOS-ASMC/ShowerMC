@@ -1,0 +1,3365 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Manual for JAM                                                      % % last
+%modified Apr. 22 2000                                                   % %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[]{article}
+%define page size: these two lines are for A4 paper
+%\setlength{\textheight}{245mm} \setlength{\topmargin}{-5mm}
+
+%define page size: these two lines are for US legal size paper 
+%to enable them, remove % at the beginning of the lines
+\setlength{\textheight}{240mm}
+\setlength{\topmargin}{10mm}
+
+%define page size: common for A4 and US legal
+\setlength{\headheight}{0mm}
+\setlength{\headsep}{-15mm}
+\setlength{\footskip}{12mm}
+\setlength{\textwidth}{160mm}
+\setlength{\oddsidemargin}{0mm}
+\setlength{\evensidemargin}{0mm}
+\setlength{\textwidth}{180mm}
+\setlength{\oddsidemargin}{-10mm}
+\setlength{\evensidemargin}{-20mm}
+
+\def\VERSION{1.009}
+
+%line spacing
+\renewcommand{\baselinestretch}{1.0}
+
+%new list environments to replace itemize and enumerate
+\newenvironment{Itemize}{\begin{list}{$\bullet$}%
+{\setlength{\topsep}{0.2mm}\setlength{\partopsep}{0.2mm}%
+\setlength{\itemsep}{0.2mm}\setlength{\parsep}{0.2mm}}}%
+{\end{list}}
+\newcounter{enumct}
+\newenvironment{Enumerate}{\begin{list}{\arabic{enumct}.}%
+{\usecounter{enumct}\setlength{\topsep}{0.2mm}%
+\setlength{\partopsep}{0.2mm}\setlength{\itemsep}{0.2mm}%
+\setlength{\parsep}{0.2mm}}}{\end{list}}
+
+%list environment suitable for manuals
+\newenvironment{entry}%
+{\begin{list}{}{\setlength{\topsep}{0mm} \setlength{\itemsep}{0mm}
+\setlength{\parskip}{0mm} \setlength{\parsep}{0mm}
+\setlength{\leftmargin}{20mm} \setlength{\rightmargin}{0mm}
+\setlength{\labelwidth}{18mm} \setlength{\labelsep}{2mm}}}%
+{\end{list}}
+\newenvironment{subentry}%
+{\begin{list}{}{\setlength{\topsep}{0mm} \setlength{\itemsep}{0mm}
+\setlength{\parskip}{0mm} \setlength{\parsep}{0mm}
+\setlength{\leftmargin}{10mm} \setlength{\rightmargin}{0mm}
+\setlength{\labelwidth}{18mm} \setlength{\labelsep}{2mm}}}%
+{\end{list}}
+
+\newcommand{\ttt}[1]{{\tt#1}}
+\newcommand{\itemt}[1]{\item[{\tt #1}\hfill]}
+\newcommand{\iteme}[1]{\item[{\tt #1}]}
+%\newcommand{\itemt}[1]{\item[\texttt{#1}\hfill]}
+
+\newcommand{\comment}[1]{}
+\newcommand{\bold}[1]{\mbox{\boldmath $#1$}}    %       bold symbol
+\newcommand{\rr}{{\bold{r}}}
+\newcommand{\pp}{{\bold{p}}}
+\newcommand{\RR}{{\bold{R}}}
+\newcommand{\PP}{{\bold{P}}}
+\newcommand{\srt}{\mbox{$\sqrt{s}$}}
+\newcommand{\plab}{\mbox{$p_{\rm lab}$}}
+\newcommand{\Elab}{\mbox{$E_{\rm lab}$}}
+\newcommand{\Kbar}{\mbox{${\bar K}$}}
+\newcommand{\sigtot}{\mbox{$\sigma_{tot}(s)$}}
+\newcommand{\sigel}{\mbox{$\sigma_{el}(s)$}}
+\newcommand{\sigtR}{\mbox{$\sigma_{\mbox{t-R}}(s)$}}
+\newcommand{\sigtS}{\mbox{$\sigma_{\mbox{t-S}}(s)$}}
+\newcommand{\sigbw}{\mbox{$\sigma_{BW}(s)$}}
+\newcommand{\sigsS}{\mbox{$\sigma_{\mbox{s-S}}(s)$}}
+\newcommand{\sigpiY}{\mbox{$\sigma_{\pi Y}(s)$}}
+
+\newcommand{\sigdiff}{\mbox{$\sigma_{{\rm diff}}(s)$}}
+\newcommand{\signondiff}{\mbox{$\sigma_{{\rm nondiff}}(s)$}}
+\newcommand{\sigsoft}{\mbox{$\sigma_{{\rm soft}}(s)$}}
+\newcommand{\sigjet}{\mbox{$\sigma_{{\rm jet}}(s)$}}
+\newcommand{\sigann}{\mbox{$\sigma_{{\rm ann}}(s)$}}
+\newcommand{\sigch}{\mbox{$\sigma_{{\rm ch}}(s)$}}
+\newcommand{\Bbar}{\mbox{$\bar B$}}
+
+\newcommand{\Dl}{\mbox{$\Delta(1232)$}}
+\newcommand{\Ds}{\mbox{$\Delta^*$}}
+\newcommand{\Ns}{\mbox{$N^*$}}
+\newcommand{\Mx}{\mbox{${\cal M}$}}                    % matrix element
+
+%roman names for particles in math mode
+\def\GeV{\mbox{\rm GeV}}
+\def\MeV{\mbox{\rm MeV}}
+\def\fm{\mbox{\rm fm}}
+
+\renewcommand{\a}{\rm{a}}
+\renewcommand{\b}{\rm{b}}
+\renewcommand{\c}{\rm{c}}
+\renewcommand{\d}{\rm{d}}
+\newcommand{\e}{\rm{e}}
+\newcommand{\f}{\rm{f}}
+\newcommand{\g}{\rm{g}}
+\newcommand{\hrm}{\rm{h}}
+\newcommand{\lrm}{\rm{l}}
+\newcommand{\n}{\rm{n}}
+\newcommand{\p}{\rm{p}}
+\newcommand{\q}{\rm{q}}
+\newcommand{\s}{\rm{s}}
+\renewcommand{\t}{\rm{t}}
+\renewcommand{\u}{\rm{u}}
+\newcommand{\A}{\rm{A}}
+\newcommand{\B}{\rm{B}}
+\newcommand{\D}{\rm{D}}
+\newcommand{\F}{\rm{F}}
+\renewcommand{\H}{\rm{H}}
+\newcommand{\J}{\rm{J}}
+\newcommand{\K}{\rm{K}}
+\renewcommand{\L}{\rm{L}}
+\newcommand{\Q}{\rm{Q}}
+\newcommand{\R}{\rm{R}}
+\newcommand{\T}{\rm{T}}
+\newcommand{\W}{\rm{W}}
+\newcommand{\Z}{\rm{Z}}
+\newcommand{\bbar}{\overline{\rm{b}}}
+\newcommand{\cbar}{\overline{\rm{c}}}
+\newcommand{\dbar}{\overline{\rm{d}}}
+\newcommand{\fbar}{\overline{\rm{f}}}
+\newcommand{\pbar}{\overline{\rm{p}}}
+\newcommand{\qbar}{\overline{\rm{q}}}
+\newcommand{\sbar}{\overline{\rm{s}}}
+\newcommand{\tbar}{\overline{\rm{t}}}
+\newcommand{\ubar}{\overline{\rm{u}}}
+\newcommand{\Fbar}{\overline{\rm{F}}}
+\newcommand{\Qbar}{\overline{\rm{Q}}}
+
+\newcommand{\lsim}{\mbox{\raisebox{-0.6ex}{$\stackrel{<}{\sim}$}}\:}
+\def\GeVc{{\rm GeV/c}}
+
+
+
+
+% A useful Journal macro
+\def\Journal#1#2#3#4{{#1} {\bf #2}, #3 (#4)}
+
+% Some useful journal names
+\def\NCA{\em Nuovo Cimento}
+\def\NIM{\em Nucl. Instrum. Methods}
+\def\NIMA{{\em Nucl. Instrum. Methods} A}
+\def\NP{\em Nucl. Phys.}
+\def\NPA{{\em Nucl. Phys.} A}
+\def\NPB{{\em Nucl. Phys.} B}
+\def\PLB{{\em Phys. Lett.}  B}
+\def\PRL{\em Phys. Rev. Lett.}
+\def\PR{{\em Phys. Rev.}}
+\def\PRD{{\em Phys. Rev.} D}
+\def\PRC{{\em Phys. Rev.} C}
+\def\ZPA{{\em Z. Phys.} A}
+\def\ZPC{{\em Z. Phys.} C}
+\def\PR{{\em Phys. Rep.}}
+\def\CPC{{\em Comp. Phys. Comm.}}
+\def\MPLA{{\em Mod. Phys. Lett.} A}
+\def\ARPS{{\em Annu. Rev. Part. Sci.}}
+\def\PTPsuppl{{\em Prog. Theor. Phys. Suppl.}}
+\def\RMP{{\em Rev.Mod.Phys.}}
+\def\ANP{{\em Annals Phys.}}
+\def\PPNP{{\em Prog. Part. Nucl. Phys.}}
+\def\PTP{{\em Prog. Theor. Phys.}}
+\def\JP{{\em J. Phys.}}
+
+\def\etal{{\it et al.}}
+
+%fraction of page devoted to figures and other floats
+\setcounter{topnumber}{1}
+\setcounter{bottomnumber}{1}
+\renewcommand{\textfraction}{0.1}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.9}
+\renewcommand{\floatpagefraction}{0.8}
+
+%one caption and figure/table, indented but spanning whole page
+\newlength{\captivewidth}
+\setlength{\captivewidth}{\textwidth}
+\addtolength{\captivewidth}{-10mm}
+\newcommand{\captive}[1]{\rule{5mm}{0mm}%
+\begin{minipage}{\captivewidth}%
+\caption[small]{#1}\end{minipage}}
+
+%minimal separation between rows in table 
+\newlength{\tablinsep}
+\setlength{\tablinsep}{0.73\baselineskip}
+
+%size of column (half page width + blank in middle)
+\newlength{\halfpagewid}
+\setlength{\halfpagewid}{0.5\textwidth}
+\addtolength{\halfpagewid}{-10mm}
+ 
+%set level for table of contents
+\setcounter{tocdepth}{2}
+
+
+
+\begin{document}
+
+\sloppy
+%\begin{flushright}
+%  version 1.005
+%\end{flushright}
+
+
+\title{\bf JAM \VERSION:
+A microscopic simulation program
+ for ultra-relativistic nuclear collisions
+%\footnote{}
+}
+\author{Yasushi Nara \thanks{E-mail:ynara@hadron31.tokai.jaeri.go.jp}\\
+  {\it Advanced Science Research Center, 
+        Japan Atomic Energy Research Institute}, \\
+ {\it Tokai, Naka, Ibaraki 319-1195, Japan}
+     and\\
+ {\it Physics Department,
+  Brookhaven National Laboratory, Upton, N.Y. 11973, U.S.A.}}
+
+\date{}
+\maketitle
+
+\begin{abstract}
+\noindent
+JAM is a simulation program which
+ is designed to simulate (ultra-) relativistic nuclear collisions
+ from initial stage of nuclear collision to final state interaction
+ in hadronic gas stage
+ and
+ can be used from low($\Elab=1-10$AGeV) energy.
+In JAM, hadrons and their excited states
+% and on-shell partons
+% which are produced from hard parton-parton scattering
+ are explicitly propagated in space-time by the cascade method.
+In order to describe nuclear collisions consistently from low to high energy,
+  elementary hadron-hadron collisions are modeled by resonance production
+  at low energies, string excitations at soft region and
+  hard parton-parton scattering at collider energies according to
+  the important physics at each energy range.
+\end{abstract}
+
+PACS: 25.75.G, 14.20.G, 24.85.+p
+
+%\newpage
+
+\section{Program Summary}
+
+{\noindent\em Title of program:} JAM 1.0\\
+
+{\noindent\em Program obtainable from:}
+ CPC Program Library, Queen's University of Belfast, N. Ireland
+ and from the author at ynara@hadron03.tokai.jaeri.go.jp\\
+
+
+{\noindent\em Computer for which the program is designed:}
+ Pentium, Dec alpha, Hewlett Packard UX-A-9000  SPARC stations
+and other computers with a FORTRAN 77 compiler.\\
+
+
+{\noindent\em Computers on which it has been tested:}
+  DEC Workstation,  SUN workstation, Pentium personal computer.\\
+
+{\noindent\em Operating systems under which the program has been tested:}
+OSF1 V4.0 878 alpha, Free-BSD, Linux, Sun-OS 5.5.1.\\
+
+{\noindent\em Programming language used:} FORTRAN 77\\
+
+{\noindent\em Memory required to execute with typical data:} 1,450 words\\ 
+
+{\noindent\em No.of bits in a word:} 64\\
+
+{\noindent\em Number of lines in distributed program:} 64253\\
+
+{\noindent\em Keywords:} ultrarelativistic heavy ion collisions,
+cascade, hadron, parton, pQCD, Boltzmann equation. \\
+
+
+{\noindent\em Nature of physical problem}
+
+\noindent
+The microscopic description of ultra-relativistic nuclear collisions
+is necessary to understand the time evolution of 
+hot and dense matter produced in heavy-ion collisions
+ from non-equilibrium stage.
+A model which can simulate consistently 
+ from low to high incident energy nuclear collisions
+ are required for the
+systematic studies of the bombarding energy dependence on some observable
+and the treatment of the final state interactions among produced particle.
+
+\bigskip
+
+{\noindent\em Method of solution}
+
+\noindent
+ The space-time evolution of hadrons including 
+ excited states
+is solved by the cascade method.
+Low energy total and elastic hadron-hadron cross sections
+ are parameterized to experimental data if possible.
+Inelastic hadron-hadron collisions are modeled by the resonance
+picture at low energy,
+string picture at intermediate energy
+and hard parton-parton scattering at high energy.
+
+\bigskip
+
+{\noindent\em Typical running time}
+
+\noindent
+ The running time depends on the bombarding energy,system size and
+ impact-parameter.
+For example, on the pentium II 266MHz on Free-BSD 2.2.6R:
+
+Si(14.6AGeV/c)+Al b=1.5fm 1m 33s per 100events on DEC alpha.
+
+
+{\noindent\em Unusual features of the program}\\
+\noindent none
+
+%\newpage
+
+\bigskip
+\begin{flushleft}
+{\large \bf LONG WRITE-UP}\\
+\end{flushleft}
+
+
+\section{Introduction}
+
+In ultra-relativistic heavy ion collisions,
+ reaction dynamics is generally complex.
+We have to solve basically many-body system involved several
+  hundred particles at initial stage
+  but due to the large number of multi-particle productions,
+  number of particles are reached to about the several (hundred) thousands
+ depending on both the incident energy and impact parameter.
+We may use Monte-Carlo simulation to solve these many-body system.
+In order to investigate and understand its dynamics,
+  event generators have been made such as
+ FRITIOF~\cite{fritiof}, LUCIAE~\cite{luciae},
+ DPM~\cite{dpm}, VENUS~\cite{venus},
+ HIJING~\cite{hijing}, HIJET~\cite{hijet}.
+These models do not follow explicitly space-time trajectory but
+assume Glauber geometry for the treatment of AA collisions.
+Microscopic hadronic transport models such as
+  RQMD~\cite{rqmd1,rqmd2}, QGSM~\cite{qgsm}, ARC~\cite{arc},
+  ART~\cite{art}, UrQMD~\cite{urqmd} and HSD~\cite{hsd}
+  have been used to describe the nucleus-nucleus collisions
+%  especially at AGS($\sim 10$AGeV) and SPS($\sim 200$AGeV) energies
+  from first $NN$ collision stage
+  to the final state interaction among produced particles.
+These microscopic transport models follow the space-time trajectory
+  of the particles and can extract detailed space-time information
+  on the reaction dynamics in nuclear collisions.
+
+Boltzmann-Uehling-Uhlenbeck (BUU)~\cite{buu} approach
+  based on the classical kinetic one-body transport equation
+  including the Pauli-blocking of the final state of the colliding nucleons
+  is the first attempt to describe heavy ion collisions
+  at the energy range 30AMeV $\sim$ 2GeV,
+  by microscopic transport model
+  in which two-body collision term are realized
+  by the intra-nuclear cascade model~\cite{inc1,inc2,inc3}
+  and nuclear meanfield is solved by the test-particle method~\cite{buu}.
+Quantum molecular dynamics (QMD) model~\cite{qmd}
+  has been developed in order to simulate the time evolution of the
+  n-body phase space distribution function.
+Both relativistic version of BUU and QMD have been also
+  appeared which are called RBUU~\cite{rbuu} and RQMD~\cite{rqmd1} respectively.
+ART and HSD are an extension of BUU and RBUU model to the high energies,
+  while RQMD and UrQMD are based on the spirit of QMD model.
+The most important element for high energy nuclear collisions \Elab$>10$AGeV
+  in above mentioned transport models are incoherent superposition of
+  two-body collisions among particles.
+%In the present version of JAM1.0,
+%  any mean field effect
+%  is not included,
+%  therefore, the applicability of JAM1.0 is restricted to only high energies.
+Some observable may strongly depend on the mean field,
+  for example, the mean field effect on the transverse flow at AGS energies
+  ~\cite{flow,art}.
+
+
+
+In ultra-relativistic heavy ion collisions at collider energies,
+ hard and semihard processes are expected to be important~\cite{hijing}.
+Multiple minijet production with initial and final state radiation
+  has been included into event generator for nuclear collision
+  in HIJING~\cite{hijing} and VNI~\cite{vni} based on perturbative QCD (pQCD).
+In HIJING, the number of minijets per inelastic $pp$ collision
+  is calculated using an eikonal formalism and AA collision
+  are realized by the Glauber type multiple $NN$ collisions.
+VNI is a Monte Carlo implementation of the parton cascade model
+  in which space-time evolution of on-shell as well as off-shell partons
+  are followed by cascade method.
+Any multiple parton-parton collisions are, therefore,
+  automatically included in VNI.
+Interaction among the produced partons would be important.
+Parton cascade models VNI~\cite{vni} and ZPC~\cite{zpc}
+ are designed to implement theses parton dynamics to study
+ space-time evolution of partons.
+
+JAM has been developed based on the above mentioned models
+ for the concept that
+ it should reduce hadronic transport model like BUU and QMD at low energies,
+ in order to describe consistently nuclear collision from low to 
+ high energy, in addition to be able to treat the final state
+ interaction among produced hadrons,
+ while at collider energies, multiple minijets production is 
+ included.
+% and space-time evolution of the partons from hard scattering
+% can be followed.
+Although, in present version of JAM, these requirements has not been
+ completely implemented,
+The main features included in JAM\VERSION~ are as follows.
+ (1) At low energy, inelastic hadron-hadron ($hh$) collisions are modeled by
+     the resonance productions based on the idea from RQMD and UrQMD.
+ (2) Nuclear mean field is simulated based on the BUU theory.
+ (3) Above resonance region, soft string excitation is implemented
+     along the lines of the HIJING model~\cite{hijing}.
+ (4) Multiple minijet production is also included in the same way
+     as the HIJING model in which jet cross section and the number
+     of jet is calculated using an eikonal formalism for
+     perturbative QCD (pQCD) and hard parton-parton scatterings
+     with initial and final state radiation are simulated
+     using PYTHIA~\cite{pythia} program.
+
+
+%In principle,
+% all parameters of the microscopic model for nuclear collisions
+% should be determined and fixed from elementary $pp$ or $ep$ data.
+%However, there are some free parameters like formation time
+%  which can be not determined by the basic theory at present.
+
+
+
+
+
+
+\section{Description of the model}
+
+In this section, we will present the main aspect of JAM~\cite{jam}.
+
+\subsection{Main features of the model}
+
+For the description of AA collisions in  cascade model,
+ the trajectories of all hadrons as well as resonances
+ including produced particles are followed explicitly
+   as a function of space and time.
+The main components of our model are as follows.
+(1)  Nuclear collision is assumed to be described by the
+   sum of independent binary $hh$ 
+   (possibility parton-parton, parton-hadron)
+   collisions.
+   $hh$ collisions are realized by the closest distance approach.
+  Two particles will collide if their distance is smaller than
+  $\sqrt{\sigma(s)/\pi}$, here $\sigma(s)$ represents the total cross
+  section at the c.m. energy $\srt$.
+  As a default option, any mean field is not included, therefore 
+  the trajectory of hadrons are straight line in between two-body
+  collisions or decays.
+  As a results of $hh$ collision, hadrons are assumed to be
+  excited to either resonance or string at soft collisions,
+  in the case of hard scattering, on-shell partons and remnants.
+(2) The initial positions of each nucleons are sampled by the
+    parameterized distribution of nuclear density.
+   Fermi motion of nucleons are assigned
+   according to the local Fermi momentum.
+(3) all established hadronic states (see appendix~\ref{app:particle})
+    are explicitly included
+    with explicit iso-spin states as well as their anti-particles
+   and they can propagate in space-time.
+(4) the inelastic $hh$ collisions produce resonances at low energies
+   while at high energies
+   ( $\sim 4\GeV$ in $BB$ collisions $\sim 3\GeV$ in $MB$ collisions
+    and $\sim 2\GeV$ in $MM$ collisions)
+  color strings are formed and they decay into hadrons according to the
+  Lund string model with some formation time.
+ Formation point and time are determined
+  by assuming yo-yo formation point~\cite{bialas}.
+ This gives roughly formation time of 1fm/c
+  with string tension $\kappa=1$GeV/fm.
+(5)
+Hadrons which have original constituent quarks can scatter with hadrons
+  assuming the additive quark cross section within a formation time.
+The importance of this quark(diquark)-hadron interaction
+ for the description of baryon stopping
+at CERN/SPS energies was reported by Frankfurt group~\cite{rqmd1,urqmd}.
+(6) Pauli-blocking for the final nucleons in two-body collisions
+    are also considered.
+(7)
+ Low energy baryon-baryon, baryon-meson and  meson-meson rescattering
+ are also included assuming resonance/string excitation picture
+ in order to treat final state interaction of hadronic gas.
+Extending the particle table of PYTHIA, baryon and meson resonances
+ are explicitly propagated and they can rescatter.
+
+
+
+
+\subsection{Modeling hh collisions}
+
+In order to consistently describe nucleus-nucleus collisions
+for the large energy regime from $\sim 1\GeV$ to collider energies, 
+hadron-hadron collisions are basically modeled by the resonance production at
+ $\srt<4\GeV$,
+soft string excitation at $4<\srt<50\GeV$,
+minijet production at $\srt>10\GeV$.
+Total hadronic cross section is divided by
+\begin{equation}
+  \sigma_{tot}(s)=\sigel+\sigtR+\sigbw+\sigtS+\sigsS+\sigann+\sigch ~,
+\end{equation}
+where $\sigel$~ is elastic,
+      $\sigtR$~ t-resonance production,
+      $\sigbw$~ s-channel resonance formation,
+      $\sigsS$~ s-channel string formation,
+      $\sigann$~ annihilation of $\Bbar B$,
+      $\sigch$~ charge exchange cross sections respectively.
+$\sigtS$~ contains the soft string excitation and hard parton-parton scattering
+which can be written within the eikonal formalism for pQCD~\cite{hijing}
+\begin{equation}
+\sigtS=2\pi\int^{\infty}_0 db^2\left[1-e^{-\chi(b,s)}\right],
+\end{equation}
+where $\chi(b,s)$ is defined as
+\begin{equation}
+  \chi(b,s)=\left({1\over2}\sigsoft+{1\over2}\sigjet\right) T_N(b,s).
+\end{equation}
+with overlap function $T_N(b,s)$
+   and soft \sigsoft\ and hard \sigjet\ cross sections.
+The \sigsoft~ is usually decomposed into diffractive part and
+  low $p_T$ non-diffractive part.
+The \sigjet\ rrepresents the cross section of hard parton scattering
+  and can be calculated by perturbative QCD (pQCD) as
+  \begin{equation}
+    \sigjet  =  \int \int \int d x_1 \, d x_2 \, d \hat{t} \,
+     f_1(x_1, Q^2) \, f_2(x_2, Q^2) \, \frac{d \hat{\sigma}}{d \hat{t}}.
+  \end{equation}
+  with parton distribution function $f(x_i,Q^2)$ and $Q$ is
+  a typical momentum transfer in the partonic process.
+The $d \hat{\sigma}/d \hat{t}$ expresses the differential
+cross section for a partonic scattering.
+PYTHIA is used to generate hard scattering including initial- and
+final-state radiation.
+The space-time points of partons produced by the hard scattering 
+ are calculated applying uncertainty principle~\cite{eskola1}.
+
+
+Particle productions at low energies($\srt\leq 4.0$ for the BB collisions)
+are modeled via the excitation and decay of resonances.
+Inelastic cross sections are assumed to be filled up with
+the resonance formations \sigtR up to $E_{cm}=$3-4GeV.
+The gap between experimental inelastic cross section
+ and resonance formation cross sections
+ are assigned to be string formation.
+The following resonance excitations are implemented in NN
+ collisions
+\begin{itemize}
+\item[(1)] $NN \to  N\Delta(1232)$,
+  \ \ (2) $NN \to  NN^* $,
+  \ \ (3) $NN \to  \Delta(1232)\Delta(1232)$,
+\item[(4)] $NN \to  N\Delta^* $,
+  \ \ (5) $NN \to  N^*\Delta(1232) $,
+\ \ (6) $NN \to  \Delta(1232)\Delta^* $,
+\ \ (7) $NN \to  N^*N^*  $,
+\item[(8)] $NN \to  N^*\Delta^* $,
+\ \ (9) $NN \to  \Delta^*\Delta^* $.
+\end{itemize}
+The strength of each branches are determine from the exclusive
+pion production data~\cite{CernHera}.
+
+
+The cross section for the production of resonances may be written by
+\begin{equation}
+ \label{eq:cross}
+ {d\sigma_{12\to34}\over d\Omega}=
+    {(2S_3+1)(2S_4+1)\over 64\pi^2 s p_{12}}
+    \int\int p_{34} |\Mx|^2 A(m_3^2)A(m_4^2)dm_3^2dm_4^2
+\end{equation}
+where $S_i, i=3,4$ express the spin of the particles in the final state.
+Mass distribution function $A(m_i^2)$ for nucleons is just a $\delta$-function,
+while that for resonances is given
+by the relativistic Breit-Wigner function
+\begin{equation}
+  A(m^2)={1\over \cal N}{m_R\Gamma(m)\over (m^2-m_R^2)^2 + m_R^2\Gamma(m)^2}.
+ \label{eq:rlorentz}
+\end{equation}
+where $\cal N$ denotes the normalization constant.
+ In this paper,
+we use simply take ${\cal N} = \pi$ which is a value in the case of
+a constant width.
+The full width $\Gamma(m)$ is a sum of all partial decay width
+$\Gamma_R(MB)$ for resonance $R$ into mesons $M$ and baryons $B$
+which depends on the momentum of the decaying particle~\cite{rqmd2,urqmd}:
+\begin{equation}
+ \Gamma_R(MB)=\Gamma^0_R(MB) {m_R\over m}
+              \left({p_{cms}(m)\over p_{cms}(m_R)}\right)^{2\ell+1}
+   {1.2 \over 1+0.2\left({p_{cms}(m)\over p_{cms}(m_R)}\right)^{2\ell+1}}
+   \label{eq:width}
+\end{equation}
+where $\ell$ and $p_{cms}(m)$ are
+ the relative angular momentum
+ and 
+ the relative momentum in the exit channel in their rest frame.
+%
+Neglecting the mass dependence of the matrix element,
+   masses of resonances are generated according to the distribution
+   \begin{equation}
+      P(m_3,m_4)= 4m_3m_4 p_{34}A(m_3^2)A(m_4^2)dm_3dm_4
+   \end{equation}
+%
+%
+Note that we do not give the cross sections for each resonance production
+  but for the average cross section.
+We need to know the matrix element $|\Mx|^2$ for all resonances
+  from the formula Eq.(\ref{eq:cross}).
+In Ref.~\cite{Teis}, the matrix elements are fitted to reproduce
+the pion production cross sections up to two-pion productions
+ as well as $\eta$ production cross section assuming the constant value
+ for the matrix element.
+In our model, we assume simply that
+ each resonance production cross section can be selected
+ according to the probability:
+\begin{equation}
+  \label{eq:resprob}
+  P(R_i,R_j) \sim (2S_i+1)(2S_j+1)\int\int
+                    p_{ij}(m_i,m_j)A_i(m_i)A_j(m_j)dm_idm_j ,
+\end{equation}
+where $A_i$ represents the Breit-Wigner function.
+This simple assumption gives reasonable results for the pp data.
+
+
+\subsection{Inverse processes}
+
+In the processes for resonance absorption,
+  we use a generalized detailed balance formula~\cite{Wolf2,detbal1,detbal2}
+  which takes the finite width of the resonance mass into account.
+The differential cross section for the reaction $(3,4)\to(1,2)$
+can be expressed by the cross section for $(1,2)\to(3,4)$;
+\begin{equation}
+  {d\sigma_{34\to 12}\over d\Omega}=
+       {(2S_1+1)(2S_2+1)\over (2S_3+1)(2S_4+1)}
+          {p^2_{12} \over p_{34}}
+    {d\sigma_{12\to 34}\over d\Omega}
+     {1\over \int\int p_{34} A(m_3)A(m_4)d(m_3^2)d(m_4^2)}~.
+\end{equation}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Meson-Baryon, Meson-Meson Collisions}
+\label{subsec:MBMM}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+We now turn to the explanation of meson-baryon ($MB$) and meson-meson
+($MM$) collisions.
+We also use
+ resonance/string excitation model for $MB$ and $MM$ collisions.
+
+Total cross section for $\pi N$ incoming channel is assumed to be decomposed to
+\begin{equation}
+ \sigtot^{\pi N}=\sigbw+\sigel +\sigsS+\sigtS,
+\end{equation}
+%
+where \sigel, \sigbw, \sigsS, and \sigtS~ denote
+the $t$-channel elastic cross section,
+the $s$-channel resonance formation cross section
+	with the Breit-Wigner form, 
+the $s$-channel and $t$-channel string formation cross sections, respectively.
+We neglect the $t$-channel resonance formation cross section at a
+  energy range of 
+%$<\sqrt{s}\sim 2$GeV.
+$\sqrt{s}\lsim 2$GeV.
+%
+The $t$-channel elastic cross section \sigel~ was determined so that
+the sum of the elastic component of
+ the $s$-channel Breit-Wigner cross section \sigbw~
+ and $t$-channel elastic cross section \sigel~ 
+reproduces the experimental elastic data for $\pi N$ interaction.
+%
+Above the $\Delta(1232)$ region, $t$-channel elastic cross section
+becomes non-zero in our parameterization.
+%
+String formation cross sections (\sigsS~ and \sigtS) are 
+ determined to fill up the difference between
+ experimental total cross section and $\sigbw+\sigel$.
+%
+We calculate the resonance formation cross section \sigbw\ 
+using the Breit-Wigner formula~\cite{Brown,rqmd1}
+(neglecting the interference between resonances),
+\begin{equation}
+    \label{eq:bw}
+\sigma(MB \to R)= {\pi(\hbar c)^2 \over p_{cm}^2}
+         \sum_{R}  |C(MB,R)|^2  {(2S_R+1) \over (2S_M+1)(2S_B+1)}
+                     {\Gamma_R(MB)\Gamma_R(tot) \over
+                      (\sqrt{s}-m_R)^2+\Gamma_R(tot)^2/4} \ .
+\end{equation}
+The momentum dependent decay width
+Eq.~(\ref{eq:width}) are also used for the calculation of
+ decay width in Eq.~(\ref{eq:bw}).
+$S_R$, $S_B$ and $S_M$ denote the spin of
+ the resonance, the decaying baryon and meson respectively.
+The sum runs over resonances,
+   $R=N(1440)\sim N(1990)$ and $\Delta(1232)\sim\Delta(1950)$.
+Actual values for these parameters are 
+ taken from the Particle Data Group~\cite{PDG96}
+ and adjusted
+ within an experimental error bar
+to get reasonable fit for $MB$ cross sections.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% aK-N total and elastic
+%\FIGxakn
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Since the $\Kbar N$ interaction
+has some exoergic channels %reactions
+such as $\Kbar N\to \pi Y$,
+we need to include additional terms:
+\begin{equation}
+ \sigtot^{\Kbar N}=\sigbw+\sigel+\sigch+\sigpiY+\sigsS+\sigtS,
+\label{eq:xakn}
+\end{equation}
+where \sigch~ and \sigpiY~ denote $t$-channel charge exchange reaction
+  and $t$-channel hyperon production cross sections
+  which are also fixed by the requirement that
+  the sum of $t$-channel contributions and
+  Breit-Wigner contributions reproduce experimental data.
+%
+Breit-Wigner formula enables us to calculate
+  experimentally unmeasured cross sections
+  such as $\rho N \to \Lambda K$.
+For the calculation of \sigbw,
+we include hyperon resonances,
+      $R=\Lambda(1405)\sim\Lambda(2110)$
+      and 
+      $\Sigma(1385)\sim\Sigma(2030)$.
+The total and elastic cross sections for $\Kbar N$ interactions
+ used in JAM are fit to the date~\cite{PDG96}.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% kbarN -> pi Y and charge exchange cross sections
+%\FIGxkny
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The symbol $\sigma_{\pi Y}(s)$ in Eq.(\ref{eq:xakn})
+ is the sum of $t$-channel pion hyperon production
+cross sections $\Kbar N\to \pi Y$, $Y=\Lambda,\Sigma$.
+The cross section for the inverse processes such as $\pi Y\to  \Kbar N$ are
+calculated using the detailed balance formula.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% KN total and elastic
+%\FIGxkaon
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+$KN$ incoming channel cannot form any $s$-channel resonance
+ due to their quark contents. Therefore
+the total cross section can be written within our model as follows, 
+\begin{equation}
+ \sigtot^{KN}=\sigtR+\sigel+\sigch +\sigtS,
+\end{equation}
+where \sigtR~ is $t$-channel resonance formation cross section.
+%
+%
+In the present version of JAM,
+only $K N\to K\Delta$, $K N\to K(892)N$ and $K N \to K(892)\Delta$
+are explicitly fitted to experimental data~\cite{CernHera}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% KN inelastic
+%\FIGxkaonD
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+
+In meson-meson scattering,
+ we also apply the same picture as that in meson-baryon collisions:
+\begin{equation}
+ \sigtot=\sigbw + \sigtR + \sigel + \sigsS + \sigtS.
+\end{equation}
+%
+%
+%
+%
+The difference between experimental inelastic cross section
+and resonance cross sections at energies above resonance region
+for the meson-baryon and meson-meson collisions
+are attributed to the string formation cross section
+where $1/\srt$ energy dependence of \sigsS~ is used~\cite{rqmd2}.
+
+For the cross sections for which no experimental data are available,
+we calculate the total and elastic cross sections by using the
+additive quark model~\cite{rqmd1,urqmd,goulianos}
+\begin{eqnarray}
+  \sigma_{tot} &=& \sigma_{NN}\left({n_{1}\over3}\right)\left({n_2\over3}\right)
+                 \left(1-0.4{n_{s1}\over n_1}\right)
+                 \left(1-0.4{n_{s2}\over n_2}\right) ~, \\
+  \sigma_{el} &=& \sigma_{tot}^{2/3}
+               (\sigma_{el}^{NN}/ \sigma_{NN}^{2/3}) ~,
+\end{eqnarray}
+where $\sigma_{NN}$, $\sigma_{el}^{NN}$ express nucleon-nucleon total
+and elastic cross sections and $n_i$,$n_{si}$ are the 
+number of quarks and $s$-quarks contained in the hadron respectively.
+This expression works well above resonance region where the cross section
+becomes flat.
+
+For the $t$-channel resonance production cross sections \sigtR,
+we do not fit experimental data explicitly in this work
+except for $NN$ reaction and one and two pion productions in $KN$ reaction,
+because of the vast body of the possibilities for the final states.
+ Instead, we simply determine the outgoing resonance types
+according to the spins $S_3$, $S_4$ in the final state  and phase space
+for the production of resonances $R_3$ and $R_4$
+\begin{equation}
+% P(R_3,R_4) \sim (2S_3+1)(2S_4+1)p_{34}(s)^2 ~.
+ P(R_3,R_4) \propto (2S_3+1)(2S_4+1)p_{34}(s)^2 ~.
+\end{equation}
+where $p_{34}(s)$ denotes the c.m. momentum in the final state.
+If the incoming channel involves resonances, their ground state
+particles are also considered in the final state.
+Once the outgoing resonance types are determined,
+we generate masses according to the Breit-Wigner distribution.
+
+For the angular dependence in the processes of
+  $t$-channel resonance production \sigtR,
+we use
+\begin{equation}
+  {d\sigtR \over dt} \sim \exp(bt),
+\end{equation}
+and the slope parameter $b$ for the energy range of
+  $\srt>2.17\GeV$
+   is parameterized by
+\begin{equation}
+   b=2.5 + 0.7\log(s/2),
+\end{equation}
+with invariant mass squared $s$ given in units of GeV$^2$.
+We use the same parameterization presented in Ref.~\cite{niita}
+ for the energy below $\srt<2.17\GeV$ for the $t$-channel resonance
+productions.
+The elastic angular distribution is also taken from Ref.~\cite{niita}
+ for $\srt<10\GeV$
+and from PYTHIA~\cite{pythia} for $\srt>10\GeV$.
+
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Soft interactions modeled by string model} \label{sec:string}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+At an energy range above $\srt>4-5$GeV,
+the (isolated) resonance picture breaks down because
+width of the resonance becomes wider and 
+the discrete levels get closer.
+The hadronic interactions at
+the energy range 4-5$<\srt<$10-100GeV where
+it is characterized by the small transverse momentum transfer
+is called "soft process", and
+string phenomenological models
+are known to describe the data for such soft interaction well.
+The hadron-hadron collision % of a hadron with another hadron
+leads to a string like excitation longitudinally.
+In actual description of the soft processes,
+we follow the prescription adopted in the HIJING model~\cite{hijing}, 
+as described below.
+
+In the center of mass frame of two colliding hadrons,
+we introduce light-cone momenta defined by
+\begin{equation}
+p^+ = E+p_z, \qquad p^- = E-p_z\ .
+\end{equation}
+Assuming that beam hadron 1 moves in the positive z-direction
+and target hadron 2 moves negative z-direction,
+the initial momenta of the both hadrons are
+\begin{equation}
+  p_1 = (p_1^+,p_1^-,0_T), \qquad p_2 = (p_2^+,p_2^-,0_T)\ . 
+\end{equation}
+After exchanging the momentum $(q^+,q^-,\pp_T)$, the momenta will change to
+\begin{equation}
+       p'_1 = ((1-x^+)P^+,x^-P^-,\pp_T),
+ \qquad p'_2 = (x^+P^+,(1-x^-)P^-,-\pp_T), 
+\end{equation}
+where $P^+=p_1^++p_2^+=P^-=p_1^-+p_2^-=\srt$ (in c.m. frame).
+The string masses will be
+\begin{equation}
+  M_1^2= x^-(1-x^+)s-p^2_T, \qquad M_2^2=x^+(1-x^-)s-p^2_T,
+\end{equation}
+respectively.
+Minimum momentum fractions are
+ $x_{min}^+=p_2^+/P^+$ and $x_{min}^-=p_1^-/P^-$.
+For light-cone momentum transfer for the non-diffractive events,
+ we use the same distribution as that in
+DPM~\cite{dpm} and HIJING~\cite{hijing}:
+\begin{equation}
+  P(x^{\pm})= {(1.0-x^{\pm})^{1.5}\over (x^{\pm2}+c^2/s)^{1/4}}\ ,
+\end{equation}
+for baryons and
+\begin{equation}
+  P(x^{\pm})= {1\over (x^{\pm2}+c^2/s)^{1/4}((1-x^{\pm})^2+c^2/s)^{1/4}}\ ,
+\end{equation}
+for mesons, where $c=0.1 $GeV is a cutoff.
+For single-diffractive events, in order to reproduce
+experimentally observed mass distribution $dM^2/M^2$,
+we use the distribution
+\begin{equation}
+   P(x^{\pm})={1 \over (x^{\pm2}+c^2/s)^{1/2}}.
+\end{equation}
+
+
+The same functional form as the HIJING model~\cite{hijing}
+  for the soft $\pp_T$ transfer at low 
+%$\pp_T<p_0$
+$p_T<p_0$
+is used
+\begin{equation}
+   f(\pp_T) = \left\{ (p_T^2+c_1^2)(p_T^2+p_0^2)
+                     (1+e^{(p_T-p_0)/c_2})  \right\}^{-1} ~,
+\end{equation}
+where $c_1=0.1\GeVc$, $p_0=1.4\GeVc$ and $c_2=0.4\GeVc$,
+to reproduce the high momentum tail of the particles
+at energies $E_{lab}=10\sim20$GeV.
+
+
+
+
+The strings are assumed to hadronize via quark-antiquark 
+or diquark-antidiquark % (AO)
+creation using Lund fragmentation model PYTHIA6.1\cite{pythia}.
+Hadron formation points from a string fragmentation
+are assumed to be given by
+  the yo-yo formation point~\cite{bialas} which is defined by the 
+  first meeting point of created quarks.
+Yo-yo formation time is about 1fm/c assuming the string
+tension $\kappa=1$ GeV/fm at AGS energies.
+
+%+ADD
+In the Lund string model, space-time coordinates and energy-momentum
+coordinates for the quarks are directly related
+ via the string tension~\cite{lund,lund2}.
+Let us consider one-dimensional massless $q\bar q$ string in the c.m..
+If $x_i^{\pm}=t_i\pm x_{zi}$ denote the light-cone coordinates of the 
+$i$th production point, then the light cone momenta
+$p_i^{\pm}=E_n\pm p_{zi}$ of the $i$ th rank hadron
+which is produced by the energy-momentum fraction $z_i$
+from ($i-1$)th string $  p^+_i = z_i p^+_{i-1}$
+ are fixed by
+\begin{equation}
+p_i^+ = \kappa (x_{i-1}^+ - x_i^+),\quad
+p_i^- = \kappa (x_i^- - x_{i-1}^-),
+\end{equation}
+with initial value
+\begin{equation}
+  x^+_0 = {W\over \kappa},\qquad x^-_0=0,
+\end{equation}
+where $W$ corresponds to the string initial invariant mass.
+Using the relation $p_i^+p_i^-=m_{i\perp}^2$ with
+$m_{i\perp}$ being transverse mass of the $i$th hadron,
+we have the recursion formulae~\cite{lund}
+\begin{equation}
+  x_i^+ = (1-z_i)x^+_{i-1}, \quad
+  x_i^- = x^-_{i-1} + \left({m_{i\perp}\over \kappa}\right)^2
+                   {1-z_i\over z_i}{1\over x^+_i}.
+\end{equation}
+Therefore, yo-yo formation points are obtained as
+\begin{equation}
+    x_i^{yoyo}=(x_{i-1}^+,x_i^-), \label{eq:yoyo}
+\end{equation}
+and constituent formation points
+\begin{equation}
+    x_i^{const}=(x_i^+,x_i^-). \label{eq:const}
+\end{equation}
+In RQMD~\cite{rqmd2}, the formation points of hadrons are calculated
+as the average of the two $q\bar q$ production point as
+\begin{equation}
+    x_i^{rqmd}
+  =\left({x_i^+ + x_{i-1}^+\over 2},{x_i^-+x_{i-1}^-\over 2}\right).
+  \label{eq:rqmd}
+\end{equation}
+Clearly, one can see that
+\begin{equation}
+    x_i^{const} < x_i^{rqmd} < x_i^{yoyo} ~.
+\end{equation}
+As a default, JAM uses yo-yo formation point.
+The different formation points can be used by the switch \ttt{mstc(72)}.
+
+
+
+
+
+\section{Program description}
+
+
+\subsection{Random number generator}
+Default random number generator in JAM\VERSION~ is
+taken from PYTHIA. Another random number generator can be used
+when the user rewrite the {\tt function rn}.
+
+\subsection{Main subroutines}
+
+The main program has to be supplied by the user.
+These three subroutines are to be called by the main program.
+\begin{entry}
+\itemt{subroutine jaminit(nev,bmin,bmax,dt,nstep,chfram,chbeam,chtarg,cwin)}
+\itemt{subroutine jamevt(iev)}
+\itemt{subroutine jamfin}
+\end{entry}
+
+
+
+\begin{verbatim}
+subroutine jaminit(nev,bmin,bmax,dt,nstep,chfram,chbeam,chtarg,cwin)
+\end{verbatim}
+Purpose: to initialize the program.
+This subroutine should be called only once before simulate collision event.
+ It reads the parameters
+from either the initialization file named {\tt fname(1)} specified by user
+or the main program.
+\medskip
+
+%\begin{description}
+\begin{entry}
+\iteme{nev:} integer; specifying the number of total events
+  to be generated.
+\iteme{bmin:} real*8; Minimum impact parameter(fm).
+\iteme{bmax:} real*8; Maximum impact parameter(fm).
+If ${\tt bmax}<0$, impact parameter is distributed
+      according to the squared $b^2$ distribution
+       between {\tt bmin} and {\tt bmax},
+     while ${\tt bmax}>0$, impact parameter is uniformly distributed
+     between {\tt bmin} and {\tt bmax}.
+      If $\ttt{mstc(18)} \mbox{(number of impact parameter bin)} >1$,
+     impact parameter is distributed by the bin
+      $\delta b=(\ttt{bmax}-\ttt{bmin})/\ttt{mstc(18)}$
+      and total number of simulation event becomes
+          $\ttt{mstc(18)}\times \ttt{nev}$.
+
+\iteme{dt:} real*8: time step size in fm/c.
+
+\iteme{nstep:} integer: total number of time step.
+
+\iteme{chfram:} character*8 : computational frame. Available options are
+  \begin{subentry}
+    \iteme{'nn':}        nucleon-nucleon center of mass frame.
+    \iteme{'cm':}        Total center of mass frame.
+    \iteme{'lab':}       Laboratory frame.
+    \iteme{'collider':} Collider experiment.
+    \iteme{'user':}   User has to specified particle momemtum and
+                     coordinate. i.e.  common block \ttt{jamevnt1},
+                      \ttt{jamevnt2} and \ttt{jamjet1}
+                     should be filled up by the user as a initial condition
+                     of simulation.
+    \iteme{'box1.00':} Box calculation to simulate infinite matter,where
+                       1.00 corresponds to the density in
+                        $\rho_{0}$ (normal nuclear matter) unit.
+  \end{subentry}
+
+\iteme{chbeam, chtarg:} character*8 : Projectile and target.
+ \begin{subentry}
+  \iteme{'p':}     proton.
+  \iteme{'pbar':}  antiproton.
+  \iteme{'n':}     neutron.
+  \iteme{'nbar':}  antineutron.
+  \iteme{'pi-':}   negative pion.
+  \iteme{'pi0':}   neutral pion.
+  \iteme{'pi+':}   positive pion.
+  \iteme{'k-':}    negative kaon.
+  \iteme{'k+':}    positive kaon.
+  \iteme{'197Au'}  Gold nucleus,
+         where \ttt{197} indicates mass number of nucleus
+         and {\tt Au} specifies proton number.
+          'H', 'He', 'Li', 'Be',B','C',....... can be used.
+  \itemt{\tt '100:50'} total mass number \ttt{100} and \ttt{50} neutrons.
+ \end{subentry}
+
+\iteme{cwin:} character*15 : Incident energy with a unit.
+ In the case of \ttt{fram}=\ttt{'user'} or \ttt{'box'}, \ttt{cwin}
+is used to estimate the hard cross section above the c.m. energy
+of 10GeV. So if the c.m. energy of expected two-body collision
+among hadrons are blow 10GeV, \ttt{cwin} does not matter, but
+should be set below 10GeV.
+    Input examples are the follows:
+ \begin{subentry}
+  \iteme{'100mev':}  incident energy is 100MeV per nucleon.
+  \iteme{'100mevc':} incident momentum is 100MeV/c per nucleon.
+  \iteme{'100gev':}  incident energy is 100GeV per nucleon.
+  \iteme{'100gevc':} incident momentum is 100GeV/c per nucleon.
+  \iteme{'200gev':}  total energy $\sqrt{s}$ is 200GeV per nucleon,
+                     in the case of ${\tt chframe}={\tt 'collider'}$.
+ \end{subentry}
+%\end{description}
+\end{entry}
+
+
+\begin{verbatim}
+subroutine jamevt(iev)
+\end{verbatim}
+{\bf Purpose:} to simulate complete one event.
+\begin{entry}
+ \iteme{iev:} Current event number (input).
+\end{entry}
+
+\begin{verbatim} subroutine jamfin \end{verbatim} {Purpose:} to finish up
+simulation.
+
+
+
+
+
+\subsection{Common blocks for event record}
+
+\begin{verbatim}
+      parameter (mxv=30000)
+      common /jamevnt1/r(5,mxv),p(5,mxv),v(5,mxv),k(11,mxv)
+      common /jamevnt2/nv,nbary,nmeson
+\end{verbatim}
+
+\begin{entry}
+\itemt{nv:}    Line number which is used during the simulation
+               i.e., number of line occupied by the current event.
+\itemt{nbary:}  Line number of baryons. Baryons are stored in the
+                line \ttt{i=1$\sim$ nbary}.
+\itemt{nmeson:}  The particles other than baryons  are stored in the
+                line \ttt{i=nbary+1$\sim$ nv}.
+\end{entry}
+
+\bigskip
+
+\begin{entry}
+\itemt{r(1,i) :} x-position (fm).
+\itemt{r(2,i) :} y-position (fm).
+\itemt{r(3,i) :} z-position (fm).
+\itemt{r(4,i) :} time of particle (fm/c).
+\itemt{r(5,i) :} Formation time (fm/c) for the hadron which has
+                 constituent quarks.  This has same value as {\tt r(4,i)},
+                 if the particle is newly produced particles.
+\medskip
+\itemt{p(1,i):} x-momentum (GeV/c).
+\itemt{p(2,i):} y-momentum (GeV/c).
+\itemt{p(3,i):} z-momentum (GeV/c).
+\itemt{p(4,i):} kinetic energy $=\sqrt{p_i^2 + m_i^2}$.
+\itemt{p(5,i):} mass of particle (GeV/c$^2$).
+
+\medskip
+\itemt{v(1,i):} production vertex point, x-position (fm).
+\itemt{v(2,i):} production vertex point, y-position (fm).
+\itemt{v(3,i):} production vertex point, z-position (fm).
+\itemt{v(4,i):} production vertex point, time (fm/c).
+\itemt{v(5,i):} life time of the particle in fm/c if it is unstable.
+
+\medskip
+
+\itemt{k(1,i):} status code KS, which gives the current status of
+	            the particle stored in the line.
+\begin{subentry}
+% \itemt{$<0$:}  particle entries with negative status codes are only
+%             virtually present and become active only after a certain
+%             formation time.
+ \itemt{$<0$:}  particle entries which have some constituent quarks.
+            Other virtual sea quarks are formed after a certain
+            formation time.
+ \itemt{$> 11$:} no longer exist. i.e., absorbed particles.
+ \itemt{$=1$:} stable particle.
+ \itemt{$=2$:} resonance.
+ \itemt{$=3$:} string.
+ \itemt{$=4$:} parton.
+ \itemt{$=5$:} nuclear cluster.
+ \itemt{$=-1$:} virtual stable particle (not resonance).
+ \itemt{$=-2$:} virtual unstable particle (resonance).
+ \itemt{$=-11$:} virtual stable particle but constituent quark can interact.
+ \itemt{$=-12$:} virtual resonance particle but constituent quark can interact.
+ \itemt{$=-21$:} virtual stable particle but constituent di-quark can interact.
+ \itemt{$=-22$:} virtual resonance but constituent di-quark can interact.
+ \itemt{$=-31$:} virtual stable particle but constituent 2quarks
+                 in a baryon can interact.
+ \itemt{$=-32$:} virtual resonance but constituent 2quarks in a baryon
+                 can interact.
+\end{subentry}
+
+\itemt{k(2,i):} KF particle code i.e. Particle Data Group numbering scheme.
+\itemt{k(3,i):} 1000*{\tt mste(1)}+{\tt mste(2)}.
+               See section \ref{sec:swi} for the meaning of the
+               values \ttt{mste(1)} and \ttt{mste(2)}.
+\itemt{k(4,i):} origin of production.
+       In the case of collision: 1000*{\tt mste(22)}+{\tt mste(24)},
+       while produced from decay: {\tt mste(24)}=KF code of mother particle.
+\itemt{k(5,i):} collision counter (internal use to avoid second collision).
+\itemt{k(6,i):} multi-step history of collisions.
+\itemt{k(7,i):} number of collision suffered so far (initial value is
+               set to be  1 for projectile and -1 for target respectively.
+\itemt{k(8,i):} identify the same ensemble among test particles.
+\itemt{k(9,i):} three times the baryon number.
+\itemt{k(10,i):} minimum line number of color flow connection
+    in the case of parton. for hadrons this is zero.
+\itemt{k(11,i):} maximum line number of color flow connection
+    in the case of parton. for hadrons this is zero.
+\end{entry}
+
+
+
+
+
+\subsection{Common blocks for Particle Data}
+
+The following common blocks which contain particle
+data are essentially the same as 
+ PYTHIA6.1 program~\cite{pythia} with some modifications.
+
+\begin{verbatim}
+      common/pydat2/kchg(500,7),pmas(500,4),parf(2000),vckm(4,4)
+      common/pydat3/mdcy(500,3),mdme(4000,3),brat(4000),kfdp(4000,5)
+\end{verbatim}
+{\bf Purpose:} to give particle/parton  data. Particle data is
+ stored by compressed code KC that can be calculated by calling function
+  {\tt kc=jamcomp(kf)} where {\tt kf} corresponds to the particle flavor code.
+I refer users to the original PYTHIA manual~\cite{pythia}
+   for detailed description.
+
+
+\begin{entry}
+\item[{\tt kchg(kc,1)}:] three times particle charge.
+\item[{\tt kchg(kc,2)}:] color information.
+\item[{\tt kchg(kc,3)}:] particle/antiparticle distinction.
+\item[{\tt kchg(kc,4)}:] PDG code.
+\item[{\tt kchg(kc,5)}:] particle family ID.
+\item[{\tt kchg(kc,6)}:] three times baryon number.
+\item[{\tt kchg(kc,7)}:] strangeness.
+\medskip
+\item[{\tt pmas(kc,1)}:] mass in GeV.
+\item[{\tt pmas(kc,2)}:] total decay width in GeV.
+\item[{\tt pmas(kc,3)}:] deviation of BW.
+\item[{\tt pmas(kc,4)}:] the average life time in mm.
+\medskip
+\item[{\tt mdcy(kc,1)}:] switch to tell whether a particle may be allowed
+                         to decay or not.
+     \begin{subentry}
+        \itemt{$=0$:} the particle is not allowed to decay.
+        \itemt{$=1$:} the particle is allowed to decay.
+     \end{subentry}
+\item[{\tt mdcy(kc,2)}:] entry point into the decay channel table
+                         for compressed code kc.
+                        It is 0, if no decay channels have been defined.
+\item[{\tt mdcy(kc,3)}:] total number of decay channels.
+\medskip
+\item[{\tt mdme(idc,1)}:] on/off switch for individual decay channel.
+     \begin{subentry}
+       \itemt{$=0$:} channel is switched off.
+       \itemt{$=1$:} channel is switched on.
+     \end{subentry}
+
+\item[{\tt mdme(idc,2)}:] matrix element in decay.
+     \begin{subentry}
+       \itemt{$=0$:} momentum of particles are determined from
+           phase space.
+       \itemt{$=1$:} $\omega$ and $\phi$ decays into three pions.
+     \end{subentry}
+\item[{\tt mdme(idc,3)}:]  relative angular momentum for each decay channel
+                           in two-body decay.
+\end{entry}
+For the detailed meaning of \ttt{mdme(idc,1),mdme(idc,2),mdme(idc,3)},
+  See the original manual Ref.~\cite{pythia}.
+
+
+\subsection{Further common blocks}
+
+For completeness, we list here the common blocks which contain
+ include file {\tt jam1.inc}.
+
+\begin{verbatim}
+      common/jamjet1/vq(10,mxv),kq(2,mxv)
+\end{verbatim}
+{\bf Purpose:} to store parton properties or decay orientation.
+
+ For the strings,
+\begin{entry}
+\itemt{kq(1,i):} flavor code of    quark.
+\itemt{kq(2,i):} flavor code of    diquark (anti-quark).
+\itemt{vq(1,i):} $p_x$ (GeV/c) of parton     (quark).
+\itemt{vq(2,i):} $p_y$ (GeV/c) of parton     (quark).
+\itemt{vq(3,i):} $p_z$ (GeV/c) of parton     (quark).
+\itemt{vq(4,i):} energy(GeV)  of parton  (quark).
+\itemt{vq(5,i):}  mass (GeV/c$^2$) of parton    (quark).
+\itemt{vq(6,i):} $p_x$ (GeV/c) of parton     (diquark/anti-quark).
+\itemt{vq(7,i):} $p_y$ (GeV/c) of parton     (diquark/anti-quark).
+\itemt{vq(8,i):} $p_z$ (GeV/c) of parton     (diquark/anti-quark).
+\itemt{vq(9,i):}  energy (GeV)of parton  (diquark/anti-quark).
+\itemt{vq(10,i):} mass of(GeV/c$^2$) parton    (diquark/anti-quark).
+\end{entry}
+
+\medskip
+For the resonances, \ttt{kq(j,i)} and \ttt{vq(j,i)} contain the following
+information:
+\begin{entry}
+\itemt{kq(1,i):} $=999999$.
+\itemt{kq(2,i):} $=0$.
+\itemt{vq(1,i):} $\beta_x$ (GeV/c) in two-body c.m..
+\itemt{vq(2,i):} $\beta_y$ (GeV/c)  in two-body c.m..
+\itemt{vq(3,i):} $\beta_z$ (GeV/c)  in two-body c.m..
+\itemt{vq(4,i):} $\gamma$ in two-body c.m..
+\itemt{vq(5,i):} $\phi$  in two-body c.m.
+\itemt{vq(6,i):} $\theta$ in two-body c.m.
+\itemt{vq(7,i):} $=0$.
+\itemt{vq(8,i):} $=0$.
+\itemt{vq(9,i):} $=0$.
+\itemt{vq(10,i):} $=0$.
+\end{entry}
+
+\begin{verbatim}
+      common/jamsave1/rcp(5,6),pcp(5,6),vcp(5,6),kcp(11,6)
+      common/jamsave2/vqcp(10,6),kqcp(2,6)
+\end{verbatim}
+{\bf Purpose:} to save two-body collision information.
+Before performing two-body collision or decay,
+ particle information is stored in \ttt{common jamsave1, jamsave2}.
+Meaning is the same as corresponding vectors.
+
+
+\begin{verbatim}
+      parameter (mxcoll=50000)
+      common/jamcol/coll(6,mxcoll),icoll(3,mxcoll),mentry
+\end{verbatim}
+{\bf Purpose:} to store collision matrix.
+\begin{entry}
+\itemt{mxcoll:} Maximum collision number in each time step.
+\itemt{mentry:} number of entry of collision pair which will collide.
+\itemt{icoll(1,i):} line number of particle 1 specified by collision entry i.
+\itemt{icoll(2,i):} line number of particle 2 specified by collision entry i.
+\itemt{icoll(3,i):} cell number specified by collision entry i
+                  used in box calculation.
+\itemt{coll(1,i):} contain time of collision in computational frame (fm/c).
+\itemt{coll(2,i):} contain total cross section (mb).
+\itemt{coll(3,i):} contain elastic cross section (mb).
+\itemt{coll(4,i):} contain impact parameter squared (fm$^2$).
+\end{entry}
+
+\begin{verbatim}
+      common/jamcell/rcell(3,27)
+\end{verbatim}
+{\bf Purpose:} to store cell for box calculation.
+\begin{entry}
+\itemt{rcell(i,j):} cell in the case of BOX calculation.
+\end{entry}
+
+
+
+
+
+
+\subsection{The General Switches, Options and Parameters}\label{sec:swi}
+
+\begin{verbatim}
+      common/jamdat1/mstc(200),parc(200),mstd(200),pard(200)
+\end{verbatim}
+{\bf Purpose:} to contain input parameters, default values and options
+ in \ttt{mstc} and \ttt{parc}. The  \ttt{mstd} and \ttt{pard}
+ give event information. Default values are indicated by (D=),
+while variables that used internally are denoted by (I).
+
+\begin{entry}
+\itemt{mstc(1) :} (D=19780503) random seed.
+\itemt{mstc(2) :} (D=1) total number of event to be generated.
+\itemt{mstc(3) :} (D=1) total number of time step.
+           \ttt{mstc(3)$\times$parc(2)} is a time (fm/c) in the case of
+          \ttt{mstc(44)=1}.
+\itemt{mstc(4) :} (D=2) computational frame.
+ \begin{subentry}
+        \itemt{$=0$:} laboratory system.
+        \itemt{$=1$:} overall c.m. system.
+        \itemt{$=2$:} nucleon-nucleon c.m. system.
+        \itemt{$=3$:} collider.
+       \itemt{$=10$:} box.
+       \itemt{$=100$:} user defined initial condition.
+ \end{subentry}
+\itemt{mstc(5) :} number of test particles.
+\itemt{mstc(6) :} (D=0) treatment of AA collisions.
+   \begin{subentry}
+      \itemt{$<-101$ :} Collisions are generated according to the 
+                     mean free path argument. This option can only
+                     be used with baryon-nucleus collisions.
+      \itemt{$=-111$ :} mean free path method 1 with uniform matter density.
+      \itemt{$=-112$ :} mean free path method 1 with Fermi density.
+      \itemt{$=-121$ :} mean free path method 2 with uniform matter density.
+      \itemt{$=-122$ :} mean free path method 2 with Fermi density.
+      \itemt{$=-131$ :} mean free path method 3 with uniform matter density.
+      \itemt{$=-132$ :} mean free path method 3 with Fermi density.
+
+       where, mean free path method 1 is defined as following~\cite{KK}:\\
+       We determine the collision point according to the probability
+       distribution $dP=\exp(-dr/\lambda)/\lambda dr$,
+       with $\lambda=1/(P_p+P_n+P_d)$,
+       $P_p=\sigma_p\rho_p$, $P_n=\sigma_n\rho_n$
+       $P_d=\Gamma/v\gamma$.
+
+       In method 2 and 3, collision probabilities are
+       calculated from 
+       $dP=\sigma \rho(\rr)dz$ and $dP=\sigma \rho(\rr)v dt$ respectively
+       in order to account for the defuseness of the nuclear density.
+       Note that \ttt{mstc(6)=-112} would not give correct collision
+       probability.
+
+
+      \itemt{$=-3$ :} Glauber type multiple collision for AA collision,
+                      sequential collisions are generated according to
+                      the additive quark cross section.
+      \itemt{$=-2$ :} Glauber type multiple collision for AA collision,
+                      but if the scattering of baryons
+                      which have only one-constituent quark are not 
+                      considered.
+      \itemt{$=-1$ :} Glauber type multiple collision for AA collision,
+                      Fritiof type calculation.
+      \itemt{$=-21,-22,-23$ :} same as \ttt{mstc(6)=-1,-2,-3},
+      but after performing
+       all predicted NN collisions and fragment strings,
+       final state hadron interaction are simulated (not work now).
+
+      \itemt{$=0$ :} Cascade mode.
+      \itemt{$=1$ :} no collision and no mean field.
+      \itemt{$=2$ :} BUU mode: Soft Skyrm force and no collision.
+      \itemt{$=4$ :} BUU mode: Hard Skyrm force and no collision.
+      \itemt{$=12$ :} BUU mode: Soft Skyrm force.
+      \itemt{$=14$ :} BUU mode: Hard Skyrm force.
+   \end{subentry}
+
+\itemt{mstc(7) :} (D=0) selection of a reaction type. This version only
+    allows $=0$.
+\comment{
+      = 0 : light and heavy-ion collisions as well as proton, anti-proton
+           ,kaon, pion .... induced.
+      = 41: Stopped K- reaction  (Not implemented now).
+      = 42: Stopped Xi- reaction  (Not implemented now).
+      = 42: Stopped Omega- reaction (Not implemented now).
+      = 43: (K-,K+)                  (Not implemented now).
+      = 44: Charm nucleus production (Not implemented now).
+}
+
+\itemt{mstc(8) :} (D=0) Job mode (debug mode).
+\begin{subentry}
+\itemt{$=0$:} almost no information are printed. This is useful for large JOB.
+\itemt{$=1$:} simple information are printed.
+\itemt{$=2$:} detailed information are printed. After every collision and decay
+         various errors are checked (momentum conservation ....).
+\itemt{$=3$:} more detailed information are printed.
+\itemt{$=4$:} more and more detailed information are printed.
+\end{subentry}
+
+\itemt{mstc(9)  :}(D=27) contains number of cells for box simulation.
+\itemt{mstc(10) :} (D=1) number of impact parameter bin.
+
+\itemt{mstc(11) :} (D=1) check on possible errors.
+  \begin{subentry}
+        \itemt{$=1$:} No.
+        \itemt{$=2$:} stop program after writing out error message.
+  \end{subentry}
+
+\itemt{mstc(12)  :} (D=30) number of errors that are printed.
+
+\itemt{mstc(13)  :} (D=1) printing of warning messages.
+  \begin{subentry}
+        \itemt{$=0$:} no warning is written.
+        \itemt{$=1$:} \ttt{mstc(12)} warnings are printed.
+        \itemt{$=2$:} all warnings are printed.
+  \end{subentry}
+
+\itemt{mstc(14)  :} (D=30) number of warnings that are printed.
+
+\itemt{mstc(15)  :} not used.
+
+\itemt{mstc(16)  :}(D=0) display particles on any terminal during the 
+                   simulation.  Time step for display can be controlled
+                   by \ttt{parc(7)} and scale of display for \ttt{parc(6)}.
+\begin{subentry}
+       \itemt{$=0$ :} no display.
+       \itemt{$=1$ :} configuration space display (all hadrons).
+       \itemt{$=2$ :} configuration space display (baryons only).
+       \itemt{$=3$ :} configuration space display (mesons only).
+       \itemt{$=11$:} momentum space display (all hadrons).
+       \itemt{$=12$:} momentum space display (baryons only).
+       \itemt{$=13$:} momentum space display (mesons only).
+\end{subentry}
+
+\itemt{mstc(17):} (D=0) switch in the case of elementary
+           ($pp$,$\pi p$...)collisions.
+       \itemt{$=0$ :} Inelastic as well as  elastic collisions are
+                      generated.
+       \itemt{$=1$ :} only inelastic collisions are generated.
+
+\itemt{mstc(18)-mstc(19)  :} not used.
+\itemt{mstc(20) :}(D=0) flag for call of \ttt{subroutine jamsetp}.
+   if \ttt{jamsetp} was called \ttt{mstc(20)$=1$}.
+
+\itemt{mstc(21) :}(D=0)(I) number of call of \ttt{subroutine jaminit}.
+                   This is mainly used for the initialization
+                   procedures which is necessary only once.
+
+%---------------------------------------------------
+
+\itemt{mstc(22) :} (I) starting point of KC code for $N^*$ resonance.
+\itemt{mstc(23) :} (I) end point of KC code for $N^*$ resonance.
+\itemt{mstc(24) :} (I) starting point of KC code for $\Delta^*$.
+\itemt{mstc(25) :} (I) end point of KC code for $\Delta^*$.
+\itemt{mstc(26) :} (I) starting point of KC code for $\Lambda^*$.
+\itemt{mstc(27) :} (I) end point of KC code for $\Lambda^*$.
+\itemt{mstc(28) :} (I) starting point of KC code for $\Sigma^*$.
+\itemt{mstc(29) :} (I) end point of KC code for $\Sigma^*$.
+\itemt{mstc(30) :} (I) starting point of KC code for $\Xi^*$.
+\itemt{mstc(31) :} (I) end point of KC code for $\Xi^*$.
+\itemt{mstc(32) :} (I) starting point of KC code for mesons.
+\itemt{mstc(33) :} (I) end point of KC code for mesons.
+
+%-----------------------------
+% Input and output file names
+%-----------------------------
+\itemt{mstc(34)-mstc(36) :} not used.
+
+\itemt{mstc(36) :}(D=1) I/O number for input configuration file:
+                   \ttt{fname(1)}.
+\itemt{mstc(37) :}(D=2) I/O number for output file : \ttt{fname(2)} that
+              print out some information on simulation conditions.
+\itemt{mstc(38) :}(D=3) I/O number for output of error message. \ttt{fname(3)}.
+\itemt{mstc(39) :}(D=4) I/O number for multi run control file. \ttt{fname(4)}.
+\itemt{mstc(40) :}(D=8) I/O number for \ttt{fname(5)}.
+
+\medskip
+
+%----------------------------------------------------------------------------
+\itemt{mstc(41)  :} (D=1) switch for resonance decay after simulation.
+  \begin{subentry}
+    \itemt{$=0$} all resonances ($\Delta$,$\rho$....) will remain
+                 after the end of simulation,
+                 if their decay time is longer than simulation time.
+    \itemt{$=1$} all resonances ($\Delta$,$\rho$....).
+                 are forced to decay at the end of simulation,
+                 if they remain undecayed.
+    \end{subentry}
+
+\itemt{mstc(42)  :} (D=1): option to turn off the weak decay of $\pi^0$,
+ $\Lambda$.....
+    \begin{subentry}
+        \itemt{$=0$:} allow weak decay after simulation.
+        \itemt{$=1$:} weak decay is turned off.
+    \end{subentry}
+\itemt{mstc(43)  :} (D=1) switch for inclusion of Fermi motion of nucleons
+                    in nucleus.
+    \begin{subentry}
+       \itemt{$=0$ :} without Fermi motion of nucleons.
+       \itemt{$=1$ :} Fermi motion is included.
+    \end{subentry}
+
+\itemt{mstc(44)  :} (D=1) switch for the end of calculation.
+    \begin{subentry}
+       \itemt{$=1$ :} simulation is stopped at the time=
+         \ttt{mstc(3)$\times$parc(2)} which is
+         specified by the user.
+       \itemt{$=2$ :}  simulation is continued until all collisions
+        and decays are not expected.
+    \end{subentry}
+
+\itemt{mstc(45)  :} (D=0) switch for the deuteron coalescence.
+    \begin{subentry}
+       \itemt{$=0$ :} no.
+       \itemt{$=1$ :} deuterons are formed at the end of simulation.
+    \end{subentry}
+
+\itemt{mstc(46)  :} (D=1) option for the treatment of cascading 
+   in the case of more than one parallel run.
+    \begin{subentry}
+       \itemt{$=1$ :} parallel ensemble method.
+       \itemt{$=2$ :} full ensemble method in which all particles
+                      among test particles can collide
+                      with reduced cross section
+                      $\sigma_{tot}/\tt{mstc(5)}$.
+    \end{subentry}
+
+
+%------------------------
+% Collisions 51-99
+%------------------------
+
+\itemt{mstc(51)(D=3)  :} switch for two body  collisions.
+    \begin{subentry}
+           \itemt{$=0$ :} only baryon-baryon collisions.
+           \itemt{$=1$ :} only baryon-baryon  and  meson-baryon collisions.
+           \itemt{$=2$ :} hadron-hadron collisions (no parton collisions).
+           \itemt{$=3$ :} hadron-parton and  hadron-hadron collisions.
+           \itemt{$=4$ :} all (not implemented in this version).
+    \end{subentry}
+
+\itemt{mstc(52) :} (D=5) switch for cascading method.
+    Collision frame is chosen to be the two particle center of mass frame,
+    but there are some option for the selection of ordering
+    of collision time and point~\cite{zpc,bin1}.
+ \begin{subentry}
+    \itemt{$=2$:} collisions and decays are ordered according to the
+                  average of the two collision times.
+    \itemt{$=3$:} the earlier collision time of the two collision times
+                  in the computational frame are taken to be the ordering time.
+    \itemt{$=4$:} the later collision time of the two collision times
+                  in the computational frame are taken to be the ordering time.
+    \itemt{$=5$:} the collision space point is the midpoint of
+                  the two particles in two-body c.m.frame.
+    \itemt{$=11$:} all particles have always same time whenever collision
+                   or decay happened; all particles are propagated up
+                   to this time.
+  \end{subentry}
+
+\itemt{mstc(53)(D=1) :} switch for treatment of particles which are within a
+                         formation time.
+ \begin{subentry}
+   \itemt{$=1$:} collision can happen with $\sigma_{hh}=$ additive quark
+                 cross section within a formation time.
+    \itemt{$=2$:}any collision can not happen within a formation time.
+    \itemt{$=3$:}no formation time for hadrons which has constituent quarks.
+ \end{subentry}
+
+\itemt{mstc(54) :} (D=1)
+  \begin{subentry}
+    \itemt{$=1$ :} avoid first collisions between nucleons among same nucleus
+                   that has not yet collided.
+   \itemt{$=0$ :}  allow all collisions.
+  \end{subentry}
+
+\itemt{mstc(55) :} (D=0) frozen resonance option.
+  \begin{subentry}
+   \itemt{$=0$ :} off.
+    \itemt{$=1$ :} this keeps unstable particles stable
+                   during the simulation and only decay
+                   after the end of simulation.
+  \end{subentry}
+
+\itemt{mstc(56) :} (D=1) switch for Pauli-blocking in collisions and decays.
+  \begin{subentry}
+     \itemt{$0$ :} no Pauli-blocking.
+     \itemt{$1$ :} blocking factor is calculated by the one-body phase space
+                   distribution function using Gaussian wave-packet as
+                   $f_{i}=\sum_{i \neq j}
+    =8\exp[-{(\rr_i-\rr_j)^2\over 2L} - {2L(\pp_i-\pp_j)^2\over \hbar^2} ]$,
+                  where $L$ is defined by the parameter \ttt{parc(15)}.
+   \itemt{$2$ :} blocking factor is calculated by Fusimi function as
+                 $f_i=\sum_{i \neq j}|<\phi_i|\phi_j>|
+       =\sum_{i \neq j}\exp[
+          -{(\rr_{i}-\rr_{j})^2\over 4L}-{(\pp_i-\pp_j)^2L\over \hbar^2}]$,
+                where $L$ is defined by the parameter \ttt{parc(15)}.
+  \end{subentry}
+
+\itemt{mstc(57) :} (D=0) not used.
+\comment{
+         =0: No
+         =1: Recalculate momenta of the colliding particles in order to
+             recover total energy conservation in case of potential forces act.
+}
+%------------------------
+% resonance
+%------------------------
+\medskip
+
+\itemt{mstc(61)(D=3) :} switch of baryon resonance decay angular distribution.
+\begin{subentry}
+  \itemt{$=0$ :} isotropic decay.
+  \itemt{$=1$ :} anisotropic with Gaussian $p_t$, width of Gaussian is
+                 \ttt{parc(43)}.
+  \itemt{$=2$ :} anisotropic + isotropic with Gaussian $p_t$, 
+                 width of Gaussian is \ttt{parc(43)}.
+  \itemt{$=3$ :} anisotropic with Gaussian $p_t$ distribution,
+                 but  ${d\sigma \over dp_t}$ is reinterpreted as 
+                ${d\sigma \over p_rd\theta}$,
+                where $p_r$ is relative momentum
+                in rest frame of decaying particle.
+                At high energies and forward angles, these become the same.
+\end{subentry}
+
+\itemt{mstc(62)(D=22) :} option for detailed balance formula.
+  \ttt{isw1=mod(mstc(62)/10,10)} is used for the choice of
+   Breit-Wigner function, while \ttt{isw2=mod(mstc(62),10)}
+   is used to specify different formula.
+\begin{subentry}
+   \itemt{isw1$=1$:} non-relativistic Breit-Wigner function
+                     $F(m)dm={\Gamma/2 \over (m-m_0)^2 + \Gamma^2/4}dm$
+                     is used.
+   \itemt{isw1$=2$:} relativistic Breit-Wigner function
+                   $F(m)dm={2mm_0dm\Gamma \over (m^2-m_0^2)^2 + (m_0\Gamma)^2}$
+                     is used.
+   \itemt{isw1$=3$:} relativistic Breit-Wigner function
+                    $F(m)dm={2m^2dm\Gamma \over (m^2-m_0^2)^2 + (m\Gamma)^2}$
+                     is used.
+   \itemt{isw2$=0$:} constant decay width is used.
+   \itemt{isw2$=1$:} no-momentum dependence in integration~\cite{detbal1}.
+   \itemt{isw2$=2$:} momentum dependence in integration.
+   \itemt{isw2$=3$:} P.Danielevicz and G.F.Bertch formula
+                         ~\cite{detbal1,detbal2}.
+\end{subentry}
+
+\itemt{mstc(63) :}(D=3) option for the formula of $\Delta(1232)$ decay width.
+ \begin{subentry}
+  \itemt{$=0$:} no decay(frozen delta).
+  \itemt{$=1$:} formula by Frankfurt group.
+  \itemt{$=2$:} formula by Giessen group.
+  \itemt{$=3$:} formula in Ref.~\cite{dwid1}.
+  \itemt{$=4$:} formula by Kitazoe \etal Ref~\cite{Kitazoe}.
+ \end{subentry}
+
+\itemt{mstc(64) :}(D=3) option for the method of sampling resonance mass
+                        distribution in non-strange baryon-baryon collisions.
+ \begin{subentry}
+  \itemt{$=0$:} mass is sampled according to the probability $p(m)dm= dm/m$.
+  \itemt{$=1$:} mass is selected by Breit-Wigner,
+                but individual resonance states are selected from only spin.
+  \itemt{$=2$:} mass and individual resonance states are selected by
+                the probability obtained from integrated Breit-Wigner.
+  \itemt{$=3$:} same as 2 but width in Breit-Wigner function
+                is momentum dependent.
+ \end{subentry}
+
+\itemt{mstc(65) :} (D=1) option for the resonance width for decay.
+ \begin{subentry}
+         \itemt{$=1$ :} momentum dependent width.
+         \itemt{$=0$ :} constant width.
+ \end{subentry}
+
+\itemt{mstc(66)(D=0) :} option for the treatment of s-wave pion production
+   in nucleon-nucleon collisions. 
+ \begin{subentry}
+    \itemt{$=0$ :} s-wave one-pion production is effectively simulated by
+        $NN \to NN(1440)^*$.
+    \itemt{$=1$ :} include s-wave pion productions explicitly,
+                   as $NN\to NN\pi$.
+ \end{subentry}
+
+\itemt{mstc(67),mstc(68),mstc(69),mstc(70) :} (D=2,2,2,2)
+     selection of the angular distribution for
+     resonance production scattering in $BB$(\ttt{mstc(67)}),
+     $MB$(\ttt{mstc(68)}), $MM$(\ttt{mstc(69)}) and $\Bbar B$(\ttt{mstc(70)})
+     collisions at energy above $\srt=2.17$GeV.
+ \begin{subentry}
+    \itemt{$=2$ :} angular dependence is sampled by $\exp(bt)$ distribution.
+                   See \ttt{parc(44)-parc(46)}.
+    \itemt{$=4$ :} angular dependence is sampled by Gaussian distribution:
+                   $\exp[-(p_T/\ttt{parc(47)})^2]$.
+    \itemt{$=5$ :} angular dependence is sampled by Gaussian plus
+                    exponential distribution:
+        $\exp[-p_T/\ttt{parc(48)})]+\ttt{parc(49)}\exp[-p_T/\ttt{parc(47)})]$.
+ \end{subentry}
+%----------------------
+% soft interactions
+%----------------------
+\medskip
+
+\itemt{mstc(71)(D=1) :} switch for diffractive reaction in hh collisions.
+ \begin{subentry}
+    \itemt{$=0$ :} diffractive scattering off.
+    \itemt{$=1$ :} on.
+ \end{subentry}
+
+\itemt{mstc(72)(D=2) :} switch for hadron formation point from string decay.
+ \begin{subentry}
+    \itemt{$=1$:} constituent production formation point.
+    \itemt{$=2$:} yo-yo formation point.
+    \itemt{$=3$:} mean value of yo-yo point and constituent production point.
+    \itemt{$=4$:} constant formation time specified by \ttt{parc(55)}.
+ \end{subentry}
+
+\itemt{mstc(73):}(D=2) choice of baryon production model in string decay
+    (same as \ttt{mstj(12)} in PYTHIA).
+ \begin{subentry}
+   \itemt{$=0$ :} no baryon-antibaryon pair production at all.
+   \itemt{$=1$ :} diquark-antidiquark pair production allowed; diquark
+                  treated as a unit.
+   \itemt{$=2$ :} diquark-antidiquark pair production allowed;
+           with possibility for diquark breaking according to 'popcorn' scheme.
+   \itemt{$=3$ :} as =2, but with improved SU(6) treatment.
+   \itemt{$=4$ :} as =3, but also suppressing diquark vertices with low Gamma
+                  values.
+   \itemt{$=5$ :} revised popcorn model. Independent of \ttt{parj(3-7)}.
+                  Depending on \ttt{parj(8-10)}. Including the same kind of
+                 suppression as =4.
+ \end{subentry}
+
+\itemt{mstc(74)(D=1) :} switch for dipole-approximated QCD radiation
+                    of the string system in soft interactions.
+
+ \begin{subentry}
+   \itemt{$=0$ :} off.
+   \itemt{$=1$ :} on.
+ \end{subentry}
+
+\itemt{mstc(75)(D=1) :} switch for the $p_t$ kick due to soft interactions
+                 (\ttt{ihpr2(5)} in HIJING).
+ \begin{subentry}
+   \itemt{$=0$ :} $p_t$ kick is sampled by Gaussian.
+   \itemt{$=1$ :} include extra low $p_t$ transfer to the valence quarks
+       with parameter \ttt{parc(67-68)}.
+ \end{subentry}
+
+\itemt{mstc(76) (D=0) :} treatment string in space-time.
+    =0: all strings decay into hadrons immediately taking
+       the formation time into account. 
+    =1: strings from hard scattering
+       are explicitly propagated.
+    =2: strings from soft excitation as well as hard scattering
+       are explicitly propagated (see parc(72)) (not work now).
+
+
+%------------------
+%  hard scattering
+%------------------
+\medskip
+
+\itemt{mstc(81) :} (D=1)  switch for hard scattering.
+ \begin{subentry}
+    \itemt{$=0$ :} off.
+    \itemt{$=1$ :} hard scattering on.
+ \end{subentry}
+
+\itemt{mstc(82) :}(D=3) choice of proton structure functions.
+ \begin{subentry}
+    \itemt{$=1$ :} EHLQ set 1 (1986 updated version).
+    \itemt{$=2$ :} EHLQ set 2 (1986 updated version).
+    \itemt{$=3$ :} Duke-Owens set 1.
+    \itemt{$=4$ :} Duke-Owens set 2.
+    \itemt{$=5$ :} CTEQ2M (best MSbar fit)
+    \itemt{$=6$ :} CTEQ2MS (singuar at small x)
+    \itemt{$=7$ :} CTEQ2MF (flat at small x)
+    \itemt{$=8$ :} CTEQ2ML (large $\Lambda$)
+    \itemt{$=9$ :} CTEQ2L (best leading order fit)
+    \itemt{$=10$ :} CTEQ2D (best DIS fit)
+    \itemt{$=11$ :} CRV LO (1992 updated version)
+    \itemt{$=12$ :} CTEQ 3L (leading order). 
+    \itemt{$=13$ :} CTEQ 3M (MSbar).
+    \itemt{$=14$ :} CTEQ 3D (DIS).
+    \itemt{$=15$ :} GRV 94L (leading order).  % *
+    \itemt{$=16$ :} GRV 94M (MSbar).
+    \itemt{$=17$ :} GRV 94D (DIS).
+ \end{subentry}
+
+\itemt{mstc(83) :}(D=1) 
+ \begin{subentry}
+     \itemt{$=1$ :} probability of number of jet from HIJING formalism.
+     \itemt{$=2$ :} probability of number of jet from PYTHIA formalism.
+ \end{subentry}
+
+\itemt{mstc(84) :}(D=0) Option for nuclear shadowing effect.
+ \begin{subentry}
+            \itemt{$=0$ :} off.
+            \itemt{$=1$ :} on.
+ \end{subentry}
+
+\itemt{mstc(85) :}(D=2) choice of scheme for parton collision-time estimate.
+ \begin{subentry}
+            \itemt{$=1$ :} exponential distribution.
+            \itemt{$=2$ :} Gyulassy-Wang distribution.
+ \end{subentry}
+
+
+%
+%  BUU part
+%
+\medskip
+
+\itemt{mstc(101) :}(D=0) option for Coulomb potential.
+ \begin{subentry}
+            \itemt{$=0$ :} off.
+            \itemt{$=1$ :} on.
+ \end{subentry}
+\itemt{mstc(102) :}(D=1) time step to calculate the boundary of Coulomb.
+
+
+\medskip
+%---------------------------
+\subsubsection*{ Event study and analysis}
+The following switches are provided for the study of
+some observable and time evolution of particle
+in the case of \ttt{mstc()}=1.
+As a default (D=0), nothing is done.
+%---------------------------
+%General observable:
+% if =2, output every run.
+\comment{mstc(151): (D=0) not used (Nuclear cluster analysis)}
+
+\itemt{mstc(152):} (D=0) rapidity spectra $dN/dy$.
+\itemt{mstc(153):} (D=0) transverse momentum spectra $1/p_{\perp}dN/dp$.
+\itemt{mstc(154):} (D=0) particle multiplicity.
+\itemt{mstc(155):} (D=0) flow $d<Px>/dy$, $d<P_t>/dy$.
+\itemt{mstc(156):} (D=0) invariant energy distribution of two-body collisions.
+\itemt{mstc(157):} (D=0) output sampled ground state.
+
+\medskip
+Time dependent studies:
+\itemt{mstc(161):} (D=0) all analyses will not be done.
+\itemt{mstc(162):} (D=0) count two-body collisions and decays in time.
+\itemt{mstc(163):} (D=0) time evolution of directed transverse flow.
+\itemt{mstc(164):} (D=0) output time evolution of phase space data.
+ \begin{subentry}
+   \itemt{$=1$ :} MDRAW~\cite{mdraw} format.
+                  Before using this, directory 'DISP' is required
+                  in current directory.
+   \itemt{$=2$ :} ANGEL~\cite{angel} format.
+ \end{subentry}
+\itemt{mstc(165):} (D=0) time evolution of particle.
+\itemt{mstc(166):} (D=0) time evolution of particle density using small shell.
+\itemt{mstc(167):} (D=0) time evolution of particle density
+                         using Gaussian smearing.
+\itemt{mstc(168):} (D=0) time evolution of temperature written by Toshiki
+   \begin{subentry}
+    \itemt{$=1$ :} normal temperature fit.
+    \itemt{$=2$ :} variable bin (under construction).
+   \end{subentry}
+\itemt{mstc(169):} (D=0) =1: show how the temperature was fitted,
+                    if \ttt{mstc(168)=1}.
+
+\end{entry}
+
+\bigskip
+\bigskip
+
+% PARC()
+\begin{entry}
+\itemt{parc(1)  :} not used.
+\comment{
+\itemt{parc(1)  :} (D=-1.) max. CPU time to simulate.
+            if parc(1)<0, there is no limit.
+}
+\itemt{parc(2)  :} (D=100.0) time step size for evolution in fm/c.
+
+\itemt{parc(3)  :} (D=0.0)  minimum impact parameter in "fm" \ttt{bmin}.
+
+\itemt{parc(4)  :} (D=0.0)  maximum impact parameter in "fm" \ttt{bmax}.
+       If $\ttt{bmax}<0$, impact parameter is distributed
+        according to the squared $b^2$
+       distribution between \ttt{bmin} and \ttt{bmax},
+       while $\ttt{bmax}>0$ , impact parameter is uniformly distributed
+       between bmin and bmax.
+
+\itemt{parc(5) :} (D$=-1.0$fm) initial distance $r_z$ between beam and target.
+ \begin{subentry}
+  \itemt{$< 0.0$:}$r_z = r_1+r_2+6.0$ for $E_{lab}<$ 200MeV,\\
+                  $r_z = r_1+r_2+4.0$ for 200MeV$<E_{lab}<$1GeV,\\
+                  $r_z = r_1/\gamma_p + r_2/\gamma_t + 2.0$ for $E_{lab}>$1GeV.
+  \itemt{$>=0.0$:}$r_z = r_1/\gamma_p + r_2/\gamma_t + \ttt{parc(5)}$.
+ where $r_1$ and $r_2$ represent projectile and target radius respectively,
+ and $\gamma_p$ and $\gamma_t$ correspond to $\gamma$ factor for
+ the projectile and target.
+\end{subentry}
+
+\itemt{parc(6):} (D=2.0) scale of display for switch \ttt{mstc(16)}.
+\itemt{parc(7):} (D=1.0fm/c) time slice for time dependent analysis.
+\itemt{parc(7):} (D=1.0fm/c) time slice for display.
+
+\itemt{parc(8-10):} not used.
+%-----------------
+% Ground state 20-29
+%-----------------
+
+\itemt{parc(11) :} (D=0.54fm) diffuseness parameter in Woods-Saxon distribution
+                              for the density of nucleus.
+\itemt{parc(12) :} (D=1.124fm) parameter of Woods-Saxon tail.
+\itemt{parc(13) :} (D=0.8fm)   minimum distance between identical nucleons
+                               for sampling of nucleus.
+\itemt{parc(14) :} (D=0.8fm) minimum distance  between $p$ and $n$
+                             for sampling of position.
+\itemt{parc(15) :} (D=2.0 fm$^2$) width of Gaussian wave packet,
+                  here definition of $L$ is
+               $ \phi_i(r)={1\over (2\pi L)^{3/4}}
+                 \exp[-{(r-R_i)^2 \over 4L} + {i \over \hbar}r\cdot P_i] $.
+
+\itemt{parc(16)-parc(20) :} not used.
+%----------------------
+% Constant parameters
+%----------------------
+\itemt{parc(21) :} (D=0.168$1/\fm^3$) normal nuclear matter density $\rho_0$.
+\itemt{parc(22) :} (D=$-16.0$MeV)  binding energy of nuclear matter.
+\itemt{parc(23) :} (D=0.001439767) Coulomb constant.
+\itemt{parc(24) :} (D=0.93960GeV$^2$) neutron masses.
+\itemt{parc(25) :} (D=0.93830GeV$^2$) proton mass.
+\itemt{parc(26) :} (D=0.13500GeV$^2$) $\pi^0$ mass.
+\itemt{parc(27) :} (D=0 .13960GeV$^2$) $\pi^+$ mass.
+\itemt{parc(28) :} (D=0.938950002GeV$^2$) nucleon mass.
+\itemt{parc(29) :} (D=0.1373GeV$^2$) average pion mass.
+\itemt{parc(30) :} not used.
+
+%--------------
+%  Collisions 31-
+%--------------
+\medskip
+
+\itemt{parc(31) :} (D=5.0fm) maximum spatial distance for which
+            a two-body collision still can occur.
+
+\itemt{parc(32)-parc(38) :} low energy cut off for $hh$ collisions.
+\itemt{parc(32) :} (D=55mb) maximum cross section
+                            for$ pn$ collisions at low energy.
+\itemt{parc(33) :} (D=55mb) maximum cross section
+                            for $pp$ collisions at low energy.
+\itemt{parc(34) :} (D=200mb) maximum cross section
+                             for $BB$ collision at low energy
+                            (involving resonance).
+\itemt{parc(35) :} (D=200mb) maximum cross section
+                             for $MB$ collisions at low energy.
+\itemt{parc(36) :} (D=150mb) maximum cross section
+                             for $MM$ collisions at low energy.
+\itemt{parc(37) :} (D=350mb) maximum cross section
+                             for $\Bbar B$ collision at low energy.
+\itemt{parc(38) :} (D=0.05GeV) kinetic energy cutoff
+                               for two-body collisions at low energy.
+
+%------------
+% resonance
+%------------
+\itemt{parc(41) :} (D=0.001GeV) minimum kinetic energy in decays.
+\itemt{parc(42) :} (D=0.5fm) production point of daughter from mother in decay.
+\itemt{parc(43) :} (D=0.4GeV/c) width of Gaussian $p_t$ distribution
+                    for the decay of resonance, see \ttt{mstc(61)}.
+
+\itemt{parc(44),parc(45),parc(46) :}(D=2.5(GeV/c$^{-2}$,0.7,2.0)
+                   slope parameter for angular distribution
+                   in inelastic $hh$ collisions: $d\sigma/dt=e^{at}$
+                   ~\cite{ref:slope} for resonance production
+                   in the case of \ttt{mstc(67-70)=2},
+                   where slope parameter is parametrized by
+        $a=\ttt{parc(44)}+\ttt{parc(45)}*(\log(s)-\log(\ttt{parc(46)}))$.
+
+\itemt{parc(47) :} (D=0.36(GeV/c)$^{-2}$) Gaussian width for the option of
+                    \ttt{mstc(67)=4,5}.
+\itemt{parc(48) :} (D=0.3) exponential width for the option of
+                    \ttt{mstc(67)=5}.
+\itemt{parc(49) :} (D=0.2) ratio for exponential for  \ttt{mstc(67)=5}.
+%-------------------
+% string
+%-------------------
+\medskip
+
+\itemt{parc(51) :} (D=2.0GeV/c$^2$) minimum mass of string
+                                   for non-strange baryons.
+\itemt{parc(52) :} (D=3.5GeV/c$^2$) mass cut off for non-strange baryon
+                                    resonances.
+\itemt{parc(53) :} (D=2.0GeV/$^2$) minimum mass of non-strange mesonic string.
+\itemt{parc(54) :} (D=1.0GeV/fm) string tension.
+\itemt{parc(55) :} (D=1.0fm/c) formation time.
+\itemt{parc(56) :} (D=4.0GeV/c$^2$) invariant mass cut-off for the dipole
+                     radiation of a string system below which soft gluon
+                     radiations are terminated.
+
+\itemt{parc(57) :} not used.
+%not work
+%\itemt{parc(57) :} (D=0.1) string life time parameter: 
+%  parc()*mass, see mstc(68).
+
+%-------------------
+% soft interactions
+%-------------------
+
+\itemt{parc(61) :} (D=4.6 GeV) Parameter of $BB$ collision
+   to use string model (GeV) except non-strange baryon-baryon collision,
+   where resonance production cross sections are explicitly parametrized.
+\itemt{parc(62) :} (D=2.8 GeV) Parameter of $MB$ collision
+                                    to use string model.
+\itemt{parc(63) :} (D=1.8 GeV) Parameter of $MM$ collision
+                                  to use string model.
+\itemt{parc(64) :} (D=1.09GeV/c$^2$) minimum value for the non-strange
+                                     baryonic resonance states.
+\itemt{parc(65) :} (D=0.7GeV/c$^2$) minimum value for the invariant mass
+                  of the excited meson-like string system
+                 in a hadron-hadron interaction.
+\itemt{parc(66) :} (D=0.36GeV) width of the Gaussian $P_t$ distribution of
+                   produced hadron in Lund string fragmentation 
+                   (\ttt{parj(21)} in PYTHIA6.1).
+\itemt{parc(67), parc(68) :} (D=0.1GeV/c, 1.4GeV/c)
+     parameters in the distribution for the $P_t$ kick from soft interactions
+      (\ttt{hipr1(19),hipr1(20)} in HIJING1).
+\itemt{parc(69), parc(70) :} (D=0.05GeV/c, 1.0GeV/c)
+     parameters in the distribution for the $P_t$ kick from resonance
+    production interactions for the option \ttt{mstc(67)=6}.
+
+%---------------
+% hard
+%---------------
+
+\itemt{parc(71) :} (D=10GeV) lowest c.m. energy  to do pQCD scattering.
+                     %(=parp(2))
+\itemt{parc(72) :} (D=0.1) parameter for the mean reaction time for the
+           parton-parton scattering: $\tau=\ttt{parc(71)}/Q^2$.
+\itemt{parc(73) :} (D=0.1) parameter for the mean life time of time-like
+           parton branching.
+\itemt{parc(74) :} (D=1.0) parameter for the mean life time of space-like parton
+           branching.
+%-----------------------------
+% cluster
+%-----------------------------
+\itemt{parc(151) :} (D=2.1fm) critical separation of two-baryons
+             above which a cluster cannot be formed.
+\itemt{parc(152) :} (D=0.3GeV/c$^2$) critical separation of two-baryons
+                         in momentum space.
+
+\itemt{parc(191) :} JAM version number.
+\itemt{parc(192) :} JAM subversion number.
+\itemt{parc(193) :} last year of modification for JAM.
+\itemt{parc(194) :} last month of modification for JAM.
+\itemt{parc(195) :} last day of modification for JAM.
+
+\end{entry}
+
+\bigskip
+\bigskip
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%     MSTD()
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{entry}
+\itemt{mstd(1) :} projectile ID.
+\itemt{mstd(2) :} projectile mass number.
+\itemt{mstd(3) :} proton number in projectile.
+
+\itemt{mstd(4) :} target ID.
+\itemt{mstd(5) :} target mass number.
+\itemt{mstd(6) :} proton number in target.
+
+\itemt{mstd(11) :} number of all initial particles.
+\itemt{mstd(12) :} initial total baryon number.
+\itemt{mstd(13) :} initial total charge.
+\itemt{mstd(14) :} initial total strangeness.
+\itemt{mstd(15) :} number of cell for box simulation,
+                         \ttt{mstd(15)}$=$\ttt{mstc(9)}.
+
+\itemt{mstd(21) :} current event number.
+\itemt{mstd(22) :} random seed of current event.
+\itemt{mstd(23) :} current time step.
+\itemt{mstd(24) :} number of event for each impact parameter bin.
+\itemt{mstd(25) :} count of number of warnings.
+\itemt{mstd(26) :} type of latest warning given.
+\itemt{mstd(27) :} count of number of errors.
+\itemt{mstd(28) :} type of latest errors given.
+\itemt{mstd(29) :} collision counter(internal use).
+\itemt{mstd(30) :} flag for absorbed particles.
+  \begin{subentry}
+     \itemt{$=1$}: there are absorbed (already dead) particles in JAM array.
+     \itemt{$=0$}: No.
+  \end{subentry}
+
+%------------------
+% Collision number
+%------------------
+
+\itemt{mstd(41) :} total number of elastic collisions in current event.
+\itemt{mstd(42) :} total number of inelastic collisions in current event.
+\itemt{mstd(43) :} total number of absorptions in current event.
+\itemt{mstd(44) :} number of Baryon-Baryon collision in current event.
+\itemt{mstd(45) :} number of Meson-Baryon collision in current event.
+\itemt{mstd(46) :} number of Meson-Meson collision in current event.
+\itemt{mstd(47) :} number of antibaryon-Baryon collision in current event.
+\itemt{mstd(48) :} number of hadron-parton collisions in current event.
+\itemt{mstd(49) :} number of parton-parton collisions in current event.
+\itemt{mstd(50) :} number of decays in current event.
+\itemt{mstd(51) :} number of Fermi blocks in current event.
+\itemt{mstd(52) :} number of Low energy cuts in current event.
+\itemt{mstd(53) :} number of decay after simulation. in current event.
+\itemt{mstd(54) :} not used.
+\comment{
+mstd(54) : total number of forbidden collisions at energy conservation
+           in current event (not used).
+}
+\itemt{mstd(55) :} total number of jet produced from hard scattering
+                   in current event.
+\itemt{mstd(56) :} counter for formation time of newly produced hadrons.
+\itemt{mstd(57) :} counter for formation time of hadrons which contains original quarks.
+
+\itemt{mstd(61) :} average number of total collision which produce strangeness.
+\itemt{mstd(62) :} same as \ttt{mstd(61)}, but collision involved constituent. quarks.
+\itemt{mstd(63) :} average number of strangeness production
+                   from string fragmentation.
+\itemt{mstd(64) :} average number of strangeness production 
+                   from resonance decay.
+
+\itemt{mstd(61-80) :} not used.
+
+
+
+\itemt{mstd(81) :} Maximum number of \ttt{nv} actually used in simulation.
+\itemt{mstd(82) :} Maximum number of \ttt{mentry} actually used.
+\itemt{mstd(83) :} total number of quarks in current event.
+\itemt{mstd(84) :} total number of gluons in current event.
+
+\comment{
+\itemt{mstd(91) :} number of JAMCLUST calls in present run.
+\itemt{mstd(92) :} number of nuclear cluster in present run.
+\itemt{mstd(99) :} max. number of outgoing flavor in jamrmas2.
+}
+
+\end{entry}
+
+\bigskip
+\bigskip
+%=================================================================
+% PARD()
+%=================================================================
+\begin{entry}
+\itemt{pard(1) :} current global time.
+\itemt{pard(2) :} current impact parameter(fm).
+\itemt{pard(3) :} current minimum impact parameter.
+\itemt{pard(4) :} impact parameter bin.
+\itemt{pard(5) :} $\beta$ factor for the transformation to laboratory frame.
+\itemt{pard(6) :} $\gamma$ factor for the transformation to laboratory frame.
+\itemt{pard(7) :} $R_x$; x-coordinate shift of projectile.
+\itemt{pard(8) :} $R_y$; y-coordinate shift of target.
+\itemt{pard(9) :} initial total $p_x$.
+\itemt{pard(10):} initial total $p_y$.
+\itemt{pard(11):} initial total $p_z$.
+\itemt{pard(12):} initial total energy.
+\itemt{pard(13):} initial total energy per initial baryons.
+
+\itemt{pard(14) :} laboratory beam energy in "GeV per nucleon".
+\itemt{pard(15) :} laboratory  beam momentum in "GeV/c per nucleon".
+\itemt{pard(16) :} colliding energy $\sqrt{s}$ per nucleon.
+\itemt{pard(17) :} beam rapidity $y_p$.
+\itemt{pard(18) :} c.m. momentum.
+
+\medskip
+%----------------
+%Box parameters
+%----------------
+\itemt{pard(21) :}  cell length (fm).
+\itemt{pard(22) :}  total energy/baryon (GeV) to set for box calculation.
+
+\itemt{pard(31) :} $p_x$ of projectile.
+\itemt{pard(32) :} $p_y$ of projectile.
+\itemt{pard(33) :} $p_z$ of projectile.
+\itemt{pard(34) :} mass of projectile.
+\itemt{pard(35) :} $\beta$ of projectile.
+\itemt{pard(36) :} $\gamma$ of projectile.
+\itemt{pard(37) :} $r_x$ of projectile.
+\itemt{pard(38) :} $r_y$ of projectile.
+\itemt{pard(39) :} $r_z$ of projectile.
+\itemt{pard(40) :} radius of projectile.
+
+\itemt{pard(41) :} $p_x$ of target.
+\itemt{pard(42) :} $p_y$ of target.
+\itemt{pard(43) :} $p_z$ of target.
+\itemt{pard(44) :} mass of target.
+\itemt{pard(45) :} $\beta$ of target.
+\itemt{pard(46) :} $\gamma$ of target.
+\itemt{pard(47) :} $r_x$ of target.
+\itemt{pard(48) :} $r_y$ of target.
+\itemt{pard(49) :} $r_z$ of target.
+\itemt{pard(50) :} radius of target.
+
+%----------------
+%Collisions 120-
+%----------------
+
+\itemt{pard(51) :} maximum c.m. distance  for $BB$ collision.
+\itemt{pard(52) :} maximum c.m. distance  for $BB$ collision.
+\itemt{pard(53) :} maximum c.m. distance  for $DN$ collision.
+\itemt{pard(54) :} maximum c.m. distance  for $MB$ collision.
+\itemt{pard(55) :} maximum c.m. distance  for $MM$ collision.
+\itemt{pard(56) :} maximum c.m. distance  for $\Bbar B$ collision.
+
+
+%See mstc(31)-mstc(38).
+\itemt{pard(71) :} event average number of elastic collisions.
+\itemt{pard(72) :} event average number of inelastic collisions.
+\itemt{pard(73) :} event average number of absorptions.
+\itemt{pard(74) :} event average number of $BB$ collisions.
+\itemt{pard(75) :} event average number of $MB$ collisions.
+\itemt{pard(76) :} event average number of $MM$ collisions.
+\itemt{pard(77) :} event average number of $\Bbar B$ collisions.
+\itemt{pard(78) :} event average number of decays.
+\itemt{pard(79) :} event average number of Fermi blocks.
+\itemt{pard(80) :} event average number of Low energy cuts.
+\itemt{pard(81) :} event average number of decay after simulation.
+\itemt{pard(82) :} event average multiplicity.
+\itemt{pard(83) :} event average meson multiplicity.
+\itemt{pard(84) :} not used.
+\comment{
+\itemt{pard(84) :} average number of forbidden collision
+                       due to energy conservation.
+}
+\itemt{pard(85) :} average number of hadron-parton collisions.
+\itemt{pard(86) :} average number of parton-parton collisions.
+\itemt{pard(87) :} average number of hard scattering.
+\itemt{pard(88) :} average formation time of newly produced hadrons.
+\itemt{pard(89) :} average formation time of hadron which contains ordinal
+                   constituent quark.
+
+\itemt{pard(101)-pard(103) :}
+        parameters of nuclear E.O.S. in BUU mode
+     which are defined as
+$$E_{pot}=\alpha {\rho_B\over\rho_0}
+      + \beta \left({\rho_B \over \rho_0}\right)^\gamma ,$$
+where $\alpha=\ttt{pard(101)}$,
+      $\beta=\ttt{pard(102)}$,
+and      $\gamma=\ttt{pard(103)}$.
+Those values depend on the choice of compressibility
+specified by \ttt{mstc(6)}.
+
+\end{entry}
+
+
+\bigskip
+
+\begin{verbatim}
+     common/jamdat2/pare(200),mste(200)
+\end{verbatim}
+{\bf Purpose:} to store some information to handle two-body collisions.
+%-----------------------------------
+% mste() Current two-body collision
+%-----------------------------------
+\begin{entry}
+
+\itemt{mste(1) :} current collision channel.
+ \begin{subentry}
+    \itemt{$=0$ :} collision cannot happen.
+    \itemt{$=1$ :} elastic collision.
+    \itemt{$=2$ :} inelastic collisions.
+    \itemt{$=3$ :} annihilations.
+    \itemt{$=4$ :} string excitation.
+    \itemt{$=5$ :} string excitation of nucleon-nucleon collisions.
+    \itemt{$=6$ :} hard parton-parton scattering.
+   \itemt{$=11$ :}  direct s-wave pion scattering.
+   \itemt{$= -1$ :} Pauli-blocking.
+   \itemt{$= -2$ :} error after the call of \ttt{jamcross}.
+   \itemt{$=-9$ :}  hard scattering false.
+   \itemt{$=-77$ :} soft interaction false.
+   \itemt{$=-88$ :} energetically not allowed  collision.
+   \itemt{$=-99$ :} something was wrong.
+ \end{subentry}
+
+\itemt{mste(2) :} collision type.
+ \begin{subentry}
+         \itemt{$=-1$ :} decay of resonance or string.
+         \itemt{$=-2$ :} decay of resonance or string after simulation.
+         \itemt{$=1$  :} baryon-baryon collision.
+         \itemt{$=2$  :} meson-baryon collision.
+         \itemt{$=3$  :} meson-meson collision.
+         \itemt{$=4$  :} antibaryon-baryon collision.
+         \itemt{$=5$  :} parton-hadron collision.
+         \itemt{$=6$  :} parton-parton collision.
+ \end{subentry}
+\itemt{mste(3) :} outgoing channel for more than two-body final state.
+ \begin{subentry}
+         \itemt{$=0$ :} two-body final.
+         \itemt{$=1$ :} $pp\to pp \pi$.
+         \itemt{$=2$ :} $nn\to nn \pi$.
+         \itemt{$=3$ :} $pn\to nn \pi$.
+ \end{subentry}
+\itemt{mste(4) :} status of the latest soft string excitation.
+ \begin{subentry}
+        \itemt{$=1$ :} double diffractive.
+	\itemt{$=2$ :} projectile single diffractive.
+	\itemt{$=3$ :} target single diffractive.
+	\itemt{$=4$ :} non-diffractive.
+ \end{subentry}
+
+\itemt{mste(5) :} number of jet in least hard collision.
+\itemt{mste(6) :} cell number \ttt{icoll(3,i)} in current collision.
+
+\itemt{mste(21):} line number of the ingoing particle 1.
+\itemt{mste(22):} KC code of the ingoing particle 1.
+\itemt{mste(23):} line number of the ingoing particle 2.
+\itemt{mste(24):} KC code of the ingoing particle 2.
+
+\itemt{mste(40):} =1 during the final decay after simulation, otherwise =0.
+
+
+\comment{
+%ingoing particle 1
+\medskip
+\itemt{mste(21):} line number of the ingoing particle 1.
+\itemt{mste(22):} KC code of the ingoing particle 1.
+\itemt{mste(23):}41 line number of the ingoing particle 2.
+\itemt{mste(24):}42 KC code the ingoing particle 2.
+\itemt{mste(25):}61 line number  the outgoing particle 1.
+\itemt{mste(26):}62 KC code of the outgoing particle 1.
+\itemt{mste(27):}81 line number the outgoing particle 2.
+\itemt{mste(28):}82 kc code the outgoing particle 2.
+\itemt{mste(29):}101 line number of the outgoing particle 3.
+\itemt{mste(30):}102 KC code of the outgoing particle 3.
+\itemt{mste(31):}121 line number of the outgoing particle 4.
+\itemt{mste(32):}122 kc code of the outgoing particle 4.
+
+\itemt{mste(23):} \ttt{k(1,i)} of the ingoing particle 1.
+\itemt{mste(24):} \ttt{k(2,i)} particle ID of the ingoing particle 1.
+\itemt{mste(25):} \ttt{k(3,i)} charge of  ingoing particle 1.
+\itemt{mste(26):} \ttt{k(4,i)} of the  ingoing particle 1.
+\itemt{mste(27):} \ttt{k(5,i)} of the  ingoing particle 1.
+\itemt{mste(28):} \ttt{k(6,i)} of the  ingoing particle 1.
+\itemt{mste(29):} \ttt{k(7,i)} of the  ingoing particle 1.
+\itemt{mste(30):} \ttt{k(8,i)} of the  ingoing particle 1.
+\itemt{mste(31):} \ttt{k(9,i)} of the  ingoing particle 1.
+\itemt{mste(32):} \ttt{k(10,i)} of the  ingoing particle 1.
+\itemt{mste(33):} \ttt{k(11,i)} of the  ingoing particle 1.
+\itemt{mste(34):} \ttt{kq(1,i)} of the  ingoing particle 1.
+\itemt{mste(35):} \ttt{kq(2,i)} of the  ingoing particle 1.
+
+\medskip
+\itemt{mste(41)-mste(55):} same meaning as above for the ingoing particle 2.
+\itemt{mste(61)-mste(75):} same meaning as above for the outgoing particle 1.
+\itemt{mste(81)-mste(95):} same meaning as above for the outgoing particle 2.
+\itemt{mste(101)-mste(115):} same meaning as above for the outgoing particle 3.
+\itemt{mste(121)-mste(135):} same meaning as above for the outgoing particle 4.
+}
+
+\bigskip
+\bigskip
+%-------------------------
+% PARE() Latest collision
+%-------------------------
+\itemt{pare(1) :} maximum time for collision search.
+\itemt{pare(2) :} c.m.energy of two-body system in the latest collision.
+\itemt{pare(3) :} $x\sigtot$ of latest collision, where $x$ denotes random
+                  number.
+\itemt{pare(4) :} total cross section of latest collision.
+\itemt{pare(5) :} elastic cross section of latest collision.
+\itemt{pare(6) :} impact parameter squared of latest collision.
+\itemt{pare(7) :} c.m. momentum of latest collision.
+\itemt{pare(8) :} collision time for particle 1.
+\itemt{pare(9) :} collision time for particle 2.
+\itemt{pare(11):} sum of energy of the two particles before collision
+                   in the observer frame.
+
+\itemt{pare(12):}$\beta_x$ for transformation from two-body c.m. frame to observer frame.
+\itemt{pare(13):}$\beta_y$ for transformation from two-body c.m. frame to observer frame.
+\itemt{pare(14):}$\beta_z$ for transformation from two-body c.m. frame to observer frame.
+\itemt{pare(15):}$\gamma$ for transformation from two-body c.m. frame to observer frame.
+
+\comment{
+%ingoing particle 1
+\itemt{pare(21):}\ttt{p(1,i)}$p_x$ of the ingoing particle 1 in the latest collision.
+\itemt{pare(22):}\ttt{p(2,i)}$p_y$ of the ingoing particle 1 in the latest collision.
+\itemt{pare(23):}\ttt{p(3,i)}$p_z$ of the ingoing particle 1 in the latest collision.
+\itemt{pare(24):}\ttt{p(4,i)}$E$ of the ingoing particle 1 in the latest collision.
+\itemt{pare(25):}\ttt{p(5,i)} mass of the ingoing particle 1 in the latest collision.
+\itemt{pare(26):}\ttt{r(1,i)} of the ingoing particle 1 in the latest collision.
+\itemt{pare(27):}\ttt{r(2,i)} of the ingoing particle 1 in the latest collision.
+\itemt{pare(28):}\ttt{r(3,i)} of the ingoing particle 1 in the latest collision.
+\itemt{pate(29):}\ttt{r(4,i)} of the ingoing particle 1 in the latest collision.
+\itemt{pate(30):}\ttt{r(5,i)} of the ingoing particle 1 in the latest collision.
+\itemt{pare(31):}\ttt{v(1,i)} of the ingoing particle 1 in the latest collision.
+\itemt{pare(32):}\ttt{v(2,i)} of the ingoing particle 1 in the latest collision.
+\itemt{pare(33):}\ttt{v(3,i)} of the ingoing particle 1 in the latest collision.
+\itemt{pare(34):}\ttt{v(4,i)} of the ingoing particle 1 in the latest collision.
+\itemt{pate(35):}\ttt{v(5,i)} of the ingoing particle 1 in the latest collision.
+\itemt{pare(36):}\ttt{vq(1,i)} of the ingoing particle 1 in the latest collision.
+\itemt{pare(37):}\ttt{vq(2,i)} of the ingoing particle 1 in the latest collision.
+\itemt{pare(38):}\ttt{vq(3,i)} of the ingoing particle 1 in the latest collision.
+\itemt{pare(39):}\ttt{vq(4,i)} of the ingoing particle 1 in the latest collision.
+\itemt{pare(40):}\ttt{vq(5,i)} of the ingoing particle 1 in the latest collision.
+\itemt{pare(41):}\ttt{vq(6,i)} of the ingoing particle 1 in the latest collision.
+\itemt{pare(42):}\ttt{vq(7,i)} of the ingoing particle 1 in the latest collision.
+\itemt{pare(43):}\ttt{vq(8,i)} of the ingoing particle 1 in the latest collision.
+\itemt{pare(44):}\ttt{vq(9,i)} of the ingoing particle 1 in the latest collision.
+\itemt{pare(45):}\ttt{vq(10,i)} of the ingoing particle 1 in the latest collision.
+\medskip
+%ingoing particle 2
+\itemt{pare(46)-pare(70):} same meaning as above for the ingoing particle 2.
+
+%outgoing particle 1
+\itemt{pare(71)-pare(95) :} same meaning as above for the outgoing particle 1.
+%outgoing particle 2
+\itemt{pare(96)-pare(120) :} same meaning as above for the outgoing particle 2.
+%outgoing particle 3
+\itemt{pare(121)-pare(145) :} same meaning as above for the outgoing particle 3.
+%outgoing particle 4
+\itemt{pare(146)-pare(170) :} same meaning as above for the outgoing particle 4.
+}
+
+\end{entry}
+
+
+\subsection{Other physics routines}
+
+The routines which is important for the main task for the simulation
+or is expected to be used frequently by the users
+are listed here.
+
+\begin{entry}
+\itemt{subroutine jamread(nevent,bmin,bmax,dt,nstep,chfram,chbeam,chtarg,cwin)}
+
+: to read input configuration file.
+
+\itemt{subroutine jamlist(mlist)}
+
+     : to list event record or particle data.
+
+\itemt{subroutine jamname(kf1,kf2,kf3,chau)}
+
+: to give the particle/parton/nucleus name as character string.
+For nucleus,
+$\ttt{kf1}=1000000000+1000000N_{n}+1000N_{p}+N_{\Lambda}$,
+
+$\ttt{kf2}=1000000000+1000000N_{\Sigma^-}+1000N_{\Sigma^0}+N_{\Sigma^+}$,
+
+$\ttt{kf3}=1000000000+1000000N_{\Xi^-}+1000N_{\Xi^0}+N_{\Omega^-}$.
+
+where $N_{n},N_{p},N_{\Lambda},N_{\Sigma^-},N_{\Sigma^0},N_{\Sigma^+},
+N_{\Xi^-},N_{\Xi^0},N_{\Omega^-}$ represent the number of particle
+contained in nucleus respectively.
+Otherwise, \ttt{kf1} is usual FK flavor code and \ttt{kf2} and \ttt{kf3}
+are not used.
+
+\itemt{subroutine jamboost}
+
+: to boost the ground state nuclei/particles.
+
+\itemt{subroutine jamgrund}
+
+: to make the ground state of target and projectile.
+
+\itemt{subroutine jamjeti}
+
+: to initialize the PYTHIA and HIJING routines to simulate 
+ string fragmentation, jet production and calculation of jet-cross sections.
+
+\itemt{subroutine jamupdat(mupda,lfn)}
+
+ : to facilitates the updating of particle and decay data
+    by allowing it to be done in an external file.
+
+\itemt{subroutine jamcoll}
+
+: to administer the two-body collisions and decays.
+
+\itemt{subroutine jamcross}
+: to administer the hadron-hadron collisions.
+
+\itemt{subroutine jamscatt}: to perform two-body collisions.
+\itemt{subroutine jamabsrb}: to treat annihilation scattering.
+\itemt{subroutine jamchanl}: to select final scattering channel.
+\itemt{subroutine jamangel}: to calculate elastic angular distribution.
+\itemt{function jamslope}:   to give slope parameter in two-body collisions.
+\itemt{subroutine jamangin}: to calculate inelastic angular distribution.
+\itemt{subroutine jamsoft}:  to give masses of the excited nucleons.
+\itemt{subroutine jamhard}:  to perform jets production.
+\itemt{subroutine jamdec}:   to administrate the fragmentation of jet system or decay.
+\itemt{subroutine jamjdec}:  to fragment jet system by Lund model.
+\itemt{subroutine jamrdec}:  to calculate decay of hadrons.
+
+
+\end{entry}
+
+
+\section{Instructions on how to run the program}
+
+ Program usage of JAM is very similar to other famous event generators;
+ PYTHIA~\cite{pythia},FRITIOF~\cite{fritiof},HIJING~\cite{hijing}
+ and VNI~\cite{vni}. for example, (1) main program by users,
+ (2) Particle flavor code is the same as particle data group particle
+     numbering scheme.
+
+\begin{itemize}
+\item Write main program in which at least 
+       \ttt{call jaminit()}, \ttt{call jamevt(iev)} and
+        \ttt{call jamfin} must be written.
+\item Make executable  file after rewriting Makefile for suitable
+      machine and your main program name.
+\end{itemize}
+
+\subsection{Output from JAM}
+Some output files are generated in JAM.
+\begin{itemize}
+\item General information on inputs and outputs 
+        are written in file
+     specified by \ttt{fname(2)} (default name can be seen in \ttt{jamdata}).
+\item
+    Some error or warning messages are written in file 
+    \ttt{fname(3)}.
+\item
+    Current event number generated are written in file \ttt{fname(3)},
+    if $\ttt{mstc(39)}=1$.
+\item
+   If switches for event study are on,
+   files are created, for example,  with the file name \ttt{JAM162.DAT}
+   in the case of $\ttt{mstc(162)}=1$.
+
+\end{itemize}
+
+
+
+\subsection{Most simple example: Main program and its output}
+Here is an most simple example main program. This simulates
+S(200AGeV/c)+S collision for impact parameter sampled by $b<1$fm.
+
+\begin{verbatim}
+c...A main program for S(200GeV/c)+S
+
+      include 'jam1.inc'
+      include 'jam2.inc'
+      character frame*8,proj*8,targ*8,cwin*15
+
+c....Initialize JAM
+      mstc(1)=48827       ! random seed.
+      mevent=1            ! total simulation event
+      bmin=0.0d0          ! minimum impact parameter
+      bmax=-1.0d0         ! maximum impact parameter
+      dt=100.0d0          ! collision time(fm/c)
+      nstep=1             ! time step
+      cwin='200gevc'      ! incident energy
+      frame='nn'          ! comp. frame
+      proj='32S'          ! projectile
+      targ='32S'          ! target
+      mstc(156)=1         ! analysis of collision distribution on.
+
+c...Initialize JAM.
+      call jaminit(mevent,bmin,bmax,dt,nstep,frame,proj,targ,cwin)
+
+c...Simulation start.
+      do iev=1,mevent
+
+c...Simulate one event.
+        call jamevt(iev)
+
+c...List phase space data.
+        call jamlist(1)
+
+      end do
+
+c...Final output.
+      call jamfin
+
+      end
+\end{verbatim}
+
+
+Some global information is written in the file "\ttt{JAMRUN.DAT}". 
+
+\begin{verbatim}
+ ******************************************************************************
+ ******************************************************************************
+ **                                                                          **
+ **                                                                          **
+ **   Welcome to the JAM Monte Carlo!                                        **
+ **                                                                          **
+ **   JJJJJJJJ  AAAA      MM     MMM                                         **
+ **      JJ    AA  AA     MMM    MMM                                         **
+ **      JJ   AAAAAAAA    MM MMMM MM                                         **
+ **   J  JJ  AA      AA   MM      MM                                         **
+ **   JJJJJ AA        AA  MM      MM                                         **
+ **                                                                          **
+ **    This is JAM  version 1.009                                            **
+ **  Last date of change:  6 Sep 1999                                        **
+ **                                                                          **
+ **                                                                          **
+ **                                                                          **
+ **  JAM is a free software which can                                        **
+ **  be distributed under the GNU Gen                                        **
+ **  eral Public License. There is no                                        **
+ **  warranty for the program.                                               **
+ **                                                                          **
+ **  Copyright (c) 1998 Yasushi Nara                                         **
+ **                                                                          **
+ **  Main author: Yasushi Nara;                                              **
+ **  Advance Science Research Center, Japan Atomic Energy Research Institute **
+ **  Tokai-mura, Naka-gun, Ibaraki-ken  319-1195, Japan                      **
+ **  e-mail: ynara@bnl.gov                                                   **
+ **                                                                          **
+ **                                                                          **
+ **                                                                          **
+ ******************************************************************************
+ ******************************************************************************
+
+
+      *******************************************************************
+      *                                                                 *
+      *          Reaction:                                              *
+      *                                                                 *
+      *              mass  32( 16, 16) ==> mass  32( 16, 16)            *
+      *                                                                 *
+      *              Collision of 32S     on 32S                        *
+      *                                                                 *
+      *                                                                 *
+      *               Beam energy   =    199.06 A GeV                   *
+      *               Beam momentum =    200.00 A GeV/c                 *
+      *               C.M. energy   =     19.43 A GeV                   *
+      *                                                                 *
+      *                               Beam        Target                *
+      *          Velocity/c:       0.9953164     -.9953164              *
+      *          Gamma factor:      10.344        10.344                *
+      *          p_x(GeV/c):         0.000         0.000                *
+      *          p_z(GeV/c):         9.667        -9.667                *
+      *          r_x(fm):            0.000         0.000                *
+      *          r_z(fm):           -0.816         0.816                *
+      *                                                                 *
+      *        Impact parameters are distributed according to b^2:      *
+      *                  0.000 < b <   1.000 (fm)                       *
+      *                                                                 *
+      *******************************************************************
+
+
+
+      * Input output file name: "            non"
+      * Computational frame: nucl.-nucl. c.m.
+      * Random seed     =     48827
+      * # of event      =      1
+      * Time step size  =100.000 fm/c
+      * # of timestep   =      1
+
+
+
+
+                           per simulation      1 runs       1 parallel runs
+      -----------------------------------
+       Total collisions      =   478.0000
+       Elastic collisions    =    87.0000
+       Inelastic collisions  =   391.0000
+       Absorptions           =   213.0000
+       baryon-baryon coll.   =    60.0000
+       meson-baryon coll.    =   191.0000
+       meson-meson coll.     =   222.0000
+       anti-B-B coll.        =     5.0000
+       hadron-parton coll.   =     0.0000
+       parton-parton coll.   =     0.0000
+       Resonance decays      =   405.0000
+       Total particles       =   390.0000
+       Mesons                =   316.0000
+       Pauli blocks          =     1.0000
+       Blocks due to E.con.  =     0.0000
+       Low energy cuts       =  2211.    
+       Decay after simul.    =     7.0000
+       Mean formation time          =     0.9814  114.0000
+       Mean const. formation time   =     1.4099  184.0000
+
+
+       average number of jet=    0.0000
+       max. number of nv=      607
+       max. number of mentry=      270
+
+
+ ==============================================================================
+          FINAL HADRON MULTIPLICITIES
+ ==============================================================================
+
+ total particle   390.000000000000     
+ charged particle   214.000000000000     
+ negative particle   91.0000000000000     
+ positive particle   91.0000000000000     
+   22        22  gamma                 1.00    
+  132       111  pi0                   115.    
+  133       211  pi+                   87.0      pi-                   84.0    
+  153       221  eta                   6.00    
+  173       311  K0                    10.0      Kbar0                 7.00    
+  174       321  K+                    5.00      K-                    3.00    
+  252      2112  n0                    35.0      nbar0                 1.00    
+  253      2212  p+                    28.0      pbar-                 3.00    
+  327      3112  Sigma-                1.00      Sigmabar+            0.000E+00
+  328      3212  Sigma0                1.00      Sigmabar0            0.000E+00
+  329      3222  Sigma+                3.00      Sigmabar-            0.000E+00
+
+      * CPU time=   0 h   0 m  21 s
+      *******************************
+\end{verbatim}
+
+\subsection{Input from a input configuration file}
+As a default \ttt{fname(1)} is set to be '0'.
+In this case, JAM does not use any input file.
+If there is a statement in a main program like
+\begin{verbatim}
+      fname(1)='jam.cfg'
+\end{verbatim}
+JAM read input parameter from file name \ttt{'jam.cfg'}.
+\begin{itemize}
+\item \ttt{event, bmin, bmax, projectile, target, timestep, dt, win}
+      are used to specify simulation conditions.
+\item '\#' and '!' can be used to comment.  Blank line is also allowed.
+\item Both upper and lower case can be used.
+\item If you want to change default value of \ttt{mstc()}, \ttt{parc()},
+        put, for example, \ttt{mstc(65)= 2}.
+\item Input file should be ended by \ttt{'end'} command.
+\end{itemize}
+
+Here is a example input file.
+
+\begin{verbatim}
+event=100             # Total number of siumulation run
+MSTC(1) =8595934      # random seed.
+
+proj =208Pb        # projectile
+targ =208Pb        # target
+win= 158gev        # incident energy
+bmin =  0.0        # minimum impact parameter in fm.
+bmax = -3.2        # maximam impact parameter in fm with $b^2$ distribution.
+
+frame= nn         # nn c.m. frame.
+dt= 100.0         # Time step size(fm/c)
+timestep = 1      # total number of time step.
+
+#***************************************************>
+#***** Optional input of mstc and parc   ***********>
+#***************************************************>
+fname(2)=XXX     # file name for simulation conditions.
+fname(3)=YYY     # file name for Some Information
+
+Mstc(8)=1        # job mode. =0:Job.
+mstc(5)= 1       # impact parameter bin number
+parc(6)= 10.0    # scale of display
+mstc(16)= 0      # display on/off.
+
+# option for analysis
+mstc(155)=1     # calculate transverse flow.
+mstc(156)=1     # energy distribution of collisions on.
+mstc(162)=0     # Output collision histroy off.
+
+mstc(163)=1     ! time evolution of directed transverse flow
+mstc(164)=0     ! Output phase space data in time interval
+mstc(165)=0     ! Output time evolution of particle yield
+mstc(166)=0     ! Output time evolution of particle density
+parc(7)= 2.0    ! Output time interval (fm/c)
+
+end             ! Input end
+\end{verbatim}
+
+
+%\section{Modification and further development}
+
+{\Large \bf Acknowledgments}\\[1ex]
+
+I am very grateful to K.K. Geiger for useful discussions.
+I would like to thank A. Ohnishi
+  for continuing encouragement and discussions.
+I acknowledge the inclusion of matter calculation part
+ to Toshiki Maruyama.
+I also wish to acknowledge careful reading of the manuscript
+ to S. Chiba and A. Ohnishi.
+I'd also like to thank Brookhaven National Laboratory for giving the
+author an opportunity to stay.
+
+
+\section*{Appendix}
+
+\subsection*{A: Particle codes}\label{app:particle}
+
+  Here the particle flavor codes defined in JAM are listed.
+  Corresponding antiparticle has the negative of its flavor code.
+  I refer the reader to Ref.~\cite{PDG96} for the detailed meaning of
+   the particle numbering scheme.
+The particle name printed in the table is obtained using subroutine
+ \ttt{jamname}.
+
+\begin{table}[ptb]
+\captive{Quark, lepton , gauge boson and diquark codes.
+\protect\label{t:codeone} }  \\
+\vspace{1ex}
+\begin{center}
+\begin{tabular}{|c|c|c||c|c|c|@{\protect\rule{0mm}{\tablinsep}}}
+\hline
+KF & Name & Printed & KF & Name & Printed \\
+\hline
+    1 & $\d$ & \ttt{d}   &  11 & $\e^-$ &  \ttt{e-}    \\
+    2 & $\u$ & \ttt{u}   &  12 & $\nu_{\e}$ &  \ttt{nu\_e}   \\
+    3 & $\s$ & \ttt{s}   &  13 & $\mu^-$ &  \ttt{mu-}   \\
+    4 & $\c$ & \ttt{c}   &  14 & $\nu_{\mu}$ & \ttt{nu\_mu}   \\
+    5 & $\b$ & \ttt{b}   &  15 & $\tau^-$ & \ttt{tau-}   \\
+    6 & $\t$ & \ttt{t}   &  16 & $\nu_{\tau}$ &  \ttt{nu\_tau}   \\
+    7 & $\lrm$ & \ttt{l}   &  17 & $\chi^-$ & \ttt{chi-}  \\
+    8 & $\hrm$ & \ttt{h}   &  18 & $\nu_{\chi}$ & \ttt{nu\_chi}  \\
+   21 & $\g$ & \ttt{g}             &    & &   \\
+   22 & $\gamma$ & \ttt{gamma}     & 32 & $\Z'^0$ & \ttt{Z'0}   \\
+   23 & $\Z^0$ & \ttt{Z0}          & 33 & $\Z''^0$ & \ttt{Z"0}   \\
+   24 & $\W^+$ & \ttt{W+}          & 34 & $\W'^+$ & \ttt{W'+}   \\
+   25 & $\H^0$ & \ttt{H0}          & 35 & $\H'^0$ & \ttt{H'0}   \\
+   26 & &                          & 36 & $\A^0$ & \ttt{A0}   \\
+   27 & &                          & 37 & $\H^+$ & \ttt{H+}   \\
+   91 &  cluster & \ttt{cluster}   &    & &\\
+   92 & string & \ttt{string}      &    & &\\
+      &          &             & 1103 & $\d\d_1$ & \ttt{dd\_1}  \\
+ 2101 & $\u\d_0$ & \ttt{ud\_0} & 2103 & $\u\d_1$ & \ttt{ud\_1}  \\
+      &          &             & 2203 & $\u\u_1$ & \ttt{uu\_1}  \\
+ 3101 & $\s\d_0$ & \ttt{sd\_0} & 3103 & $\s\d_1$ & \ttt{sd\_1}  \\
+ 3201 & $\s\u_0$ & \ttt{su\_0} & 3203 & $\s\u_1$ & \ttt{su\_1}  \\
+      &          &             & 3303 & $\s\s_1$ & \ttt{ss\_1}  \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+ 
+%
+%   MESONS
+%
+\begin{table}[ptb]
+\captive{light and strange meson codes\protect\label{t:codetwo} }
+\vspace{1ex}
+\begin{center}
+\begin{tabular}{|c|c|c||c|c|c||c|c|c|@{\protect\rule{0mm}{\tablinsep}}} \hline
+KF & Name & Printed & KF & Name & Printed & KF & Name & Printed \\ \hline
+      111 & $\pi^0$           &  \ttt{pi0      }   &     10220 & $\sigma$          &  \ttt{sigma-m     }   &       130 & K$_{L}^{0}$       &  \ttt{K\_L0     }  \\
+      211 & $\pi^+$           &  \ttt{pi+      }   &       221 & $\eta$            &  \ttt{eta         }   &       310 & K$_{S}^{0}$       &  \ttt{K\_S0     }  \\
+      113 & $\rho^0$          &  \ttt{rho0     }   &       223 & $\omega$          &  \ttt{omega       }   &       311 & K$^{0}$           &  \ttt{K0        }  \\
+      213 & $\rho^+$          &  \ttt{rho+     }   &       225 & f$_2$             &  \ttt{f\_2        }   &       321 & K$^{+}$           &  \ttt{K+        }  \\
+    10111 & a$_0^0$           &  \ttt{a\_00    }   &       331 & $\eta'$           &  \ttt{eta'        }   &       313 & K$^{*0}$          &  \ttt{K*0       }  \\
+    10211 & a$_0^+$           &  \ttt{a\_0+    }   &       333 & $\phi$            &  \ttt{phi         }   &       323 & K$^{*+}$          &  \ttt{K*+       }  \\
+    20113 & a$_1^0$           &  \ttt{a\_10    }   &       335 & f$'_2$            &  \ttt{f'\_2       }   &     10313 & K$_1^{0}$         &  \ttt{K\_10     }  \\
+    20213 & a$_1^+$           &  \ttt{a\_1+    }   &     10221 & f$_0$             &  \ttt{f\_0        }   &     10323 & K$_1^{+}$         &  \ttt{K\_1+     }  \\
+      115 & a$_2^0$           &  \ttt{a\_20    }   &     10223 & h$_1$             &  \ttt{h\_1        }   &       315 & K$^{*0}_2$        &  \ttt{K*\_20    }  \\
+      215 & a$_2^+$           &  \ttt{a\_2+    }   &     10331 & f$'_0$            &  \ttt{f'\_0       }   &       325 & K$^{*+}_2$        &  \ttt{K*\_2+    }  \\
+    10113 & b$_1^0$           &  \ttt{b\_10    }   &     10333 & h$'_1$            &  \ttt{h'\_1       }   &     10311 & K$^{*0}_0$        &  \ttt{K*\_00    }  \\
+    10213 & b$_1^+$           &  \ttt{b\_1+    }   &     20221 & $\eta(1295)$      &  \ttt{eta(1295)   }   &     10321 & K$^{*+}_0$        &  \ttt{K*\_0+    }  \\
+    20111 & $\pi(1300)^0$     &  \ttt{pi(1300)0}   &     20223 & f$_1$             &  \ttt{f\_1        }   &     20313 & K$^{*0}_1$        &  \ttt{K*\_10    }  \\
+    20211 & $\pi(1300)^+$     &  \ttt{pi(1300)+}   &     20333 & f$'_1$            &  \ttt{f'\_1       }   &     20323 & K$^{*+}_1$        &  \ttt{K*\_1+    }  \\
+    10115 & $\pi_2(1670)^0$   &  \ttt{pi\_2(1670)0}   &     30221 & f$_0(1300)$       &  \ttt{f\_0(1300)  }   &     30313 & K(1410)$^{0}$     &  \ttt{K*(1410)0 }  \\
+    10215 & $\pi_2(1670)^+$   &  \ttt{pi\_2(1670)+}   &     30223 & $\omega(1420)$    &  \ttt{omega(1420) }   &     30323 & K(1410)$^{+}$     &  \ttt{K*(1410)+ }  \\
+    30113 & $\rho(1465)^0$    &  \ttt{rho(1465)0}   &     30333 & $\phi(1680)$      &  \ttt{phi(1680)   }   &     40313 & K(1680)$^{0}$     &  \ttt{K*(1680)0 }  \\
+    30213 & $\rho(1465)^+$    &  \ttt{rho(1465)+}   &     50223 & f$_1(1510)$       &  \ttt{f\_1(1510)  }   &     40323 & K(1680)$^{+}$     &  \ttt{K*(1680)+ }  \\
+    40113 & $\rho(1700)^0$    &  \ttt{rho(1700)0}   &     60223 & $\omega(1600)$    &  \ttt{omega(1600) }   &       317 & K$_3(1780)^{0}$   &  \ttt{K\_3(1780)0}  \\
+    40213 & $\rho(1700)^+$    &  \ttt{rho(1700)+}   &           &               &                           &       327 & K$_3(1780)^{+}$   &  \ttt{K\_3(1780)+}  \\
+          &               &                        &           &               &                           &     10315 & K$_2(1770)^{0}$   &  \ttt{K\_2(1770)0}  \\
+          &               &                        &           &               &                           &     10325 & K$_2(1770)^{+}$   &  \ttt{K\_2(1770)+}  \\
+          &               &                        &           &               &                           &     20315 & K$_2(1820)^{0}$   &  \ttt{K\_2(1820)0}  \\
+          &               &                        &           &               &                           &     20325 & K$_2(1820)^{+}$   &  \ttt{K\_2(1820)+}  \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+%
+%  Non-Strange Baryons
+%
+
+\begin{table}[ptb] 
+\captive{ Non-strange baryon codes\protect\label{t:codethree} }  
+\vspace{1ex} 
+\begin{center} 
+\begin{tabular}{|c|c|c||c|c|c| @{\protect\rule{0mm}{\tablinsep}}}   \hline
+KF & Name & Printed & KF & Name & Printed\\ \hline
+2112 & n & \ttt{n0}                           & 1114 & $\Delta^-$  & \ttt{delta-}                  \\
+2212 & p & \ttt{p+}                           & 2114 & $\Delta^0$  & \ttt{delta0}                  \\
+    12112 & $N(1440)^0$ &  \ttt{N(1440)0}     & 2214 & $\Delta^+$  & \ttt{delta+}                  \\
+    12212 & $N(1440)^+$ &  \ttt{N(1440)+}     & 2224 & $\Delta^{++}$ & \ttt{delta++}                 \\
+     1214 & $N(1520)^0$ &  \ttt{N(1520)0}     &     31114 & $\Delta(1600)^{- }$ &  \ttt{D(1600)- } \\
+     2124 & $N(1520)^+$ &  \ttt{N(1520)+}     &     32114 & $\Delta(1600)^{0 }$ &  \ttt{D(1600)0 } \\
+    22112 & $N(1535)^0$ &  \ttt{N(1535)0}     &     32214 & $\Delta(1600)^{+ }$ &  \ttt{D(1600)+ } \\
+    22212 & $N(1535)^+$ &  \ttt{N(1535)+}     &     32224 & $\Delta(1600)^{++}$ &  \ttt{D(1600)++} \\
+    32112 & $N(1650)^0$ &  \ttt{N(1650)0}     &      1112 & $\Delta(1620)^{- }$ &  \ttt{D(1620)- } \\
+    32212 & $N(1650)^+$ &  \ttt{N(1650)+}     &      1212 & $\Delta(1620)^{0 }$ &  \ttt{D(1620)0 } \\
+     2116 & $N(1675)^0$ &  \ttt{N(1675)0}     &      2122 & $\Delta(1620)^{+ }$ &  \ttt{D(1620)+ } \\
+     2216 & $N(1675)^+$ &  \ttt{N(1675)+}     &      2222 & $\Delta(1620)^{++}$ &  \ttt{D(1620)++} \\
+    12116 & $N(1680)^0$ &  \ttt{N(1680)0}     &     11114 & $\Delta(1700)^{- }$ &  \ttt{D(1700)- } \\
+    12216 & $N(1680)^+$ &  \ttt{N(1680)+}     &     12114 & $\Delta(1700)^{0 }$ &  \ttt{D(1700)0 } \\
+    21214 & $N(1700)^0$ &  \ttt{N(1700)0}     &     12214 & $\Delta(1700)^{+ }$ &  \ttt{D(1700)+ } \\
+    22124 & $N(1700)^+$ &  \ttt{N(1700)+}     &     12224 & $\Delta(1700)^{++}$ &  \ttt{D(1700)++} \\
+    42112 & $N(1710)^0$ &  \ttt{N(1710)0}     &     11112 & $\Delta(1900)^{- }$ &  \ttt{D(1900)- } \\
+    42212 & $N(1710)^+$ &  \ttt{N(1710)+}     &     11212 & $\Delta(1900)^{0 }$ &  \ttt{D(1900)0 } \\
+    31214 & $N(1720)^0$ &  \ttt{N(1720)0}     &     12122 & $\Delta(1900)^{+ }$ &  \ttt{D(1900)+ } \\
+    32124 & $N(1720)^+$ &  \ttt{N(1720)+}     &     12222 & $\Delta(1900)^{++}$ &  \ttt{D(1900)++} \\
+    11218 & $N(1990)^0$ &  \ttt{N(1990)0}     &      1116 & $\Delta(1905)^{- }$ &  \ttt{D(1905)- } \\
+    12128 & $N(1990)^+$ &  \ttt{N(1990)+}     &      1216 & $\Delta(1905)^{0 }$ &  \ttt{D(1905)0 } \\
+          &              &                    &      2126 & $\Delta(1905)^{+ }$ &  \ttt{D(1905)+ } \\
+          &              &                    &      2226 & $\Delta(1905)^{++}$ &  \ttt{D(1905)++} \\
+          &              &                    &     21112 & $\Delta(1910)^{- }$ &  \ttt{D(1910)- } \\
+          &              &                    &     21212 & $\Delta(1910)^{0 }$ &  \ttt{D(1910)0 } \\
+          &              &                    &     22122 & $\Delta(1910)^{+ }$ &  \ttt{D(1910)+ } \\
+          &              &                    &     22222 & $\Delta(1910)^{++}$ &  \ttt{D(1910)++} \\
+          &              &                    &     21114 & $\Delta(1920)^{- }$ &  \ttt{D(1920)- } \\
+          &              &                    &     22114 & $\Delta(1920)^{0 }$ &  \ttt{D(1920)0 } \\
+          &              &                    &     22214 & $\Delta(1920)^{+ }$ &  \ttt{D(1920)+ } \\
+          &              &                    &     22224 & $\Delta(1920)^{++}$ &  \ttt{D(1920)++} \\
+          &              &                    &     11116 & $\Delta(1930)^{- }$ &  \ttt{D(1930)- } \\
+          &              &                    &     11216 & $\Delta(1930)^{0 }$ &  \ttt{D(1930)0 } \\
+          &              &                    &     12126 & $\Delta(1930)^{+ }$ &  \ttt{D(1930)+ } \\
+          &              &                    &     12226 & $\Delta(1930)^{++}$ &  \ttt{D(1930)++} \\
+          &              &                    &      1118 & $\Delta(1950)^{- }$ &  \ttt{D(1950)- } \\
+          &              &                    &      2118 & $\Delta(1950)^{0 }$ &  \ttt{D(1950)0 } \\
+          &              &                    &      2218 & $\Delta(1950)^{+ }$ &  \ttt{D(1950)+ } \\
+          &              &                    &      2228 & $\Delta(1950)^{++}$ &  \ttt{D(1950)++} \\
+\hline
+\end{tabular} 
+\end{center} 
+\end{table} 
+
+%
+%  Strange Baryons
+%
+
+\begin{table}[ptb] 
+\captive{Strange baryon codes\protect\label{t:codefoure} }  
+\vspace{1ex} 
+\begin{center} 
+\begin{tabular}{|c|c|c||c|c|c| @{\protect\rule{0mm}{\tablinsep}}}   \hline
+KF & Name & Printed & KF & Name & Printed\\ \hline
+3122 & $\Lambda^0$ & \ttt{Lambda0}                 & 3112 & $\Sigma^-$     & \ttt{Sigma-}               \\
+    13122 & $\Lambda(1405)^0$ &  \ttt{L(1405)0}    & 3212 & $\Sigma^0$     & \ttt{Sigma0}               \\
+     3124 & $\Lambda(1520)^0$ &  \ttt{L(1520)0}    & 3222 & $\Sigma^+$     & \ttt{Sigma+}               \\
+    23122 & $\Lambda(1600)^0$ &  \ttt{L(1600)0}    & 3114 & $\Sigma^{*-}$  & \ttt{Sigma*-}              \\
+    33122 & $\Lambda(1670)^0$ &  \ttt{L(1670)0}    & 3214 & $\Sigma^{*0}$  & \ttt{Sigma*0}              \\
+    13124 & $\Lambda(1690)^0$ &  \ttt{L(1690)0}    & 3224 & $\Sigma^{*+}$  & \ttt{Sigma*+}              \\
+    43122 & $\Lambda(1800)^0$ &  \ttt{L(1800)0}    &     13112 & $\Sigma(1660)^-$ &  \ttt{S(1660)- }    \\
+    53122 & $\Lambda(1810)^0$ &  \ttt{L(1810)0}    &     13212 & $\Sigma(1660)^0$ &  \ttt{S(1660)0 }    \\
+     3126 & $\Lambda(1820)^0$ &  \ttt{L(1820)0}    &     13222 & $\Sigma(1660)^+$ &  \ttt{S(1660)+ }    \\
+    13126 & $\Lambda(1830)^0$ &  \ttt{L(1830)0}    &     13114 & $\Sigma(1670)^-$ &  \ttt{S(1670)- }    \\
+    23124 & $\Lambda(1890)^0$ &  \ttt{L(1890)0}    &     13214 & $\Sigma(1670)^0$ &  \ttt{S(1670)0 }    \\
+     3128 & $\Lambda(2100)^0$ &  \ttt{L(2100)0}    &     13224 & $\Sigma(1670)^+$ &  \ttt{S(1670)+ }    \\
+    23126 & $\Lambda(2110)^0$ &  \ttt{L(2110)0}    &     23112 & $\Sigma(1750)^-$ &  \ttt{S(1750)- }    \\
+          &              &                         &     23212 & $\Sigma(1750)^0$ &  \ttt{S(1750)0 }    \\
+3312 & $\Xi^-$     & \ttt{Xi-}                     &     23222 & $\Sigma(1750)^+$ &  \ttt{S(1750)+ }    \\
+3322 & $\Xi^0$     & \ttt{Xi0}                     &      3116 & $\Sigma(1775)^-$ &  \ttt{S(1775)- }    \\
+3312 & $\Xi^{*-}$  & \ttt{Xi*-}                    &      3216 & $\Sigma(1775)^0$ &  \ttt{S(1775)0 }    \\
+3314 & $\Xi^{*0}$  & \ttt{Xi*0}                    &      3226 & $\Sigma(1775)^+$ &  \ttt{S(1775)+ }    \\
+    13312 & $\Xi(1690)^-$ &  \ttt{X(1690)- }       &     13116 & $\Sigma(1915)^-$ &  \ttt{S(1915)- }    \\
+    13322 & $\Xi(1690)^0$ &  \ttt{X(1690)0 }       &     13216 & $\Sigma(1915)^0$ &  \ttt{S(1915)0 }    \\
+    13314 & $\Xi(1820)^-$ &  \ttt{X(1820)- }       &     13226 & $\Sigma(1915)^+$ &  \ttt{S(1915)+ }    \\
+    13324 & $\Xi(1820)^0$ &  \ttt{X(1820)0 }       &     23114 & $\Sigma(1940)^-$ &  \ttt{S(1940)- }    \\
+    23312 & $\Xi(1950)^-$ &  \ttt{X(1950)- }       &     23214 & $\Sigma(1940)^0$ &  \ttt{S(1940)0 }    \\
+    23322 & $\Xi(1950)^0$ &  \ttt{X(1950)0 }       &     23224 & $\Sigma(1940)^+$ &  \ttt{S(1940)+ }    \\
+     3316 & $\Xi(2030)^-$ &  \ttt{X(2030)- }       &      3118 & $\Sigma(2030)^-$ &  \ttt{S(2030)- }    \\
+     3326 & $\Xi(2030)^0$ &  \ttt{X(2030)0 }       &      3218 & $\Sigma(2030)^0$ &  \ttt{S(2030)0 }    \\
+          &              &                         &      3228 & $\Sigma(2030)^+$ &  \ttt{S(2030)+ }    \\
+3334 & $\Omega^-$  & \ttt{Omega-}                  &           &              &                         \\
+\hline
+\end{tabular} 
+\end{center} 
+\end{table} 
+
+%
+% Heavy particles.
+%
+\begin{table}[ptb]
+\captive{Heavy meson codes\protect\label{t:codefive} }
+\vspace{1ex}
+\begin{center}
+\begin{tabular}{|c|c|c||c|c|c|@{\protect\rule{0mm}{\tablinsep}}} \hline
+KF & Name & Printed & KF & Name & Printed \\ \hline
+   411 & $D^+$        & \ttt{D+}       &    511 & $B^0$        & \ttt{B0}       \\
+   413 & $D^{*+}$     & \ttt{D*+}      &    513 & $B^{*0}$     & \ttt{B*0}      \\
+   415 & $D^{*+}_2$   & \ttt{D*\_2+}   &    515 & $B^{*0}_2$   & \ttt{B*\_20}   \\
+   421 & $D^0$        & \ttt{D0}       &    521 & $B^+$        & \ttt{B+}       \\
+   423 & $D^{*0}$     & \ttt{D*0}      &    523 & $B^{*+}$     & \ttt{B*+}      \\
+   425 & $D^{*0}_2$   & \ttt{D*\_20}   &    525 & $B^{*+}_2$   & \ttt{B*\_2+}   \\
+   431 & $D_s^+$      & \ttt{D\_s+}    &    531 & $B_s^0$      & \ttt{B\_s0}    \\
+   433 & $D^{*+}_s$   & \ttt{D*\_s+}   &    533 & $B^{*0}_s$   & \ttt{B*\_s0}   \\
+   435 & $D^{*+}_{2s}$& \ttt{D*\_2s+}  &    535 & $B^{*0}_{2s}$& \ttt{B*\_2s0}  \\
+   441 & $\eta_c$     & \ttt{eta\_c}   &    541 & $B_c^+$      & \ttt{B\_c+}    \\
+   443 & $J/\psi$     & \ttt{J/psi}    &    543 & $B^{*+}_c$   & \ttt{B*\_c+}   \\
+   445 & $\chi_{2c}$  & \ttt{chi\_2c}  &    545 & $B^{*+}_{2c}$& \ttt{B*\_2c+}  \\
+ 10411 & $D^{*+}_0$   & \ttt{D*\_0+}   &    551 & $\eta_b$     & \ttt{eta\_b}   \\
+ 10413 & $D_1^+$      & \ttt{D\_1+}    &    553 & $\Upsilon$   & \ttt{Upsilon}  \\
+ 10421 & $D^{*0}_0$   & \ttt{D*\_00}   &    555 & $\chi_{2b}$  & \ttt{chi\_2b}  \\
+ 10423 & $D_1^0$      & \ttt{D\_10}    &  10511 & $B^{*0}_0$   & \ttt{B*\_00}   \\
+ 10431 & $D^{*+}_{0s}$& \ttt{D*\_0s+}  &  10513 & $B_1^0$      & \ttt{B\_10}    \\
+ 10433 & $D_{1s}^+$   & \ttt{D\_1s+}   &  10521 & $B^{*+}_0$   & \ttt{B*\_0+}   \\
+ 10441 & $\chi_0^c$   & \ttt{chi\_0c}  &  10523 & $B_1^+$      & \ttt{B\_1+}    \\
+ 10443 & $h_{1c}$     & \ttt{h\_1c}    &  10531 & $B^{*0}_{0s}$& \ttt{B*\_0s0}  \\
+ 20413 & $D^{*+}_1$   & \ttt{D*\_1+}   &  10533 & $B_{1s}^0$   & \ttt{B\_1s0}   \\
+ 20423 & $D^{*0}_1$   & \ttt{D*\_10}   &  10541 & $B^{*+}_{0c}$& \ttt{B*\_0c+}  \\
+ 20433 & $D^{*+}_{1s}$& \ttt{D*\_1s+}  &  10543 & $B_{1c}^+$   & \ttt{B\_1c+}   \\
+ 20443 & $\chi_{1c}$  & \ttt{chi\_1c}  &  10551 & $\chi_0^b$   & \ttt{chi\_0b}  \\
+100443 & $\psi'$      & \ttt{psi'}     &  10553 & $h_{1b}$     & \ttt{h\_1b}    \\
+       &              &                &  20513 & $B^{*0}_1$   & \ttt{B*\_10}   \\
+       &              &                &  20523 & $B^{*+}_1$   & \ttt{B*\_1+}   \\
+       &              &                &  20533 & $B^{*0}_{1s}$& \ttt{B*\_1s0}  \\
+       &              &                &  20543 & $B^{*+}_{1c}$& \ttt{B*\_1c+}  \\
+       &              &                &  20553 & $\chi_{1b}$  & \ttt{chi\_1b}  \\
+       &              &                & 100553 & $\Upsilon'$  & \ttt{Upsilon'} \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+
+\begin{table}[ptb]
+\captive{Heavy baryon codes\protect\label{t:codesix} }
+\vspace{1ex}
+\begin{center}
+\begin{tabular}{|c|c|c||c|c|c||c|c|c|@{\protect\rule{0mm}{\tablinsep}}} \hline
+KF & Name & Printed & KF & Name & Printed & KF & Name & Printed \\ \hline
+ 4112 & $\Sigma_c^0$          & \ttt{Sigma\_c0}     & 5112 & $\Sigma_b^-$     & \ttt{Sigma\_b-}  &
+ 5432 & $\Omega^{'0}_{bc}$    & \ttt{Omega'\_bc0}   \\
+ 4114 & $\Sigma*_c^0$         & \ttt{Sigma*\_c0}    & 5114 & $\Sigma^{*-}_b$  & \ttt{Sigma*\_b-} &
+ 5434 & $\Omega^{*0}_{bc}$    & \ttt{Omega*\_bc0}   \\
+ 4122 & $\Lambda_c^+$         & \ttt{Lambda\_c+}    &  5122 & $\Lambda_b^0$   & \ttt{Lambda\_b0} &
+ 5442 & $\Omega_{bcc}^+$      & \ttt{Omega\_bcc+}   \\
+ 4132 & $\Xi_c^0$             & \ttt{Xi\_c0}        &  5132 & $\Xi_b^-$       & \ttt{Xi\_b-}     &
+ 5444 & $\Omega^{*+}_{bcc}$   & \ttt{Omega*\_bcc+}  \\
+ 4212 & $\Sigma_c^+$          & \ttt{Sigma\_c+}     &  5142 & $\Xi_{bc}^0$    & \ttt{Xi\_bc0}    &
+ 5512 & $\Xi_{bb}^-$          & \ttt{Xi\_bb-}       \\
+ 4214 & $\Sigma*_c^+$         & \ttt{Sigma*\_c+}    &  5212 & $\Sigma_b^0$    & \ttt{Sigma\_b0}  &
+ 5514 & $\Xi^{*-}_{bb}$       & \ttt{Xi*\_bb-}      \\
+ 4222 & $\Sigma_c^{++}$       & \ttt{Sigma\_c++}    &  5214 & $\Sigma^{*0}_b$ & \ttt{Sigma*\_b0} &
+ 5522 & $\Xi_{bb}^0$          & \ttt{Xi\_bb0}       \\
+ 4224 & $\Sigma*_c^{++}$      & \ttt{Sigma*\_c++}   &  5222 & $\Sigma_b^+$    & \ttt{Sigma\_b+}  &
+ 5524 & $\Xi^{*0}_{bb}$       & \ttt{Xi*\_bb0}      \\
+ 4232 & $\Xi_c^+$             & \ttt{Xi\_c+}        &  5224 & $\Sigma^{*+}_b$ & \ttt{Sigma*\_b+} &
+ 5532 & $\Omega_{bb}^-$       & \ttt{Omega\_bb-}    \\
+ 4312 & $\Xi^{'0}_c$          & \ttt{Xi'\_c0}       &  5232 & $\Xi_b^0$       & \ttt{Xi\_b0}     &
+ 5534 & $\Omega^{*-}_{bb}$    & \ttt{Omega*\_bb-}   \\
+ 4314 & $\Xi^{*0}_c$          & \ttt{Xi*\_c0}       &  5242 & $\Xi_{bc}^+$    & \ttt{Xi\_bc+}    &
+ 5542 & $\Omega_{bbc}^0$      & \ttt{Omega\_bbc0}   \\
+ 4322 & $\Xi^{'+}_c$          & \ttt{Xi'\_c+}       &  5312 & $\Xi^{'-}_b$    & \ttt{Xi'\_b-}    &
+ 5544 & $\Omega^{*0}_{bbc}$   & \ttt{Omega*\_bbc0}  \\
+ 4324 & $\Xi^{*+}_c$          & \ttt{Xi*\_c+}       &  5314 & $\Xi^{*-}_b$    & \ttt{Xi*\_b-}    &
+ 5554 & $\Omega^{*-}_{bbb}$   & \ttt{Omega*\_bbb-}  \\
+ 4332 & $\Omega_c^0$          & \ttt{Omega\_c0}     &  5322 & $\Xi^{'0}_b$    & \ttt{Xi'\_b0}    &
+      &                       &                     \\
+ 4334 & $\Omega^{*0}_c$       & \ttt{Omega*\_c0}    &  5324 & $\Xi^{*0}_b$    & \ttt{Xi*\_b0}    &
+      &                       &                     \\
+ 4412 & $\Xi_{cc}^+$          & \ttt{Xi\_cc+}       &  5332 & $\Omega_b^-$    & \ttt{Omega\_b-}  &
+      &                       &                     \\
+ 4414 & $\Xi^{*+}_{cc}$       & \ttt{Xi*\_cc+}      &  5334 & $\Omega^{*-}_b$ & \ttt{Omega*\_b-} &
+      &                       &                     \\
+ 4422 & $\Xi_{cc}^{++}$       & \ttt{Xi\_cc++}      &  5342 & $\Omega_{bc}^0$ & \ttt{Omega\_bc0} &
+      &                       &                     \\
+ 4424 & $\Xi_{cc}^{*++}$      & \ttt{Xi*\_cc++}     &  5412 & $\Xi^{'0}_{bc}$ & \ttt{Xi'\_bc0}   &
+      &                       &                     \\
+ 4432 & $\Omega_{cc}^+$       & \ttt{Omega\_cc+}    &  5414 & $\Xi^{*0}_{bc}$ & \ttt{Xi*\_bc0}   &
+      &                       &                     \\
+ 4434 & $\Omega^{*+}_{cc}$    & \ttt{Omega*\_cc+}   &  5422 & $\Xi^{'+}_{bc}$ & \ttt{Xi'\_bc+}   &
+      &                       &                     \\
+ 4444 & $\Omega_{ccc}^{*++}$  & \ttt{Omega*\_ccc++} &  5424 & $\Xi^{*+}_{bc}$ & \ttt{Xi*\_bc+}   &
+      &                       &                     \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\subsection*{B: Particle family codes}\label{app:code}
+
+JAM has an other particle code which is rough identification of
+ the particles comparison to the PDG code.
+It can be obtained from \ttt{kchg(kc,5)}.
+
+\begin{verbatim}
+c...Elementary particles.
+      common/partdat3/id_quark,id_lept,id_exc,id_boson,id_diq
+     $       ,id_tec,id_susy,id_special
+c...Mesons.
+      common/partdat2/id_pi,id_light1,id_light0
+     $    ,id_str,id_charm,id_bott,id_cc,id_bb,id_mdiff
+c...Baryons.
+      common/partdat1/id_nucl,id_nucls,id_delt,id_delts
+     $     ,id_lamb,id_lambs,id_sigm,id_sigms,id_xi,id_xis,id_omega
+     $    ,id_charmb,id_bottb,id_bdiff
+\end{verbatim}
+
+Actual values are stored in \ttt{block data jamdata}.
+
+
+
+\begin{thebibliography}{20}
+
+\bibitem{fritiof}
+      B. Andersson, G. Gustafson and H. Pi, \Journal{\ZPC}{57}{485}{1993};\\
+      H. Pi, \Journal{\CPC}{71}{173}{1992}.
+
+\bibitem{luciae}
+     Sa Ben-Hao and Tai An, \Journal{\CPC}{90}{121}{1995};
+     \Journal{\PRC}{55}{2010}{1997};
+     \Journal{\PLB}{399}{29}{1997};
+     \Journal{\PLB}{409}{393}{1997}.
+
+\bibitem{dpm}
+        A. Capella, U. Sukhatme, C.-I. Tan and J. Tran Thanh Van,
+        \Journal{\PR}{236}{225}{1994}.
+
+\bibitem{venus} K. Werner,
+   \Journal{\ZPC}{42}{85}{1989};
+   \Journal{\PR}{232}{87}{1993}.\\
+ VENUS, 
+{\em http://www-subatech.in2p3.fr/Sciences/Theorie/venus/venus.html}.
+
+\bibitem{pythia} T. Sj{\" o}strand, \Journal{\CPC}{82}{74}{1994};
+      {\em http://www.thep.lu.se/tf2/staff/torbjorn/Pythia.html}.
+
+\bibitem{hijing}
+        X. N. Wang and M. Gyulassy, \Journal{\PRD}{44}{3501}{1991};
+        X. N. Wang, \Journal{\PR}{280}{287}{1997};
+        X. N. Wang and M. Gyulassy, \Journal{\CPC}{83}{307}{1994};
+        {\em http://www-nsdth.lbl.gov/\verb+~+xnwang/hijing/}.
+
+
+\bibitem{hijet} A. Shor, R. S. Longacre,
+	\Journal{\PLB}{218}{100}{1989}.
+
+
+\bibitem{rqmd1}
+H. Sorge, H. St\"ocker and W. Greiner, \Journal{\ANP}{192}{266}{1989};
+H. Sorge, A. von Keitz, R. Mattiello, H. St\"ocker and W. Greiner,
+  \Journal{\ZPC}{47}{629}{1990}.
+H. Sorge, L. Winckelmann, H. St\"ocker and  W. Greiner,
+ \Journal{\ZPC}{59}{85}{1993}.
+
+\bibitem{rqmd2}
+H. Sorge, \Journal{\PRC}{52}{3291}{1995}.
+
+
+\bibitem{qgsm}
+L. Bravina, L.P. Csernai, P. Levai, and D. Dtrottman,
+  \Journal{\PRC}{51}{2161}{1994}.
+
+\bibitem{arc}
+Y. Pang, T. J. Schlagel, S. H. Kahana,
+   \Journal{\NPA}{544}{435c}{1992};
+   \Journal{\PRL}{68}{2743}{1992};
+ S. H. Kahana, D. H. Kahana, Y. Pang, and T. J. Schlagel,
+  \Journal{\ARPS}{46}{31}{1996}.
+ 
+
+\bibitem{art}
+  B. A. Li and C. M. Ko,  \Journal{\PRC}{52}{2037}{1995}.
+\Journal{\PLB}{382}{337}{1996};
+\Journal{\NPA}{630}{556}{1998};
+\Journal{\PRC}{58}{R1382}{1998};
+B. A. Li, C.M. Ko, and G.Q. Li, \Journal{\PRC}{54}{844}{1996}.
+
+\bibitem{hsd}
+ W. Ehehalt and W. Cassing \Journal{\NPA}{602}{449}{1996};
+ J. Geiss, W. Cassing and C. Greiner, nucl-th/9805012;
+ W. Cassing and E. L. Bratkovskaya, \Journal{\PR}{308}{65}{1999}.
+
+\bibitem{urqmd}
+L.A. Winckelmann, S.A. Bass, M. Bleicher, M. Brandstetter, A. Dumitru,
+C. Ernst, L. Gerland, J. Konopka, S. Soff, C. Spieles, H. Weber,
+C. Hartnack, J. Aichelin, N. Amelin, H. St\"ocker and W. Greiner,
+  Nucl. Phys. {\bf A610}, 116c (1996); nucl-th/9610033;
+%
+%
+S.A. Bass, M. Belkacem, M. Bleicher, M. Brandstetter, L. Bravina, C. Ernst,
+L. Gerland, M. Hofmann, S. Hofmann, J. Konopka, G. Mao, L. Neise, S. Soff,
+C. Spieles, H. Weber, L.A. Winckelmann, H. St\"ocker, W.  Greiner,
+C. Hartnack, J. Aichelin and  N. Amelin,
+\Journal{\PPNP}{41}{225}{1998}; nucl-th/9803035;
+%
+%
+M Bleicher, E. Zabrodin, C. Spieles, S. A. Bass, C. ernst,
+S. Soff, L. Bravina, M. Belkacem, H. Weber, H. St\"ocker and W. Greiner,
+\Journal{\JP}{G25}{1859}{1999}.
+
+
+
+
+
+
+\bibitem{buu}
+        G. F. Bertsch and S. Das Gupta, 
+        \Journal{\PR}{160}{189}{1988}.
+
+\bibitem{inc1}
+K. Chen,  Z. Frankel, G.Friedlander, J. R. Grover, J. M. Miller
+and Y. Shimamoto, \Journal{\PR}{166}{1968}{949}.
+\bibitem{inc2}
+Y. Yariv and Z. Frankel, \Journal{\PRC}{20}{2227}{1979}.
+\bibitem{inc3}
+J. Cugnon, \Journal{\PRC}{22}{1885}{1980};
+J. Cugnon, T. Mizutani and J. Vandermeulen,
+          \Journal{\NPA}{352}{505}{1981}.
+
+\bibitem{rbuu}
+	W.Cassing and U.Mosel,
+	\Journal{\PPNP}{25}{235}{1990}.
+
+\bibitem{qmd}
+        J. Aichelin, 
+        \Journal{\PR}{202}{233}{1991}.
+\bibitem{vni}
+K. Geiger and B. M{\"u}ller, \Journal{\NPB}{369}{600}{1992};
+K. Geiger, VNI,
+        \Journal{\PR}{258}{238}{1995};
+        \Journal{\CPC}{104}{70}{1997};
+ {\em http://rhic.phys.columbia.edu/rhic/vni}.
+
+\bibitem{zpc}
+       B. Zhang, ZPC, \Journal{\CPC}{109}{70}{1997};
+      {\em http://nt1.phys.columbia.edu/people/bzhang/ZPC/zpc.html}.
+
+\bibitem{cascade1} Y. Pang, GCP,
+    {\em http://rhic.phys.columbia.edu/rhic/gcp.}.
+
+\bibitem{bin1}
+	B. Zhang and Y. Pang,
+        \Journal{\PRC}{56}{2185}{1997}.
+\bibitem{bin2}
+	B. Zhang, M. Gyulassy  and Y. Pang,
+         \Journal{\PRC}{58}{1175}{1998}.
+
+\bibitem{flow}
+R. Mattiello, H. Sorge,  H. St\"ocker and W. Greiner,
+  \Journal{\PRC}{55}{1443}{1997}.
+
+\bibitem{eskola1} K. J. Eskola and X. N. Wang, \Journal{\PRD}{49}{1282}{1994}.
+
+
+\bibitem{jam}
+Y. Nara, N. Otuka, A. Ohnishi, K. Niita, S.  Chiba,
+   \Journal{\PRC}{61}{024901}{2000},   e-Print: nucl-th/9904059;
+Y. Nara, \Journal{\NPA}{638}{555c}{1998},
+ {\em http://quark.phy.bnl.gov/\verb+~+ynara/jam/}.
+
+
+\bibitem{CernHera}
+{\it Total Cross-Sections for Reactions of High Energy Particles}
+  vol. 12a and vol. 12b
+edited by A. Baldni, V. Flaminio, W. G. Moorhead and D. R. O. Morrison
+(Springer-Verlag Berlin 1988).
+
+\bibitem{Teis}
+ S. Teis, W. Cassing, M. Effenberger, A. Hombach, U. Mosel and Gy. Wolf,
+  \Journal{\ZPA}{356}{421}{1997}.
+
+
+% detbal
+\bibitem{Wolf2}
+        Gy.Wolf, W.Cassing, U.Mosel,
+        \Journal{\NPA}{552}{549}{1993}.
+\bibitem{detbal1}
+        P. Danielewicz and G. F. Bertch,
+        \Journal{\NPA}{533}{712}{1991}.
+\bibitem{detbal2}
+        Bao-An Li, \Journal{\NPA}{552}{605}{1993}.
+
+\bibitem{Kitazoe}
+	Y. Kitazoe,
+	\Journal{\PTP}{73}{1191}{1985}.
+
+\bibitem{bialas}
+	A. Bialas, M. Gyulassy,
+	\Journal{\NPB}{291}{793}{1987}.
+\bibitem{dwid1} J. Randrup, \Journal{\NPA}{314}{429}{1979)};
+          Rittenberg, \Journal{\RMP}{43}{S1}{1971}.
+
+\bibitem{PDG96}
+Particle-Data-Group, \newblock Phys. Rev. {\bf D54} (1996).
+
+\bibitem{ref:slope} See for example,
+   \Journal{\PTPsuppl}{41,42}{p291}{1967}.
+
+\bibitem{goulianos} K. Goulianos, \Journal{\PR}{101}{1983}{169}.
+
+
+\bibitem{Brown}
+        G. E. Brown, C. M. Ko, Z. G. Wu and L. H. Xia,
+        \Journal{\PRC}{43}{1881}{1991}.
+
+\bibitem{lund}
+  B. Andersson, G. Gustafson, G. Ingelman and T. Sj\"ostrand,
+     \Journal{\PR}{97}{31}{1983}.
+\bibitem{lund2}
+  T. Sj\"ostrand,
+     \Journal{\NP}{B248}{469}{1984}.
+
+
+
+\bibitem{niita}
+K. Niita, S. Chiba, T. Maruyama, T. Maruyama, H. Takada, T. Fukahori,
+ Y. Nakahara and A. Iwamoto,
+    \Journal{\PRC}{52}{2620}{1995}.
+
+\bibitem{KK}
+   Y. Nara, A. Ohnishi, T. Harada and A. Engel,
+    \Journal{\NPA}{614}{433}{1997}.
+
+\bibitem{mdraw}
+   Toshiki Maruyama, the graphic software {\it mdraw} can be obtained
+   from \\
+{\em http://hadron31.tokai.jaeri.go.jp/msource/Draw/draw.html}.
+\bibitem{angel}
+   Koji Niita, the graphic software {\it angel} can be obtained
+   from the request on e-mail: {\em niita@hadron03.tokai.jaeri.go.jp}.
+
+
+\end{thebibliography}{}
+
+
+
+\end{document}
+

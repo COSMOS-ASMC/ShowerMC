@@ -1,0 +1,286 @@
+c    ******************************************************************
+c    *                                                                *
+c    *  prompt muon decay  mode is important.
+c    *     others are roughly introduced to keep the energy conservation
+c    *
+c    *  cdDecay: decay of D+- meson into K + mu + neu    7 %
+c                                        K + pi + mu + neumu 3.2 %  10.2
+c                                        ---------------------------
+c                                        K + e  + neu   6.8 %       17. 
+c                                        K + pi+ e+ neue  4.1 %     21.1
+c                                        K0-bar + pi   2.9          24
+c                                        K 2pi         9.0          33 
+c                                        K0bar +2pi    9.7          42.7
+c                                        K+3pi         6.4          49.1
+c                                        K0bar + 3pi   7.0          56.1
+c                                        K+2pi+2pi0    2.2          58.3
+c                                        K0bar + 4pi   5.4          63.7
+c                                        2K0b +K       1.8          65.5
+c                                        3pi + pi0     1.9          67.4
+c                                        --------------- these modes are
+c                                          enhanced by a factor of
+c                                       (100-10.2)/(67.4-10.2)=1.57
+c
+c                D0               into   K + mu + neu  3.23       3.23
+c                                        -----------------------
+c                                        K + e  + neue 3.66       3.66
+c                                        K + pi0 + e neue  1.6    5.26
+c                                        K + pic + e neue 2.8     8.06
+c                                        K-+pi+           3.85   11.95
+c                                        K0bar+pi0        2.12   14.07
+c                                        K0bar + 2pi      5.4    19.11
+c                                        K-pi+ pi0        13.9   33.01   
+c                                        K-+2pi+ pi-       7.6   40.61
+c                                        K0bar+pi+ pi- p0  10.0  50.61
+c                                        K-pi+ 2pi0        15    65.61
+c                                        K-2pi+ pi- pi0    4.1   69.71
+c                                        K0bar pi+ pi- 2pi0 10.6 80.31
+c                                        pi+pi-pi0          1.6  81.91
+c                                        2pi+ 2pi- pi0      1.9  83.81
+c                                       --------- these are enhanced 1.193
+c
+c    ******************************************************************
+c
+      subroutine cdDecay(pj, a, np)
+      implicit none
+#include  "Zptcl.h"
+#include  "Zcode.h"
+
+      record /ptcl/ pj   ! input. demeson
+      integer np                ! output. # of ptcls stored in a
+      record /ptcl/ a(*)  ! output. to store produced ptcls
+
+      real*8 u
+
+      real*8 brd0e, brd0mu, brd0pi0e, brd0pice,
+     *       brdce, brdcmu, brdcpie,  brdcpimu
+      parameter (brd0e = 0.0366, brd0mu = brd0e+ 0.0323,
+     *      brd0pi0e = brd0mu + 0.016, brd0pice = brd0pi0e+0.028)
+      parameter (brdce = 0.067, brdcmu = brdce + 0.07,
+     *        brdcpie= brdcmu + 0.041, brdcpimu = brdcpie + 0.032)
+
+      call rndc(u)
+      if(pj.charge .eq. 0) then
+         if(u .lt. brd0e) then
+            call cdDecayNonpi(1, pj, a, np)
+         elseif(u .lt. brd0mu ) then
+            call cdDecayNonpi(2, pj, a, np)
+         elseif(u .lt.  brd0pi0e)  then
+            call cdDecay0pi(1, pj, a, np)
+         elseif(u .lt. brd0pice) then
+            call cdDecay0pi(2, pj, a, np)
+         else
+            np = 0
+         endif
+      else
+         if(u .lt. brdce) then
+            call cdDecayNonpi(1, pj, a, np)
+         elseif(u .lt.  brdcmu ) then
+            call cdDecayNonpi(2, pj, a, np)
+         elseif(u .lt. brdcpie) then
+            call cdDecaycpi(1, pj, a, np)
+         elseif(u .lt. brdcpimu) then
+            call cdDecaycpi(2, pj, a, np)
+         else
+            np = 0
+         endif
+      endif
+      end
+c     ********************************
+      subroutine cdDecayNonpi(flag, pj, a, np)
+      implicit none
+#include  "Zptcl.h"
+#include  "Zcode.h"
+c             D0 -> K- +  e+  + neue and C.C
+      integer flag  ! input.  1--> electron mode
+                    !         2--> muon mode    
+      record /ptcl/ pj   ! input. demeson
+      integer np                ! output. # of ptcls stored in a
+      record /ptcl/ a(*)  ! output. to store produced ptcls
+
+      integer muchg, neusubc, kchg, ksubc, icon, i
+      real*8 u, w
+
+
+      call rndc(u)
+      if(u .lt. .50) then
+         ksubc = k0s
+      else
+         ksubc = k0l
+      endif
+      if(pj.charge .gt. 0) then
+         muchg = 1
+         kchg = 0
+         neusubc =regptcl
+      elseif(pj.charge .lt. 0) then
+         muchg = -1
+         kchg = 0
+         neusubc = antip
+      elseif(pj.subcode .eq. regptcl) then
+         muchg = 1
+         kchg = -1
+         neusubc = regptcl
+         ksubc = 0
+      else
+         muchg = -1
+         kchg = 1
+         neusubc = antip
+         ksubc = 0
+      endif
+      if(flag .eq. 1) then
+c          electron
+         call cmkptc(kelec, 0,  muchg,  a(1))
+c           neue
+         call cmkptc(kneue, neusubc, 0, a(2))
+      elseif(flag .eq. 2) then
+c                 muon
+         call cmkptc(kmuon, 0,  muchg,  a(1))
+c                neumu
+         call cmkptc(kneumu, neusubc, 0, a(2))
+      else
+         call cerrorMsg('flag error in cdDecaynonpi',0)
+      endif
+c                 kaon
+      call cmkptc(kkaon, ksubc, kchg, a(3))
+c            3  body pure phase space
+      call cnbdcy(3, pj.mass, a,  0, w, icon)
+      np = 3
+      do   i=1, np
+         call cibst1(i, pj, a(i), a(i))
+      enddo
+      end
+c     **************************************
+      subroutine cdDecaycpi(flag, pj, a, np)
+      implicit none
+#include  "Zptcl.h"
+#include  "Zcode.h"
+c             D+ -> K- +  pi+ + e-  + neue and C.C
+c                   K- +  pi+ + mu- + neumu and C.C
+
+      integer flag  ! input.  1--> electron mode for Dcharge
+                    !              K- pi0 e+ neue for D0
+                    !         2--> muon mode     for Dcharge
+                    !              K0~ pi- e+ neue for D0
+      record /ptcl/ pj   ! input. demeson
+      integer np                ! output. # of ptcls stored in a
+      record /ptcl/ a(*)  ! output. to store produced ptcls
+
+      integer muchg, neusubc, kchg, ksubc, icon, i
+      real*8 u, w
+
+      call rndc(u)
+      if(u .lt. .50) then
+         ksubc = k0s
+      else
+         ksubc = k0l
+      endif
+
+      if(pj.charge .gt. 0) then
+         muchg = 1
+         kchg = -1
+         neusubc =regptcl
+      elseif(pj.charge .lt. 0) then
+         muchg = -1
+         kchg = 1
+         neusubc = antip
+      else
+         call cerrorMsg('only charged D for cdDecaycpi', 0)
+      endif
+      if(flag .eq. 1) then
+c          electron
+         call cmkptc(kelec, 0,  muchg,  a(1))
+c           neue
+         call cmkptc(kneue, neusubc, 0, a(2))
+      elseif(flag .eq. 2) then
+c                 muon
+         call cmkptc(kmuon, 0,  muchg,  a(1))
+c                neumu
+         call cmkptc(kneumu, neusubc, 0, a(2))
+      else
+         call cerrorMsg('flag error in cdDecay',0)
+      endif
+c            kaon
+      call cmkptc(kkaon, ksubc, kchg, a(3))
+c            pion
+      call cmkptc(kpion, 0, -kchg, a(4))
+
+c            4  body pure phase space
+      call cnbdcy(4, pj.mass, a,  0, w, icon)
+      np = 4
+      do   i=1, np
+         call cibst1(i, pj, a(i), a(i))
+      enddo
+      end
+c     **************************************
+      subroutine cdDecay0pi(flag, pj, a, np)
+      implicit none
+#include  "Zptcl.h"
+#include  "Zcode.h"
+c             D0 -> K- +  pi0 + e+  + neue and C.C
+c                   K0 +  pi- + e+  + neue and C.C
+
+      integer flag  ! input.  1--> pi0 mode
+                    !         2--> pi- mode 
+      record /ptcl/ pj   ! input. demeson
+      integer np                ! output. # of ptcls stored in a
+      record /ptcl/ a(*)  ! output. to store produced ptcls
+
+      integer muchg, neusubc, kchg, ksubc, icon, i, pic
+      real*8 u, w
+
+      call rndc(u)
+      if(u .lt. .50) then
+         ksubc = k0s
+      else
+         ksubc = k0l
+      endif
+
+      if(pj.subcode .eq. regptcl) then
+c           D0
+         if(flag .eq. 1) then
+c              --> K- pi0 e+ neue
+            muchg = 1  ! e+
+            kchg = -1  ! 
+            neusubc = regptcl
+            ksubc = 0
+            pic = 0
+         else
+c               --> K0~ pi- e+ neue
+            muchg =1  ! e+
+            kchg = 0    ! K0
+            neusubc = antip
+            pic = -1  
+         endif
+      else
+c          D0~
+         if(flag .eq. 1) then
+c              -->K+ pi0 e- neue~
+            muchg = -1
+            kchg = 1
+            neusubc = antip
+            ksubc = 0
+            pic = 0
+         else
+c             --> K0 pi+ e- neue~
+            muchg = -1   ! e-
+            kchg = 0
+            neusubc = antip
+            pic = 1
+         endif
+      endif
+c          electron
+      call cmkptc(kelec, 0,  muchg,  a(1))
+c           neue
+      call cmkptc(kneue, neusubc, 0, a(2))
+c           kaon
+      call cmkptc(kkaon, ksubc, kchg, a(3))
+c           pion
+      call cmkptc(kpion, 0, pic, a(4))
+
+c           4  body pure phase space
+      call cnbdcy(4, pj.mass, a,  0, w, icon)
+      np = 4
+      do   i=1, np
+         call cibst1(i, pj, a(i), a(i))
+      enddo
+      end
