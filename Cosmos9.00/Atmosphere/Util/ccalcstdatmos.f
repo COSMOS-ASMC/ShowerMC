@@ -48,7 +48,8 @@
       integer nodes    ! real number of nodal points given in the table.
       integer icon, i,ios
       
-      real*8 z(maxnodes), t(maxnodes), p(maxnodes), rho(maxnodes)
+!     real*8 z(maxnodes), t(maxnodes), p(maxnodes), rho(maxnodes)
+      real*8 z(maxnodes), t(maxnodes), rho(maxnodes)
       real*8 scaleh(maxnodes), alfa(maxnodes), beta(maxnodes),
      *       d0(maxnodes)
       real*8 m, g, k, nuc, c2, kbymg, dtdz, dsum(maxnodes)
@@ -68,7 +69,8 @@
       nodes = 0
       do while(1 .gt. 0 )
          read(TempDev, *, iostat=ios)
-     *    z(nodes+1), t(nodes+1), p(nodes+1), rho(nodes+1)
+     *    z(nodes+1), t(nodes+1),  rho(nodes+1)
+!     *    z(nodes+1), t(nodes+1), p(nodes+1), rho(nodes+1)
          if(ios .ne. 0) goto 10
          nodes = nodes + 1
       enddo
@@ -103,16 +105,16 @@
       enddo
 !          height, temp, pres, rho, alfa, d0, dsum, H
 !       dsum is the grammage above the node. all in mks unit.
-      write(*,*)"# height, temp, press, rho, alfa, d0, dsum, H"
+      write(*,*)"# height, temp, rho, alfa, d0, dsum, H"
       write(*,*) "#-----------------------------------------"
       do i = 1, nodes-1
          write(*,
-     *   '(8g14.5)')
-     *   sngl(z(i)),sngl(t(i)),sngl( p(i)), sngl(rho(i)),
-     *   sngl(alfa(i)), sngl( d0(i)), sngl(dsum(i)), sngl(scaleh(i))
+     *   '(1p,7g14.5)')
+     *   z(i),t(i),  rho(i),
+     *   alfa(i),  d0(i), dsum(i), scaleh(i)
       enddo
 !      do zx = 0., 11.d3, 1.d3
 !         write(*, *) 
-!     *    rho(1)*(1 + alfa(1)*(zx - 0.)/scaleh(1))**(-1.-1./alfa(1))
+!     *    rho(1)*(1 + alfa(1)*(zx - 0.)/scaleh(1)**(-1.-1./alfa(1)
 !      enddo
       end

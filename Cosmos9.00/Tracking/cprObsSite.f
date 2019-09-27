@@ -12,17 +12,17 @@
       integer io ! input. dev. no.
       type(site)::aSite
       
-      write(io, *)sngl(aSite%pos%depth*0.1),
-     * sngl(aSite%pos%height), 
-     * sngl(aSite%pos%radiallen/1000.),
-     * aSite%pos%xyz%r(1), aSite%pos%xyz%r(2), aSite%pos%xyz%r(3)
+      write(io, '(1p, 6g13.4)'
+     *  aSite%pos%depth*0.1), aSite%pos%height, 
+     *  aSite%pos%radiallen/1000., 
+     * aSite%pos%xyz%r(1:3)
       end
 !    *********************************print header
       subroutine cprObsSiteHd(io)
 !    **************************************
       integer io ! inpu%t dev. no.
-      write(io, *)
-     * ' depth (gr/cm2)  Height(m)  Distance to E-center(km)'//
+      write(io, '(a)')
+     * ' depth (g/cm2)  Height(m)  R(km) and'//
      * '   x,y,z in XYZ system(m)'
       end
 ! 
@@ -40,18 +40,17 @@
       integer io ! input . output dev. no.
       type(assite)::aSite
       
-      write(io, *)sngl(aSite%pos%depth*0.1),
-     * sngl(aSite%pos%height), 
-     * sngl(aSite%pos%radiallen/1000.),
-     * sngl(aSite%mu), 
-     * aSite%pos%xyz%r(1), aSite%pos%xyz%r(2), aSite%pos%xyz%r(3)
+      write(io, '(1p,7g13.4)')
+     *  aSite%pos%depth*0.1, aSite%pos%height, 
+     *  aSite%pos%radiallen/1000.,aSite%mu, 
+     *  aSite%pos%xyz%r(1:3)
       end
 !    *********************************print header
       subroutine cprASObsSiteHd(io)
 !    **************************************
       integer io ! input.
-      write(io, *)
-     * ' depth (gr/cm2)    Height(m)   Distance to E-center(km)'//
+      write(io, '(a)' ) 
+     * ' depth (g/cm2)    Height(m)   Distance to E-center(km)'//
      * ' Molere Unit(m)     x,y,z in XYZ system (m)'
       end
 

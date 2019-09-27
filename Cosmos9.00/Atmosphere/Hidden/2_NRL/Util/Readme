@@ -1,20 +1,15 @@
-Read the top part of NRLGenData.f
-   To use NRL data, in  Cosmos/cosmos/condc.h, 
-ATMOSPHERE 
-   must be set to 3  and the library must be updated.
-To do so,  if Zcondc.h is ready,
-1)  go to Cosmos/Tracking/Atmosphere
-2)  touch cstandatmos0.f
-3)  make clean; make
-This is ok for using NRLGenData.f; To compile it,
-come here and
-  make clean; make
+The programs here are for manipulating  NRL atmophere:
+  Generate data for  quick computing of atmophere profile of 
+  specifiied condisions( preiod, place )
 
-But for the entire cosmos, it is better to
-4)  remove all in Cosmos/cosmos/lib/$ARCH/*
-5)  and remake the entire library, i.e at
-    Comsmos/
-    make veryclean; make
+0)  If the current atmophere model is not NRL,  ypu must once issue
+ a command "atmosModel.sh" and select the NRL model to remake the
+ library.  
+ when you use the NRL model in your applicatoin, you need to set
+    AtmosModel = 2
+ in the input namelist (&Hparam).
+
+
     
 
 -------------

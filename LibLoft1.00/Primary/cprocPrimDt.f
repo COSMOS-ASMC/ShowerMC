@@ -72,7 +72,7 @@
       integer icon
 !
 !
-      character*12 symb
+      character(16):: symb  !  12->16 (2019/Aug/29)
       integer k,  pap, massn, chgn
       character*70 msg
       integer:: kf
@@ -91,7 +91,7 @@
       k = 1
       if(symb(1:3) .eq.  'iso')  then
 !                  read A, Z
-         read(symb(4:12), *) massn, chgn
+         read(symb(4:16), *) massn, chgn   !  12->16 2019/Aug/29
          if(massn .le. chgn) then
             write(msg,*) ' primary =',symb,
      *     ' invalid(becaus A=',massn,'<= Z=',chgn
@@ -100,7 +100,8 @@
          symb = 'iso'          
       elseif(symb(1:3) .eq.  'pdg')  then
 !                  read PDG code   ! no heavy primary
-         read(symb(4:12), *) kf
+         read(symb(4:16), *) kf !  12->16 2019/Aug/29  now heavy
+                                ! 1ry can be managed by pdg   
          call ckf2cos(kf, each%code, each%subcode, each%charge)
          symb = 'pdg'           ! erase kf code
          return !!!!!!!
@@ -152,7 +153,7 @@
       integer  icon
 !     
 !
-      character*12 symb
+      character(16):: symb  !  12-> 16  2019/Aug/29
       integer k
       character*70 msg
 

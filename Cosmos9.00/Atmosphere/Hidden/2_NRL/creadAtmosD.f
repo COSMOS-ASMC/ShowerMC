@@ -9,7 +9,7 @@
      *       any( NRL_period(3:4) < 0  ) .or.
      *       any( NRL_period(3:4) > 23 )  ) then
             write(0,*)
-     *      ' AtmosModel-3 is being used, i.e'
+     *      ' AtmosModel-2 is being used, i.e'
             write(0,*)
      *      ' you want to use NRL time-place-dependent atmosphere model'
             write(0,*)

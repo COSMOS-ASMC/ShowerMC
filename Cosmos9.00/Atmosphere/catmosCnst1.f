@@ -106,11 +106,15 @@
 !     * atmos.z(i), atmos.d0(i), atmos.a(i), atmos.b(i), atmos.H(i)
 !////////
       enddo
-      atmos%cumd(nodes) =  atmos%rho(nodes) * Hinf   ! put  very small amout
+
 !            top node must be gas.
       if( atmos%rhoc(nodes) < 0. ) then
          write(0,*) ' the top node matter is =', atmos%matter(nodes)
-         call cerrorMsg(' it is not gas', 0)  ! stop
+         write(0,*) ' it should be gas but not so '
+         write(0,*) ' For a Moon like object, put "sp" at the top'
+         stop
+      else
+         atmos%cumd(nodes) =  atmos%rho(nodes) * Hinf ! put  very small amout
       endif
 
       do i = nodes-1, 1, -1

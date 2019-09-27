@@ -143,9 +143,10 @@
                  ! too small and spline interpolation becomes NG for the 
                  ! 2nd derivative 500 m gives as good as 100 m in the stable
                  ! region. 
-      character(len=64):: line  ! 1 line should be <= 64 cha.
+      character(len=100):: line  ! 1 line should be <= 64 cha.
 
       integer:: i, icon
+
       call copenf(devno, filename, icon)
       if(icon /= 0 ) then
          write(0,*) ' file=',filename
@@ -164,25 +165,75 @@
       nsize=0
       do while ( .true. )
          read(devno,'(a)', end=100)  line
-         nsize = nsize + 1
+         if( line /= " " )  then
+            nsize = nsize + 1
+         endif
       enddo
  100  continue
 
       rewind devno
 
       nsizem = nsize - 1
-      write(0,*) ' nsize=',nsize
+      write(0,*) 'NRL atmos:  nsize=',nsize
       call cNRLalloc            ! allocate arrays
 
       call cskipComment(devno, icon)
-      do i = 1, nsize
-         read(devno, *)  h(i), den(i), temp(i)
-      enddo
-      close(devno)
+      i = 0
+      do 
+         read(devno,'(a)', end=100 ) line
+         call kcountFields(line, nf)
+         if( nf > 0 ) then
+             i = i + 1
+             if( nf ==  3 ) then
+                read(devno, *)  h(i), den(i), temp(i)            
+                locs = 0
+             elseif( nf == 4 ) then
+                read(devno, *)  h(i), den(i), temp(i), matter
+                locs =index(matter,"*")
+             else
+                write(0,*)
+     *             ' error in adata or input data creadAtmosD.fh'
+                write(0,*) ' data: ', line
+                write(0,*) ' nf=', nf
+                stop
+             endif
+             if(locs == 0 ) then
+                atmos%matter(i) = matter
+                atmos%rhoc(i) = 1.0
+             elseif(locs > 1 ) then
+                atmos%matter(i) = matter(1:locs-1)
+                read(matter(locs+1:), *) atmos%rhoc(i)
+             else
+                write(0,*) ' ivalide media spec=', matter
+                stop
+             endif
+          endif
+       enddo
+ 100   continue
+       close(devno)
+       atmos%nodes = nsize
+!         assume default is Air
+       if( atmos%matter(1) == "  " )  atmos%matter(1) = "Air"
+       do i = 2, nodes
+          if( atmos%matter(i) == " " )
+     *            atmos%matter(i) = atmos%matter(i-1)
+       enddo
+!     Count # of uniq media (normally 1; only Air)
+!     and read media data (by eprdMFfile) to be ready for EM
+!      process sampling
+       call cgetMedia
+
+       
       write(0,*) ' NRL atmospheric data has been read from'
       write(0,*)  filename
       end   subroutine cNRLdataRead
 
+      subroutine cqAtmosModel(modelno)
+      implicit none
+      integer,intent(out):: modelno
+      modelno = 2
+      end subroutine cqAtmosModel
+      
       subroutine cNRLHeaderRead(io)
       use nrl_atmos
       implicit none
@@ -193,13 +244,12 @@
 
       read(io,*) term1, term2, term3
       if( term2 /= "NRL") then
+
          write(0,*)
-     *    'NRL data is needed since ATMOSPHERE 3 is specified'
-         write(0,*)
-     *    'in Zcondc.h '    
-         write(0,*)
-     *    'For the NRL atmosphere data: 1st line must be like'
-         write(0,*) '# NRL  atmos...  but we have'
+     *        'NRL data is needed since ATMOSPHERE 2 is specified'
+         write(0, '(a)') ' The first line must be:'
+         write(0,'(a)') "# NRL atmosp..."
+         write(0,*) 'But header part of the file is:'
          write(0,'(a," ", a," ", a)') 
      *     trim(term1), trim(term2), trim(term3)
          stop
@@ -275,7 +325,7 @@
       
       integer,intent(in):: io    ! write dev #
 
-      write(io,'(a)') "# NRL atmosphere: # 3"
+      write(io,'(a)') "# NRL atmosphere: # 2"
       write(io,'(a,f10.1)')  "# lat ", glat
       write(io,'(a, f10.1)') "# long ", glong
       write(io,'(a, i3)') "# day1 ", gday1

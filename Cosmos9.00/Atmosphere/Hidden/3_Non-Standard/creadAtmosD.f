@@ -83,24 +83,24 @@
       do while(.true.)
          read(TempDev, '(a)',end=10, iostat=ios) line
 !!!!!!!!!!
-         write(0,*) ' line: ', trim(line)
+!         write(0,*) ' line: ', trim(line)
 !!!!!!!!!!!!!!!         
          call kcountFields(line, nf)
 !!!!!!!!!!
-         write(0,*) ' nf =', nf
+!         write(0,*) ' nf =', nf
 !!!!!!!!!!!!         
          if( nf > 0 ) then
             nodes = nodes + 1
-            if( nf == 4 ) then
+            if( nf == 3 ) then
                read(line, *)
-     *           atmos%z(nodes), atmos%T(nodes),
-     *              atmos%P(nodes), atmos%rho(nodes)
+     *           atmos%z(nodes), atmos%T(nodes), atmos%rho(nodes)
+!     *              atmos%P(nodes), 
                locs = 0
-            elseif( nf == 5 ) then
+            elseif( nf == 4 ) then
                read(line, *)
-     *           atmos%z(nodes), atmos%T(nodes),
-!     *           atmos%P(nodes), atmos%rho(nodes), atmos%matter(nodes)
-     *              atmos%P(nodes), atmos%rho(nodes), matter
+     *              atmos%z(nodes), atmos%T(nodes),
+     *                   atmos%rho(nodes), matter
+!     *              atmos%P(nodes), atmos%rho(nodes), matter
                locs = index(matter,"*")
             else
                write(0,*) ' error in adata or input data creadAtmosD.fh'

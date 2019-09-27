@@ -21,7 +21,10 @@ SRCS	      = qgsjet-II-04.f \
 SYSHDRS	      =
 
 all:
-	make	Checkdir $(LIBRARY) SeeSubDir "TARGET=$@"
+	make	Unfreeze	Checkdir $(LIBRARY) SeeSubDir "TARGET=$@"
+
+Unfreeze:
+	bunzip2 -kf qgsdat-II-04.bz2
 
 clean:
 	@rm -f $(OBJS) core  *~ a.out temp*.o 

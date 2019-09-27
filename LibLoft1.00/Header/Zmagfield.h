@@ -27,7 +27,10 @@
      *                   v,       ! vertical comp.(down is +)
      *                   a        ! deflection angle (deg. east is +)
 
-              endmap 
+              endmap
+	      map
+		real(8):: r(3)
+	      endmap
           endunion     
 #endif
 !  

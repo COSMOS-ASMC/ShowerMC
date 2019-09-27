@@ -35,7 +35,8 @@ module modAtmosDef
     !
   real(8),save:: AlmostVacH = 210d3   ! m
   real(8),save:: AlmostVacT   ! = 1.8d-3  !  kg/m2  will be set in
-                       !  catmosCnst1 using AlmostvacH
+  !  catmosCnst1 using AlmostvacH
+
   !
   integer,parameter:: maxnodes = 40
   ! maximum no. of nodes to express the atmosphere.
@@ -69,8 +70,8 @@ module modAtmosDef
      real*8  z(maxnodes)
      real*8  zi(maxnodes)
      real*8  T(maxnodes)
-     real*8  P(maxnodes)
-     real*8  logP(maxnodes)
+!     real*8  P(maxnodes)     removed: not used now 2019/Sep/3
+!     real*8  logP(maxnodes)
      real*8  rho(maxnodes)
      real*8  logrho(maxnodes)
      real*8  logrhoi(maxnodes) 

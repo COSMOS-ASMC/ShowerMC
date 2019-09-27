@@ -18,7 +18,7 @@
       write(0,*) '  If &Param contains "PhotoProd", please omit it'
       write(0,*) '  If &HParam contains "ALateCor", it is now '  
       write(0,*) "  integer (old one is logical);"
-      write(0,*) "  Ecrit, X0, MacChgDist must be removed"      
+      write(0,*) "  Ecrit, X0, MagChgDist must be removed"      
       write(0,*) "else examin the system message "
       write(0,*) " "
 

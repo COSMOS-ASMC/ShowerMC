@@ -19,8 +19,10 @@ SRCS	      = qgsjet-II-03.f
 SYSHDRS	      =
 
 all:
-	make	Checkdir $(LIBRARY) SeeSubDir "TARGET=$@"
+	make	Unfreeze	Checkdir $(LIBRARY) SeeSubDir "TARGET=$@"
 
+Unfreeze:
+	(cd $(LIBLOFT)/Data/QGS; bunzip2 -kf qgsdat-II-03.ascii.bz2)
 clean:
 	@rm -f $(OBJS) core  *~ a.out temp*.o 
 	make SeeSubDir "TARGET=$@"

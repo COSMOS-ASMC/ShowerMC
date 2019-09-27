@@ -11,8 +11,9 @@
 #include  "Zptcl.h"
 #include  "Zcode.h"
 !     **************************************************
-      type(ptcl)::proj
-      real*8 ctau
+      type(ptcl),intent(inout)::proj
+      real(8),intent(out):: ctau
+      real(8)::  u
 !
 !
       real*8 tcpi, tck, tcmu, tcks, tckl, tcpi0, tcd0, tcdc, 
@@ -49,8 +50,18 @@
          elseif(abs(proj%subcode) .eq. k0s) then
             ctau = tcks
          else
-            write(0,*) ' K0 subcode=', proj%subcode, ' stragne'
-            stop
+!             though vary rare, sugcode=0 could happen;
+!     assigin it;  2019/Sep/5
+            call rndc(u)
+            if(u < 0.5d0) then
+               proj%subcode =  k0l
+               ctau = tckl
+            else
+               proj%subcode =  k0s
+               ctau = tcks
+            endif
+            ! write(0,*) ' K0 subcode=', proj%subcode, ' stragne'
+            !  stop
          endif
       elseif(proj%code .eq. kmuon) then
          ctau = tcmu

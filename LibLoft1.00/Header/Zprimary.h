@@ -24,7 +24,7 @@
          type component     ! 1 component of 1ry 
            sequence
              integer label          ! composition label number
-             character*12 symb        ! 'P', 'gamma' etc
+             character*16 symb        ! 'P', 'gamma' etc  12->16 (2019/Aug/29)
              character*3 eunit        ! 'GeV' etc
              character*4 etype        ! 'KE/n' etc
              character*1 diff_or_inte   ! 'd' or 'i'
