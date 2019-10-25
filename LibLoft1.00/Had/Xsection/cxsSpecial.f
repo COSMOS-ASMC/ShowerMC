@@ -1,4 +1,3 @@
-!     next is for  Cosmos bofore version 9
 !     This is a dummy routine to avoid "unresolved external name"
 !     at link time when the user does not supply own cxsSpecial.f
 !      

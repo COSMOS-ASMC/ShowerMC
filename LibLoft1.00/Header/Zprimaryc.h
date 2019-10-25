@@ -4,7 +4,7 @@
 !
          type primaryid
            sequence
-             character*12  symb              ! 'cno' etc
+             character*16  symb              ! 'cno' etc
              integer code, subcode, charge      ! used to call cmkptc
          end type primaryid
          type eunit

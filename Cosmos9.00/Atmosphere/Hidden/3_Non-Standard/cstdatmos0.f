@@ -17,33 +17,43 @@
         real*8 a
 
 !       if(z .ne. zsave) then
-          if( z >= atmos%z(atmos%nodes) ) then
-             ans = atmos%rho(atmos%nodes)*
-     *            exp(-(z-atmos%z(atmos%nodes))/Hinf)
-          elseif(z .lt. atmos%z(1)) then
-             if( atmos%rhoc(1) < 0.) then
-                !  non- gas
-                ans = atmos%rho(1)
-             else
-                ans = atmos%rho(1)*
-     *               exp( (atmos%z(1)-z)/atmos%H(1) )
-             endif
+        if( z > atmos%z(atmos%nodes) ) then
+           if( atmos%rhoc(atmos%nodes) < 0. ) then
+                ! solid;  the top media must be gas
+              write(0,*) ' top medium=', atmos%matter(atmos%nodes)
+              write(0,*)
+     *             ' is not gas; If moon-like object, put thin "sp" '
+              write(0,*)
+     *             ' at the top part'
+              stop
+           else
+              ans = atmos%rho(atmos%nodes)*
+     *             exp(-(z-atmos%z(atmos%nodes))/Hinf)
+          endif
+       elseif(z .lt. atmos%z(1)) then
+          if( atmos%rhoc(1) < 0.) then
+!            non- gas
+             ans = atmos%rho(1)
           else
-             call kdwhereis(z, atmos%nodes, atmos%z, 1, i)
+             ans = atmos%rho(1)*
+     *            exp( (atmos%z(1)-z)/atmos%H(1) )
+          endif
+       else
+          call kdwhereis(z, atmos%nodes, atmos%z, 1, i)
 !             max i with  z>=atmos%z(i) ; i=0 -> z< lower bound
 !                         nodes-> z>=upper bound
-!                    those cases have been  checked  already in above.
-             a = atmos%a(i)
-             if( atmos%rhoc(i) < 0.) then
-                ans = atmos%rho(i)
-             elseif(a .ne. 0.d0) then
-                ans =  atmos%rho(i)*
+!                    those cases have been  checked  already  above.
+          a = atmos%a(i)
+          if( atmos%rhoc(i) < 0.) then
+             ans = atmos%rho(i) ! non gas
+          elseif(a .ne. 0.d0) then
+             ans =  atmos%rho(i)*
      *            (1+ a*(z-atmos%z(i))/atmos%H(i))**(-1.0d0-1.d0/a)
-	     else
-                ans =
-     *             atmos%rho(i) * exp(- (z-atmos%z(i))/atmos%H(i))
-            endif
-          endif 
+          else
+             ans =
+     *            atmos%rho(i) * exp(- (z-atmos%z(i))/atmos%H(i))
+          endif
+       endif 
 !          zsave = z
 !       endif
        cvh2den = ans
@@ -187,11 +197,11 @@
           else
              a = atmos%a(i)
              if(a .ne. 0.d0) then
-                ans = atmos%rho(i)*a/atmos%H(i) *
+                ans = atmos%rho(i)*a/atmos%H(i) * (-1.d0-1.0/a)*
      *          (1.0d0 + a*(z-atmos%z(i))/atmos%H(i) )**(-2.d0-1.0d0/a)
              else
-                ans =- atmos%rho(i)/atmos%H(i)* 
-     *               exp(- (z-atmos%z(i)/atmos%H(i)))
+                ans = - atmos%rho(i)/atmos%H(i)* 
+     *               exp(- (z-atmos%z(i))/atmos%H(i))
              endif
           endif
        endif
@@ -256,6 +266,7 @@
              a = atmos%a(i)
              if(a .ne. 0.) then
                 ans = atmos%rho(i)* (a/atmos%H(i))**2 *
+     *              (-1.d0-1.0/a)*(-2.d0-1.0d0/a) *
      *               (1. + a*(z-atmos%z(i))/atmos%H(i))**(-3.-1./a)
              else
                 ans = atmos%rho(i)/atmos%H(i)**2  *

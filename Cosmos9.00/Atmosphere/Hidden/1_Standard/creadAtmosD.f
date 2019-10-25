@@ -118,12 +118,12 @@
          call kcountFields(line, nf)
          if( nf > 0 ) then
             nodes = nodes + 1
-            if( nf == 4 ) then
+            if( nf == 3 ) then
                read(line, *)
      *           atmos%z(nodes), atmos%T(nodes),
      *           atmos%rho(nodes)
                locs = 0
-            elseif( nf == 5 ) then
+            elseif( nf == 4 ) then
                read(line, *)
      *           atmos%z(nodes), atmos%T(nodes),
      *           atmos%rho(nodes), matter

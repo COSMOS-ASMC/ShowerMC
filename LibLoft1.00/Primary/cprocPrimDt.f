@@ -16,7 +16,7 @@
       character*70 msg
 !
       integer i, icon
-      character*10 temp1
+      character*16 temp1
 !
       icon = 0
       prm%NoOfSamplings = EventsInTheRun ! counter, including discarded ones

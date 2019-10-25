@@ -76,26 +76,7 @@
       endif
        
       if( model /= "special" ) then
-        select case(model)
-          case( "phits" ) 
-            call cxsPhits(pj, media)
-         case( "dpmjet3" )
-            call cxsDpmjet3(pj, media)
-         case( "jam" ) 
-            call cxsJam(pj, media)
-         case( "qgsjet2" )
-            call cxsQgsjet2(pj, media)
-         case( "epos" )
-            call cxsEPOS(pj, media)
-         case( "sibyll" )
-            call cxsSibyll(pj, media)
-         case( "gheisha" ) 
-            call cxsGheisha(pj, media)
-         case("incdpm3")   
-            call cxsIncdpm3(pj, media)
-         case default
-            call cxsOther( pj, media)
-         end select
+         call cGetXsecByNonSpecial(model, pj, media)         
       endif
       if(media%xs < smallxs) then
          media%xs = smallxs
@@ -111,6 +92,47 @@
 
       end subroutine cGetXsec
 
+      subroutine cGetXsecByNonSpecial(model, pj, media)
+!      use modXsecMedia, xmedia=>media      
+      implicit none
+#include "Zcode.h"
+#include "Zptcl.h"
+!           #include "Zevhnp.h"      
+#include "Zmedia.h"      
+      character(*),intent(in):: model ! normally current active
+       ! interaction model. but  may be any valid model. 
+       ! must not be "special"
+      type(ptcl)::pj           ! input.   projectile 
+!      type(xsmedia),intent(inout):: media ! media (media%xs will be got)
+      type(epmedia),intent(inout):: media ! input/output
+
+      if( model == "special") then
+         write(0,*) ' model is ', model,
+     *   ' invalid to cGetXsecByNonSpecial'
+         stop
+      endif
+
+      select case(model)
+        case( "phits" ) 
+           call cxsPhits(pj, media)
+        case( "dpmjet3" )
+           call cxsDpmjet3(pj, media)
+        case( "jam" ) 
+           call cxsJam(pj, media)
+        case( "qgsjet2" )
+           call cxsQgsjet2(pj, media)
+        case( "epos" )
+           call cxsEPOS(pj, media)
+        case( "sibyll" )
+           call cxsSibyll(pj, media)
+        case( "gheisha" ) 
+           call cxsGheisha(pj, media)
+        case("incdpm3")   
+           call cxsIncdpm3(pj, media)
+        case default
+           call cxsOther( pj, media)
+      end select
+      end  subroutine cGetXsecByNonSpecial
 
       subroutine cxsJam(pj,  media)
 !      use modXsecMedia, xmedia=>media

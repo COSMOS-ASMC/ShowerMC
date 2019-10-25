@@ -1,6 +1,12 @@
-!  This is an unrealistic  example of cxsSpecial.
-!     next is for before Cosmos version 9
-#define BEFCOSV9
+!     This is an  example of cxsSpecial.f
+!     copy this to your own app area, and put
+!     #inlude "cxsSpecial.f"
+!     in the main application program.
+!     and
+!     make clean; make
+!      
+!     next "#define" is for before Cosmos version 9
+!      #define BEFCOSV9
       subroutine cxsSpecial(pj, media, model)
 !     Normally, in default, the hadronic intraction x-section is provided by the
 !     currently active model of hadronic interaction (event generator).
@@ -28,7 +34,7 @@
 !
 !     
 !     This program is used only when "special" is specified in XsecModel.
-
+!       
 !
 #if defined (BEFCOSV9)
       use modXsecMedia, xmedia=>media
@@ -55,22 +61,24 @@
       integer:: subc
       logical needown
       integer:: i
-
-      needown = .false.
-      subc = pj%subcode
-      needown = subc > 8 .and. pj%fm%p(4)/subc > 100.
-
-      if( .not. needown) then
-          ! use current active model for x-section
-         call cqActiveMdl(model)
-      else
-         !  my own fake x-section
-         do i = 1, media%noOfElem
-!            xs = 0.3* media%elem(i)%A**0.5 ! very small xs
-            xs = 300. * media%elem(i)%A**0.85 ! very large xs
-            media%elem(i)%nsigma = xs * media%elem(i)%No
-            sumxs = sumxs + media%elem(i)%nsigma 
-         enddo
-         media%xs = sumxs
-      endif
+!     This  example is to modify the xs to be a 1.1 times higher
+!     value of the standard procedure: i,e  XsecModel = " "
+!     which means it is same as IntModel.
+!
+      
+!      write(0,*) '  model =', model
+!     get current active int. model
+!        get current active interaction model
+      call cqActiveMdl(model)
+!      write(0,*) ' aaaaa bbbbb  cccc '
+!      write(0,*) '  model =', model
+!  get standard xs for the model
+!      get corresponding standard xs --> media%xs
+      call cGetXsecByNonSpecial(model, pj, media)
+!      write(0,*) ' original xs=', media%xs
+!         increase it by 10%      
+      media%xs = media%xs*1.1
+!     reset the model to be "special" ;without this, xs will be
+!         reset to be tandard one.
+      model = 'special'
       end
